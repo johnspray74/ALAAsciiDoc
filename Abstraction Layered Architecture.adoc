@@ -15,6 +15,8 @@
 
 John R Spray
 
+
+
 I would like to acknowledge the help of Roopak Sinha at AUT (Auckland University of Technology) in the writing of the paper for ECSA 2018 including his academic perspective. 
 
 // for web site
@@ -30,35 +32,60 @@ This article is organised as passes. The initial pass is brief and each subseque
 ---
 == Pass one - What problem does ALA solve?
 
-Before getting inside the mechanisms of how ALA works, let's explain  ALA in terms of the problem it solves.
+Before getting inside the mechanisms of how ALA works, let's explain what problems ALA solves.
 
+
+=== The Big ball of mud
+
+ALA is a high level strategy to structure code. It tells you how to organise your code so it doesn't degenerate, little by little, into a big ball of mad during it's life cycle. Architectural patterns or styles, such as Layers, Event-Driven, MVC, UML Models, Dependency Injection, Functional Programming and Object Oriented Design are insufficient to prevent a big ball of mud, as are software principles such as Single Responsibility, Liskov Substitution, Interface Segregation, and Dependency Inversion.  What is needed is a higher order organisational strategy. That strategy makes it clear where, how and why to use all these other things. 
 
 === An optimal reference architecture for certain quality attributes
 
-ALA is a way to structure code. It tells you how to organise your code so it doesn't degenerate, little by little, into a big ball of mad during it's life cycle. Architectural patterns or styles, such as Layers, Event-Driven, MVC, UML Models, Dependency Injection, Functional Programming and Object Oriented Design are insufficient to prevent a big ball of mud, as are software principles such as Single Responsibility, Liskov Substitution, Interface Segregation, and Dependency Inversion.  What is needed is a higher order organisational strategy. That strategy makes it clear where, how and why to use all these other things. That higher order strategy is ALA. 
-
-ALA is a reference structural architecture. Its structure is independent of any specific functional or non-functional requirements, so it is a general reference architecture. It is optimal for these non-functional requirements:
+ALA is a reference architecture. It is independent of any specific functional domain, so it is a general reference architecture. The reference architecture is 'optimal' for certain non-functional requirements. By optimal, I mean that it makes these qualities as good as they can be.
 
 ** Readability
 ** Complexity
 ** Maintainability
 ** Testability
 
-If other non-functional requirements are also important, ALA still provides a good starting point. Even if the ALA structure must be compromised in places, it is still better to start from that point. As it happens, the maintainability resulting from ALA frequently makes other quality attributes easy to do as well, without significantly compromising ALA's structure.
+If other non-functional requirements are also important, ALA provides a good starting point. Even if the ALA structure must be compromised for other qualities, it is still better to start with these quality attributes optimised and deviate from them as necessary. As it happens, the maintainability resulting from ALA frequently makes other quality attributes easy get as well, without significantly compromising ALA's structure. For example, in an ALA application it is often easy to make local performance optimizations that don't affect the application code. Or, you can port an application without changing the application code.  
 
-=== Readability
+=== Readability 
+
 
 [.float-group]
 -- 
 image::close_up_code.jpg[,400, title="Code quickly becomes a big ball of mud", float="right"]
 
-ALA code is always readable, not because of style, conventions, comments or documentation of the code itself, but simply because code appears as separate little programs.  
+ALA code is readable, not because of style, convention, comments or documentation, but because any one piece of code appears to you as a separate little program. ALA has zero run-time dependencies, yet does not suffer from the usual problems of indirection. 
 --
+
+
+==== Read this if you have an existing ALA application and you need to start reading the code. 
+
+
+
+You will find three folders called:
+
+* Application
+
+* DomainAbstractions
+
+* ProgrammingParadigms
+
+There should also be a readme file that points to this website.  
+
+The starting point is the Application folder. There you should find a diagram that fully describes the requirements of a specific application, and is executable. It should be quite easy to read the diagram as it only describes the requirements and does not involve itself with any implementation. It is declarative, not imperative. There should be a source file that was generated directly from the diagram. Looking at this source file may help clarify questions about how the diagram manages to actually execute.
+
+There are dependencies from the diagram in the Application folder on the abstractions in the DomainaAbstractions folder. The abstractions in the DomainAbstractions folder have no dependencies among themselves, and definitely know nothing about the application. That is why in ALA they are called abstractions rather than classes. Their abstraction level is more general than the application, and aligns with the domain. 
+
+There are dependencies from the code in the abstractions in the DomainAbstractions folder on the abstract interfaces in the ProgrammingParadigms folder. In the ProgrammingParadigms folder. You may also find some documentation about the programming paradigms that these Interfaces make possible. The abstraction level of the ProgrammingParadigms folder is more general again - the paradigms should be useful in a range of domains.  
+
 
 
 === Complexity
 
-There is a meme in the software industry that the complexity of software must be some function of its size. This need not be so. With proper use of abstraction it is possible to have complexity that is constant regardless of program size. In ALA, complexity is constant:
+There is a meme in the software industry that the complexity of software must be some function of its size. This need not be so. With proper use of abstraction it is possible to have complexity that is constant regardless of program size. ALA makes use of this.
 
 anchor:ComplexityGraph1[]
 
@@ -126,7 +153,7 @@ This is a qualitative graph comparing the complexity of an ALA application with 
 
 === Maintainability
 
-If ALA is done well, the maintainability characteristic over time should qualitatively follow the green curve in the graph below. If a project will never be maintained past about six months, it probably won't be worth doing ALA.
+If ALA is done well, the maintainability characteristic over time should qualitatively follow the green curve in the graph below. The payback for the effort to learn ALA and design an ALA applciation is enormous. If a project will has a toal life of six months or less (will never be maintained) it may not be worth doing ALA.
 
 [chart,line,file="effort_curve.png", opt="title=Effort per user-story,x-label=months"]
 --
@@ -209,30 +236,30 @@ The graph compares ALAs maintainability with a typical loosely coupled software 
 
 === Domain oriented
 
-As has been found in other techniques such such as Domain Specific Languages, Domain Driven Design, Model Driven Software Development and Language Oriented Programming, ALA is highly domain oriented. It has a method, or process that starts with describing requirements, inventing the needed domain abstractions as you go.   
+As has been found in other techniques such such as Domain Specific Languages, Domain Driven Design, Model Driven Software Development and Language Oriented Programming, ALA is highly domain oriented. It has a methodology or process that starts with describing requirements, and inventing needed domain abstractions as you go to easily describe those requirements.   
 
 
 === The software engineer's trap
 
-Typical bright young engineers come out of university knowing C++ (or another low-level imperative language that mimics the silicon), and are confident that because the language is Turing-complete, if they string together enough statements, they can accomplish anything. At first they can. Agile methods only require them to deliver an increment of functionality. There hardly seems a need for a software architect to be involved, and besides, we are told that any design errors can be corrected through incremental refactoring.
+Typical bright young engineers come out of university knowing C++ or Java (or other C*, low-level, imperative, language that mimics the silicon), and are confident that, because the language is Turing-complete, if they string together enough statements, they can accomplish anything. At first they can. Agile methods only require them to deliver an increment of functionality. There hardly seems a need for a software architect to be involved. And besides, we are told that any design be emerged through incremental refactoring.
 
 image::Cynefin.jpg[,500, title="Code can quickly get complex", float="left"]
 
-As the program gets larger, things are getting a little more complicated, but their brains still handle the complications, so they continue. One day the code transitions into the complex. Unknowingly, they have stepped into a trap. The incremental effort to maintain starts to eat away and eventually outweigh the incremental increase in value. This negative return causes the codebase itself to lose its value. Eventually it is no longer an asset to the business. 
+As the program gets larger, things are getting a little more complicated, but their brains still handle the complications, so they continue. One day the code suddenly 'transitions'. It transitions from the complicated quadrant into the complex quadrant. And now it is trapped there. It is too complex for the in-the-large refactoring that would be required to make it transition back. This pattern happens over and over again in almost all software. The incremental effort to maintain starts to eat away and eventually outweigh the incremental increase in value. This negative return causes the codebase itself to eventually have a negative value, and no longer be an asset to the business. 
 
-When a new bright young engineer who knows C++ arrives, he looks at the legacy codebase and is convinced (mostly by Dunning-Kruger bias) that he can do better. And the cycle starts over. This is the CRAP cycle (Create, Repair, Abandon, rePlace).
+When a new bright young engineer who knows C* arrives, he looks at the legacy codebase and is convinced (mostly by Dunning-Kruger bias) that he can do it right. And the cycle starts repeats. This is the CRAP cycle (Create, Repair, Abandon, rePlace). ALA is the only method I know that can prevent the CRAP cycle.
 
 === My story
 
-From early on in my career, stuck in the CRAP cycle, I wanted a pre-worked generally applicable 'template architecture' that would tell me what the organisation of the code should look like, so that I could concentrate on implementing the functional requirement. I searched for such a thing many times. In my searches, I would find things like 'loose coupling', and I remember asking myself, yes but how does one accomplish that?
+From early on in my career, I experienced the CRAP cycle many times. Each time I wanted to find a way to not fall into it. I would read and use all the architectural styles and principles I could find. I would find things like 'loose coupling', and I remember asking myself, yes but how does one accomplish that?, and still fail. I started searching for a pre-worked, generally applicable, 'template architecture' that would tell me what the organisation of the code should look like. I searched for such a thing many times. I never found one. 
 
-Forty years worth of mistakes later, I finally have what I wanted. The turning point was when I noticed a two (accidental) successes. These successes were only noticed years later, 15 years in one case and 5 years in the other. They had both undergone considerable maintenance during that time. But their simplicity had never degraded and their maintenance had always been straightforward. It was like being at a rubbish dump and noticing two pieces of metal that had never rusted.
+Forty years worth of mistakes later, I finally have that template. The turning point was when I noticed two (accidental) successes in parts of two projects. These successes were only noticed years later, 15 years in one case and 5 years in the other. They had each undergone considerable maintenance during that time. But their simplicity had never degraded and their maintenance had always been straightforward. It was like being at a rubbish dump and noticing two pieces of metal that had never rusted. You wonder over to the metal and ask, what is going on here?
 
 One of them had the same functionality as another piece of software that I had written years earlier. That software was the worst I had ever written. It was truly a big ball of mud, and maintenance had become completely impossible, causing the whole product to be abandoned. So it wasn't what the software did that made the difference between good and bad. It was how it was done.
 
-Analysing the common properties of those two code bases, which no other pieces of our software had, caused the beginnings of ALA.
+Analysing the common properties of those two code bases, which no other pieces of our software had, caused the insight of ALA.
 
-As I wrote it down, more and more pieces seemed to fit into place. How it worked made more and more sense. Subsequently, I ran some experiments to see if the quality attributes could be predictably reproduced. These experiments are discussed in detail later in this article.
+As I wrote it down, more and more pieces seemed to fit into place. How it worked made more and more sense. Subsequently, I ran some experiments to see if the quality attributes could be predictably reproduced. These experiments, which have worked spectacularly well so far, are discussed later in this article.
 
 
 === Overwhelming software architecture styles, patterns & principles
@@ -242,26 +269,26 @@ Currently the problem of structuring software code to meet these quality attribu
 * Complexity, Understandability, Readability, Maintainability, Modifiability, Testability, Extensibility, Dependability, Performance, Availability, Scalability, Portability, Security, usability, Fault-tolerance
 * Views, Styles, Patterns, Tactics, Models, UML, ADL's, ADD, SAAM, ATAM, 4+1, Decomposition
 * CBD/CBSE, C&C, Pipes & Filters, n-tier, Client/Server, Plug-in, Microservices, Monolithic, Contracts, Message Bus
-* Module, Component, Layer, Class, Object, Abstraction, Granularity 
+* Modules, Components, Layers, Classes, Objects, Abstraction, Granularity 
 * Information hiding, Separation of Concerns, Loose Coupling & High Cohesion 
 * Semantic coupling, Syntax coupling, Temporal coupling, existence coupling, Dependencies, Interactions, Collaboration
 * Interfaces, Polymorphism, Encapsulation
-* Execution models, Event-Driven, Multithreaded, Mainloop, Data-driven, Concurrency, Reactor pattern 
+* Execution models, Event-Driven, Multithreaded, Mainloop, Data-driven, Concurrency, Reactor pattern, Race condition, Deadlock, Priority Inversion, Reactive 
 * Principles: SRP, OCP, LSP, ISP, DIP; MVC, MVP, etc 
 * Design Patterns: Layers, Whole-Part, Observer, Strategy, Factory method, Wrapper, Composite, Decorator, Dependency Injection, Callbacks, Chain of Responsibility, etc
 * Expressiveness, Fluency, DDD, Coding guidelines, Comments, Documentation 
-* Programming Paradigms, Imperative, Declarative, OO, Activity-flow, Work-flow, Data-flow, State machine, GUI layout, Navigation-flow, Data Schema, Functional, FRP, RX, Monads, AOP, Polyglot-Programming Paradigms
+* Programming Paradigms, Imperative, Declarative, OO, Activity-flow, Work-flow, Data-flow, State machine, GUI layout, Navigation-flow, Data Schema, Functional, Immutable objects, FRP, RX, Monads, AOP, Polyglot-Programming Paradigms
 * Messaging: Push, Pull, Synchronous, Asynchronous, Shared memory, Signals & Slots
 * Memory management, Heap, Persistence, Databases, ORMs
 * Up-front design, Agile, Use cases, User stories, TDD, BDD, MDSD
 
-Mastering all these topics takes time and experience. Even if you can master them, juggling them all and being able to use the right ones at the right time, while also mastering technologies and tools, and all the time sprinting is a big ask. In today's Agile world, working code is what the team is judged on, especially by project managers or product owners who have no interest in architecture. They often don't want to know about any attempts to inform them, such as the rather negative sounding term "technical debt". Usually all this pressure for short term gains means that software architecture is neglected. 
+Mastering all these topics takes time. Even if you can, juggling them all and being able to use the right ones at the right time, while also mastering technologies and tools, while all the time doing agile sprints is a big ask. In today's agile world, very short term working code is what the team is judged on, especially by project managers or product owners who have no direct interest in architecture. They often don't want to know about the Definition of Done or be involved in the management of (the rather negative sounding term) "technical debt". The overwhelming nature of the knowledge base combine with the rewards of quick 'working' code usually means that software architecture is neglected. 
 
 === Pre-solved recipe of architectural styles, patterns and principles  
 
 ALA works by pre-solving for many of these software engineering topics as far as possible without knowing the functional requirements. The result is a reference architecture that gives you meta-structure and some important constraints, especially on what relationships you can and can't have in that structure. 
 
-Consequently, ALA contains no truly novel ideas. Instead it is a recipe based on the aforementioned overwhelming list of software engineering topics. Some ingredients are added in much larger quantity than in conventional software design (such as abstraction). Some are relatively neutral. And there are a few big ones that it surprisingly excludes. Like any good recipe, the ingredients work together to form a whole that is much greater than the sum of parts. That whole makes improvements to quality significantly greater than the incremental improvements that any single topic would be used alone. It continues to surprise me just how effective it is. The big surprise for me was the few very well-established memes in software engineering that the ALA structure says is wrong. We will get to these one at a time in the subsequent passes.
+Consequently, ALA contains no truly novel ideas. Instead it is a recipe based on the aforementioned overwhelming list of software engineering topics. Some ingredients are added in much larger quantity than you might expect (such as abstraction). Some are relatively neutral. The biggest surprise for me were the well-established memes in software engineering that ALA says are wrong. We will discuss these one at a time in subsequent passes. Like any good recipe, the ingredients work together to form a whole that is greater than the sum of parts. That whole makes improvements to quality significantly greater than the incremental effects of the topics used independently. It continues to surprise me just how effective it is. 
 
 === The first few strokes
 
@@ -269,37 +296,32 @@ As a software engineer contemplating a new project, I have often asked myself "W
 
 Christopher Alexander, the creator of the idea of design patterns in building architecture, said, "As any designer will tell you, it is the first steps in a design process which count for the most. The first few strokes which create the form, carry within them the destiny of the rest".
 
-In an Agile world, where every stage of software development, including architecture, is emerges from iterative sprints, this wisdom has been lost. ALA restores that wisdom to software development, and gives the software architect the exact process to follow for that piece of up-front design in sprint zero. No more than one sprint is required to do the architecture, regardless of the size of the project.
+In an Agile world, where every stage of software development, including architecture, emerges from iterative sprints, this wisdom has been lost. ALA restores that wisdom to software development, and gives the software architect the exact process to follow for that piece of up-front design in sprint zero. No more than one sprint is required to do the architecture, regardless of the size of the project.
 
-I believe the result of those first few strokes of the design would never be arrived at by the agile process. Furthermore, once this architecture is done, the Agile process works significantly better thereafter. And my experience so far over several projects is that the architecture does not need to change as the development proceeds. 
-
-
-
-
-
+I believe the result of those first few strokes of the design would never be arrived at by an agile process. Furthermore, once this architecture is done, the Agile process works significantly better thereafter. And my experience over several projects so far is that the architecture does not need to change as the development proceeds. 
 
 
 === Example project - Functional composition
 
-In this example, we use 'functional composition' because it is the easiest programming paradigm to use ALA. However, keep in mind that functional composition is not a suitable programming paradigm for most programs. It only suits when the problem requires dedicated CPU to process a job as fast as it can in computer time. Nothing else ever needs doing while that is being done, and we never have to wait for anything else while it is being done. Nevertheless, this is often the case for very small parts of programs, so it's still worth applying ALA to functional composition at this micro scale.
+In this example, we use 'functional composition' because it is the easiest programming paradigm to use ALA. However, keep in mind that functional composition is not a suitable programming paradigm for most programs. (It only suits when a problem requires dedicated CPU to process a job as fast as it can in computer time, nothing else needs doing while this is happening, and it doesn't have to wait for anything while it is being done. Nevertheless, this is often the case for very small parts of programs, so it's still worth applying ALA to functional composition at this micro scale.
 
 Functional composition means composing with function calls. Applying ALA to functional composition means four things:
 
-*  Make every function an abstraction
+*  Every function must be an abstraction
 
-For our purpose here, an abstraction means that our brain can easily learn (preferably by reading the function name or a comment) and retain what a function essentially does. It means that when other programmers are reading your code where a function is called, they stay reading that code and don't have to go and find the function to read code there as well. It could be one simple thing like filter, or get an ADC reading. The name of the function would not be generic ProcessData, or CalculateResult. It would not be the name of the event that caused it to be executed like PulseComplete. The first two just separate code without saying what the abstraction is. The last one is just a place where you put everything that must be done now. 
-
-*  Keep function call tree depth shallow
-
-Often only two levels will be used. The top level corresponds to the detail level of a specific application. The second level corresponds to the abstraction level of the domain.
+For our purpose here, an abstraction means that our brain can easily learn (by reading the function name or a comment) and retain what a function essentially does. It means that when other programmers are reading your code where a function is called, they never have to 'follow the indirection', they can stay with the code unit they are in, they don't have to go and find the function to read code there as well. It should be one simple thing like filter, or get an ADC reading. The name of the function would not be generic ProcessData, or CalculateResult. It would not be the name of the event that caused it to be executed like PulseComplete. They separate a concern but  without abstraction. 
 
 * Abstraction level increases as you go down the levels
 
-The abstraction level should move away from the specifics of the application at the top level, toward more ubiquitous, more reusable, and more stable functions. So the 2nd level should have the abstraction level of the domain. The 3rd level has the abstraction level of the types of programming problems being solved, such as using third party libraries or what's often referred to as middleware, or writing their equivalents ourselves. For completeness, a 4th level would be the library that comes with your language. 
+The abstraction level should move away from the specifics of the application at the top level, toward more ubiquitous, more reusable, and more stable functions. The 2nd level should have the abstraction level of the domain. The 3rd level should have the abstraction level of the classes of programming problems being solved, such as using third party libraries or what's often referred to as middleware, or writing their equivalents ourselves. For completeness, a 4th level would be your programming language library. No where in these levels is the underlying hardware, nor data. Hardware and data are not abstractions. Later we will see where they go, but for now forget all preconceived notions of layers being built on top of runtime essentials such as hardware or data.  
+
+*  Keep function call tree depth shallow
+
+Often only two levels will be used. The top level corresponds to the detail level of a specific application. The second level corresponds to the abstraction level of the domain. A process of factoring out common code will lead to too many levels and non-abstractions.
 
 * Keep depth levels at discrete levels of abstraction
 
-A function that doesn't clearly belong at one of those abstractions may be straddling two levels. Refactor so that application specifc details go to the level above, and something more abstract and reusable goes below it.
+A function that doesn't clearly belong at one of those abstraction levels may be straddling two levels. This causes all code to have knowledge of requirements. Refactor the function so that application specifc details go to the level above, and an abstract, reusable in the domain function goes below it.
 
 Let's look at some bad code that breaks each of these constraints and then the corresponding code that fixes them. 
 
@@ -324,7 +346,7 @@ Let's look at some bad code that breaks each of these constraints and then the c
  void ProcessTemperature(temperature)
  {
     temperature = (temperature + 4) * 8.3;  <4>
-    SmoothAndDisplay(temperature);  <5>
+    Smooth(temperature);  <5>
  }
 
 .smooth.c
@@ -340,10 +362,10 @@ Let's look at some bad code that breaks each of these constraints and then the c
 <1> function name abstraction level incorrect - name is specific to application instead of domain
 <2> implementation details that should be in a domain abstraction
 <3> function name doesn't describe an abstraction
-<4> detail should have an abstraction for offsetting and scaling
+<4> details such as 4 and 8.3 are specific to application. They destroy a potential abstraction
 <5> function composition in wrong level (should be called from application level which knows this needs doing)
 <6> function has two abstractions (responsibilities)
-<7> detail should be an abstraction (and keep consistent terms)
+<7> details such as 2 are specific to application. They destroy a potential abstraction
 <8> function composition too deep (should be called from application level)
 
 
@@ -387,33 +409,32 @@ Let's look at some bad code that breaks each of these constraints and then the c
  }
 
 <1> Application is readable on it's own without having to go and read code inside any of the abstractions it uses.
-<2> The application fully expresses the requirements, and does nothing else, delegating all the actual work to the abstractions. Only the application knows about the thermometer. Application knows nothing of the how the abstractions work, only what they do.
-<3> None of the abstractions used know anything about each other or anything about the application itself - they don't know for example about the thermometer.
-<4> Application knows the requirement detail of how many adc readings for each temperature display update.
-<5> Application knows conversion offset and factors from adc to Celcius but not how to do offsetting and scaling.
-<6> Application knows filtering configuration but not how to actually do filtering.
-<7> Filter is a good abstraction despite having a side effect
+<2> The application describes the requirements, all of the requirements, and does nothing else. It delegates all the actual work to domain abstractions. Only the application knows it is a thermometer. The application knows nothing of how the abstractions work, only what they do.
+<3> None of the abstractions know anything about each other or anything about the application - they don't know they are being used in a thermometer.
+<4> Application knows the requirement detail of how many ADC readings are needed for each temperature display update.
+<5> Application knows conversion from ADC to Celcius but not how to do offsetting and scaling.
+<6> Application knows filtering configuration but not how to do filtering.
+<7> Emphasis is on abstraction not just side effects. Filter is a good abstraction despite having a side effect.
 
-Remember that while instances of abstractions can be composed perfectly well with functional composition, it is not generally a good programming paradigm or execution model, especially as a program scales up in size. We have used it here to demonstrate ALA in familiar easy code, but we won't get far doing everything with functions. The problem is that functional composition forces the execution flow to follow exactly the composition flow (the instances of abstractions we have composed together). This only suits a narrow range of problems. Usually we will need to use ALA in other programming paradigms and execution models that separate execution flow from the composition flow. All the other examples to follow will do this.
+Remember that while instances of abstractions can be composed perfectly well with functional composition, it is not generally a useful programming paradigm or execution model. We have used it here to demonstrate ALA in familiar, easy code, but we won't get far doing everything with functions. The problem is that functional composition forces the execution flow to follow exactly the composition flow. This only suits a narrow range of problems. Usually we will need to use ALA in other programming paradigms (execution models) that separate execution flow from composition flow. For example, the most common programming paradigm we will use is Data-flow - when we compose domain abstractions together, we mean that data will later pass between them. All the examples to follow will use a range of different programming paradigms and consequently consequently composition will mean different types of flows.
 
 
 == Pass two - What is ALA?
 
-In this section we give some different perspectives to try to explain what ALA is. Because we all have different experiences, and different hooks on which we hang new ideas, we need different perspectives to 'get' the insight. Find one or two that best explain the insight for you. Don't worry about the ones that don't make sense. 
+In this section we give some different perspectives to try to explain what ALA is. Because we all have different experiences, and different hooks on which we hang new ideas, we need different perspectives to 'get' the insight. Find one or two that best explain the insight for you. Don't worry about the ones that don't make sense to you. 
 
  
 
 === Abstraction Layers
 
-This first perspective is the most difficult to understand because it is the most abstract perspective we will use. I introduce it first because it is the essence of ALA and what gives it its name and its structure. We will spend most of this article understanding it until it is second nature. 
-
+This first perspective is the most difficult to understand because it is the most abstract perspective we will use. I introduce it first because it is the one that most differentiates ALA, and gives ALA it its name and structure. 
 The diagram shows the abstraction layers:
 
 image::Layers.png[Layers diagram, title="The four ALA layers", width=75%]
 
-The first problem in understanding abstraction layers is understanding what abstraction means. Unfortunately the software industry has misused the word because it always sees hardware at the bottom, and since hardware is 'concrete', it must be the least abstract and as we build things on top of the hardware we must get more abstract. This is completely wrong if we use the original meaning of the word 'abstract'. A later section goes into depth on what 'abstract' means. For now, just suspend everything you think you know about abstraction, and everything you know about layers. In ALA, the hardware is never at the bottom.
+The first problem in understanding abstraction layers is understanding what abstraction means. Unfortunately the software industry has misused the word to the point where we get things upside down. This comes about because it sees hardware or data at the bottom, and since hardware and data are 'concrete', it must be the least abstract and so as we build things on top that hardware or data, we must get more abstract. This is completely wrong. A later section goes into depth on what 'abstract' means. For now, just suspend everything you think you know about abstraction, and everything you know about layers. In ALA, neither the hardware nor the data is at the bottom.
 
-Becasue this perspective doesn't really connect with anything you already know, we will just list three key takeaway points that will gradually become clearer as you reads other parts of this article.
+Because this perspective doesn't really connect with anything you already know, we will just list three key takeaway points that will gradually become clearer as you get used to them in later parts.
 
 . In ALA the only dependencies you are allowed are instances of abstractions (shown as green arrows on the diagram) and referred to as 'knowledge dependencies'.
 
@@ -426,18 +447,15 @@ Becasue this perspective doesn't really connect with anything you already know, 
 
 If I had just two minutes to explain what ALA is, this is the perspective I would use: 
 
-This first perspective puts the focus on your input information - the requirements. ALA is an architecture for directly expressing requirements. And having expressed those requirements, it is executable. Instead of having requirements capture and software as two documents with two sources of truth, ALA combines them into a single document and a single source of truth. 
-
-BDD (Behavioural Driven Design) does something similar, but only achieves it for requirements and their tests. ALA goes one step further and makes the expressed requirements also the executable source code.
-
+This perspective puts the focus on your input information - the requirements. ALA is a methodology that directly describes requirements. And, having described those requirements, it is executable. Instead of having requirements capture and software as two documents with two sources of truth, ALA combines them into a single document and a single source of truth. BDD (Behavioural Driven Design) does something similar, but only achieves it for requirements and their tests. ALA goes one step further and makes the expressed requirements also the executable source code.
 
 ===== Executable Architecture
 
-Although the ALA method is to express the requirements, this process produces the architecture or the design. (I do not make a distinction between architecture and design.) ALA isn't just executable functional requirements, it is executable architecture.
+As well as being a description of the requirements, and an executable, the document is also the architecture or the design. (I do not make a distinction between architecture and design.) ALA isn't just an executable requirements description, it is executable architecture.
 
 === Agility
 
-ALA is inherently optimally agile. By agile, we mean it's easy to change the functional requirements. ALA achieves this in its highest level separation of concerns. This primary separation is code that just expresses requirements from code concerned with any kind of implementation. The implementation code never has knowledge of any specific requirement, so it doesn't change as requirements change. Only the code that expresses requirements needs to change, and that code has no details other requirements and so is optimally minimal. ALA is the means and method of making this separation possible.
+Apart from an iteration zero, ALA is inherently optimally agile. By agile, we mean it's easy to change the functional requirements. ALA achieves this in its highest level separation of concerns. This primary separation is code that just describes requirements from code that just does implementation. The implementation code never has knowledge of any specific requirement, so it generally doesn't change when requirements change. Only the code that describes requirements needs to change, and that code is optimally minimal over requirements, and so is optimally agile over changes to requirements.
 
 === Abstractions and relations of their instances
 
@@ -450,7 +468,7 @@ Consider this phrase, often found near definitions of software architecture.
 [red]#*elements*# and _their_ [red]#*relations*#.
 ====
 
-Notice the word 'their', which I have italicised to emphasis that the relations are inferred to be between the said elements. It implies that the elements know something about each other. It implies they collaborate. This is really bad meme we are perpetuating as it is what leads to complex software. It is completely unnecessary. 
+Notice the word 'their', which I have italicised to emphasis that the relations are inferred to be between the said elements. It implies that the elements know something about each other. It implies they collaborate. This is a really bad meme. 
 
 Here are some examples of this meme you can find in software engineering literature:
 
@@ -484,15 +502,15 @@ This seemingly subtle shift causes a complete change in the structure of the arc
 
 ==== The problem with "Elements and their relations"
 
-An architecture based on "elements and their relations" generally turns out like this:
+An architecture based on "elements and their relations" generally turns out something like this:
 
 image::Slide8.jpg[Elements and their relations, title="Elements and their relations", align="center"]
 
-The figure above shows five elements (as modules) and their relations (as interactions). Study almost any piece of software, and this is what you will find.
+The figure shows five modules (or classes) and their relations (as interactions). Study almost any piece of software, and this is what you will find.
 
-The structure generally can be viewed as 'clumping'. Like galaxies, certain areas have higher cohesion and other areas are loosely coupled, but the difference is only one of degree.
+The structure generally can be viewed as 'clumping'. Like galaxies, certain areas have higher cohesion, and so go in boxes. other areas are loosely coupled, and so in lines. The difference is only one of degree.
 
-Software health in this type of architecture is effectively management of dependencies. This dependency management has two conflicting forces. One is the need to have interactions to make the modules work as a system. The other is to minimize the interactions to keep the modules as cohesive and loosely coupled as possible. As maintenance proceeds, the number of interactions inevitably increases, and the interfaces get fatter. the clumping is gradually compromised.
+Software health in this type of architecture is effectively management of dependencies. This dependency management has two conflicting forces. One is the need to have interactions to make the modules work as a system. The other is to minimize the interactions to keep the modules as cohesive and loosely coupled as possible. As maintenance proceeds, the number of interactions inevitably increases, and the interfaces get fatter. The clumping is gradually compromised.
 
 Various architectural styles are aimed at managing this conflict. Most notably:
 
@@ -503,7 +521,7 @@ Various architectural styles are aimed at managing this conflict. Most notably:
 . Avoid high fan-in and high fan-out on a single module.
 . Avoid dependencies on unstable interfaces.
 
-Note that none of this 'dependency management' really avoids circular coupling. To some extent there will always be 'implicit coupling' in this type of architectural structure, because inevitably the modules must collaborate. A function, for example, will be written to do what it's caller requires even if it shows no explicit dependency in its code. Circular dependencies may be avoided at compile-time, but will still be present at design-time, even if one or other of the modules has a good interface. That is why in the diagram above, dependencies are drawn from the insides of each of the modules. This indicates that the code inside has some inherent collaborative coupling.
+Note that none of this 'dependency management' really avoids circular coupling. To some extent there will always be 'implicit coupling' in this type of architectural structure, because inevitably the modules must collaborate. A function, for example, will be written to do what it's caller requires even if it shows no explicit dependency in its code. Circular dependencies may be avoided at compile-time, but will still be present at design-time, even if one or other of the modules has an interface. That is why in the diagram above, dependencies are drawn from the insides of each of the modules. This indicates that the code inside has some inherent design-time collaborative coupling.
 
 
 ==== Abstractions and relations of their instances
@@ -512,7 +530,7 @@ When you use abstractions instead of modules, the qualitative difference is that
 
 image::Slide9.jpg[Abstractions do not interact, title="Abstraction do not interact", align="center"]
 
-The word 'modules' has been changed to the word 'abstractions'. All the dependencies are gone. And with them all their problems, and all their management. The implicit coupling that we talked about earlier is also gone. It not longer has a 'clumping' structure.
+The word 'modules' has been changed to the word 'abstractions'. All the dependencies are gone. And with them all their problems, and all their management. The implicit coupling that we talked about earlier is also gone. It not longer has a 'clumping' structure. loose coupling is replaced with zero coupling.
 
 The obvious question now is how can the system work? Where do all the interactions we had before go? The answer is they go inside one additional abstraction:
 
@@ -522,13 +540,13 @@ Interactions or collaboration should never be implemented in your abstractions. 
 
 At this point, some people are looking for the flaw in the argument. Surely those dependencies have just moved somewhere else? How can we have got this so wrong for so long. 
 
-Consider two well established software abstractions. Lets pick and if statement and a an assignment statement. You would have often composed together two instances of these to make a specific user story. The abstractions "if statement" and "assignment statement" don't have any knowledge of each other. The interaction between the instances only happens inside your module, the more specific one that knows about the user story. 
+Consider two well established software abstractions - the 'if statement' and the 'assignment statement'. You would have often composed together two instances of these to make a specific user story. The abstractions 'if statement' and 'assignment statement' don't have any knowledge of each other. The interaction between the instances only happens inside your module, the more specific one that knows about the user story. 
 
-Now imagine that you didn't have the the if statement and the assignment statement abstractions when you started. So you started writing an if statement module. Then, from inside that module, you connected it to your assignment statement module. And the assignment statement module, you just made it do what the if statement module needed, just a specific variable. Imagine the opportunity you missed to invent those two abstractions. The two modules you wrote are useless for anything else. And to understand the user story you must understand the insides of both of them, because they collaborate. 
+Now imagine that you didn't have the if statement and the assignment statement abstractions when you started. So you started writing an if statement module. Then, from inside that module, you connected it to your assignment statement module. And the assignment statement module, you just made it do what the if statement module needed, just a specific variable. Imagine the opportunity you missed to invent those two abstractions. The two modules you wrote are useless for anything else. And to understand the user story you must understand the insides of both of them, because they collaborate. 
 
-But if you invent the two abstractions, the user story, being just a simple composition of instances of the two, is extraordinarily simple. And the abstractions themselves know nothing of each other, so each of them is simple too. This is the opportunity we are missing, all the time everywhere, just because of the wording of those memes we listed above.
+But if you invent the two abstractions, the user story, being just a simple composition of instances of the two, is extraordinarily simple. And the abstractions themselves know nothing of each other, so each of them is simple too. This is the opportunity we are missing, all the time, everywhere in our code, just because of the wording of those memes we listed above.
 
-Imagine the impact this change has. Instead of managing dependencies, which has been the primary focus of software engineering, they are completely gone! We have only one type of dependency left - "an instance of an abstraction". This dependency type turns out to be a good one, a very good one, for it is the one our brains use to understand complicated things. And it turns out that it's just enough dependency to make the system work. Software engineering should not be 'managing dependencies'. It should be 'inventing abstractions'.  
+Imagine the impact this change has. Instead of managing dependencies, which has been the primary focus of software engineering, they are completely gone! We have only one type of dependency left - "an instance of an abstraction". This dependency type turns out to be a good one, a very good one, for it is the one our brains use to understand complicated things such as the world around us. And it turns out that it's just enough dependency to make the system work. Software engineering should not be 'managing dependencies'. It should be 'inventing abstractions'.  
 
 === Real world metaphors
 
@@ -542,13 +560,34 @@ Instances can be composed to make a molecule:
 image:water_molecule.jpg[Water molecule, 300, title="Water molecule"]
 
 
-If water was implemented in the same way we typically write software, there would be no water molecule, and the oxygen molecule would be modified to instantiate hydrogen atoms and interact with them. Even if dependency injection is used to avoid the instantiating, it is still unlikely that a water abstraction would be invented to do that, and there still be the problem of the oxygen module being modified to interact with hydrogen's interface. Either way, the oxygen module ends up with some implicit knowledge of hydrogen. And hydrogen probably ends up with some implicit knowledge of oxygen in providing what it needs. 
+If water was implemented in the same way we typically write software, there would be no water molecule, and the oxygen molecule would be modified to instantiate hydrogen atoms and interact with them. Even if dependency injection is used to avoid the instantiating, it is still unlikely that a water abstraction would be invented to do that, and there still be the problem of the oxygen module being modified to interact with hydrogen's specific interface. Either way, the oxygen module ends up with some implicit knowledge of hydrogen. And hydrogen probably ends up with some implicit knowledge of oxygen in providing what it needs. 
 
-This implicit knowledge is represented by the following diagram. The lines are shown coming from the inner parts of the modules to represent implicit knowledge of each other.
+This implicit knowledge is represented by the following diagram. The relationship is shown coming from the inner parts of the modules to represent implicit knowledge of each other.
+
+[plantuml,file="diagram-o-h.png"]
+----
+@startdot
+digraph foo {
+graph [rankdir=LR]
+subgraph cluster_o { 
+style="rounded"
+margin="16"
+Oxygen [style="setlinewidth(0)"]
+}
+subgraph cluster_h { 
+style="rounded"
+margin="16"
+Hydrogen [style="setlinewidth(0)"]
+}
+edge [color=red]
+Oxygen -> Hydrogen [dir="both", arrowhead="dot", arrowtail="dot"]
+}
+@enddot
+----
 
 
 
-While oxygen and hydrogen are modules, as abstractions they are destroyed because oxygen now comes with two hydrogen and cant be used as a building block type for any other types of modules.
+While oxygen and hydrogen are modules, they are not abstractions because oxygen is implicitly tied to hydrogen and vice-versa. They can't be used as building blocks for any other molecules.
 
 To keep the oxygen as abstract as it is in the real world, an interface must be conceived that is even more abstract than oxygen or hydrogen. In the molecule world this is called a polar bond.
 
@@ -557,7 +596,7 @@ The corresponding software would look like this:
 
 image::Slide15.jpg[, title="", align="center"]
 
-The water molecule has "uses instances of" relationship with the two atoms, and the atoms have "uses instances of" relationships with the even more ubiquitous polar bond. Polar bond is an axample of what we call an 'abstract interface'.
+The water molecule has "uses instances of" relationship with the two atoms, and the atoms have "uses instances of" relationships with the even more abstract polar bond. Polar bond is an example of what we call an 'abstract interface'.
 
 ==== Lego
 
@@ -565,7 +604,7 @@ The second real world meatphor is Lego. Shown in the image below is the same thr
 
 image::Slide16.jpg[, title="", align="center"]
 
-The abstractions are the various lego pieces, instances of which can be assembled together to make things. Lego pieces themselves have instances of an abstract interface, which is the stud and tube. There is a second abstract interface, the axle and hole. We also call the abstract interface the 'execution model' and here with the lego metaphor we start to see why it can be thought of in this way - when the model roles, the axle and hole interface executes.
+The domain abstractions are the various lego pieces, instances of which can be assembled together to make things. Lego pieces themselves have instances of an abstract interface, which is the stud and tube. There is a second abstract interface, the axle and hole. We also call the abstract interface the 'execution model' and here with the lego metaphor we start to see why it can be thought of in this way - when the model runs, the axle and hole interface executes.
 
 ==== Electronic schematic
 
@@ -577,13 +616,13 @@ In this domain, the abstract interfaces (execution models) are both digital sign
 
 ==== A clock
 
-The forth and final real world metaphor is a clock. Here we show composition of abstractions to make new abstractions as a process. The process is a circle because instances of the new abstraction can themselves be used to make still more specific abstractions. Each time around the circle adds one layer to the abstraction layering.
+The forth and final real world metaphor is a clock. In this diagram, we show the process of composition of abstractions to make a new abstraction. The process is a circle because instances of the new abstraction can themselves be used to make still more specific abstractions. Each time around the circle adds one layer to the abstraction layering.
 
 image::Slide18.jpg[, title="", align="center"]
 
-To go round the circle once, we start with abstract versions parts such as cog wheels and hands. Instances of these have abstract ways they can interact, such as fitting on axles and meshing teeth. The next step is to instantiate some of these abstractions and configure them. For example, configure the size and number of teeth of the cog wheels. Next comes the composition step, where they are assembled. Finally we have a new abstraction, the clock. Instances of them can be used to know when to do things during your day, but that is a whole different abstraction. 
+To go round the circle once, we start with abstract parts such as cog wheels and hands. Instances of these have abstract interfaces that allow them to interact at run-time, such as spnnin on axles and meshing teeth. The next step is to instantiate some of these abstractions and configure them. For example, configure the size and number of teeth of the cog wheels. Next comes the composition step, where they are assembled. Finally we have a new abstraction, the clock. Instances of them can be used to know when to do things during your day, but that is a whole different abstraction. 
 
-There are many other instances of this pattern in the real world, and in nature. In fact almost everything is composed in this way, or is understood by such composition.
+There are many other instances of this pattern in the real world, and in nature. In fact almost everything is composed in this way.
 
 === Example project - Ten-pin bowling
 
@@ -604,7 +643,7 @@ The ten-pin bowling problem is a common coding kata. Usually the problem is just
 ----
 
 
-The ALA method starts by "expressing the requirements in terms of abstractions that you invent". When we start expressing requirements of ten-pin bowling, we immediately find that "a game consists of multiple frames", and a "frame consists of multiple balls". Let's invent an abstraction to express that "multiplicity". Lets call it a "Frame".  Instances of Frame can be wired together to make a "ConsistsOf" relationship. So lets invent an abstract interface to represent that, and call it 'IConsistsOf'.
+The ALA method starts by "describing the requirements in terms of abstractions that you invent". When we start describing the requirements of ten-pin bowling, we immediately find that "a game consists of multiple frames", and a "frame consists of multiple balls". Let's invent an abstraction to express that. Let's call it a "Frame". Instances of Frame can be wired together to make a "ConsistsOf" relationship. So let's invent an abstract interface to represent that, and call it 'IConsistsOf'.
 
 Here is the diagram of what we have so far.
 
@@ -644,23 +683,21 @@ game -> frame -> ball [label = "ConsistsOf"]
 @enddot
 ----
 
-The Frame abstraction is configured with a lambda function to tell it when to stop. These lambda functions are written inside the Frame instances. A Frame will tell its parent it is complete when the lambda expression is true and the last child Frame is complete. 
+The Frame abstraction is configured with a lambda function to tell it when to stop. These lambda functions are written inside the boxes of the Frame instances. The Frame works like this. It will tell its parent it is complete when both the lambda expression is true and its last child Frame is complete. We have also added a SinglePlay abstraction. 
 
-The idea of the Frame abstraction is that at run-time it will form a composite pattern when as runs. As each down-stream child frame completes, a Frame will copy it to start a new one. This will form a tree structure where the "game" will end up with 10 "frames", and the frame will end up with one, two or three SinglePlays. In other words, it will form a tree. 
+The idea of the Frame abstraction is that at run-time it will form a composite pattern. As each down-stream child frame completes, a Frame will copy it to start a new one. This will form a tree structure where the "game" will end up with 10 "frames", and each frame will end up with 1, 2 or 3 SinglePlays.
 
 The end of the chain is terminated with a leaf abstraction that also implements the 'IConsistsof' interface called 'SinglePlay'. It represents the most indivisible play of a game, which in bowling is a throw of a ball. Its job is to record the individual throw score. 
 
 Note, in reference to the ALA layers, this diagram sits in the top layer, the Application layer. The boxes are instances of abstractions that come from the second layer, the Domain Abstractions layer. The arrows are instances of the Programming Paradigm, 'InConsistsOf', which comes from the third layer, the Programming Paradigms layer.  
 
-This diagram will score 10 frames of ten-pin bowling but does not yet handle strikes and spares.
-
-So lets do some 'maintenance' of our application. Because the application consists of simple abstractions, which are inherently stable, maintenance should be easy without spoiling the abstractions.
+This diagram will score 10 frames of ten-pin bowling but does not yet handle strikes and spares. So lets do some 'maintenance' of our application. Because the application so far consists of simple abstractions, which are inherently stable, maintenance should be easy without changing these abstractions.
 
 The way a ten-pin bowling scorecard works, bonuses are scored in a different way for the last frame than the first 9 frames. In the last frame, they are shown as scores on the scorecard, so there are up to 3 balls in that frame. In the first nine frames, the bonus balls come from following frames, and just appear added to the previous frames total. 
 
 To handle the last frame, we just need to modify the completion lambda expression. To handle the first 9 frames, we introduce a new abstraction. Lets call it Bonuses. Although we are inventing it first for the game of ten-pin bowling, it is important to think of it as a general purpose, potentially reusable abstraction.
 
-What the Bonus abstraction does is, after its child frame completes, it continues adding plays to the score until its lambda function returns true.
+What the Bonus abstraction does is, after its child frame completes, it continues adding plays to the score until its own lambda function returns true.
 
 The completed ten-pin bowling scorer is this:
 
@@ -699,7 +736,7 @@ private IConsistsOf game = new Frame("game")
 
 So far, this has been a fairly top-down, waterfall-like approach. We have something that represents all the details of the requirements, but we haven't considered implementation at all. Past experience tells us this may lead us into dangerous territory. Will the devil be in the details? Will the design have to change once we start implementing the abstractions? The first few times I did this, I was unsure. I was not even sure it could actually be made to work. Is it just a simple matter of writing classes for those three abstractions and the whole thing comes to life? 
 
-I can only answer that question from experience: In all the examples and projects I have do so far, the system has worked, and implementation of the abstractions has not caused their design, or the application layer to change. I think it is because of the use of abstractions. Abstractions are naturally decoupled. The application design leaves out no details except inside abstractions. These details inside abstractions are decoupled at design-time.
+I can only answer that question from experience: In all the examples and projects I have do so far, the system has worked, and implementation of the abstractions has not caused their design, or the application layer to change. I think it is because of the use of abstractions. Abstractions are naturally decoupled and stable. The application design leaves out no details except inside abstractions. These details inside abstractions are decoupled at design-time.
 
 The hard architectural work is done. Implementing the three abstractions turns out to be straightforward.
 
@@ -729,7 +766,7 @@ private readonly int frameNumber = 0;
 
 The second variable is the lambda expression that is passed to us by the application. It would be readonly (immutable) except that I wanted to user a setter to pass it in, not the constructor, to indicate optional configuration. 
 
-The third variable is the frameNumber. It allows frame objects to know which one they are to their parent -1st child, 2nd child etc. This value is passed to the lambda expression in case it wants to use it. For example, lambda expression for a bowling frame needs to know if it is frame number 9.  
+The third variable is the frameNumber. It allows frame objects to know which child they are to their parent -1st child, 2nd child etc. This value is passed to the lambda expression in case it is needed. For example, the lambda expression for a bowling frame needs to know if it is the last frame.  
 
 The methods of the IConsistsOf interface are now straightforward to write. Lets go over a few of them to get the idea. Here is the Ball method implementation for Frame:
 
@@ -754,9 +791,9 @@ public void Ball(int player, int score)
 }
 ....
 
-It just has to pass on the ball score to all the child objects. Any that have completed will ignore it. Then it looks to see if the last child has completed, and if so starts a new child.
+It looks to see if the last child has completed, and if so starts a new child. Then it just passes on the ball score to all the child objects. Any that have completed will ignore it.
 
-The IsComplete method checks if the last child object is complete and the lambda expression also says our local frame is complete:
+The IsComplete method checks both if the last child object is complete and the lambda expression says we are completee:
 
 ....
 private bool IsComplete()
@@ -797,7 +834,7 @@ IConsistsOf GetCopy(int frameNumber)
 
 The few remaining methods of the IConsistOf interface are trivial. The implementation of IConsistsOf for the other two abstractions, SinglePlay and Bonuses, is similarly straightforward. Note that whereas Frame uses the composite pattern, Bonuses uses the decorator pattern. It implements and requires the IConsistsOf interface. The SinglePlay abstraction, being a leaf abstraction, only implements the IConsistsOf interface. 
 
-One method we haven't discussed is the wireTo method that we used extensively in the application code to wire together instances of our abstractions. The wireTo method for Frame is shown below:  
+One method we haven't discussed is the wireTo method that we used extensively in the application code to wire together instances of our domain abstractions. The wireTo method for Frame is shown below:  
 
 ....
 public Frame WireTo(IConsistsOf c)
@@ -808,18 +845,18 @@ public Frame WireTo(IConsistsOf c)
 }
 ....
 
-This method does not need to be implemented in every domain abstraction. I use an extension method for wireTo. The WireTo extension method uses reflection to find the local variable to assign the object being wired.
+This method does not need to be implemented in every domain abstraction. I use an extension method for WireTo. The WireTo extension method uses reflection to find the local variable to assign the object being wired.
 
-The WireTo method will turn out to be useful in many ALA designs. Remember in ALA we "express requirements by composing instances of abstractions". If the 'instances' of 'abstractions' are implemented as 'objects' of 'classes', then we will use the wireTo method. If the 'instances' of 'abstractions' are 'invocations' of 'functions', as we did in example project in pass 1, we wont use WireTo obviously. In the coffeemaker example to come, 'instances' of 'abstractions' are 'references' to 'modules' because a given application would only have one of each abstraction.
+The WireTo method will turn out to be useful in many ALA designs. Remember in ALA we "express requirements by composing instances of abstractions". If the 'instances' of 'abstractions' are implemented as 'objects' of 'classes', then we will use the wireTo method. If the 'instances' of 'abstractions' are 'invocations' of 'functions', as we did in the example project in pass 1, we wont use WireTo obviously. In the coffeemaker example to come, 'instances' of 'abstractions' are 'references' to 'modules' because a given application would only have one of each abstraction.
 
-The wireTo method returns 'this', which is what allows the fluent coding style used in the application code. The configuration setter methods also return a this reference so that they too can be used in the fluent style. 
+The wireTo method returns 'this', which is what allows the fluent coding style used in the application code. The configuration setter methods also return the this reference so that they too can be used in the fluent style. 
 
-The full source code for the bowling application can be downloaded from here: https://github.com/johnspray74/GameScoring[GameScoring code]
+The full source code for the bowling application can be viewed or downloaded from here: https://github.com/johnspray74/GameScoring[GameScoring code]
 
 
 === Example project - Tennis
 
-Now let's modify the bowling application to score tennis. If the bowling game hadn't been implemented using ALA, you probably wouldn't contemplate doing this. But ALA has provided us with domain abstractions and a useful programming paradigm for the domain of game scoring. That Frame abstraction looks like it could be used for the match, which consists of sets, for the set which consists of games, and for the game which consists of SinglePlays.
+Now let's modify the bowling application to score tennis. If the bowling game hadn't been implemented using ALA, you probably wouldn't contemplate doing this. But ALA has provided us with domain abstractions and a useful programming paradigm for the domain of game scoring. That Frame abstraction looks like it could be useful for the match, which consists of sets, for the set which consists of games, and for the game which consists of SinglePlays.
 
 We will need to make a small generalization to the Frame abstraction first. This will allow it to keep score for two players. We just change the type of the score from int to int[]. The Ball method will be generalized to take a player parameter to indicate which player won a play.
 
@@ -867,7 +904,7 @@ private IConsistsOf match = new Frame()
 
 Again, the new WinnerTakesPoint abstraction is easy to write. It is a decorator that implements and requires the IConsistsOf interface. Most methods pass through except the GetScore, which returns 0,0 until the down-stream object completes, then it returns either 1,0 or 0,1 depending on which player has the higher score.
 
-Now let's switch our attention back to another example of maintenance. Lets add the tiebreak feature. Another instance of Frame will score the tiebreak quite nicely. However we will need an abstraction that can switch us from playing the set to the tie break. Let's call it Switch, and give it a lambda function to configure it with when to switch to the tiebreak. Switch returns the sum of scores of its two downstream objects. Here then is the full expression of the requirements of the tennis scorer:
+Now let's switch our attention back to another example of maintenance. Lets add the tiebreak feature. Another instance of Frame will score the tiebreak quite nicely. However we will need an abstraction that can switch us from playing the set to the tie break. Let's call it Switch, and give it a lambda function to configure it with when to switch to the tiebreak. Switch returns the sum of scores of its two downstream objects. Here then is the full description of the requirements of the tennis scorer:
 
 
 [plantuml,file="tennis2.png"]
@@ -932,11 +969,9 @@ So there you have it. Around 8 lines of code express the scoring requirements of
 
 The domain abstractions are zero-coupled with one another, and are each straightforward to write by just implementing the methods of the IConsistOf interface according to what the abstraction does. The abstractions are simple and stable. So no part of the program is more complex than its own local part.
 
-The domain abstractions are reusable in the domain of game scoring.
+The domain abstractions are reusable in the domain of game scoring. And, my experience was that as the details inside the abstractions were implemented, the application design didn't have to change. Here is a link to the code on Github: https://github.com/johnspray74/GameScoring[GameScoring code]
 
-And, most importantly, the experience was that as the details inside the abstractions were implemented, the application design didn't have to change. Here is a link to the code on Github: https://github.com/johnspray74/GameScoring[GameScoring code]
-
-Why two applications? The reason for doing two applications in this example is to emphasis where all the details of the requirements end up. The only difference between the bowling and tennis applications is the two diagrams, which are translated into two code files: bowling.cs and tennis.cs. These two files completely express the detailed requirements of their respective games. No other source files have any knowledge of these specific games. Furthermore, Bowling.cs and Tennis.cs do not do anything other than express requirements (in an executable way). All implementation to actually make it execute is hidden in domain abstractions and programming paradigm abstractions. 
+Why two xample applications? The reason for doing two applications in this example is to emphasis where all the details of the requirements end up. The only difference between the bowling and tennis applications is the two diagrams, which are translated into two code files: bowling.cs and tennis.cs. These two files completely express the detailed requirements of their respective games. No other source files have any knowledge of these specific games. Furthermore, Bowling.cs and Tennis.cs do not do anything other than express requirements (in an executable way). All implementation to actually make it execute is hidden in domain abstractions and programming paradigm abstractions. 
 
 == Pass three - Why ALA Works
 
@@ -1096,7 +1131,7 @@ Only one 'composition' relationship is shown from the top layer to the second la
 
 ==== Why is the decomposition approach so prevalent?
 
-The decomposition approach is often the defacto or informal method used by developers. It is also encouraged by many architecture styles and patterns, for example layering or MVC. It is the method used in ADD (Attribute Driven Design). Indeed it is sometimes described as the very definition of what software architecture is.
+The decomposition approach is often the de facto or informal method used by developers. It is also encouraged by many architecture styles and patterns, for example layering or MVC. It is the method used in ADD (Attribute Driven Design). Indeed it is sometimes described as the very definition of what software architecture is.
 
 The intended idea is that the decomposed elements are easier problems to solve. Keep decomposing in a fractal manner and eventually the elements are small enough to be solvable.
 
@@ -1156,7 +1191,7 @@ Take a moment to look at these three abstractions. The UI has a lamp you can con
 
 ==== Programming Paradigms layer
 
-We haven't talked about the Programming Paradigms Layer of ALA yet. Suffice it to say it contains what we might refer to by any of the terms: 'execution models', 'programming paradigms', 'paradigm interfaces', or 'abstract interfaces'. They are interfaces used to wire together the domain abstractions in arbitrary ways. Each gives a different meaning to the lines we will use in the applciation diagram.  
+We haven't talked about the Programming Paradigms Layer of ALA yet. Suffice it to say it contains what we might refer to by any of the terms: 'execution models', 'programming paradigms', 'paradigm interfaces', or 'abstract interfaces'. They are interfaces used to wire together the domain abstractions in arbitrary ways. Each gives a different meaning to the lines we will use in the application diagram.  
 
 Generally we need multiple programming models for an application. For the coffeemaker we will use three
 
@@ -1493,7 +1528,7 @@ ALA takes advantage of the fact that zero-coupled abstractions can keep complexi
 [tree,file="folderstructure.png"]
 --
 root
-|--Applications
+|--Domain1
 |  |--Application1
 |  |  `--application.cpp
 |  |--Application2
@@ -1503,9 +1538,7 @@ root
 |  |  |--abstraction1.h
 |  |  |--abstraction2.cpp
 |  |  `--abstraction2.h
-|--DomainHardware
-|--DomainConnectivity
-|--DomainDatabase
+|--Domain2
 `--ProgrammingParadigms
    |--Paradigm1.h
    `--Paradigm2.h
@@ -1513,27 +1546,10 @@ root
 ....
 
 
-[tree,file="folderstructure.png"]
+[tree,file="folderstructure2"]
 --
 root
-|--Applications
-|  |--Application1
-|  |  `--application.cpp
-|  |--Application2
-|  |  `--application.cpp
-|  |--DomainAbstractions
-|  |  |--abstraction1.cpp
-|  |  |--abstraction1.h
-|  |  |--abstraction2.cpp
-|  |  `--abstraction2.h
-|--DomainHardware
-|--DomainConnectivity
-|--DomainDatabase
-`--ProgrammingParadigms
-   |--Paradigm1.h
-   `--Paradigm2.h
 --
-
 
 ////
 [tree,file="folderstructure.png"]
@@ -1782,9 +1798,9 @@ wtp3 -> tiebreak -> play2
 ----
 ////
 
-I left the code out of the GetGameOrTieBreakScore box as it is a little big for the diagram here. It is similar to the Linq query above but it must first determine if a tiebreak is in progress and get that if so. Also it translates game scores from like 1,0 to "15","love".
+I left the code out of the GetGameOrTieBreakScore box as it is a little big for the diagram here. It is similar to the LINQ query above but it must first determine if a tie break is in progress and get that if so. Also it translates game scores from like 1,0 to "15","love".
 
-Having designed the complete ALA applications in diagram form, implementation in code for the application is trivial as it is just use of the WireTo extension method to wire exactly according to the diagram. The domain abstractions are also easy because they are zero coupled with one-another and with the application layer. The method to write them is simply to determine what is needed in teh interfaces to make the them able to communicate, and then implement those interfaces for each one.
+Having designed the complete ALA applications in diagram form, implementation in code for the application is trivial as it is just use of the WireTo extension method to wire exactly according to the diagram. The domain abstractions are also easy because they are zero coupled with one-another and with the application layer. The method to write them is simply to determine what is needed in the interfaces to make the them able to communicate, and then implement those interfaces for each one.
 
 Although the diagram must be turned into text code to actually execute, it is important in ALA to do these architecture design diagrams first. They not only give you the application, they give you the architectural design by giving you the domain abstractions and programming paradigms as well. If you try to design an ALA structure in your head while you write it directly in code, you will get terribly confused and make a mess. UML class diagrams will be even worse. Code at different abstraction levels will end up everywhere, and run-time dependencies will abound. Our programming languages, and the UML Class diagram, are just not designed to support abstraction layered thinking. And it is too easy to add bad function calls or 'new' keywords into code in the wrong places. Not using an application diagram to do the design in ALA is like an electronics engineer not using a schematic to design an electronic circuit. The reason boxes and lines work is that it just doesn't look right when you draw a line from the inside of the box to the outside (which would create a run-time dependency). It's clearly breaking the abstraction. Yet it's fine to add a box (a design-time dependency). In text, these two things look the same. In UML class diagrams, they look the same also.
 
@@ -1811,7 +1827,7 @@ consolerunner = new ConsoleGameRunner("Enter number pins:", (pins, scorer) => sc
 If you compare this code with the disgram, you will see a pretty direct correspeodnece. 
 Remember 'game' comes from our previous example.
 
-That's pretty much all the code in the application. Oh there is the 'translate' function, but it is pretty straight forward once the requirements for the way a Tenpin scorecard is actually filled in and enumerated. You can see it, and all the code at the github link below. 
+That's pretty much all the code in the application. Oh there is the 'translate' function, but it is pretty straight forward once the requirements for the way a Tenpin scorecard is actually filled in and enumerated. You can see it, and all the code at the Github link below. 
 
 Note that at run-time, not all data-flows have to go directly between wired up instances of domain abstractions. The data can come up into the application layer code, and then back down. This was the case when we did the functional composition example in pass 1. In this application we are doing that with the code in the square boxes that get the score from the game tree. The important thing is that all the code in the application is specific to the application requirements.  
 
@@ -1997,7 +2013,7 @@ That completes our discussion of all the new code for the console applications f
 
 https://github.com/johnspray74/GameScoring[GameScoring code]
 
-As
+
 
 
 == Pass five - The philosophy behind ALA
@@ -2571,7 +2587,7 @@ The code in Abstraction A could look something like this. Don't take too much no
     }
     
     // code that runs when work is finished.
-    // may be called from the nd of start, or any time later
+    // may be called from the end of start, or any time later
     private finishedWork()
     {
         if (next!=null) next.start();    
@@ -2579,7 +2595,7 @@ The code in Abstraction A could look something like this. Don't take too much no
  }
 ....
 
-Abstraction A both _provides_ and _accepts_ the interface. This allows it to be wired before or after any of its peer abstractions. In ALA we use the word 'accepts' rather than 'requires' because there is often an end to a chain of abstractions wired together. If no next interface is wired in, the activity flow ends. 
+Abstraction A both _provides_ and _accepts_ the interface. This allows it to be wired before or after any of its peer abstractions. In ALA we use the word 'accepts' rather than 'requires' because there is often an end to a chain of abstraction instances wired together. If no next interface is wired in, the activity flow ends. 
 
 Abstraction B would be written in the same way, as it also knows about the Activity flow interface:
 ....
@@ -2607,7 +2623,7 @@ Abstraction B would be written in the same way, as it also knows about the Activ
  }
 ....
 
-NOTE: As an aside, in some C# experiments, we wrote wireTo as an extension method for all objects. It used reflection to look at the interfaces provided by the class, and the private local interface variables in the class. It would then match up the interface types and do the wiring automatically. It could even set up reverse direction interfaces so that complicated programming paradigms that required method calls going in both directions could be wired by the one wireTo operation.   
+NOTE: As an aside, in C# projects, we wrote wireTo as an extension method for all objects. It used reflection to look at the private interface variables in the source class and the interfaces provided by the destination class. It would then match up the interface types and do the wiring automatically. It could even use port names to explicitly wire ports of the same types.   
 
 Now let's revisit the molecule analogy. By now we would know to put the knowledge that Oxygen is bonded to two Hydrogens inside the water abstraction where it belongs.
 
@@ -2686,17 +2702,17 @@ The programming paradigm here is a polar bond. It is more abstract (more ubiquit
  Abstraction Water
  {
     new Oxygen()
-        .wireIn(new Hydrogen())
-        .wireIn(new Hydrogen())
+        .wireTo(new Hydrogen())
+        .wireTo(new Hydrogen())
         .Initialize();
  }
 ....
 
-Let's do one more example, this time with a Data-flow programming paradigm. I have found that data-flow is the most useful programming paradigm in practice. It suits a large range of problems. 
+Let's do one more example, this time with a Data-flow programming paradigm. I have found that data-flow is the most useful programming paradigm in practice. It is useful in a a large range of problems. 
 
 Let's construct a thermometer. Assume we already have in our domain several useful abstractions: an ADC (Analog Digital Converter) that knows how to read data from the outside world, a Thermistor abstraction that knows how to linearise a thermistor, a Scale abstraction that knows how to offset and scale data, a filter abstraction that knows how to smooth data, and a display abstraction that knows how to display data.
 
-We also know that these abstractions all support the Data-flow programming paradigm.
+All these domain abstractions will use the Data-flow programming paradigm. Note that none of them know anything about a Thermometer, nor the meaning of the data they process.
 
 So we can go ahead and create a Thermometer application just by doing this:
 
@@ -2726,18 +2742,18 @@ When we manually compile the diagram (assuming we don't have automated code gene
 
  Abstraction Thermometer
  {
-    new ADC()
-        .setPort(2).setPin(3),setFrequency(1000)
-        .wireTo(new Thermister().setType('K').setInputRange(20,1023))
-        .wireTo(new Scale().setOffset(32).setSlope(0.013))
-        .wireTo(newDisplay().setDigits(4).setDecimals(1));
+    new ADC(Port2, Pin3)
+        .setFrequency(1000)
+        .wireTo(new Thermister().setType('K').setInputRange(20,1023)
+            .wireTo(new Scale(32,0.013)
+                .wireTo(newDisplay().setDigits(4).setDecimals(1))
+            )
+        );
  }
 
-NOTE: The configuration setter returns the object on which the call is made, but the wireTo method returns the object passed in so that you can wire up a chain of data-flow abstraction instances by stringing them together.
+NOTE: The configuration setters and teh WireTo extension method return the object on which the call is made to support the fluent coding style.
 
-The diagram is the architecture of the specific application, Thermometer, but is also executable.
-
-The diagram has all the cohesive knowledge that is a thermometer, and no other knowledge.
+The diagram is the requirements, the solution and the architecture of the application, and is executable. The diagram has all the cohesive knowledge that is a thermometer, and no other knowledge.
 
 The diagram can be read stand-alone, because all the dependencies in it are knowledge dependencies on abstractions we would already know in the domain.
 
@@ -2776,7 +2792,7 @@ NOTE: Later we will introduce an asynchronous (event driven) execution model. It
 
 For simplicity, we will just implement a synchronous push system. Again, don't worry about the filter itself. The code is just there to see how the LowPassFilter fits in with the Data-flow programming paradigm, and how simple doing that can be. 
 
- Abstraction IDataFlow<T>
+ Interface IDataFlow<T>
  {
     push(T data);
  }
@@ -2786,10 +2802,11 @@ For simplicity, we will just implement a synchronous push system. Again, don't w
  /// 1. Decimates the incoming data rate down by the setCutoff configuration
  /// 2. Smooths the data with a single pole filter with cutoff frequency equall to the input frequency divided by the cutoff. T must be a numeric type.
  /// Normal checks and exceptions removed to simplify
- Abstraction LowPassFilter<T> : IDataFlow<T>
+ Class LowPassFilter<T> : IDataFlow<T>
  {
-    private Dataflow next = new DataFlow();
+    private Dataflow next;
     
+    // This is normally done by a general extension method
     public IDataflow wireTo(IDataflow _next) 
     {
         next = _next;
@@ -2820,7 +2837,7 @@ For simplicity, we will just implement a synchronous push system. Again, don't w
  }
 ....
 
-You will notice that both the Domain abstraction and the connection interface abstraction used a parameterised type. This makes sense because only the application, the Thermometer, knows the actual types it needs to use. Also, the interface didn't look a lot different from the Activity interface. 
+You will notice that both the Domain abstraction, Filter, and the Programming Paradigm abstract interface, IDataFlow, use a parameterised type. This makes sense because only the application, the Thermometer, knows the actual types it needs to use.  
 
 ////
 Suppose we wanted to do something more with the programming paradigm, let's say to support fan-out of the data so that multiple domain abstractions can be wired to the same data stream output. 
@@ -2873,11 +2890,11 @@ All *software architectures* should contain *two concepts* for its *elements*  e
 ====
 Abstractions are design-time elements. Instances are run-time elements. Object oriented programming has the two concepts in classes and objects. But many discussions on software architecture seem to combine them into one term, such as modules, components or layers. They may implicitly contain the separate concepts, as components may, but not having them explicit will inevitably lead to confusion. 
 
-The problem is their different dependencies. Dependencies between Instances are run-time or compile-time dependencies. Dependencies between Abstractions are _only_ knowledge dependencies. If we don't have separate terms for design-time and run-time elements, we will tend to implement run-time dependencies in the design-time elements, turning them into design-time dependencies. 
+The problem is their different dependencies. Dependencies between Instances are run-time dependencies. Dependencies between Abstractions are knowledge dependencies. If we don't have separate terms for design-time and run-time elements, we will tend to implement run-time dependencies in the design-time elements, destroying them as abstractions. 
 
-Nearly all common layering schemes have this problem. Another common example of the problem is associations between classes. The most important idea that OOP brought us, the idea of different design-time elements and run-time elements, has been ruined by associations. They let you implement run-time dependencies between objects in their classes.
+Nearly all common layering schemes have this problem. A common example of the problem is associations between classes. The most important idea that OOP brought us, the idea of different design-time elements and run-time elements, has been ruined by associations. They encourage you to implement run-time dependencies between classes, an anti-pattern in ALA.
 
-What we should be doing is representing the knowledge of run-time dependencies between objects inside another class. By using the terms *Abstraction* and *Instance*, ALA honours the separation of run-time elements and design-time elements. All knowledge of dependencies between instances must be implemented inside another abstraction, so that at design-time they are not dependencies at all.
+What we should be doing is representing the knowledge of run-time dependencies between instances inside another abstraction. By using the terms *Abstraction* and *Instance*, ALA honours the separation of run-time elements and design-time elements, and reminds us not to implement runtime dependences between abstractions. at design-time they are not dependencies at all.
 
 
 
@@ -2888,21 +2905,21 @@ What we should be doing is representing the knowledge of run-time dependencies b
 
 ==== "Decomposition of the system"
 
-As discussed in the sections 2, the common software design approach is stated this way:
+As discussed in section 2, a common software design approach is stated this way:
 
 [WARNING]
 ====
 The [red]#*decomposition*# of your [red]#*system*# into [red]#*elements*# and their [red]#*interactions*#.
 ====
 
-In ALA, we do the exact opposite. The design method is stated this way:
+In ALA, this considered an anti-pattern, and we do the exact opposite. The design method is stated this way:
 
 [TIP]
 ====
 The [green]#*expression*# of your [green]#*requirements*# by [green]#*composition*# of [green]#*abstractions*#.
 ====
 
-In section 2, we discussed decomposition/composition difference between these two approaches. Here we review that difference, and look at other differences in the wording of the two approaches. 
+In section 2, we discussed the decomposition/composition difference between these two approaches. Here we review that difference, and look at other differences in the wording of the two approaches. 
 
 ==== Decomposition creates less abstract elements
 
@@ -2912,7 +2929,7 @@ We want dependencies to be in the direction of the more abstract, more ubiquitou
 
 ==== Composition creates more abstract elements
 
-When you are starting a green fields project, when no abstractions have yet been invented for the domain, this is the one method to have foremost in your mind.
+When you are starting a green fields project, when no abstractions have yet been invented for the domain, this is the methodology to have foremost in your mind.
 
 "The [green]#*expression*# of your [green]#*requirements*# by [green]#*composition*# of [green]#*abstractions*#."
 
@@ -2922,13 +2939,13 @@ Just expressing the requirements, without thinking about their implementation, w
 
 
 
-In every creative process outside of software, for example painting or composing music or designing a clock, the process would be much better described as composition of abstractions.
+In every creative process outside of software, for example painting or composing music or designing a clock, the process would be much better described as composition of abstractions than decomposition of the final result. Decomposition is just plain backwards.
 
 ==== "interacting elements"
 
-The elements resulting from any decomposition process are likely to interact or collaborate to accomplish the purpose of the parent element. The design methodology actually includes the word "interacting".
+The elements resulting from any decomposition process are likely to interact or collaborate to accomplish the purpose of the parent element. The design methodology actually includes the word "interacting". In ALA, it is an anti-pattern to have abstractions interacting. They would no longer be abstractions. 
 
-As discussed in the previous section on "no loose coupling", interactions, which are run-time coupling, are not desirable between abstractions. In ALA they become knowledge inside another abstraction.
+As discussed in the previous section on "no loose coupling", interactions, which are run-time coupling, are not allowed between design time elements. Instead interactions are represented at design time completely contained inside one abstraction.
 
 
 ==== Disappearing structure
