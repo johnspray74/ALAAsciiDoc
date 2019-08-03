@@ -1,0 +1,26 @@
+Open powershell window here
+C:\John\Projects\ALA\ALA (AsciiDoc)
+
+git clone https://github.com/johnspray74/ALAAsciiDoc.git
+git status
+git diff
+git diff --staged
+git pull
+git add filename
+git commit -a -m 'message'		// stage all then commit
+git commit -m 'message'
+to exit vim <ESC>:wq<enter>
+git push origin master
+
+$ git mv old_filename new_filename
+
+To create a new repository from an existing unversioned project
+In github, create the new repository WITHOUT README.md
+
+echo "# ProjectName" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git remote add origin https://github.com/johnspray74/ALAAsciiDoc.git
+git push -u origin master
+

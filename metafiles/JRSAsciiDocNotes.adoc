@@ -1,0 +1,124 @@
+= AsciiDoc notes
+Author Name
+:doctype: article
+:encoding: utf-8
+:lang: en
+:toc: left
+:numbered:
+
+
+
+== Generating HTML output
+
+
+. Output the HTML file
+. Put the code in GoogleAnalyticsCode.txt just inside the <Head> element of every page
+. Log into InmotionHosting.com AMP (not CPanel directly) johnspray74@gmail.com fw2017
+. Go to cPanel, then File Manager
+. Browse to public_html\abstractionlayeredarchitecture
+. Rename index.html to be deleted later
+. Upload new index.html
+. Upload any new images from the images folder to the images folder
+. Check the website and its images
+
+
+== Starting Asciidoc
+
+AsciiDocFX is run from the taskbar, then use the recent side-tab or double click on a .adoc file. Or or double click on a .adoc file
+
+
+== Using AsciiDocFX
+
+
+=== Diagrams
+
+
+
+
+== Installation notes
+
+AsciiDocFX was installed using:
+"C:\Users\John\Downloads\AsciidocFX_Windows.exe"
+
+=== Graphviz installation
+
+On my desktop machin I had to separately install graphviz, as per the instructions in the AsciiDocFX documentation at asciidocfx.com, from www.graphviz.org, an .msi file. After the install, AsciiDocFX still could not find it. I had to set an environment variable:
+
+ Click Start, right click Computer, Properties, Advanced System Settings, Environment variables. Set GRAPHVIZ_DOT to C:\Program Files (x86)\Graphviz2.38\bin\dot.exe
+
+
+=== Syntax highlighting?
+
+Installed chocolatey using instruction on the web.
+Installed python using instructions 
+
+
+== Old / redundant
+
+=== Generating HTML output
+
+This method was to avoid a bug with auto-generated image names for graphics files not being local relative paths. This issue was overcome by explicitly specifying names for every graphic (which is doable but a pain) This bug is supposedly fixed in version 2.9 
+
+Command to convert the ALA article for uploading to abstractionlayeredarchitecture.com
+
+. Open a command window
+. Go to  C:\john\projects\ala\ALA (AsciiDoc)
+. asciidoctor -r asciidoctor-diagram '.\Abstraction Layered Architecture.adoc'
+
+
+=== graphic image reference bug
+
+AsciidocFX tool is great except when generating the HTML, it puts in localhost references to all the graph .png files
+
+
+==== new workaround
+
+Make sure you give a filename to every graphic, don't let it allocate them automatically
+
+==== old workaround
+
+Work around is use AsciiDoctor, Asciidoctor-diagram.
+
+Installed ruby and set the path - not sure how.
+
+Then in a windows command window used these commands:
+
+gem install asciidoctor diagram
+
+There were various other things I did according to asciidoctor-diagram instractions on Internet, but not sure if any were necessary except this:
+
+command line in a DOS windows containing the file to be converted
+
+asciidoctor -r asciidoctor-diagram '.\Abstraction Layered Architecture.adoc'
+
+
+
+=== AsciiDoctor
+
+There are two main ways to use AsciiDoctor (not AsciiDocFX) (the ruby version) on windows.
+1. An all in one app call AsciiDocFX.
+2. AsciiDoctor.exe, a command line utility (that needs Ruby installed) that converts .adoc files to HTML.
+You would then use another uby utility called Guard which can watch the .adoc file for changes, and run AsciiDoctor each time,
+then configuare a browser to live watch the HTML file.
+
+In preparation for the 2nd method, I have installed Ruby, and then using the gem command, installed asciidoctor and guard.
+The internet page describes how to set up guard.
+
+Installed this ruby installer which also automatically installs its JRE dependency. 
+"C:\Users\John\Downloads\rubyinstaller-2.5.1-2-x64.exe"
+
+Then in the DOS command window you can install ruby programs:
+gem install asciidoctor
+asciidoctor --version
+
+gem install guard guard-shell
+
+I have successfully used the AsciiDoctor.exe utility in a DOS command window by opening Powershell window in the relevant folder and typeing in
+AsciiDoctor Cheatsheet.adoc
+
+
+Command to convert the ALA article for uploading to abstractionlayeredarchitecture.com
+Open a command window
+Go to C:\john\projects\ala\ALA (AsciiDoc)
+asciidoctor -r asciidoctor-diagram '.\Abstraction Layered Architecture.adoc'
+
