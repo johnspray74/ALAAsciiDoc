@@ -1,4 +1,4 @@
-Open powershell window here
+Open powershell window here:
 C:\John\Projects\ALA\ALA (AsciiDoc)
 
 git clone https://github.com/johnspray74/ALAAsciiDoc.git
@@ -13,6 +13,16 @@ to exit vim <ESC>:wq<enter>
 git push origin master
 
 $ git mv old_filename new_filename
+
+
+// files I dont track
+.html files
+asccidocexamples
+folders
+
+
+
+
 
 To create a new repository from an existing unversioned project
 In github, create the new repository WITHOUT README.md
