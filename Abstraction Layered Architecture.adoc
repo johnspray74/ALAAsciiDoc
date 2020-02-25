@@ -1970,9 +1970,9 @@ When we started this project we had no tool for automatically generating the cod
 
 However it is instructive to know what the code looks like, just to make how the diagram executes more concrete. So here we show the code for the above sample diagram.
 
-When we were hand generating code, it was important that the code was readable from the point of view of seeing how it corresponds exactly with the diagram. We had various conventions to support this. One of these conventions was to indent the code to exactly mirrow the tree structure in the diagram.
+When we were hand generating code, it was important that the code was readable from the point of view of seeing how it corresponds exactly with the diagram. We had various conventions to support this. One of these conventions was to indent the code to exactly mirror the tree structure in the diagram. Another was that whenever a new instance of an abstraction was wired onto the tree, all its ports would be wired, and they would be wired in the order were declared in the abstraction. This implies a depth first wiring strategy, analogous to walking the diagram tree depth first. Any ports with cross connections would also be wired to their destinations. If the destination instance did not already exist it would be pre-created. 
 
-So ignoring the red lines in the diagram for a mement, your would hand generate this code.
+Using these conventions, for the diagram shown above, it was a simple matter to hand generate code like this:
 
 TBD
 
