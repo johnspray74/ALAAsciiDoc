@@ -1974,8 +1974,104 @@ When we were hand generating code, it was important that the code was readable f
 
 Using these conventions, for the diagram shown above, it was a simple matter to hand generate code like this:
 
-TBD
 
+....
+using System;
+using System.Windows.Media;
+using DomainAbstractions;
+using Wiring;
+
+
+namespace Application
+{
+    class Application
+    {
+        private MainWindow mainWindow = new MainWindow("App Name") { Icon = "XYXCompanyIcon"};
+
+        [STAThread]
+        public static void Main()
+        {
+            new Application().Initialize().mainWindow.Run();
+        }
+
+        private Application Initialize()
+        {
+            return this;
+        }
+
+        private Application()
+        {
+            var getInfoWizard = new Wizard("Get information off device") { SecondTitle = "What information do you want to get off the device?" };
+            Grid DataGrid;
+            var sessionDataSCP = new SessionDataSCP();
+            var csvFileReaderWriter = new CSVFileReaderWriter();
+
+            mainWindow
+            // UI
+                .WireTo(new Vertical()
+                    .WireTo(new Menubar()
+                        // XR3000
+                        .WireTo(new Menu("File")
+                            .WireTo(new MenuItem("Get information off device") { Icon = "GetDeviceIcon.png", ToolTip = "Get session data or LifeData or favourites from the device\nto save to a file or send to the cloud" }
+                                .WireTo(getInfoWizard)
+                            )
+                            .WireTo(new MenuItem("Put information onto device") { Icon = "PutDeviceIcon.png" })
+                            .WireTo(new MenuItem("Exit") { Icon = "ExitIcon.png" })
+                        )
+                        .WireTo(new Menu("Tools"))
+                        .WireTo(new Menu("Help"))
+                    )
+                    .WireTo(new Toolbar()
+                        // XR3000
+                        .WireTo(new Tool("GetDeviceIcon.png") { ToolTip = "Get information off device" }
+                            .WireTo(getInfoWizard)
+                        )
+                        .WireTo(new Tool("PutDeviceIcon.png") { ToolTip = "Put information onto device" })
+                        .WireTo(new Tool("DeleteDeviceIcon.png") { ToolTip = "Delete information off device" })
+                    )
+                    .WireTo(new Horizontal()
+                        .WireTo(new Grid() { InstanceName = "Sessions" })
+                        .WireTo((DataGrid = new Grid() { InstanceName = "DataGrid" })
+                            .WireFrom(sessionDataSCP)
+                        )
+                    )
+                    .WireTo(new Statusbar()
+                        .WireTo(new Text() { Color = Brushes.Green }
+                            .WireFrom(new LiteralString("Connected to device"))
+                        )
+                    )
+                );
+
+
+            getInfoWizard
+                .WireTo(new WizardItem("Get selected session files") { Icon = "IconSession.png", Checked = true }
+                    .WireTo(new Wizard("Select destination") { SecondTitle = "What do you want to do with the session files?", ShowBackButton = true }
+                        .WireTo(new WizardItem("Save selected sessions as files on the PC") { Icon = "SessionDocumentIcon.png", Checked = true }
+                            .WireTo(new SaveFileBrowser("Select location to save data") { Icon = "SaveIcon.png", InitialPath = "%ProgramData%\XYZCompany"}
+                                .WireTo(csvFileReaderWriter)
+                            )
+                        )
+                        .WireTo(new WizardItem("Send records to NAIT") { Icon = "NAIT.png" })
+                        .WireTo(new WizardItem("Send sessions to NLIS") { Icon = "NLIS.png" })
+                    )
+                    .WireTo(getInfoWizard)
+                )
+                .WireTo(new WizardItem("Get Lifedata"));
+
+            var comPorts =
+                new ComPortAdapter()
+                    .WireTo(new SCPProtocol()
+                        .WireTo(new SessionDataSCP()
+                            .WireTo(DataGrid)
+                            .WireTo(csvFileReaderWriter)
+                        )
+
+                    );
+
+        }
+    }
+}
+....
 
 
 
