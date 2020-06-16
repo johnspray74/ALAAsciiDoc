@@ -1,3 +1,8 @@
+My github login details
+johnspray74
+fastword with capital 7474
+
+
 Open powershell window here:
 C:\John\Projects\ALA\ALA (AsciiDoc)
 

@@ -8,14 +8,14 @@ Author Name
 
 
 
-== Generating HTML output
+== Putting the AsciiDoc source onto the web site
 
 * Change the Last Updated date in the ascii source file
-. In AsciiDocFX, Output the HTML file as index.html (Click HTML at top of right pane)
-. Put the code in GoogleAnalyticsCode.txt just inside the <Head> element (of every page) using a text editor that displays html
+. In AsciiDocFX, Output the HTML file as index.html, replacing the existing one (Click HTML at top of right pane)
+. Put the code in GoogleAnalyticsCode.txt just inside the <Head> element (of every page) using a notepad++ or an editor that displays html
 . Put the code in "icon code.txt" also inside the <Head> element
 . Log into InmotionHosting.com AMP  johnspray74@gmail.com fw2017
-. (CPanel directly  QUICKS34 fw2017)
+. (CPanel directly (case sensitive name) quicks34 fw2017)
 . Go to cPanel, then File Manager
 . Browse to public_html\abstractionlayeredarchitecture
 . Rename index.html to be deleted later

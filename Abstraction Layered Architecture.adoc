@@ -19,7 +19,7 @@ image::BOSS_Great_Wall.jpg[,450, title="In software, we have no view of the larg
 
 John R Spray
 
-Last update: 2020-02-07
+Last update: 2020-06-16
 
 I would like to acknowledge the help of Roopak Sinha at AUT (Auckland University of Technology) in the writing of the paper for ECSA 2018 including his academic perspective. 
 
@@ -611,7 +611,7 @@ This small set of interfaces allows instances of domain abstractions to be wired
 
 === How classes are used
 
-this is another practical viewpoint, this time on how classes are used in ALA programs.
+This is another practical viewpoint, this time on how classes are used in ALA programs.
 
 In ALA, a class's public interface (it's public methods and properties) are only used to instantiate and configure the class. It is not used for anything the class actually does. The public interface is 'owned' by the class so is specific to the configuration of that class. The public interface is only used from a class in a layer above. Only that layer knows what should be instantiated, how it should be configured, and how the instantiated objects are composed together to make a system.
 
@@ -700,7 +700,7 @@ ALA can therefore be described as 'generalised create and compose'.
 
 Generally, compositions are 'instances of abstractions' 'connected' together in a specific way. This can be thought of as a graph. A graph is most easily imagined as a box and line drawing. In the common examples of composition that we mentioned above, sequential execution flow, monads, UI layout etc, the composition using text readily supports graphs that are linear or small tree structures. Arbitrary graph structures can usually be done by adding connections in a special way - by naming some of the nodes and then connecting by their identifier. However this method is somewhat inconvenient and unreadable in text form. ALA therefore can use diagrams to allow compositions to be arbitrary graphs. We are going to need that in any non-trivial application.
 
-To support generalized composition, ALA dedicates the top layer to the composition itself, a layer below it for the abstractions from which instances can be composed, and a layer below that for the different types of composition paradigms. 
+To support generalised composition, ALA dedicates the top layer to the composition itself, a layer below it for the abstractions from which instances can be composed, and a layer below that for the different types of composition paradigms. 
 The middle layer is usually plain old classes and the bottom layer is usually plain old interfaces, although there are many other ways to do ALA. 
 
 
@@ -1276,7 +1276,7 @@ The full source code for the bowling application can be viewed or downloaded fro
 
 Now let's modify the bowling application to score tennis. If the bowling game hadn't been implemented using ALA, you probably wouldn't contemplate doing this. But ALA excels for maintainability, and I want to show that off by changing Bowling to Tennis. The Frame and IConsistsOf abstractions look like they could be pretty handy for Tennis. A match consists of sets, which consists of games, which consists of SinglePlays.
 
-We will need to make a small generalization to the Frame abstraction first. This will allow it to keep score for two players. We just change the type of the score from int to int[]. The Ball method will be generalized to take a player parameter to indicate which player won a play. A generalization of an abstraction to make it more reusable is a common operation in ALA.
+We will need to make a small generalization to the Frame abstraction first. This will allow it to keep score for two players. We just change the type of the score from int to int[]. The Ball method will be generalised to take a player parameter to indicate which player won a play. A generalization of an abstraction to make it more reusable is a common operation in ALA.
 
 The only other thing we will need to do is invent a new abstraction to convert a score such as 6,4 into a score like 1,0, because, for example, the winner of a game takes one point into the set score. This new abstraction is called WinnerTakesPoint (WTP in the diagram). 
 
@@ -1729,9 +1729,13 @@ Note that although we use lines in the diagrams in the top layer, those lines do
 
 |Hierarchical (fractal) structure |  Layered structure
 
-|Elements become less abstract as you zoom in. They are specific parts of specific parts. | Parts become more abstract as you go down the layers.  
+|Elements become less abstract as you zoom in. They are specific parts of specific parts. They have no use in another part of the decomposition. | Parts become more abstract as you go down the layers. They are reusable in many parts of the application.  
+
+| Elements have no use in another part of the application. | Elements are reusable in many parts of the application.  
 
 | Hides details through encapsulation, which works at compile-time. | Hides details through abstraction, which works at design-time.
+
+| Encapsulates abstractions | Encapsulates instances of abstractions.
 
 | Inner parts are increasingly private. They are encapsulated in increasingly smaller scopes. These private parts still need to be known about at design-time to understand the system  (unless they happen to also be good abstractions). | Lower layers are increasing public. Only the abstractions themselves are needed to understand the system.
 
@@ -1956,23 +1960,23 @@ As of this writing, the new ALA version of the application is still a research p
 
 ==== The application's diagram
 
-As we said in this chapter, diagrams can be an important aspect of ALA when the user story naturally contains a network of relationships amoung its instances of abstractions. In this application this is the case as there are UI relationships between elements of the UI, dataflow relationships between UI elements, data processing elements, and data sources, together with other event connections and minor dataflows such as a filepath.
+As we said in this chapter, diagrams can be an important aspect of ALA when the user story naturally contains a network of relationships among its instances of abstractions. In this application this is the case. There are UI relationships between elements of the UI. There are data-flow relationships between UI elements, data processing elements, and data sources. There are event-flows from UI to wizards and between wizards and the SaveFileBrowser. and there are minor data-flows such as a the filepath from the file browser to the csvFileReaderWriter.
 
-Here is a sample section from the application diagram:
+Here is a sample section from the application diagram that shows all the relationships that implement the user story:
 
 image::DatalinkApplication.xmind.png[Xmind used to design an application, title="Xmind being used to design an application", align="center"]
 
-This diagram was drawn using Xmind. It shows a single user story.  There is a UI with a menu item and a tool bar to start the user story. It then displays a browse dialog to specify the location of the file. When the filepath has been selected, it gets data off a device on a COM port, using a specific protocol, and writes it to a CSV file. The data is also shown on a grid on the UI.
+This diagram was drawn using Xmind. It shows a single user story.  There is a UI with a menu item or a tool bar to start the user story. It then displays a browse dialogue to specify the location of the file. When the filepath has been selected, it gets data off a device on a COM port, using a protocol, and writes it to a CSV file. The data is also routed to be shown on a grid on the UI.
 
-The user story diagram makes use of four different programming paradigms (which becoe four different wiring interfaces). Firstly there is the UI structure consisting of the window with its menubar etc arranged inside it. Secondly, there is an event connection for when the menu is clicked which opens the browse dialog. Thirdly a dataflow connection carries the output of the browse dialog, a string containing the selected filepath, to the CSVFileReaderWriter. Another dataflow connection carries characters between the COM port and the SCPProtocol and another carries SCPcommands from the SessionDataSCP. The forth interface is a table data flow that carries dynamic columns and rows of data from the SessionDataSCP object to the grid object in the UI and to the CSVFileReaderWriter. 
+The user story diagram makes use of four different programming paradigms (which become four different interface types). Firstly there is the UI structure consisting of the window with its menubar, grid etc arranged inside it. Secondly, there is an event connection for when the menu is clicked which opens the browse dialog. Thirdly a data-flow connection carries the output of the browse dialog, a string containing the selected filepath, to the CSVFileReaderWriter. Another data-flow connection carries characters between the COM port and the SCPProtocol and another carries SCPcommands from the SessionDataSCP. The forth programming paradigm is a table data flow that carries dynamic columns and rows of data from the SessionDataSCP object to the grid object in the UI and to the CSVFileReaderWriter. 
 
-When we started this project we had no tool for automatically generating the code from the diagram. During the project, one of the interns wrote a tool to do this.
+Having drawn the diagram to represent the user story, we need to make the diagram execute. When we started this particular project we had no tool for automatically generating the code from the diagram, but during the project, one of the interns wrote a tool to do this. It parsed the Json output from Xmind and generated C# wiring code equivalent to what we will show below.
 
-However it is instructive to know what the code looks like, just to make how the diagram executes more concrete. So here we show the code for the above sample diagram.
+However, at first we were hand generating code, and it is instructive to know what this hand generated code looks like, just so we know how the diagram actually executes. 
 
-When we were hand generating code, it was important that the code was readable from the point of view of seeing how it corresponds exactly with the diagram. We had various conventions to support this. One of these conventions was to indent the code to exactly mirror the tree structure in the diagram. Another was that whenever a new instance of an abstraction was wired onto the tree, all its ports would be wired, and they would be wired in the order were declared in the abstraction. This implies a depth first wiring strategy, analogous to walking the diagram tree depth first. Any ports with cross connections would also be wired to their destinations. If the destination instance did not already exist it would be pre-created. 
+When we were hand generating the code, it was important that the code was readable from the point of view of seeing how it corresponds exactly with the diagram. (It wasn't important that the code was readable from the point of view of seeing how the user story works - that was the job of the diagram.)  We had various conventions to support the one to one matching of diagram and code. One of these conventions was to indent the code to exactly mirror the tree structures in the diagram. Another was that whenever a new instance of an abstraction instantiated, all its ports would be wired immediately, and they would be wired in the order they were declared in the abstraction. This implies a depth first wiring strategy, analogous to walking the diagram tree depth first. Any ports with cross connections (the red lines in the diagram) would also be wired to their destinations at the time the abstraction were instantiated. If the destination instance did not already exist it would be pre-instantiated. 
 
-Using these conventions, for the diagram shown above, it was a simple matter to hand generate code like this:
+Using these conventions, it is a simple matter to hand generate the code below from the diagram.
 
 
 ....
@@ -2073,131 +2077,266 @@ namespace Application
 }
 ....
 
+We used a 'diagram first' rule to keep the diagram and code in sync. Change the diagram first, then change the wiring code.
+
+As of this writing, a graphical IDE is being developed for these types of ALA applications.
+
+
+== Chapter four - Programming paradigms
+
+=== Introduction to execution models
+
+ALA fundamentally begins with the premise of abstraction layers, with each layer significantly more abstract than the one above. So it is interesting to observe how these layers seem to emerge typical usage patterns, which in turn give rise to their names: Application layer, Domain abstraction layer, ProgrammingParadigms layer, and so on.
+
+image::JacquardLoom.jpg[JacquardLoom.jpg,400, title="Jacquard loom as a programming paradigm", float="right"]
+
+The layer below the domain abstractions is really interesting in this respect. After the application has arranged and joined instances of domain abstractions to __represent user stories__, we now want them to actually execute. There are multiple ways things can execute from simple events, to data-flows, UI layouts, states machines, data schemas, functional programming, etc. These are all quite abstract concepts which suggests a new layer below. The domain abstractions need to use them exyensively. So they make a new layer below the domain abstractions layer. Within the layer we will design interfaces for all these execution models so we will sometimes think of it as the execution models layer. But from the point of view of the application writer who is combining instances of abstractions, they look like multiple programming paradigms. So we call the layer the "Programming Paradigms layer".
+
+This list is by no means all there are. Slightly more custom ones such as "ConsistsOf" can be invented as needed (when they better express the requirements). We did this with the 'IConsistsOf' paradigm that we used in the project example for game scoring at the end of chapter two. 
+
+The "programming paradigms" layer may also contain other abstractions useful for building domain abstractions, such as a 'Persistence' abstraction. 
+
+It is an essential part of ALA to not only be able to have programming paradigms, but to use multiple programming paradigm in the same application, and in the same user story. This is referred to as polyglot programming paradigms. For most user stories, the most common paradigms needed does not include imperative but are a combination of data-flow, UI layout, data schema and activity.
+
+image::TaxonomyProgrammingParadigms.png[Taxonomy Programming Paradigms, title="Taxonomy Programming Paradigms - cited from Van Roy"]
+
+
+We will seldom make use of the 'imperative' programming paradigm - the execution model of the native CPU hardware and most so-called high-level languages, which is sequential, synchronous, execution flow of instructions or statements. (This paradigm does have a place in algorithms, however.) 
+
+Some programmers are so used to thinking in terms of sequential synchronous execution that it can be difficult to think in terms of other programming paradigms. Or, you keep wanting to know what the equivalent sequentially executed model is in order to understand what is going on under the covers in terms of what you already understand. Instead it is better to let go and just think in terms of the new programming paradigms. Certainly it is nice to know what is going on under the covers from a performance or resourcing point of view. But from a logical point of view, it is better to start expressing requirements directly in a range of new paradigms.
+
+Within each programming paradigms, there are generally some variations on how they can actually be made to execute. 
+
+The following sections are a selection of some of the more common programming paradigms. It is not an exhaustive list there are many other possibilities waiting to be invented that better allow succinct expression of requirements. 
+
+Most will also have a discussion of some of their different execution variations. 
+
+
+=== Synchronous events
+
+We start with events because we want something that we can understand starting at the code level up, so it we can get a concrete point of view of how these execution models can work. IEvent is the implementation of this simple yet very powerful and useful programming paradigm.
+
+Here is the interface. 
+
+....
+namespace ProgrammingParadigms
+{
+    public interface IEvent
+    {
+        void Execute();
+    }
+}
+....
+
+As you can see the execution model is very simple indeed - it's just a synchronous method call. Indeed it will be used to replace normal method calls between peer modules in conventional code.
+
+Let's complete our understanding at the code level by making two domain abstractions called A and B that use the interface:
 
 
 
-== Chapter four - Execution models
+....
+using ProgrammingParadigms
 
-=== Execution models (Programming paradigms)
 
-ALA requires the use of multiple execution models, and models other than the native CPU's hardware sequential instruction execution flow (called imperative). 
+namespace DomainAbstractions
+{
 
-The imperative paradigm of the hardware is the default paradigm in most general purpose high level languages. Some programmers are so used to thinking in terms of sequential execution of statements that it can be very difficult to think in terms of anything else. You keep wanting to know what the equivalent sequentially executed model is in order to understand what is going on instead of letting go and just thinking in terms of the different programming paradigm. Certainly it is nice to know what is going on under the covers from a performance or resourcing point of view. But from a logical point of view, it is better to let go and start expressing requirements directly in a range of different paradigms. 
+class A
+{
+    private IEvent Finished;
 
+    public void Start()
+    {
+        // do my work
+        Finsihed.Execute();
+    }
+
+}
+
+
+
+class B : IEvent
+{
+    IEvent Execute()
+    {
+        // do my work
+    }
+}
+
+}
+....
+
+
+Now we can write an application
+
+....
+using DomainAbstractions
+
+class Application
+{
+    var program = new A().WireTo(new B());
+    program.Start();
+}
+....
+
+
+This will instantiate one instance of each of our domain abstractions, and wire them together. (If you have not seen the WiteTo abstraction before, it is an extension method that uses reflection to search in class A for a private variable with a type that is any interface. It then sets it pointing to the instance of B if B implements the same interface. The WireTo is not central to the current discussion, the IEvent interface is.  WireTo is discussed in more detail in the example projects of chapters 2 and 3.) 
+
+Despite it's simplicity, the IEvent interface is a powerful abstraction that has a huge impact on the quality of the architecture. The programming paradigm it gives us is, effectively, the UML Activity diagram.
+
+Notice just how abstract IEvent is. It's highly reusable, it's not specific to any domain abstraction or the application. It just knows how to transmit or receive an event. Because it is so abstract, it is stable. This makes it ok to have many domain abstractions depend on it.
+
+Many domain abstractions will use it, either by accepting the interface (as Class A does) or by implementing the interface (as Class B does). Then many instances of those domain abstractions can be connected together in an infinite variety of ways. This is called compositionality.     
+
+The interface fully decouples domain abstractions, because they only have to know about this interface. They do not need to know about each other. Unlike normal method calls, senders don't know who they are talking to. 
+
+The IEvent interface could be contrasted with the observer pattern (publish/subscribe) which also claims to achieve decoupling. However the observer pattern only reverses the coupling of a normal method call. Instead of the sender knowing about the receiver, the receiver has to know about the sender. If the sender and receivers are peers the observer pattern does not solve the problem. The IEvent interface decouples in both directions. The job of 'subscribing' is correctly moved to the application layer, because only the application should have the knowledge of what is talking to what.
+
+There is normally a downside associated with decoupling, and that is that it becomes harder to follow the flow of control through the modules. That downside does not apply for the IEvent interface (or ALA in general). The reason is that the connections are still explicit - they are in the application layer that is wiring everything together. Another way of looking at this is that modules become abstractions. Abstractions should not know internally wha the external flow is.
+
+In summary, the event driven programming paradigm used to connect instance of abstractions has the following properties over a conventional method call or observer pattern used between peer modules. 
+
+These properties are:
+
+* sender decoupled from receiver
+* receiver decoupled from sender
+* connections between instances are still explicit
+* wiring is all brought to one place instead of being distibuted
+* compositionality
+
+=== State machines
+
+To get used to how different these programming paradigms can be, let's go now to something completely different - state machines. We wont be going into understanding them at the code level because we want to support hierarchical state machines, and the code for that is a little bit non-trivial, but we do want to get an understanding of how state machines are just another programming paradigm that allows us to wire together instance of abstractions. The meaning of the wiring is different than what it was for the event drien programming paradigm. 
+
+I assume a basic understanding of what state machines are.
+
+[.float-group]
+-- 
 image::FSM-generic.png[State machine execution model, title="State machine execution model", float="left"]
 
-The canonical example is a state machine. At first it can be difficult to write a program as a state machine, even if a state machine is a more suitable execution model for expressing the requirements. It takes some getting used to. 
+At first it can be difficult to express the solution to a requirements problem as a state machine, even when the state machine is a very suitable way to solve the problem. It takes some getting used to the first time. But it only takes a little bit of practice to begin to master it.
+--
 
-It is an essential part of ALA to not only be able to use alternative execution models, but to use multiple execution models in the same application, and in the same user story. This is referred to as polyglot programming paradigms. For most user stories, the most common paradigm needed is not imperative but a combination of data-flow, UI layout, data schema and activity.
+I once had to express a set of user stories that involved different things that could happen from the outside, either through the UI or other inputs. I knew these were the kind of user stories that were nicely expressed by a state machine, but I had no idea where to start. I only knew that the previously written C code to do the job was a big mess that could no longer be maintained. But I started drawing the state machine, first on paper and then in Visio, and everything started to fall into place very nicely. Before I knew it I had represented what used to be 5000 lines of C code by a single A3 sized state machine diagram. This diagram so well represented the user stories that it was easy to maintain for years to come. This experience was a big factor in the final conception of ALA.   
 
-Within these basic paradigms, there are lots of variations on how they can actually be made to execute.
+Here is the diagram.
 
-The following sections are a selection of common programming paradigms with a short description of each. This list will give you an idea of how varied they can be, and how powerful using them in combination would be. It is not an exhaustive list. In ALA you can invent your own programming paradigms when they better express the requirements, just as we did with the 'IConsistsOf' paradigm that we used in the project example for game scoring at the end of chapter two. 
+image::BigStateMachine.pdf.jpg[A state machine from a real embedded device, title="My first significant state machine for a real embedded device"]
 
+Notice that the diagram makes heavy use of hierarchical states (boxes inside boxes). These turn out to be important in most of my state machines.
+
+State machine diagrams are drawn in their own unique way. The boxes of the diagram are instances of the abstraction "State". The lines on a state machine diagram are actually instances of another abstraction, "Transition". Out of interest, to relate a state machine diagram to a more conventional ALA wiring diagram, you would replace all the lines on the state machine with boxes representing instances of Transition. The event, guard and actions that associate with a transition then go inside the transition box to configure it. Lines would then wire the transition box to its source state instance and destination state instance. Hierarchy is drawn on the state machine by boxes inside boxes, but in the conventional ALA wiring diagram, the boxes would be drawn outside with lines showing the tree structure. This analogous to the tree structured wiring we have used in previous examples for expressing UIs, which are actually 'contains' relationships. 
+
+The graphical tool being developed will allow the drawing of hierarchical state machines. It will internally transform it to conventional wiring of instances of states and transitions. Interfaces called something like ITransitionSource, ITransitionDestination and IHiercharical would be used to make it execute. It is a simple matter to write code inside the state and transition abstractions to make them execute that would be adequately efficient for most purposes. 
+
+How to make hierarchical state machine execute in an optimally efficient way is a non-trivial problem, but I have worked out the templates for what the C code should look like. Generating this code is a topic for another web page.
+
+ 
 === Imperative
 
-The default provided by your programming language. It reflects the underlying machine. Connected elements are executed consecutively and synchronously as fast as the CPU can do them. The connected elements are language statements, especially function or method calls. Functions and methods are executed 'synchronously', which means that execution is always passed with the messages. The receiver of a message gets both the message and the CPU resource to process it. The sender waits, frozen, until the receiver finishes using the CPU resource and returns it. This paradigm is only suitable when you know ahead of time the order that things will happen, and those things should happen as fast possible with no temporal concerns whatsoever. It is the paradigm to use to execute short running algorithms.
+Now that we have a bit of a feel for different types of programming paradigms, lets cover the Imparative one, becasue it's the one we all know and use all the time (when we shouldn't).
+
+Imperative is the one provided by your programming language. It exists because it reflects the way the underlying machine works, not because it suits the expression of most user stories. Because it works the same way as the underlying machine, the imperative programming paradigm is efficient at runtime. This can be important for typically a small amount of the total code.
+
+Impareative means that connected elements are executed consecutively and synchronously as fast as the CPU can execute them. The connected elements are language statements, especially function or method calls. Functions and methods are executed 'synchronously', which means that execution is always passed with the messages. The receiver of a message gets both the message and the CPU resource to process it. The sender automatically waits until the receiver finishes using the CPU resource and returns it. 
+
+The imperative paradigm is only suitable when you know ahead of time the order that things will happen, and those things should happen as fast as possible in CPU time. There is not real-time or temporal concerns other than having the entire routine execute as quickly as possible. It is the paradigm to use to execute short running algorithms.
+
 
 === Event driven
 
-'Event driven' is an overloaded term in software engineering because it generally means both 'an asynchronous message' and 'decoupled'. Let's clarify the decoupled part briefly because that part doesn't involve the execution model.
+We now return to 'Event driven' in the wider sense of the term than the synchronous event driven paradigm using the IEvent interface we discussed earlier.
+
+'Event driven' is an overloaded term in software engineering because it generally means both 'asynchronous' and 'decoupled'. Let's clarify these two aspect separately.
 
 ==== coupled/decoupled
  
-One perspective of 'Event Driven' is simply 'breaking out' of the imperative 'synchronous/coupled' paradigm. In Imperative programming, function calls are  both synchronous (because the caller waits for it to return before continuing its own execution) and coupled (because the function caller refers directly to a function in another module by its name). 
+One perspective of 'Event Driven' is simply 'breaking out' of the imperative 'synchronous & coupled' paradigm. In Imperative programming, function calls are  both synchronous (because the caller waits for it to return before continuing its own execution) and coupled (because the function caller refers directly to the function in another module or class by its name). 
 
-'Event driven' usually means both 'asynchronous' and 'decoupled'. It is asynchronous because the sender of the message does not wait for a response - it continues with its own execution immediately. It is decoupled because the sender does not name the recipient of the message. Instead the receiver usually names the event it is interested in. (Note that while this is considered 'decoupled' in Event Driven programming, it is not considered decoupled in ALA because the coupling is simply reversed - the receiver of the message names the sender (or the event name). In ALA neither coupling is allowed within a layer.) 
+'Event driven' usually means both 'asynchronous' & 'decoupled'. Asynchronous means the receiver of the message can handle the message in it's own time. And the sender can do other things immediately. Decoupled means the sender does not name the recipient of the message. In most implementations if Event driven, the receiver usually names the event it is interested in. (Note that while this is considered 'decoupled' in Event Driven programming, it is not considered decoupled enough in ALA because the receiver (as an abstraction) still has to know about events in the outside world. In ALA we would use a fully decoupled implementation of the event driven programming paradigm.) 
 
-These two notions, synchronous/asynchronous and coupled/decoupled are actually independent of each other. All four combinations are possible, and sensible. In fact all four combinations can be used in ALA. Although the term 'Event Driven' usually refers to the combination asynchronous/decoupled, in C#, events are synchronous/decoupled, being a synchronous implementation of the observer pattern - the sender waits until all receivers of the event have completed reacting to the event.
+These two notions, synchronous/asynchronous and coupled/decoupled are actually independent of each other. All four combinations are possible, and sensible. In fact all four combinations can be used in ALA. 
 
-The coupling/decoupling aspect has nothing to do with execution models. We have already established ALA's rules on coupling in chapter three (you must be fully decoupled in both directions within a layer).
-
-So now let's focus on the Event Driven programming paradigm from the perspective of being asynchronous. 
+As we said, the term 'Event Driven' usually refers to the combination: asynchronous and decoupled, However in C#, events are synchronous and decoupled, which adds to the confusion. In C#, events are a synchronous implementation of the observer pattern - the sender waits until all receivers of the event have completed reacting to the event before continuing its own execution.
 
 ==== synchronous/asynchronous 
 
-When something sends out an event or message there are two ways a receiver can can get the message from a timing point of view.
-
-A real world example of an asynchronous event is 
+When something sends out an event or message there are two ways a receiver can get the message from a timing point of view.
 
 * Synchronous - the receiver processes the message immediately when the message is sent. The receiver must be waiting, doing nothing, ready to process the message. The time of processing is therefore said to be synchronised with the sender. 
 
 * Asynchronous - The receiver processes the message in its own time some time later. The receiver may be busy doing other things in the meantime. This implies the message must be stored somewhere until the receiver is ready. The time of processing is not synchronised with the sending of the event. 
 
-So synchronous is made of an event plus the receiver in a do-nothing-wait state. asynchronous is made up an event, a storage of the event, and a receiver taking the event when it is ready. 
+So synchronous is made of an event plus the receiver in a do-nothing-wait state. Asynchronous is made up of an event, a storage of the event, and a receiver taking the event when it is ready. 
 
 
 ===== request/response pattern
 
-A common pattern is an orchestration of two messages, a request and a response. Usually both messages are processed synchronously or both messages are processes asynchronously.
+A common pattern is an orchestration of two messages, a request and a response. Usually both messages are processed synchronously or both messages are processed asynchronously.
 
-When both messages are processed synchronously it creates a very common pattern which we know of as a function call or method call. This pattern is efficient when running on a single thread because it is directly supported in silicon by the  subroutine call instruction. This instruction passes the event and the execution CPU resource to the receiver at the same time, and passes them both back for the response at the same time. It is actually a very nice invention. However, because the function or method is so common in programming languages, and is so efficient, the synchronous request/response pattern appears to be fundamental to most developers and tends to be over used for messaging when asynchronous methods would be better.
+When both messages are processed synchronously it creates a very common pattern which we know of as a function call or method call. This pattern is efficient when running on a single thread because it is directly supported in silicon by the  subroutine call instruction. This instruction passes the event and the execution CPU resource to the receiver at the same time, and passes them both back for the response at the same time. It is actually a very nice invention, and a very effective and safe pattern. However, because the synchronous function call or method call is so common in programming languages, and is so efficient, the synchronous request/response pattern appears to be fundamental to most developers and tends to be over used for messaging in situations where asynchronous messaging would be better. 
+
+Let's unravelling when to use synchronous and when to use asynchronous.
 
 ===== real world messaging
 
+In the real world we don't normally think about synchronous or asynchronous. If we are in a conversation, it is inherently synchronous. We naturally wait for the other person to stop talking, and then we talk. Synchronous can operate on slightly longer time scales as when go to the coffee machine and wait for the coffee. In synchronous, we may have to wait doing nothing at all for the receiver to be ready, as we do when we arrive for a doctors appointment. We basically do nothing until we are synchronised with the doctor. 
 
-In the real world we don't normally think about synchronous. Events or messages happen. The sender sends it out. The receivers react to the events when they get around to it. It's inherently asynchronous.
 
-If there is to be a response to the message, the sender doesn't wait around doing nothing while it waits for that response. Instead it reacts to the response when it arrives. If the response is not that important, like a request for a quote, the sender simply never notices that there was no response. If it is important to get the response, like a payment of an invoice, the sender will generally timeout if there is no response and send a new asynchronous message.
+On longer time scales everything is naturally asynchronous. We send an event out. It could be a letter, an e-mail, or dropping off our car. We don't wait, doing nothing, until the receiver is ready. We don't wait, doing nothing, for the response. The receivers react to our events in their own time. In the meantime we can do other things.
 
-There can be synchronous messages in the real world too, such as when having a conversation. 
+If the response is not that important, like a request for a quote, the sender can simply never notice that there was no response. If it is important to get the response, like a payment of an invoice, the sender will generally time out if there is no response and then talk an alternative action. So timeouts frequently come into play with asynchronous messaging.
 
-When there is to be a response, the sender can be doing other things. We don't have to think in terms of waiting at all. Instead we simply think of the sender reacting to the response event at it's convenience. This is the asynchronous execution model.
-
-Asynchronous events or messages are the fundamental form. An asynchronous message can be processes synchronously, but not the other way around. 
+Now notice that asynchronous events or messages are the fundamental form. An asynchronous message can be processed synchronously, but not the other way around. When you are waiting for the coffee machine, you are actually able to do asynchronous, just currently operating synchronously. If someone comes and talks to you, you can switch to asynchronous, and pick up the waiting coffee when you are ready rather when it is ready. In ALA we will be making use of this fundamental property of messaging so that we can build abstractions without having to know whether the abstraction we are talking to wants to handle it asynchronously or synchronously. 
 
 
 ===== Event driven as a paradigm
 
-Having understood teh difference between synchronous and asynchronous, we have seen that events and message are terms we use for either synchronous or asynchronous.
+We have discussed two properties of event driven: asynchronous and decoupled. 
 
-The term 'Event driven' carries a higher level meaning that is an execution paradigm.
+The Event Driven programming paradigm also has third meaning attached to it that is at higher level. In this context, the opposite of 'event driven' might be called 'Orchestration'.
 
-We will call the two alternatives Event Driven and Orchestration.
+The orchestration paradigm will be covered in the Activity programming paradigm in the next section. For now it just means that our application will prescribe what will happen in what order.
 
-The orchestration paradigm will be covered in the Activity programming paradigm in the next section. For now it means that in our application, at design-time, we want to prescribe what will happen in what order.
+The event driven paradigm is the opposite. In the application we don't know what will happen next (in either the outside world or what code will execute next). We will just wait until some event happens, and then react to it. Reacting to it usually changes some stored state. This state may change the way we will react to subsequent events. In other words, event driven and state machines work well together. 
 
-The event driven paradigm is the opposite. In the application at design-time. We don't know what will happen next. We will just wait until an event happens, and then react to it, usually changing some state.
-
-The Orchestration paradigm generally uses synchronous messaging - because everything is orchestrated everyone waits for everyone else to complete before they go in their turn. The Event driven paradigm can use either synchronous or asynchronous messaging. If using synchronous, everything will complete reacting to one event before a second event gets any reaction. 
+The Event driven paradigm allows events external to the system to happen at any time. We may be bust processing a previous event, so these events must be asynchronous. Events sent between modules in the system may be either asynchronous (treated like external events) or synchronous (lets do eveything everything related to an external event now - calles GALS - Globally Asynchronous locally synchronous) or a combination of both.  
 
 ===== Why use synchronous?
 
-So if asynchronous is the more general and more flexible execution model, why use synchronous at all? As mentioned synchronous is efficient on a single thread, and is supported by the very common function or method statement of our common programming languages. There are other reasons to use synchronous. 
+So if asynchronous is the more general and more flexible execution model, why use synchronous at all? As mentioned synchronous is efficient on a single thread, and is supported by the very common function or method statement of our common programming languages. These are sometimes good reasons to use synchronous. But there are other reasons to use synchronous locally. 
 
 * Synchronous allows orchestration to be coded more conveniently. After a function call, the next thing to happen is coded in the next line of code, which is very nice. If using asynchronous messages for orchestration logic, the code for what happens next ends up in a different place (where the response event arrives) (although languages that have async/await can do code orchestration using asynchronous messaging just as nicely). 
 
-* Single threaded synchronous messaging avoids certain potential problems because it is inherently deterministic - it orders the execution of everything that reacts to events whereas asynchronous leaves the ordering of execution to be determined separately, which will generally appear less deterministic.
+* Single threaded synchronous messaging avoids certain potential problems because it is internally more deterministic - it orders the execution of everything that reacts to events. Asynchronous leaves the ordering of execution to be determined separately, which will generally appear less deterministic.
 
 ===== Why use asynchronous?
 
-* Asynchronous avoid temporal coupling between sender and receiver.
+* Asynchronous avoids temporal coupling between sender and receiver. This can be hugely important, just as it's important not to have to wait for the receiver to be ready read your email before you send it, or to have to wait all day doing nothing while your car is being fixed.
 
-* Asynchronous allows separate explicit scheduling of execution for performance issues.
+* Asynchronous allows separate explicit (rather than implicit) scheduling of all work for temporal or performance issues. This explicit scheduling is both a greater freedom and a greater responsibility.
 
+* A synchronous thread can't do anything else until it gets the response. This causes performance issues for long running routines. The connonical example is the UI that freezes while the single thread application executes a long synchronous algorithm. Synchronous generally involves temporal coupling. 
 
+* Synchronous theoretically can work across threads, processors or networks (by remote procedure calls), but becomes even more problematic in temporal coupling. A synchronous call may block execution of the sender for an arbitrary length of time. The more general asynchronous approach becomes very much preferred.
 
-There are two reaons to use
+==== ALA temporal decoupling between synchronous and asynchronous
 
-The thread can't do anything else until it gets the response. This causes performance issues for long running routines. The connonical example is the UI that freezes while the single thread application executes a long synchronous algorithm. Synchronous generally involves temporal coupling. 
+ALA can use both asynchronous and synchronous. It does not have rules for when to use one or the other. The rules remain more or less the same as in non-ALA applications. However, ALA is all about abstractions that are completely uncoupled. They know absolutely nothing about each other, and this applies equally to whether they use asynchronous or synchronous events or messaging. It is therefore desirable that abstractions that generate events and abstractions that listen to events can be connected regardless of their synchronous or asynchronous nature. The only way to do this is for interfaces to be all asynchronous, and then be used synchronously when required at runtime. Let's explore the consequences of this.
 
-Synchronous can work across threads, processors or networks, but becomes even more problematic in temporal coupling. A synchronous call may block execution of the sender for an arbitrary length of time. The more general asynchronous form becomes preferred.
+Abstractions that receive events can implement the asynchronous interface either asynchronously or synchronously as they choose. If implementing synchronously, if the interface uses a callback, this means that they will call the callback function in the interface synchronously. If Tasks or Promises are used in the interface, it means they will return a Task or Promise already in the complete state. 
 
-ALA can use both asynchronous and synchronous. It does not have rules for when to use one or the other. The rules remain more or less the same as in non-ALA applications. However, ALA is all about abstractions that are completely uncoupled - they know absolutely nothing about each other. It is therefore desirable that abstractions that generate events and abstractions that listen to events don't have to be coupled by having to know whether they will both use synchronous function calls or both use some asynchronous event mechanism. The only way around this problem is for any interfaces that may need to be either to be asynchronous. That's because an asynchronous interface can be used synchronously.
+Abstractions that send events can also use the asynchronous interface synchronously if they choose. To do they simply don't do anything else until the response comes. If callbacks are used, it needn't care if the callback is called back synchronously. If Tasks or Promises are used, it needn't care if the Task or Promise it gets back after it sends the event is already in the complete state. But for when the receiver behaves asynchronously, the sender must still implement either a callback or a promise.
 
-Abstractions that receive events can implement the asynchronous interface synchronously if they choose. If callbacks are used, this means that they will call the callback function in the interface synchronously. If Tasks or Promises are used, it means they will return a Task or Promise already in the complete state. 
+In this way senders and receivers do not need to be coupled with respect to synchronous/asynchronous. If two abstractions that don't know each other are connected in the same processor, they can execute synchronously. If they are connected in over a network, they can communicate asynchronously. 
 
-Abstractions that send events can use the asynchronous interface synchronously if they choose. They simply don't do anything else until the response comes. If callbacks are used, it needn't care if the callback is called back synchronously. If Tasks or Promises are used, it needn't care if the Task or Promise it gets back after it sends the event is already in the complete state. 
+This all sounds good, but unfortunately, if you make an interface asynchronous in order for it to handle either asynchronous or synchronous, both ends must be written in the 'coding style' of asynchronous. If the sender wants to execute synchronously, the coding style looks awkward unless your language has async/await or a similar mechanism such as protothreads. This is especially true when there is a known sequence of activities to be done that is naturally expressed as sequential function calls. The other problem is that if you are in the happy position of having async/await available, the async functions can start spreading to everywhere.
 
-In this way senders and receivers do not need to be coupled with respect to synchronous/asynchronous. If two abstractions that don't know each other have their instances wired together, the sender of the event determines whether it will be asynchronous or synchronous - do nothing while it waits for the response or not. 
+On the receiver side, when it wants to implement an asynchronous interface in a  synchronous manner, it can't simply return the value - it must call the callback or set the result in the promise object first.
 
-Unfortunately, if you make an interface asynchronous in order for it to handle either asynchronous or synchronous, both ends must be written in the coding style of asynchronous. If the sender wants to use synchronous, the coding style becomes awkward unless using async/await. This is especially true when there is a known sequence of activities to be done that is naturally expressed as sequential function calls. The other problem is that if you are in the happy position of having async/await available, the async functions can start spreading to everywhere.
+All this only affects code that is written inside domain abstractions. It doesn't affect things so much at the application layer. This is because in the application layer we have lifted ourself into the declarative realm of composition of instances of abstractions. We have abstracted away the execution model in the interfaces in the Programming Paradigms layer. If you are wanting to do something sequential (but not Imperative) in the application layer module, you do it using the 'Activity' execution model which we will describe in a later section of this chapter.   
 
-On the receiver side, when it wants to implement an asynchronous interface in a  synchronous manner, it can't simplly return the vale - it must call the callback or set the result in the future object first.
-
-All this only affects code that is written inside domain abstractions. It doesn't affect things so much at the application layer. This is because in the application layer we have lifted ourself into the realm of composition of instances of abstractions. We have abstracted away the execution model in the interfaces in the Programming Paradigms layer. If you are wanting to do something sequential (but not Imperative) in the application layer module, you do it using the 'Activity' execution model which we will describe in a later section of this chapter.   
-
-
+TBD
 ==== Preemptive/non-premptive
 
 Before leaving the 'Event Driven' execution model, we just need to clarify two variants of asynchronous - preemptive or non-preemptive. An Event or Message can be sent and end up being executed on another thread or the same thread.  
@@ -2212,7 +2351,7 @@ At this point there may be confusion in the situation where you have a multi-thr
 
 ==== Examples of Event Driven
 
-There are many examples of usage of event driven such as in Node.js, the reactor pattern, IEC 61499 function blocks and there is usually an Asynchronous Event Framework behind the scenes of state machines.
+There are many examples of usage of asynchronous event driven systems. Examples are Node.js, the reactor pattern, IEC 61499 function blocks and there is usually an Asynchronous Event Framework behind the scenes of state machines.
 
 === Activity-flow
 
@@ -2359,9 +2498,6 @@ The execution timing and the timing of outputs occurs at a predictable tick time
 Glitches that could occur in an asynchronous system (discussed earlier) are eliminated at the level of single clock ticks. A fast glitch could not occur. A glitch would occur when different data paths had different lengths, and would last for at least one tick duration. Controlling glitches is therefore lifted into the normal design space.
 
 
-=== State machines (transition-flow)
-
-TBD
 
 === UI layout
 
@@ -2381,11 +2517,11 @@ TBD
 
 Robert Martin posed an interesting pedagogical sized embedded system problem about a coffee maker in his book “Agile Software Development: Principles, Patterns and Practices”. The original chapter is called “Heuristics and Coffee”.
 
-In the original chapter, the worked solution to this problem uses decomposition into three modules that collaborate or interact with one another. The ALA solution follows the opposite philosophy. It has three abstractions (which correspond with the three modules), but they do not collaborate or interact with one another. Being abstractions, they don't know anything about each other. As domain abstractions, they know nothing about the coffee machine. The coffee machine is then constructed as another abstraction, in the top layer, that makes use of the three domain abstractions. 
+In the original chapter, the worked solution to this problem uses decomposition into three modules that collaborate or interact with one another. The ALA solution follows the opposite philosophy. It has three abstractions (which correspond with the three modules), but they do not collaborate or interact with one another. Being abstractions, they don't know anything about each other. As domain abstractions, they also know nothing about the coffee machine. The coffee machine is then constructed (as another abstraction in the top layer) that makes use of the three domain abstractions. 
 
-This example uses different execution models from the 'consistsof' and 'dataflow' ones that we used in previous examples. Here we will use some exremely simple, yet quite interesting electronic-signal-like execution models that have a simple main-loop polling type implementation, just as Robert Martin's original solution also had.
+This example uses different execution models from the 'consistsof' and 'dataflow' ones that we used in previous examples. Here we will use some extremely simple, yet quite interesting electronic-signal-like execution models that have a simple main-loop polling type implementation, just as Robert Martin's original solution also had.
 
-Reading an ALA application requires first paying attention to the pre-requisite knowledge you need from lower layers. So before presenting the application, lets first familiarise ourselves with the abstractions we need from the domain layer, and the Programming Paradigms layer.
+Reading an ALA application requires first knowing the pre-requisite knowledge you need from lower layer abstractions. So before presenting the application, lets first familiarise ourselves with the abstractions we need from the domain layer, and the Programming Paradigms layer.
 
 ==== Domain abstractions layer
 
@@ -2397,7 +2533,7 @@ Take a moment to look at these three abstractions:
 
 -- The UI has a lamp you can control, and a push button which outputs an event (should have been two separate abstractions).
 
--- There is a WarmerPlate. It tells you whether or not the pot is on the warmer plate, and whether or not it is empty. It controls its own heater. 
+-- There is a WarmerPlate. It tells you whether or not a container is on the warmer plate, and whether or not it is empty. It controls its own heater. 
 
 -- There is a  Boiler. It can be turned on or off. It will tell you when it is empty of water. And you can stop water flow instantly with a steam release valve. It will turn its own heater off if it runs out of water, or the valve is opened. 
 
@@ -2458,9 +2594,9 @@ To make it actually execute, we apply the manual procedure documented in “Exec
     userInterface.LightOn = state==Brewed;
  
 
-There is a one-to-one correspondence between the lines in the diagram and the code. 
+There is a one-to-one correspondence between the lines in the diagram and the lines in the code. 
 
-As you can see, the execution model is a simple one. The 6 lines of code are continually executed. This execution model is effective and appropriate for this small application.
+As you can see, the execution model is a simple one. The 6 lines of code are continually executed in a loop. This execution model is effective and appropriate for this small application.
 
 The 6 lines of code can be built into a complete program shown below:
 
@@ -2548,35 +2684,101 @@ The resulting application passes all of Martin's original acceptance tests plus 
 
 === Agility
 
-Apart from an iteration zero, ALA is inherently optimally agile. By agile, we mean it's easy to change the functional requirements. ALA achieves this in its highest level separation of concerns. This primary separation is code that just describes requirements from code that just does implementation. The implementation code never has knowledge of any specific requirement, so it generally doesn't change when requirements change. Only the code that describes requirements needs to change, and that code is optimally minimal over requirements, and so is optimally agile over changes to requirements.
+ALA is inherently optimally agile (except for an Iteration zero which we will discuss next). By optimally agile, we mean that the amount of code that changes to change functional requirements is the minimum it can be. The amount of code that actuall depends on requirements is a small percentage of the total. This differs from the average application where most code depends on the requirements.
+
+ALA achieves this at its first level of separation of concerns. This first  separation is to separate code that will just describe requirements from code that will implementation the abstractions needed to describe the requirements. This implementation code never has knowledge of any requirements, so it generally doesn't change when requirements change. Only the code that describes requirements needs to change, and that code is optimally minimal.
 
 
 
 ==== Iteration zero
 
-When a new project begins, the only new information we have is the requirements. Any design decisions that don’t depend on the requirement could already have been made beforehand. It is those decisions that form the ALA reference architecture. Therefore,, when we get the requirements, that is our immediate and total focus. We may not know all of them, but we will only need a sample to build a picture of the architecture. 
+When a new project begins, the only new information we have is the requirements. Any design decisions that don’t depend on the specific requirements could already have been made beforehand. It is those decisions that form the ALA reference architecture. Therefore, when we get the requirements, that is our immediate and total focus. We may not know all of them, but we will only need a sample to build start inventing our domain abstractions. 
 
-Looking at the available new information as a whole first instead of taking it a bit at a time during the project's sprints will make a huge difference to the eventual architecture quality.
+Looking at the available new information as a whole first instead of taking it a bit at a time during the project's sprints will make a huge difference to the quality of the abstractions we invent, and eventually the quality of the application's architecture.
 
 The process in the first iteration takes requirements one by one, and represents them, in all their detail. Domain abstractions will be invented as you go, and they will have parameters or properties that will handle those details from requirements. 
 
 For the first green field application, you spend a maximum of one sprint. After that you do need to find out if your design works. So you may not get through all the known requirements. That does not matter. 
 
-To know whether knowledge from your design goes in the application layer of the domain abstractions layers, you consider what the scope of that knowledge is. Is the knowledge specific to this one requirement in the one application, or is it potentially reusable in the same or other applications? A softkey label is clearly specific. The concept of softkeys is clearly in the domain. 
+To know whether knowledge from your design goes in the application layer or the domain abstractions layers, you consider what the scope of that knowledge is. Is the knowledge specific to this one requirement in the one application, or is it potentially reusable in the same or other applications? A softkey label is clearly specific and goes in the application. The concept of softkeys is clearly a domain abstraction. 
 
 The output of the first sprint does not implement any of the invented abstractions, but it does include all details of the requirements that are looked at. In so doing, you design the first approximation of a DSL. The DSL may be refined later as more requirements are looked at.
 
-Each abstraction will eventually be implemented as a class, but initially we just record the names of the abstractions, and a short explanation that provides the insight into what this abstraction does. 
+Each abstraction will eventually be implemented as a class, but initially we just record the names of the abstractions, and a short explanation that provides the insight into what the abstraction does. 
 
-By the end of the first sprint the requirements will have become easier and easier to represent, as the set of abstractions will have taken shape. Sometimes you will generalize an abstraction further to enable it to be useful in for more things.
+By the end of the first sprint the requirements will have become easier and easier to represent, as the set of abstractions will have taken shape. Sometimes you will generalise an abstraction further to enable it to be useful in more parts of the application.
 
-By keeping moving through the requirements at a much faster pace than in normal development (say one feature per hour instead of one per week), we can keep representing them in a coherent way, revising abstraction ideas we have already invented. Ideally, we will end up with a set of domain abstractions that can be wired together in different ways to represent a ‘domain space’ of requirements. That domain space will grow slightly as time goes on and it accommodates a growing family of products, but we don’t want it to grow beyond that. We don’t want to invent ways of implementing things we will never do. If you leave the invention of the set of abstractions to be done gradually during the longer time scale of the project as a whole, you will lose the opportunity to have a coherent set that will compose with each other in an infinite variety of ways.
+By keeping moving through the requirements at a much faster pace than in normal development (say one feature per hour instead of one per week), we can keep representing them in a coherent way, revising abstraction ideas we have already invented. Ideally, we will end up with a set of domain abstractions that can be wired together in different ways to represent the requirement space - the space of all possible requirements. That space, which we call the domain, will grow slightly as time goes on and it accommodates a growing family of products, but we don’t want it to grow beyond that. We don’t want to invent ways of implementing things we will never do.
 
-The output of sprint zero is usually a diagram showing the wiring of instances of abstractions, together with annotated configuration information for those instances.
+On the other hand, we do want to invent quite a few abstractions during this first iterations so that we end up with a coherent set of them that will compose together in an infinite variety of ways.
 
-It doesn’t matter if some of the requirements are wrong. Chances are they are still useful for scoping out the domain space. What we are actually producing in this phase are the necessary abstractions for the Domain layer. If the requirements change later, it will be trivially simple to change them as only the Application layer wiring should change.
+The output of sprint zero is usually a diagram showing the wiring of instances of abstractions, together with configuration information for those instances.
 
-Once this process has started to become easy, which should happen within the first sprint, the burning question in our minds will become “Will all this actually work?” We have to trust that there will be a way to write those abstractions to make the whole system work.
+It doesn’t matter if some of the requirements are wrong. Chances are they are still useful for scoping out the domain space. What we are actually producing in this phase are the necessary abstractions for the Domain Abstractions layer. If the requirements change later, it will be trivially simple to change them as only the Application layer wiring should change.
+
+Once this process has started to become easy, which should happen within the first sprint, the burning question in our minds will become “Will all this actually work?” We have to trust that there will be a way to write those abstractions to make the whole system execute.
+
+==== How to invent your domain abstractions
+
+The most difficult part for people new to ALA is the skill of inventing the domain abstractions. You can fully understand the theory of ALA and why we need to invent abstractions, and still find it tricky to actually invent them. That's because in this step in the process, we have to literally become inventors who are adding to the state of the art within your domain.
+
+So the biggest insight I can offer here is don't expect it to come without effort. Put your inventors hat on. Deliberate about the problem over a long period of time. Leave it overnight. Come back to it afresh in a week. Be patient. 
+
+I sometimes find that a solution will pop out of nowhere while reading about something completely unrelated. Once the human mind has been deliberating for some time, it remembers the whole context of the problem, and seems to carry on pattern matching for potential solutions in the background. I am reminded of the story of the Dam Busters. The British wanted to bomb the German dams to flood the industrial valleys below them. They worked out that they could deliver the bombs to the face of dam by skipping them across the surface of the lake. But they couldn't get their bomber low enough to the water at night to get them to skip, because they had no way of knowing their height above the water.
+
+Then one of the pilots was attending a play. He saw the spotlights pointing at the actor from different angles. And suddenly he had the solution. By mounting spotlights at the nose and the tail of the aircraft at a certain angle, they would know when they were at the correct height when the two spots came together at the surface of the water.  
+
+In my experience, there is always a solution, and it is always worth the effort. Just as good inventions are like gold, good abstractions are like gold in your application.
+
+This section offers some practical tips on where to start.
+
+* You start by simply expressing requirements. You are inventing domain abstractions to allow you to express the requirements succinctly, but including all their details. 
+
+* Draw a diagram that describes the requirements. You will draw boxes with lines. The boxes are your invented domain abstractions. The lines are your invented programming paradigms.
+
+* Look at the English version of the requirements for words that recur. These are candidates for abstractions. 
+
+* Your diagram should have about the same amount of information as the English requirements. It will be succinct, even though it will include lots of detail such as text strings that come from requirements. Anything else that even begins to look like implementation or how it will work or execute is the beginning of an idea for an abstraction. Don't worry about them. Just concentrate on making a description of requirements. 
+
+* Always keep in mind that reusability and abstraction are two sides of the same coin. Your invented abstractions are anything that is potentially reusable.
+
+* Start with the user interface. Sketch multiple parts of the UI to make it more concrete. Then it is relatively easy to invent abstractions for your UI. They are things that will recur in different parts of the UI that you will always want to be done the same way. We can draw inspiration from the many widgets we already find in UI frameworks. ALA will often have equivalent ones that are just a little more specialised to your domain. Buttons may have a consistent size and style in your domain. Or your domain may need Softkeys, which are not usually part of a UI framework.
++
+ALA UI abstractions will usually be composed together in a tree structure representing the containment structure. This is similar to the tree structure of XAML, but in ALA we will usually do it as a diagram that is just one part of the entire application diagram.
+
+* Once you have designed some UI, you will then want to connect the UI elements that display data to some data sources. These data source are candidates for abstractions. For example, a data source that represents a disk file can be an abstraction that handles a disk file format. You will start to have dataflows between instances of data sources, be they UI elements or other source/destinations.
+
+* Between your data end points, data may need to be transformed, aggregated, filtered, sorted, validated or transacted (transacted means either all of it or none of it). All of these are great candidates for domain abstractions.
+
+* Sometimes a data source or destination will involve a protocol. A protocol is a domain abstraction. One abstraction should be invented to know about the protocol so that no other abstraction needs to know anything about the protocol. Sometimes there are protocols on top of protocols. For example, on top of a serial data stream protocol such as line terminated text, you may have another protocol that specifies the expected content of the first line.
++
+This same idea applies to file formats. A file format, such as a CSV file becomes an abstraction. If there is further formatting expected on top of the basic CSV format, such as a header row, that becomes a second abstraction.
++
+As with all abstractions, these abstractions know all about the details of something, e.g. a protocol or a format, and become the only thing in the entire application that does know about it.
++
+As a result these types of abstractions will usually handle the data going in both directions - sending and receiving, reading and writing.   
+
+* If you have hardware devices, each will become an abstraction. For example, an ADC device will become a domain abstraction. The abstraction will know all the detail about the device (everything that is in the datasheet for the device). No other part of the program will know these details.
++
+If you have an ADC device that has an SPI interface, that will become two abstractions, one that knows all the details of the device, and one that knows all the details of the basic SPI interface. 
+
+* Sometimes a section of requirements will seem like it should become a 'module' or 'function' - for example to parse a string. Try to turn the module or function into something more generally useful. Even if you still end up having only one instance of it for now, by separating that module or function into a general part and a configuration part (that has the information for it's specific use in the one part of your application), you will make the general part easier to know what it does - simply because it is more abstract. In time you will often generalise it further and start to have instances of it elsewhere.   
+
+* If all else fails, just start writing code that implements the requirements in the old fashioned way, not worrying about how messy it gets. When it is functioning as you want, then refactor it to ALA as follows. This is actually quite a straightforward process.
++
+Any code that has details that come from requirements, move that to the application layer, leaving behind generalised functions or classes that have parameters or configuration properties that the application will pass in.
++
+At first the generalised classes may have only one instance each. Look for ones that have similar functionality and combine them. The difference between them become further configuration properties, sometimes in the form of lambda expressions. 
++
+Now refactor the generalised classes or functions so that they do not call each other directly.
++
+** In the case of functions, this step will involve adding new 'wiring' parameters that themselves take functions. The application will pass in the function that it needs to be wired to. These wiring parameters will usually either be to pull the input or push the output. The wiring function signatures should be even more generalised to allow Lego-like composition of functions by the application. They become interfaces in the programming paradigms layer. Section 1.11 has a worked example of refactoring of functions to ALA. 
++
+** In the case of classes, this step will involve adding dependency injection setters. These will be used by the application to specify what class and instance it will talk to. This step removes all uses of the "new" keyword from the class (except ones that are instantiating classes in a lower abstraction layer such as your framework). Also if you have any uses of the observer pattern or publish subscribe pattern, move the code that does the subscribing out to the application. Provide a dependency injection setter for it to use. The dependency injection setters should all take generalised interfaces to allow Lego-like composition of class instances by the application.
+
+Your classes and functions are now proper abstractions because they don't know anything about the outside world, including who they are wired to, making them reusable.
+
+
 
 ==== 2nd Sprint
 
@@ -3298,7 +3500,7 @@ We now introduce the pattern that both solves the congruence problem just discus
 
 Note: The wiring pattern is not necessarily a part of an ALA architecture. For example, if your whole problem is just an algorithm, and therefore suits a functional programming style, then you can still compose abstractions with function abstractions, provided all function calls are knowledge dependencies, and not say, just passing data or events. 
 
-If you are using monads, especially I/O monads, or RX (reactive extensions), especially with hot observables, you are already using the wiring pattern. The pipes and filter pattern is also an example of the wiring pattern. Labview or Node-Red can use the wiring pattern. There are many other examples of the wiring pattern. Most support a data-flow programming paradigm. Here we generalize the pattern to support any programming paradigm. 
+If you are using monads, especially I/O monads, or RX (reactive extensions), especially with hot observables, you are already using the wiring pattern. The pipes and filter pattern is also an example of the wiring pattern. Labview or Node-Red can use the wiring pattern. There are many other examples of the wiring pattern. Most support a data-flow programming paradigm. Here we generalise the pattern to support any programming paradigm. 
 
 The wiring pattern may be the same as the "Component Pattern" in some literature if used with what is referred to as 'configurable modularity' or 'abstracted interactions'. 
 
@@ -5034,7 +5236,7 @@ Another difference is syntax. Monads are composed using a dot operator, a method
  source.Filter(x=>x>=0).Select(x=>sqrt(x))
 
 
-This code filters out values from the source that are negative and then calculates the squareroots. In ALA, because composition is generalized, the syntax would look like this:
+This code filters out values from the source that are negative and then calculates the squareroots. In ALA, because composition is generalised, the syntax would look like this:
 
  source.WireIn(new Filter(x=>x>=0)).WireIn(new Select(x=>sqrt(x))
 
