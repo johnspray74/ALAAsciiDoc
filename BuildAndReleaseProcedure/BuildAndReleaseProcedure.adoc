@@ -17,7 +17,7 @@ Author Name
 . Log into InmotionHosting.com AMP  johnspray74@gmail.com fw2017
 . (CPanel directly (case sensitive name) quicks34 fw2017)
 . Go to cPanel, then File Manager
-. Browse to public_html\abstractionlayeredarchitecture
+. Browse to public_html\abstractionlayeredarchitecture.com
 . Rename index.html to be deleted later
 . Upload new index.html
 . Upload any new images from the images folder to the images folder
