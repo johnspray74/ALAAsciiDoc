@@ -19,7 +19,7 @@ image::BOSS_Great_Wall.jpg[BOSS_Great_Wall.jpg,450, title="In software, we lose 
 
 John R Spray
 
-Last update: 2020-09-27
+Last update: 2020-10-18
 
 I would like to acknowledge the help of Roopak Sinha at AUT (Auckland University of Technology) in the writing of the paper for ECSA 2018 and  his academic perspective. 
 
@@ -2126,15 +2126,15 @@ As we said, in text from, this graph needs to use at least some symbolic connect
 
 This is bad enough. In fact this is already really, really bad compared with how the electronics guys do things.
 
-But it gets much worse. In most conventional code, we take all these symbolic connections and distribute them evenly through the files/modules/classes/functions. Now the graph is totally obfuscated.
+But it gets much worse. In most conventional code, we take all these symbolic connections and distribute them evenly through the files/modules/classes/functions. Now the graph is totally obfuscated. The graph is highly cohesive. Why do we make it harder for ourselves by breaking it up?
 
-But it gets much worse. Graphs have circles in them. There is nothing wrong with that, it's inherent in the connections in the requirements. But circles are at odds with dependency rules. So now what we do is break the cyclic dependencies using principles like dependency inversion or observer pattern. When we do this we further obfuscate the graph. Some of the connections are done at run-time by code written somewhere else. This is the so called indirection problem.
+But it gets much worse. Graphs have circles in them. There is nothing wrong with that, it's inherent in the connections in the requirements. But circles are at odds with dependency rules. So now what we do is break the cyclic dependencies using principles like dependency inversion or observer pattern. The connections don't go away. We just further obfuscated them. These connections are now done at run-time by code written somewhere else. This is the so called indirection problem.
 
 What a mess we have got into!
 
-ALA tells us how to fix this entire mess. It's really quite simple. ALA breaks up your application by factoring out abstractions. When you have done that to the maximum extent, what's left behind is nothing but the specifics of the requirements, including that graph.
+ALA tells us how to fix this entire mess. It's really quite simple. ALA breaks up your application by factoring out abstractions. When you have done that to the maximum extent, what's left behind is nothing but the specifics of the requirements, including that (highly coherent) graph.
 
-Now you can choose to go ahead and represent that graph in text in one place, using many symbolic connections, and you would already be way way better off than how we write conventional code. But even better is to do what the electronics guys do, and just build the tools to handle the graphs properly.
+Now you can choose to go ahead and represent that graph in text in one place, using many symbolic connections, and you would already be way, way better off than how we write conventional code. But even better is to do what the electronics guys do, and just build the tools to handle the graphs as diagrams properly.
 
 ==== Diagrams and text are not equivalent
 
