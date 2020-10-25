@@ -600,7 +600,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <p>John R Spray</p>
 </div>
 <div class="paragraph">
-<p>Last update: 2020-10-18</p>
+<p>Last update: 2020-10-21</p>
 </div>
 <div class="paragraph">
 <p>I would like to acknowledge the help of Roopak Sinha at AUT (Auckland University of Technology) in the writing of the paper for ECSA 2018 and  his academic perspective.</p>
@@ -609,41 +609,52 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <p><a href="Abstraction_Layered_Architecture_Paper_ECSA_2018.pdf">ALA Paper presented at ECSA 2018</a></p>
 </div>
 <div class="paragraph">
-<p><strong>Summary</strong></p>
+<p><strong>The real quick summary</strong></p>
 </div>
 <div class="paragraph">
-<p>For a quick summary of ALA read section 3.1 and then 2.1, then perhaps one of the example projects at the end of each chapter.</p>
+<p>ALA gives us two fundamental architectural constraints when writing software:</p>
 </div>
-<div class="paragraph">
-<p><strong>Organisation of this site:</strong></p>
-</div>
+<div class="openblock">
+<div class="content">
 <div class="ulist">
 <ul>
 <li>
-<p>Chapter One, "What problem does ALA solve" explains the current major crisis in software engineering.</p>
+<p>The only dependency relationship allowed is on an abstraction. That abstraction must be significantly more abstract than the abstraction containing the dependency. No other relationships are needed or allowed.</p>
 </li>
 <li>
-<p>Chapter Two, "What does the structure look like?" without explaining how or why, decribes the structure.</p>
-</li>
-<li>
-<p>Chapter Three, "Why the structure works" explains why this structure solves the problems outlined in chapter one.</p>
-</li>
-<li>
-<p>Chapter Four, "Execution models", explains the different ways to make the CPU execute the right code at the right time when the organisation of the code that emerges from ALA is completely independent of the execution flow.</p>
-</li>
-<li>
-<p>Chapter Five, "Methodology", describes ALA in terms of where it fits into Agile software development.</p>
-</li>
-<li>
-<p>Chapter Six, "The philosophy behind ALA", gives the theory of why ALA works from the perspective of complex systems and how our brains work.</p>
-</li>
-<li>
-<p>Chapter Seven, "ALA compared with&#8230;&#8203;", compares ALA with existing architectural styles and patterns, both similarities and differences. Choose the one you are most familiar with to see how ALA uses it, builds on it, or contrast with it.</p>
+<p>All abstractions must be small - 100-500 LOC (or diagram nodes).</p>
 </li>
 </ul>
 </div>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Chapter 1, "What problem does ALA solve". These two constraints solve the "big ball of mud" problem, and other related software engineering problems by providing a pre-worked meta-architecture or macro-structure that works for all software.</p>
+</li>
+<li>
+<p>Chapter 2, "What does the structure look like?". Without explaining how or why, describes what the emergent structure looks like after applying these two constraints. It describes: What an abstraction is in terms of (usually) one class or function or a small group of highly cohesive code artefacts. The most common pattern that emerges, which is to explicitly wire together instances of abstractions that communicate with each other through 'abstract interfaces'. The emergent use of abstraction layers and the standard folders for these layers. The emergent use of ports and how to make ports using plain code inside classes. The emergent use of diagrams. The use of programming paradigms when composing instances of abstractions. That multiple programming paradigms are used in an application. e.g. user interface layout, events, data flows, activity flows, state machines, data schemas, and others. The emergent property of the direct representation of requirements in a formal way, like a DSL, which is then executable.</p>
+</li>
+<li>
+<p>Chapter 3, "Why the structure works". Explains the theory behind these two fundamental architectural constraints and that they actually result in zero coupling between all abstractions. (Not just loose coupling, zero coupling.) In turn, this eliminates complexity. Explains that requirements typically inherently contain a graph structure, and that this graph should be explicit, preferably in a diagram.</p>
+</li>
+<li>
+<p>Chapter 4, "Execution models". Explains how the underlying execution for each programming paradigm can be made to actually work through 'abstract interfaces'. Explains the ways that the CPU executes the right code at the right time when the programming paradigms that emerge from ALA organise code in an orthogonal way to imperative execution flow.</p>
+</li>
+<li>
+<p>Chapter 5, "Methodology". Describes ALA in terms of where it fits into Agile software development, and the use of an "Iteration zero" to do an initial representative design.</p>
+</li>
+<li>
+<p>Chapter 6, "The philosophy behind ALA". Gives the theory of why ALA works from the perspective of complex systems and how our brains work. It describes how the two fundamental architectural constraints are designed to mimic how our brains see the real world. This leverages how our brains have evolved to use abstractions to understand the real world to enable it to understand our programs in the same way.</p>
+</li>
+<li>
+<p>Chapter 7 "ALA compared with&#8230;&#8203;". Unsurprizingly, the two fundamental constraints of ALA emerge many of the same architectural styles and patterns we find in software engineering. But it usually modifies them. Such things as layers, dependency injection, observer pattern, DSLs, components and connectors. But it also leaves some significant ones out. For example, ALA says that UML class diagrams are evil. This chapter goes through all the common large-structure styles and patterns. Choose the one you are most familiar with to see how ALA encompasses it, usually in a modified way, or contrasts with it.</p>
+</li>
+</ol>
+</div>
 <div class="paragraph">
-<p>Each chapter ends with an example project or two. These projects ground the architecture in real code. Unlike most pedagogical sized examples, these examples are progressively non-trivial. Yet because of ALA&#8217;s power, they remain small and easily readable.</p>
+<p>Each chapter ends with an example project or two. These projects show the architecture in real code. Unlike most pedagogical sized examples, these examples are progressively non-trivial. Yet because of ALA&#8217;s power, they remain uncomplicated and easy to understand.</p>
 </div>
 </div>
 </div>
@@ -3304,19 +3315,19 @@ So why do we often use a diagram instead of text in the application (top) layer 
 <p>This is bad enough. In fact this is already really, really bad compared with how the electronics guys do things.</p>
 </div>
 <div class="paragraph">
-<p>But it gets much worse. In most conventional code, we take all these symbolic connections and distribute them evenly through the files/modules/classes/functions. Now the graph is totally obfuscated.</p>
+<p>But it gets much worse. In most conventional code, we take all these symbolic connections and distribute them evenly through the files/modules/classes/functions. Now the graph is totally obfuscated. The graph is highly cohesive. Why do we make it harder for ourselves by breaking it up?</p>
 </div>
 <div class="paragraph">
-<p>But it gets much worse. Graphs have circles in them. There is nothing wrong with that, it&#8217;s inherent in the connections in the requirements. But circles are at odds with dependency rules. So now what we do is break the cyclic dependencies using principles like dependency inversion or observer pattern. When we do this we further obfuscate the graph. Some of the connections are done at run-time by code written somewhere else. This is the so called indirection problem.</p>
+<p>But it gets much worse. Graphs have circles in them. There is nothing wrong with that, it&#8217;s inherent in the connections in the requirements. But circles are at odds with dependency rules. So now what we do is break the cyclic dependencies using principles like dependency inversion or observer pattern. The connections don&#8217;t go away. We just further obfuscated them. These connections are now done at run-time by code written somewhere else. This is the so called indirection problem.</p>
 </div>
 <div class="paragraph">
 <p>What a mess we have got into!</p>
 </div>
 <div class="paragraph">
-<p>ALA tells us how to fix this entire mess. It&#8217;s really quite simple. ALA breaks up your application by factoring out abstractions. When you have done that to the maximum extent, what&#8217;s left behind is nothing but the specifics of the requirements, including that graph.</p>
+<p>ALA tells us how to fix this entire mess. It&#8217;s really quite simple. ALA breaks up your application by factoring out abstractions. When you have done that to the maximum extent, what&#8217;s left behind is nothing but the specifics of the requirements, including that (highly coherent) graph.</p>
 </div>
 <div class="paragraph">
-<p>Now you can choose to go ahead and represent that graph in text in one place, using many symbolic connections, and you would already be way way better off than how we write conventional code. But even better is to do what the electronics guys do, and just build the tools to handle the graphs properly.</p>
+<p>Now you can choose to go ahead and represent that graph in text in one place, using many symbolic connections, and you would already be way, way better off than how we write conventional code. But even better is to do what the electronics guys do, and just build the tools to handle the graphs as diagrams properly.</p>
 </div>
 <div class="sect3">
 <h4 id="truediagrams-and-text-are-not-equivalent"><a class="anchor" href="#truediagrams-and-text-are-not-equivalent"></a>3.6.1. Diagrams and text are not equivalent</h4>
@@ -7704,7 +7715,7 @@ Once the code for the single user story is understood, some acceptance tests are
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-10-18 10:15:07 NZDT
+Last updated 2020-10-21 16:06:01 NZDT
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/Docco.min.css">

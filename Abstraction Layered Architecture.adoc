@@ -12,7 +12,7 @@
 --
 image::BOSS_Great_Wall.jpg[BOSS_Great_Wall.jpg,450, title="In software, we lose our view of the large scale structure", float="right"]
 
-*Engineering in the large scale structure of code*
+*Engineering the large scale structure of code*
 --
 
 // blame J R Spray
@@ -20,6 +20,37 @@ image::BOSS_Great_Wall.jpg[BOSS_Great_Wall.jpg,450, title="In software, we lose 
 John R Spray
 
 Last update: 2020-10-18
+
+
+*The real quick summary*
+
+
+ALA gives us two fundamental architectural constraints when writing software:
+
+--
+- The only relationship allowed is a dependency on an abstraction. That abstraction must be significantly more abstract than the abstraction containing the dependency. No other relationships are needed or allowed.
+
+- All abstractions must be small - 100-500 LOC (or diagram nodes).
+--
+
+
+. Chapter 1, "What problem does ALA solve". These two constraints solve the "big ball of mud" problem, and other related software engineering problems by providing a pre-worked meta-architecture or macro-structure that works for all software.
+
+. Chapter 2, "What does the structure look like?". Without explaining how or why, describes what the emergent structure looks like after applying these two constraints. It describes: What an abstraction is in terms of (usually) one class or function or a small group of highly cohesive code artefacts. The most common pattern that emerges, which is to explicitly wire together instances of abstractions that communicate with each other through 'abstract interfaces'. The emergent use of abstraction layers and the standard folders for these layers. The emergent use of ports and how to make ports using plain code inside classes. The emergent use of diagrams. The use of programming paradigms when composing instances of abstractions. That multiple programming paradigms are used in an application. e.g. user interface layout, events, data flows, activity flows, state machines, data schemas, and others. The emergent property of the direct representation of requirements in a formal way, like a DSL, which is then executable.
+
+. Chapter 3, "Why the structure works". Explains the theory behind these two fundamental architectural constraints and that they actually result in zero coupling between all abstractions. (Not just loose coupling, zero coupling.) In turn, this eliminates complexity. Explains that requirements typically inherently contain a graph structure, and that this graph should be explicit, preferably in a diagram.
+
+. Chapter 4, "Execution models". Explains how the underlying execution for each programming paradigm can be made to actually work through 'abstract interfaces'. Explains the ways that the CPU executes the right code at the right time when the programming paradigms that emerge from ALA organise code in an orthogonal way to imperative execution flow.
+
+. Chapter 5, "Methodology". Describes ALA in terms of where it fits into Agile software development, and the use of an "Iteration zero" to do an initial representative design.
+
+. Chapter 6, "The philosophy behind ALA". Gives the theory of why ALA works from the perspective of complex systems and how our brains work. It describes how the two fundamental architectural constraints are designed to mimic how our brains see the real world. This leverages how our brains have evolved to use abstractions to understand the real world to enable it to understand our programs in the same way.
+
+. Chapter 7, "ALA compared with...". Unsurprizingly, the two fundamental constraints of ALA emerge many of the same architectural styles and patterns we find in software engineering. But it usually modifies them. Such things as layers, dependency injection, observer pattern, DSLs, components and connectors. But it also leaves some significant ones out. For example, ALA says that UML class diagrams are evil. This chapter goes through all the common large-structure styles and patterns. Choose the one you are most familiar with to see how ALA encompasses it, usually in a modified way, or contrasts with it. 
+
+Each chapter ends with an example project or two. These projects show the architecture in real code. Unlike most pedagogical sized examples, these examples are progressively non-trivial. Yet because of ALA's power, they remain uncomplicated and easy to understand.      
+
+
 
 I would like to acknowledge the help of Roopak Sinha at AUT (Auckland University of Technology) in the writing of the paper for ECSA 2018 and  his academic perspective. 
 
@@ -31,41 +62,16 @@ link:Abstraction_Layered_Architecture_Paper_ECSA_2018.pdf[ALA Paper presented at
 
 // https://AbstractionLayeredArchitecture.com/Abstraction_Layered_Architecture_Paper_ECSA_2018.pdf[ALA Paper presented at ECSA 2018]
 
-*Summary*
-
-For a quick summary of ALA read section 3.1 and then 2.1, then perhaps one of the example projects at the end of each chapter.
-
-
-
-*Organisation of this site:*
-
-** Chapter One, "What problem does ALA solve" explains the current major crisis in software engineering.
-
-** Chapter Two, "What does the structure look like?" without explaining how or why, decribes the structure.
-
-** Chapter Three, "Why the structure works" explains why this structure solves the problems outlined in chapter one.
-
-** Chapter Four, "Execution models", explains the different ways to make the CPU execute the right code at the right time when the organisation of the code that emerges from ALA is completely independent of the execution flow.
-
-** Chapter Five, "Methodology", describes ALA in terms of where it fits into Agile software development. 
-
-** Chapter Six, "The philosophy behind ALA", gives the theory of why ALA works from the perspective of complex systems and how our brains work.
-
-** Chapter Seven, "ALA compared with...", compares ALA with existing architectural styles and patterns, both similarities and differences. Choose the one you are most familiar with to see how ALA uses it, builds on it, or contrast with it. 
-
-Each chapter ends with an example project or two. These projects ground the architecture in real code. Unlike most pedagogical sized examples, these examples are progressively non-trivial. Yet because of ALA's power, they remain small and easily readable.      
-
-
 
 == Chapter one - What problem does it solve?
 
 
 
-
-
 === The Big Ball of Mud
 
-ALA is an in-the-large strategy to organise code. It provides the constraints needed for the code structure to never degenerate into sphagetti code, or what Brian Foote and Joseph Yoder describe as a "big ball of mud". As the software  life cycle continues, retaining the organisation becomes easier rather than harder. This is because of increasing reuse of software artefacts within the organisation. 
+ALA is an in-the-large strategy to organise code. It provides the constraints needed for the code structure to never degenerate into sphagetti code, or what Brian Foote and Joseph Yoder describe as a "big ball of mud". As the software  life cycle continues, retaining the organisation becomes easier rather than harder. This is because of increasing reuse of software artefacts within the organisation.
+
+
 
 === Existing architectural patterns
 
@@ -1292,7 +1298,7 @@ image::CalculatorStringConcatTemplate.png[CalculatorStringConcatTemplate.png, 40
 The two ports are both drawn on the right hand side unfortunately - a limitation of using Xmind as the drawing tool. Drawing the templates makes the ports clearer ready for implementation.  
 
 
-Many abstractions are trivial to implement becasue they are zero coupled with anything. They are like tiny stand-alone programs. Here is the full code for StrigConcat.
+Many abstractions are trivial to implement because they are zero coupled with anything. They are like tiny stand-alone programs. Here is the full code for StringConcat.
 
 .SringConcat.cs
 [source,C#]
@@ -1307,7 +1313,7 @@ namespace DomainAbstractions
     /// <summary>
     /// Outputs the input strings concatenated together
     /// Whenever an input strings changes, a new output is pushed.
-    /// ------------------------------------------------------------------------------------------------------------------
+    /// ---------------------------------------------------------------------------------------------------------
     /// Ports:
     /// 1. List<IDataFlowB<string>> inputs: inputs (indefinite number of string inputs)
     /// 2. IDataFlow<string> output: output
@@ -1325,7 +1331,6 @@ namespace DomainAbstractions
         private List<IDataFlowB<string>> inputs;
         private IDataFlow<string> output;
 
-        // Private fields ---------------------------------------------------------------
 
         /// <summary>
         /// Outputs a boolean value of true when all of its inputs are true. Null inputs are treated as false.
@@ -1356,7 +1361,7 @@ namespace DomainAbstractions
 
 The code in Concat is straightforward if you know C#, except for a few conventions which are to do with the use of ALA (which I was already proficient with):
 
-. We put a property "InstanceName" in every domain abstraction. It's not required, but the reason is because abstraction get reused. So you are likely to end up with multiple instances of an abstraction all over your program. If you name the instances, it make debugging a lot easier because you can see it in the debugger and know which instance you are in.
+. We put a property "InstanceName" in every domain abstraction. It's not required, but the reason is because abstractions get reused. So you are likely to end up with multiple instances of an abstraction all over your application. If you name the instances, it makes debugging a lot easier because you can see it in the debugger and know which instance you are in.
 
 . All the IO for the abstraction is in a section called "Ports". Usually an abstraction would have some ports that are private fields of the type of an interface, and some that are an implemented interface. It just so happens that StringConcat has no implemented interface ports.
 
@@ -1364,7 +1369,7 @@ The code in Concat is straightforward if you know C#, except for a few conventio
 
 . Notice that the "inputs" port uses IDataFlowB (not IDataflow). The B on IDataflowB indicates a tricky workaround for a limitation in the C# language. What we would have liked to do is implement IDatFlow. But we would have needed to implement IDataFlow multiple times. You can't do that in C# (although there is no reason why not in theory, and hopefully all languages will have this feature to support the concept of ports one day).
 
-. Notice that the method, inputsPostWiringInitialze, is private and apparently unused. When the WireTo operation wires a port "xyz" it looks for a private method called xyzPostWiringInitialze and invokes it immediately. This gives us the opportunity to set up handlers on any events that may be in the interface. In this case, the IDataFlowB interface has a DataChanged event (that tells us when there is new data on the inputs).    
+. Notice that the method, inputsPostWiringInitialize, is private and apparently unused. When the WireTo operation wires a port "xyz" it looks for a private method called xyzPostWiringInitialze and invokes it immediately. This gives us the opportunity to set up handlers on any events that may be in the interface. In this case, the IDataFlowB interface has a DataChanged event (that tells us when there is new data on the inputs).    
 
 . It doesn't make sense to use a StringConcat without wiring its output to something. So the line "output.Data = result" will throw an exception if the application has not wired it. Often times, abstractions have ports that are optional to wire, in which case we would use "outputs?.Data = result"
 
@@ -1410,6 +1415,7 @@ The Formula abstraction has to parse the formula string and then evaluate it. I 
 .Formula.cs
 [source,C#]
 ....
+
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using static System.Math;
