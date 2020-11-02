@@ -10,7 +10,7 @@
 
 [.float-group]
 --
-image::BOSS_Great_Wall.jpg[BOSS_Great_Wall.jpg,450, title="In software, we lose our view of the large scale structure", float="right"]
+image::BOSS_Great_Wall.jpg[BOSS_Great_Wall.jpg,600, title="In conventional code, we lose our view of the large scale structure", float="right"]
 
 *Engineering the large scale structure of code*
 --
@@ -19,38 +19,146 @@ image::BOSS_Great_Wall.jpg[BOSS_Great_Wall.jpg,450, title="In software, we lose 
 
 John R Spray
 
-Last update: 2020-10-18
+Last update: 2020-11-04
 
 
 *The real quick summary*
 
 
-ALA gives us two fundamental architectural constraints when writing software:
+Fundamentally, ALA is two architectural constraints when writing software:
 
 --
-- The only relationship allowed is a dependency on an abstraction. That abstraction must be significantly more abstract than the abstraction containing the dependency. No other relationships are needed or allowed.
+- The only relationship allowed is a dependency on an abstraction. That abstraction must be significantly more abstract than the abstraction containing the dependency. No other relationships are allowed or needed.
 
-- All abstractions must be small - 100-500 LOC (or diagram nodes).
+- All abstractions must be small - e.g. 100-500 LOC (or diagram nodes).
 --
 
 
-. Chapter 1, "What problem does ALA solve". These two constraints solve the "big ball of mud" problem, and other related software engineering problems by providing a pre-worked meta-architecture or macro-structure that works for all software.
+*The quick summary*
 
-. Chapter 2, "What does the structure look like?". Without explaining how or why, describes what the emergent structure looks like after applying these two constraints. It describes: What an abstraction is in terms of (usually) one class or function or a small group of highly cohesive code artefacts. The most common pattern that emerges, which is to explicitly wire together instances of abstractions that communicate with each other through 'abstract interfaces'. The emergent use of abstraction layers and the standard folders for these layers. The emergent use of ports and how to make ports using plain code inside classes. The emergent use of diagrams. The use of programming paradigms when composing instances of abstractions. That multiple programming paradigms are used in an application. e.g. user interface layout, events, data flows, activity flows, state machines, data schemas, and others. The emergent property of the direct representation of requirements in a formal way, like a DSL, which is then executable.
 
-. Chapter 3, "Why the structure works". Explains the theory behind these two fundamental architectural constraints and that they actually result in zero coupling between all abstractions. (Not just loose coupling, zero coupling.) In turn, this eliminates complexity. Explains that requirements typically inherently contain a graph structure, and that this graph should be explicit, preferably in a diagram.
+. Chapter 1, "What problem does ALA solve?"
 
-. Chapter 4, "Execution models". Explains how the underlying execution for each programming paradigm can be made to actually work through 'abstract interfaces'. Explains the ways that the CPU executes the right code at the right time when the programming paradigms that emerge from ALA organise code in an orthogonal way to imperative execution flow.
+** These two constraints solve the "big ball of mud" problem by providing a pre-worked reference architecture (a meta-structure for code at the largest granularity scale). 
 
-. Chapter 5, "Methodology". Describes ALA in terms of where it fits into Agile software development, and the use of an "Iteration zero" to do an initial representative design.
+** It pre-solves for the following quality attributes: Complexity, Readability, Maintainability, Testability
 
-. Chapter 6, "The philosophy behind ALA". Gives the theory of why ALA works from the perspective of complex systems and how our brains work. It describes how the two fundamental architectural constraints are designed to mimic how our brains see the real world. This leverages how our brains have evolved to use abstractions to understand the real world to enable it to understand our programs in the same way.
 
-. Chapter 7, "ALA compared with...". Unsurprizingly, the two fundamental constraints of ALA emerge many of the same architectural styles and patterns we find in software engineering. But it usually modifies them. Such things as layers, dependency injection, observer pattern, DSLs, components and connectors. But it also leaves some significant ones out. For example, ALA says that UML class diagrams are evil. This chapter goes through all the common large-structure styles and patterns. Choose the one you are most familiar with to see how ALA encompasses it, usually in a modified way, or contrasts with it. 
+
+
+. Chapter 2, "What does the structure look like?". Without explaining why, describes the code structure that emerges after applying the two constraints:
+
+** An abstraction is usually a function or class, but can be a small group of functions, classes, delegates, enums, even variables or objects. The group is highly cohesive code that is unrestricted in its internal relationships. An abstraction is usually represented by a source file.
+
+** A small number of discrete abstraction layers emerge. The layers are given the standard names: Application, Domain abstractions, Programming Paradigms, and Libraries. Folders are used for these layers. Dependencies only go down the layers, not across.
+
+** A common pattern that emerges is to explicitly wire together instances of abstractions that will communicate with each other at run-time through even more abstract 'abstract interfaces'.
+
+** The emergent use of ports and how to give classes ports using plain code.
+
+** The emergent use of diagrams to wire instances of abstractions in the top layer using a dependency injection operator, WireTo(). Code is auto-generated from the diagram like: "new A().WireTo(new B());"
+
+** The use of programming paradigms when composing instances of abstractions. Programming paradigms are often implemented with simple, quite abstract interfaces such as "interface IEvent { void Execute(); }".
+
+** Multiple programming paradigms are used in an application. e.g. interfaces for user interface layout, events, data flows, activity flows, state machines, data schemas, and others.
+
+** An emergent property is the direct representation of requirements, like a DSL, which is then directly executable.
+
+** If the Application becomes large, we add a layer called StoryAbstrations, which proovides abstractions to support separate diagrams, plugin style in the Application layer.
+
+** The ALA composition structure is analogous to real world composition structures such as Lego, electronic schematics, molecules. 
+
+
+
+
+. Chapter 3, "Why the structure works". Explains the theory behind the two fundamental architectural constraints:
+
+** Define what we mean by abstraction: A general concept. Abstractions are learnable, stable and reusable. Dependencies are always on stable concepts.
+
+** The constraint that "dependencies are only allowed only on abstractions" results in zero coupling. The code inside all abstractions in the system is zero couples with one another. (So ALA achieves "Zero coupling and high cohesion", not "loose coupling and high cohesion.)
+
+** Zero coupling together with limited abstraction size eliminates complexity.
+
+** Conventional code typically contains both good and bad dependencies. ALA simply eliminates all the bad dependencies.
+
+** Conventional architectural design uses a decomposition method. Decomposition tends to result in coupling. ALA uses a composition method. The set of artefacts being composed with start out with zero coupling.
+
+** Requirements typically inherently contain a graph structure. These graphs should be explicitly represented inside their own abstraction, preferably using a diagram.
+
+
+
+
+
+. Chapter 4, "Execution models". Explains how the underlying execution for each programming paradigm can be made to actually work.
+
+** Explains the ways that the CPU executes the right code at the right time when the structures that emerge from ALA compose abstraction in an orthogonal way to imperative execution flow.
+
+** UI layout
+
+** UI Navigation
+
+** Dataflow
+
+** Event driven
+
+** Real world time activity flow
+
+** Data schema
+
+
+
+
+
+. Chapter 5, "Methodology". Describes ALA in terms of where it fits into Agile software development
+
+** The primary methodology is that requirements are simply 'described' in terms of 'invented' domain abstractions.
+
+** An "Iteration zero" is used, important to get a starting set of domain abstractions and programming paradigms. The starting set will set the pattern of the whole design.
+
+** How to go about 'inventing' domain abstraction for the first time in a new domain.
+
+
+
+
+. Chapter 6, "The philosophy behind ALA". Gives the theory of why ALA works from the perspective of complex systems and how our brains work.
+
+** Describes how the two fundamental architectural constraints are designed to mimic how our brains see the real world.
+
+** Composition of a small number of abstractions layers in the real world as an analogy: e.g. atoms, molecules, proteins, cells, bodies.
+
+** ALA leverages how our brains have evolved to use abstractions to understand the real world. This enables us to understand our programs in the same way.
+
+** ALA achieves an optimal level of expressiveness in each layer. This includes the application layer which is just a formal expression of requirements in their details, but nothing else. 
+
+** ALA uses layers instead of encapsulation hierarchies. We want public abstractions for maximal reuse, not private specialized parts for a specialized use.
+
+** ALA does not use 'models' for its structure or architecture. Models, as the term implies, can leave out details arbitrarily. These details are unknowns and will come back to bite us. ALA only leaves out details by putting them inside arstractions, which renders them harmless. (Models differ from diagrams, which ALA can use.)
+
+** An ALA application (top layer) is three things in one: The architecture, the architecture documentation, and the executable.
+
+
+
+
+. Chapter 7, "ALA compared with...". 
+
+** Unsurprisingly, the two fundamental constraints of ALA emerge many of the same architectural styles and patterns we find in software engineering. 
+
+** It usually modifies them.
+
+** Examples: Layers, Dependency injection, Observer pattern, DSLs, Components and connectors.
+
+** It also leaves some significant ones out. For example, MVC. ALA says that UML class diagrams are evil.
+
+** Lists the common large-structure styles and patterns so you can choose the one you are most familiar with to see how ALA encompasses it, usually in a modified way, or contrasts with it. 
+
+
+
+
+
 
 Each chapter ends with an example project or two. These projects show the architecture in real code. Unlike most pedagogical sized examples, these examples are progressively non-trivial. Yet because of ALA's power, they remain uncomplicated and easy to understand.      
 
-
+This web site is a work in progress.
 
 I would like to acknowledge the help of Roopak Sinha at AUT (Auckland University of Technology) in the writing of the paper for ECSA 2018 and  his academic perspective. 
 
@@ -83,8 +191,8 @@ This set is sufficient, but there is no overarching strategy that tells you how 
 
 ALA is a reference architecture. It is independent of any specific domain, so it is a general reference architecture. The reference architecture is 'optimal' for certain non-functional requirements. By optimal, I mean that it makes these qualities as good as they can be.
 
-** Readability
 ** Complexity
+** Readability
 ** Maintainability
 ** Testability
 
@@ -323,16 +431,6 @@ ALA works by pre-solving most of these software engineering topics into a single
 Being a pre-worked recipe of the aforementioned list of styles and patterns, ALA contains no truly novel ideas. Some ingredients are accentuated in importance more than you might expect (such as abstraction). Some are relatively neutral. Some are purposefully left out. The biggest surprise for me during the conception process of ALA was that some well-established software engineering memes seemed to be in conflict. Eventually I concluded that they were in-fact plain wrong. We will discuss these in detail one at a time in subsequent chapters. But to wet your appetite here is one meme that ALA definitely banishes to furtherest of evil kingdoms: the UML class diagram. Read on to find out why.
 
 Like any good recipe, the ingredients work together to form a whole that is greater than the sum of parts. The resulting code quality is significantly ahead of what the individual memes do by themselves. It continues to surprise me just how effective, and enjoyable, it is. 
-
-=== The first few strokes
-
-As a software engineer contemplating a new project, I have often asked myself "Where do I start?" This also happens with legacy code, when contemplating the direction that refactorings should take. "If this software were structured optimally well, what would it look like?"
-
-Christopher Alexander, the creator of the idea of design patterns in building architecture, said, "As any designer will tell you, it is the first steps in a design process which count for the most. The first few strokes which create the form, carry within them the destiny of the rest". This has been my experience too.
-
-In Agile, where architecture is meant to emerge, this wisdom has been lost. ALA restores that wisdom to software development, and gives the software architect the exact process to follow for that little piece of up-front design. No more than one sprint is required to do this architectural work, regardless of the size of the project.
-
-Furthermore, once this architectural work is done, the Agile process works significantly better thereafter. Furthermore, my experience over several projects so far is that the initial architecture does not need to change as the development proceeds. 
 
 
 == Chapter two - What does the structure look like?
@@ -1297,6 +1395,8 @@ image::CalculatorStringConcatTemplate.png[CalculatorStringConcatTemplate.png, 40
 
 The two ports are both drawn on the right hand side unfortunately - a limitation of using Xmind as the drawing tool. Drawing the templates makes the ports clearer ready for implementation.  
 
+==== Implementing the domain abstractions
+
 
 Many abstractions are trivial to implement because they are zero coupled with anything. They are like tiny stand-alone programs. Here is the full code for StringConcat.
 
@@ -1453,18 +1553,161 @@ As you can see, currently the Formula abstraction can only handle formulas that 
 
 The rest of the code in the Formula abstraction is mostly dealing with this requirement of exactly six parameters used by LambdaType. But that's all internal to the abstraction. An instance of the Formula abstraction can handle any number of operands from zero to many. The Formula abstraction is also tolerant of the string on the formula input port being either just a formula such as "2*(3+1)" (implying it's not using any operand inputs), or a proper lambda expression such as "(x,y,z)=>x*(y+z).
 
-Now that we have our needed domain abstractions, let's return to the application layer, and see if we can get this calculator running. 
+Now that we have our needed domain abstractions, let's return to the application layer, and see if we can get this calculator running.
 
-Here is the diagram as entered into Xmind. You can click on the image to get a bigger version.
+
+==== Hand wiring the appication code from the diagram
+
+First here is the startup code for a wired ALA application. It is very simple:
+
+
+
+.Application.cs
+[source C#]
+....
+namespace Application
+{
+    public class Application
+    {
+        private MainWindow mainWindow;
+
+        [STAThread]
+        public static void Main()
+        {
+            Application app = new Application();
+            app.mainWindow.Run();
+        }
+
+        private Application()
+        {
+            // mainWindow = WireHelloWorld();
+            mainWindow = Calculator2RowHandWired();
+        }
+    }
+}
+....
+
+
+
+Here is an ALA Hello World application
+
+
+.Application.cs
+[source C#]
+....
+private MainWindow WireHelloWorld()
+{
+    return new MainWindow().WireTo(new Text("Hello World"));
+}
+....
+
+Ok, now we are ready to hand wire the hand drawn calculator diagram shown above:
+
+
+.Application.cs
+[source C#]
+....
+private MainWindow Calculator2RowHandWired()
+{
+    // To understand this code, you need the wiring diagram of the two row calculator
+
+    // First instantiate instances of abstractions we need to give names to. The rest can be anonymous.
+    StringConcat stringConcat = new StringConcat() { Separator = "," };
+    DataFlowConnector<string> stringConcatConnector = new DataFlowConnector<string>(); // Connectors are needed when there is fan-out or fan-in in the diagram
+    stringConcat.WireTo(stringConcatConnector, "output");
+    Formula[] formulas = { new Formula(), new Formula() }; // instantiate both the formulas up-front because we need to cross wire them
+
+
+    MainWindow mainWindow = new MainWindow("Calculator")
+        .WireTo(new Vertical()
+            .WireTo(WireRow(stringConcat, stringConcatConnector, formulas[0], formulas))
+            .WireTo(WireRow(stringConcat, stringConcatConnector, formulas[1], formulas))
+            );
+    return mainWindow;
+}
+
+
+private Horizontal WireRow(StringConcat stringConcat, DataFlowConnector<string> stringConcatConnector, Formula formula, Formula[] formulas)
+{
+    // To understand this code, you need the wiring diagram of the two row calculator
+
+    // first instantiate objects we need to give names to.  The rest can be anonymous.
+    Text result = new Text(); 
+
+    // Wire up a calculator row
+    Horizontal row = new Horizontal()
+        .WireTo(new TextBox()
+            .WireTo(new DataFlowConnector<string>()
+                .WireFrom(stringConcat, "inputs")
+            )
+        )
+        .WireTo(new TextBox()
+            .WireTo(new StringFormat<string>("({1})=>{0}")
+                .WireTo(stringConcatConnector, "inputs")
+                .WireTo(formula
+                    .WireTo(new DataFlowConnector<double>()
+                        .WireFrom(formulas[0], "operands")
+                        .WireFrom(formulas[1], "operands")
+                        .WireTo(new NumberToString()
+                            .WireTo(result)
+                        )
+                    )
+                )
+            )
+        )
+        .WireTo(result)
+        .WireTo(new TextBox());
+    return row;
+}
+....
+
+
+Commentary on this wiring code
+
+* The code is written in "fluent style". This is possible because the WireTo extension method returns its 'this' parameter, allowing you to use .WireTo() multiple times on an instance.
+
+* The parts of the diagram that have a tree structure can be wired by using more .WireTos immediately inside the brackets of another WireTo. This is what causes the indented code.
+
+* The previous two points allow much of the wiring to be done without having to think up names for the instances. The instances are anonymous just as they were on the diagram.
+
+* Where the diagram has cross wires that formed a cycle, we need to give instances names so that we can complete all the wiring to them.
+
+* Sometimes the WireTo method is given the port name of the first object. These are used when WireTo may get the wrong port if it were left to use the port types alone. (If an abstraction has multiple ports of the same type, WireTo doesn't know which port to use.)
+
+* Most abstraction have ports that can only be wired to one place, and ports that can only be wired from one place. (The UI abstractions are exceptions, for example, Horizontal can be wired to multiple children.) The hand drawn wiring diagram has several places where the wiring either 'fans out' from a port or 'fans in' to a port. Unfortunately C# does not support the concept of ports, so we improvise to make them work in normal C# code. The way this improvisation works for fan-in and fan-out is to use a connector.
+
+** For fan-out you wire the output port to a new Connector. Then you can wire the connector to multiple places.
+
+** For fan-in, the abstraction, instead of implementing the port, uses a list field of a type like IDataFlowB. The 'B" on the end means the flow of data is reversed from IDataFlow. Now to wire such an inputs port to an output port also requires a connector (a second use for connectors). When wiring an IDataFlowB, you wire from the input to the connector (the opposite way to the direction of data flow unfortunately). 
+
+* As a convenience, you can use WireFrom. It reverses the two operands being wired compared to WireTo.
+
+
+Handwritten wiring code like teh above can be managed for small applications. It is easy to get it wrong though. The code is not readable from the point of view of understanding teh application. That's what the diagram is for. So every time you make a change to the requirements, you need to do it on the diagram, then update the hand-generated code. You are still better off doing this than not using ALA. If not using ALA, the relationships shown in our explicit diagram still exist. You just go without the diagram, and your hand-generated code is obscured and distributed inside your modules. And you end up with lots of relationships between those modules that come from the implicit diagram.
+
+But we don't have to hand generate code. At the time of writing a hand written graphical IDE is under development. 
+
+Here is the calculator row part of the diagram, which was successfully used to auto generate code:
+
+
+image::CalculatorRow-GALADE.png[CalculatorRow-GALADE.png, 800, title="CalculatorRow abstraction internal wiring"]
+
+Before we had that tool, we used Xmind to do diagrams from which we could generated code. This is the approach described in the next section. 
+
+
+
+==== Automatic code generation from the diagram
+
+Here is the diagram of the 2-row calculator as it was originally entered into Xmind. You can click on the image to get a bigger version.
 
 image::Calculator2Rows.png[Calculator2Rows.png, 1000, title="Calculator drawn in Xmind (two rows version)", link=images/Calculator2Rows.png]
 
 
 Xmind is not the perfect tool to do this, but it has one huge advantage - it lays itself out. This is so important that it's why we use it (until our new tool is ready). We will put up with the disadvantages, and the necessary conventions until then. Those conventions are documented in the wiki section of the project in Github here: https://github.com/johnspray74/ReactiveCalculator/wiki[https://github.com/johnspray74/ReactiveCalculator/wiki]
 
-Entering the hand-drawn version of the diagram is a simple matter of copying and pasting the Xmind templates for the abstractions to the right place in the diagram. This connects most of the needed wiring from port to port. Xmind supports tree structured diagrams, so any cross tree wiring was done by using the red lines, which are quick to put in with cntrl-L.
+Entering the hand-drawn version of the diagram is a simple matter of copying and pasting the Xmind templates for the abstractions to the right place in the diagram. This connects most of the needed wiring from port to port. Xmind supports tree structured diagrams, so any cross tree wiring was done by using the red lines, which are quick to put in with a shortcut key.
 
-The Xmind version of the diagram is pretty much identical to the hand drawn version. The colored boxes are instances of abstractions. All the other nodes attached around the those colored boxes are the ports. The < and > signs in the ports are significant, and tell the automatic code generator which way to wire the instances. The asterisks are also significant, and tell the code generator that many wires can be wired to the one port.
+The Xmind version of the diagram is pretty much identical to the hand drawn version. The colored boxes are instances of abstractions. All the other nodes attached around those colored boxes are the ports. The < and > signs in the ports are significant, and tell the automatic code generator which way to wire the instances. The asterisks are also significant, and tell the code generator that many wires can be wired to the one port.
 
 The diagram done, it's time to generate the code. A tool called XmindParser does this. It can be downloaded from the Github project main page. Here is the tool in use to generate a calculator from the diagram.
 
@@ -1535,12 +1778,8 @@ Here is the Xmind template for the CalculatorRow abstraction showing its ports:
 image::CalculatorRowTemplate.png[CalculatorRowTemplate.png, 800, title="CalculatorRow requirements abstraction"]
 
 
-The implementation of CalculatorRow was done with a diagram. Here it is:
+The implementation of CalculatorRow was done with a diagram using the new Graphical ALA tool which was shown earlier.
 
-
-image::CalculatorRow-GALADE.png[CalculatorRow-GALADE.png, 800, title="CalculatorRow abstraction internal wiring"]
-
-At the time of writing I was transitioning from using Xmind to a new diagramming tool for ALA. This tool was in very early beta, so it does not route the cross-wiring around the boxes. However it did generate correct code.
 
 When you implement an abstraction by an internal diagram, there needs to be some extra code to wire from the ports (shown in the template above) to the internal wiring. I found this code quite tricky the first time and it took me a while. But there is a pattern to it. The new tool will be able to automatically generate this code as well, but for now I did it by hand.
 
@@ -3562,6 +3801,22 @@ Here is a link to the code on Github: https://github.com/johnspray74/GameScoring
 
 
 == Chapter five - Methodology
+
+
+=== The first few strokes
+
+As a software engineer contemplating a new project, I have often asked myself "Where do I start?" This also happens with legacy code, when contemplating the direction that refactorings should take. "If this software were structured optimally well, what would it look like?"
+
+Christopher Alexander, the creator of the idea of design patterns in building architecture, said, "As any designer will tell you, it is the first steps in a design process which count for the most. The first few strokes which create the form, carry within them the destiny of the rest". This has been my experience too.
+
+In Agile, where architecture is meant to emerge, this wisdom has been lost. ALA restores that wisdom to software development, and gives the software architect the exact process to follow for that little piece of up-front design. No more than one sprint is required to do this architectural work, regardless of the size of the project.
+
+Furthermore, once this architectural work is done, the Agile process works significantly better thereafter. 
+
+My experience over several projects so far is that the initial architecture does not need to change as the development proceeds if good quality abstraction are invented.
+
+
+
 
 === Agility
 
