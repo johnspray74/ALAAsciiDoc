@@ -446,7 +446,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <li><a href="#truethe-software-engineer-s-trap">1.5. The software engineer&#8217;s trap</a></li>
 <li><a href="#truea-short-history-of-ala">1.6. A short history of ALA</a></li>
 <li><a href="#truesimplify-the-overwhelming-software-architecture-styles-patterns-principles">1.7. Simplify the overwhelming software architecture styles, patterns &amp; principles</a></li>
-<li><a href="#truethe-first-few-strokes">1.8. The first few strokes</a></li>
 </ul>
 </li>
 <li><a href="#truechapter-two-what-does-the-structure-look-like">2. Chapter two - What does the structure look like?</a>
@@ -501,13 +500,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </li>
 <li><a href="#truechapter-five-methodology">5. Chapter five - Methodology</a>
 <ul class="sectlevel2">
-<li><a href="#trueagility">5.1. Agility</a></li>
-<li><a href="#truetechnical-debt">5.2. Technical debt</a></li>
-<li><a href="#truefolder-structure">5.3. Folder structure</a></li>
-<li><a href="#trueconvention-over-configuration">5.4. Convention over configuration</a></li>
-<li><a href="#trueknowledge-prerequisites">5.5. Knowledge prerequisites.</a></li>
-<li><a href="#truetwo-roles">5.6. Two roles</a></li>
-<li><a href="#trueexample-project-a-real-device">5.7. Example project - a real device</a></li>
+<li><a href="#truethe-first-few-strokes">5.1. The first few strokes</a></li>
+<li><a href="#trueagility">5.2. Agility</a></li>
+<li><a href="#truetechnical-debt">5.3. Technical debt</a></li>
+<li><a href="#truefolder-structure">5.4. Folder structure</a></li>
+<li><a href="#trueconvention-over-configuration">5.5. Convention over configuration</a></li>
+<li><a href="#trueknowledge-prerequisites">5.6. Knowledge prerequisites.</a></li>
+<li><a href="#truetwo-roles">5.7. Two roles</a></li>
+<li><a href="#trueexample-project-a-real-device">5.8. Example project - a real device</a></li>
 </ul>
 </li>
 <li><a href="#truechapter-six-the-philosophy-behind-ala">6. Chapter six - The philosophy behind ALA</a>
@@ -587,12 +587,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div class="content">
 <div class="imageblock" style="float: right">
 <div class="content">
-<img src="images/BOSS_Great_Wall.jpg" alt="BOSS_Great_Wall.jpg" width="450">
+<img src="images/BOSS_Great_Wall.jpg" alt="BOSS_Great_Wall.jpg" width="600">
 </div>
-<div class="title">Figure 1. In software, we lose our view of the large scale structure</div>
+<div class="title">Figure 1. In conventional code, we lose our view of the large scale structure</div>
 </div>
 <div class="paragraph">
-<p><strong>Engineering in the large scale structure of code</strong></p>
+<p><strong>Engineering the large scale structure of code</strong></p>
 </div>
 </div>
 </div>
@@ -600,61 +600,215 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <p>John R Spray</p>
 </div>
 <div class="paragraph">
-<p>Last update: 2020-10-21</p>
-</div>
-<div class="paragraph">
-<p>I would like to acknowledge the help of Roopak Sinha at AUT (Auckland University of Technology) in the writing of the paper for ECSA 2018 and  his academic perspective.</p>
-</div>
-<div class="paragraph">
-<p><a href="Abstraction_Layered_Architecture_Paper_ECSA_2018.pdf">ALA Paper presented at ECSA 2018</a></p>
+<p>Last update: 2020-11-04</p>
 </div>
 <div class="paragraph">
 <p><strong>The real quick summary</strong></p>
 </div>
 <div class="paragraph">
-<p>ALA gives us two fundamental architectural constraints when writing software:</p>
+<p>Fundamentally, ALA is two architectural constraints when writing software:</p>
 </div>
 <div class="openblock">
 <div class="content">
 <div class="ulist">
 <ul>
 <li>
-<p>The only dependency relationship allowed is on an abstraction. That abstraction must be significantly more abstract than the abstraction containing the dependency. No other relationships are needed or allowed.</p>
+<p>The only relationship allowed is a dependency on an abstraction. That abstraction must be significantly more abstract than the abstraction containing the dependency. No other relationships are allowed or needed.</p>
 </li>
 <li>
-<p>All abstractions must be small - 100-500 LOC (or diagram nodes).</p>
+<p>All abstractions must be small - e.g. 100-500 LOC (or diagram nodes).</p>
 </li>
 </ul>
 </div>
 </div>
 </div>
+<div class="paragraph">
+<p><strong>The quick summary</strong></p>
+</div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Chapter 1, "What problem does ALA solve". These two constraints solve the "big ball of mud" problem, and other related software engineering problems by providing a pre-worked meta-architecture or macro-structure that works for all software.</p>
+<p>Chapter 1, "What problem does ALA solve?"</p>
+<div class="ulist">
+<ul>
+<li>
+<p>These two constraints solve the "big ball of mud" problem by providing a pre-worked reference architecture (a meta-structure for code at the largest granularity scale).</p>
 </li>
 <li>
-<p>Chapter 2, "What does the structure look like?". Without explaining how or why, describes what the emergent structure looks like after applying these two constraints. It describes: What an abstraction is in terms of (usually) one class or function or a small group of highly cohesive code artefacts. The most common pattern that emerges, which is to explicitly wire together instances of abstractions that communicate with each other through 'abstract interfaces'. The emergent use of abstraction layers and the standard folders for these layers. The emergent use of ports and how to make ports using plain code inside classes. The emergent use of diagrams. The use of programming paradigms when composing instances of abstractions. That multiple programming paradigms are used in an application. e.g. user interface layout, events, data flows, activity flows, state machines, data schemas, and others. The emergent property of the direct representation of requirements in a formal way, like a DSL, which is then executable.</p>
+<p>It pre-solves for the following quality attributes: Complexity, Readability, Maintainability, Testability</p>
+</li>
+</ul>
+</div>
 </li>
 <li>
-<p>Chapter 3, "Why the structure works". Explains the theory behind these two fundamental architectural constraints and that they actually result in zero coupling between all abstractions. (Not just loose coupling, zero coupling.) In turn, this eliminates complexity. Explains that requirements typically inherently contain a graph structure, and that this graph should be explicit, preferably in a diagram.</p>
+<p>Chapter 2, "What does the structure look like?". Without explaining why, describes the code structure that emerges after applying the two constraints:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>An abstraction is usually a function or class, but can be a small group of functions, classes, delegates, enums, even variables or objects. The group is highly cohesive code that is unrestricted in its internal relationships. An abstraction is usually represented by a source file.</p>
 </li>
 <li>
-<p>Chapter 4, "Execution models". Explains how the underlying execution for each programming paradigm can be made to actually work through 'abstract interfaces'. Explains the ways that the CPU executes the right code at the right time when the programming paradigms that emerge from ALA organise code in an orthogonal way to imperative execution flow.</p>
+<p>A small number of discrete abstraction layers emerge. The layers are given the standard names: Application, Domain abstractions, Programming Paradigms, and Libraries. Folders are used for these layers. Dependencies only go down the layers, not across.</p>
 </li>
 <li>
-<p>Chapter 5, "Methodology". Describes ALA in terms of where it fits into Agile software development, and the use of an "Iteration zero" to do an initial representative design.</p>
+<p>A common pattern that emerges is to explicitly wire together instances of abstractions that will communicate with each other at run-time through even more abstract 'abstract interfaces'.</p>
 </li>
 <li>
-<p>Chapter 6, "The philosophy behind ALA". Gives the theory of why ALA works from the perspective of complex systems and how our brains work. It describes how the two fundamental architectural constraints are designed to mimic how our brains see the real world. This leverages how our brains have evolved to use abstractions to understand the real world to enable it to understand our programs in the same way.</p>
+<p>The emergent use of ports and how to give classes ports using plain code.</p>
 </li>
 <li>
-<p>Chapter 7 "ALA compared with&#8230;&#8203;". Unsurprizingly, the two fundamental constraints of ALA emerge many of the same architectural styles and patterns we find in software engineering. But it usually modifies them. Such things as layers, dependency injection, observer pattern, DSLs, components and connectors. But it also leaves some significant ones out. For example, ALA says that UML class diagrams are evil. This chapter goes through all the common large-structure styles and patterns. Choose the one you are most familiar with to see how ALA encompasses it, usually in a modified way, or contrasts with it.</p>
+<p>The emergent use of diagrams to wire instances of abstractions in the top layer using a dependency injection operator, WireTo(). Code is auto-generated from the diagram like: "new A().WireTo(new B());"</p>
+</li>
+<li>
+<p>The use of programming paradigms when composing instances of abstractions. Programming paradigms are often implemented with simple, quite abstract interfaces such as "interface IEvent { void Execute(); }".</p>
+</li>
+<li>
+<p>Multiple programming paradigms are used in an application. e.g. interfaces for user interface layout, events, data flows, activity flows, state machines, data schemas, and others.</p>
+</li>
+<li>
+<p>An emergent property is the direct representation of requirements, like a DSL, which is then directly executable.</p>
+</li>
+<li>
+<p>If the Application becomes large, we add a layer called StoryAbstrations, which proovides abstractions to support separate diagrams, plugin style in the Application layer.</p>
+</li>
+<li>
+<p>The ALA composition structure is analogous to real world composition structures such as Lego, electronic schematics, molecules.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Chapter 3, "Why the structure works". Explains the theory behind the two fundamental architectural constraints:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Define what we mean by abstraction: A general concept. Abstractions are learnable, stable and reusable. Dependencies are always on stable concepts.</p>
+</li>
+<li>
+<p>The constraint that "dependencies are only allowed only on abstractions" results in zero coupling. The code inside all abstractions in the system is zero couples with one another. (So ALA achieves "Zero coupling and high cohesion", not "loose coupling and high cohesion.)</p>
+</li>
+<li>
+<p>Zero coupling together with limited abstraction size eliminates complexity.</p>
+</li>
+<li>
+<p>Conventional code typically contains both good and bad dependencies. ALA simply eliminates all the bad dependencies.</p>
+</li>
+<li>
+<p>Conventional architectural design uses a decomposition method. Decomposition tends to result in coupling. ALA uses a composition method. The set of artefacts being composed with start out with zero coupling.</p>
+</li>
+<li>
+<p>Requirements typically inherently contain a graph structure. These graphs should be explicitly represented inside their own abstraction, preferably using a diagram.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Chapter 4, "Execution models". Explains how the underlying execution for each programming paradigm can be made to actually work.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Explains the ways that the CPU executes the right code at the right time when the structures that emerge from ALA compose abstraction in an orthogonal way to imperative execution flow.</p>
+</li>
+<li>
+<p>UI layout</p>
+</li>
+<li>
+<p>UI Navigation</p>
+</li>
+<li>
+<p>Dataflow</p>
+</li>
+<li>
+<p>Event driven</p>
+</li>
+<li>
+<p>Real world time activity flow</p>
+</li>
+<li>
+<p>Data schema</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Chapter 5, "Methodology". Describes ALA in terms of where it fits into Agile software development</p>
+<div class="ulist">
+<ul>
+<li>
+<p>The primary methodology is that requirements are simply 'described' in terms of 'invented' domain abstractions.</p>
+</li>
+<li>
+<p>An "Iteration zero" is used, important to get a starting set of domain abstractions and programming paradigms. The starting set will set the pattern of the whole design.</p>
+</li>
+<li>
+<p>How to go about 'inventing' domain abstraction for the first time in a new domain.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Chapter 6, "The philosophy behind ALA". Gives the theory of why ALA works from the perspective of complex systems and how our brains work.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Describes how the two fundamental architectural constraints are designed to mimic how our brains see the real world.</p>
+</li>
+<li>
+<p>Composition of a small number of abstractions layers in the real world as an analogy: e.g. atoms, molecules, proteins, cells, bodies.</p>
+</li>
+<li>
+<p>ALA leverages how our brains have evolved to use abstractions to understand the real world. This enables us to understand our programs in the same way.</p>
+</li>
+<li>
+<p>ALA achieves an optimal level of expressiveness in each layer. This includes the application layer which is just a formal expression of requirements in their details, but nothing else.</p>
+</li>
+<li>
+<p>ALA uses layers instead of encapsulation hierarchies. We want public abstractions for maximal reuse, not private specialized parts for a specialized use.</p>
+</li>
+<li>
+<p>ALA does not use 'models' for its structure or architecture. Models, as the term implies, can leave out details arbitrarily. These details are unknowns and will come back to bite us. ALA only leaves out details by putting them inside arstractions, which renders them harmless. (Models differ from diagrams, which ALA can use.)</p>
+</li>
+<li>
+<p>An ALA application (top layer) is three things in one: The architecture, the architecture documentation, and the executable.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Chapter 7, "ALA compared with&#8230;&#8203;".</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Unsurprisingly, the two fundamental constraints of ALA emerge many of the same architectural styles and patterns we find in software engineering.</p>
+</li>
+<li>
+<p>It usually modifies them.</p>
+</li>
+<li>
+<p>Examples: Layers, Dependency injection, Observer pattern, DSLs, Components and connectors.</p>
+</li>
+<li>
+<p>It also leaves some significant ones out. For example, MVC. ALA says that UML class diagrams are evil.</p>
+</li>
+<li>
+<p>Lists the common large-structure styles and patterns so you can choose the one you are most familiar with to see how ALA encompasses it, usually in a modified way, or contrasts with it.</p>
+</li>
+</ul>
+</div>
 </li>
 </ol>
 </div>
 <div class="paragraph">
 <p>Each chapter ends with an example project or two. These projects show the architecture in real code. Unlike most pedagogical sized examples, these examples are progressively non-trivial. Yet because of ALA&#8217;s power, they remain uncomplicated and easy to understand.</p>
+</div>
+<div class="paragraph">
+<p>This web site is a work in progress.</p>
+</div>
+<div class="paragraph">
+<p>I would like to acknowledge the help of Roopak Sinha at AUT (Auckland University of Technology) in the writing of the paper for ECSA 2018 and  his academic perspective.</p>
+</div>
+<div class="paragraph">
+<p><a href="Abstraction_Layered_Architecture_Paper_ECSA_2018.pdf">ALA Paper presented at ECSA 2018</a></p>
 </div>
 </div>
 </div>
@@ -684,10 +838,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div class="ulist">
 <ul>
 <li>
-<p>Readability</p>
+<p>Complexity</p>
 </li>
 <li>
-<p>Complexity</p>
+<p>Readability</p>
 </li>
 <li>
 <p>Maintainability</p>
@@ -874,21 +1028,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </div>
 <div class="paragraph">
 <p>Like any good recipe, the ingredients work together to form a whole that is greater than the sum of parts. The resulting code quality is significantly ahead of what the individual memes do by themselves. It continues to surprise me just how effective, and enjoyable, it is.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="truethe-first-few-strokes"><a class="anchor" href="#truethe-first-few-strokes"></a>1.8. The first few strokes</h3>
-<div class="paragraph">
-<p>As a software engineer contemplating a new project, I have often asked myself "Where do I start?" This also happens with legacy code, when contemplating the direction that refactorings should take. "If this software were structured optimally well, what would it look like?"</p>
-</div>
-<div class="paragraph">
-<p>Christopher Alexander, the creator of the idea of design patterns in building architecture, said, "As any designer will tell you, it is the first steps in a design process which count for the most. The first few strokes which create the form, carry within them the destiny of the rest". This has been my experience too.</p>
-</div>
-<div class="paragraph">
-<p>In Agile, where architecture is meant to emerge, this wisdom has been lost. ALA restores that wisdom to software development, and gives the software architect the exact process to follow for that little piece of up-front design. No more than one sprint is required to do this architectural work, regardless of the size of the project.</p>
-</div>
-<div class="paragraph">
-<p>Furthermore, once this architectural work is done, the Agile process works significantly better thereafter. Furthermore, my experience over several projects so far is that the initial architecture does not need to change as the development proceeds.</p>
 </div>
 </div>
 </div>
@@ -2038,8 +2177,11 @@ The middle layer is usually plain old classes and the bottom layer is usually pl
 <div class="paragraph">
 <p>The two ports are both drawn on the right hand side unfortunately - a limitation of using Xmind as the drawing tool. Drawing the templates makes the ports clearer ready for implementation.</p>
 </div>
+</div>
+<div class="sect3">
+<h4 id="trueimplementing-the-domain-abstractions"><a class="anchor" href="#trueimplementing-the-domain-abstractions"></a>2.15.2. Implementing the domain abstractions</h4>
 <div class="paragraph">
-<p>Many abstractions are trivial to implement becasue they are zero coupled with anything. They are like tiny stand-alone programs. Here is the full code for StrigConcat.</p>
+<p>Many abstractions are trivial to implement because they are zero coupled with anything. They are like tiny stand-alone programs. Here is the full code for StringConcat.</p>
 </div>
 <div class="listingblock">
 <div class="title">SringConcat.cs</div>
@@ -2054,7 +2196,7 @@ namespace DomainAbstractions
     /// &lt;summary&gt;
     /// Outputs the input strings concatenated together
     /// Whenever an input strings changes, a new output is pushed.
-    /// ------------------------------------------------------------------------------------------------------------------
+    /// ---------------------------------------------------------------------------------------------------------
     /// Ports:
     /// 1. List&lt;IDataFlowB&lt;string&gt;&gt; inputs: inputs (indefinite number of string inputs)
     /// 2. IDataFlow&lt;string&gt; output: output
@@ -2072,7 +2214,6 @@ namespace DomainAbstractions
         private List&lt;IDataFlowB&lt;string&gt;&gt; inputs;
         private IDataFlow&lt;string&gt; output;
 
-        // Private fields ---------------------------------------------------------------
 
         /// &lt;summary&gt;
         /// Outputs a boolean value of true when all of its inputs are true. Null inputs are treated as false.
@@ -2106,7 +2247,7 @@ namespace DomainAbstractions
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>We put a property "InstanceName" in every domain abstraction. It&#8217;s not required, but the reason is because abstraction get reused. So you are likely to end up with multiple instances of an abstraction all over your program. If you name the instances, it make debugging a lot easier because you can see it in the debugger and know which instance you are in.</p>
+<p>We put a property "InstanceName" in every domain abstraction. It&#8217;s not required, but the reason is because abstractions get reused. So you are likely to end up with multiple instances of an abstraction all over your application. If you name the instances, it makes debugging a lot easier because you can see it in the debugger and know which instance you are in.</p>
 </li>
 <li>
 <p>All the IO for the abstraction is in a section called "Ports". Usually an abstraction would have some ports that are private fields of the type of an interface, and some that are an implemented interface. It just so happens that StringConcat has no implemented interface ports.</p>
@@ -2118,7 +2259,7 @@ namespace DomainAbstractions
 <p>Notice that the "inputs" port uses IDataFlowB (not IDataflow). The B on IDataflowB indicates a tricky workaround for a limitation in the C# language. What we would have liked to do is implement IDatFlow. But we would have needed to implement IDataFlow multiple times. You can&#8217;t do that in C# (although there is no reason why not in theory, and hopefully all languages will have this feature to support the concept of ports one day).</p>
 </li>
 <li>
-<p>Notice that the method, inputsPostWiringInitialze, is private and apparently unused. When the WireTo operation wires a port "xyz" it looks for a private method called xyzPostWiringInitialze and invokes it immediately. This gives us the opportunity to set up handlers on any events that may be in the interface. In this case, the IDataFlowB interface has a DataChanged event (that tells us when there is new data on the inputs).</p>
+<p>Notice that the method, inputsPostWiringInitialize, is private and apparently unused. When the WireTo operation wires a port "xyz" it looks for a private method called xyzPostWiringInitialze and invokes it immediately. This gives us the opportunity to set up handlers on any events that may be in the interface. In this case, the IDataFlowB interface has a DataChanged event (that tells us when there is new data on the inputs).</p>
 </li>
 <li>
 <p>It doesn&#8217;t make sense to use a StringConcat without wiring its output to something. So the line "output.Data = result" will throw an exception if the application has not wired it. Often times, abstractions have ports that are optional to wire, in which case we would use "outputs?.Data = result"</p>
@@ -2215,23 +2356,185 @@ namespace DomainAbstractions
 <div class="paragraph">
 <p>Now that we have our needed domain abstractions, let&#8217;s return to the application layer, and see if we can get this calculator running.</p>
 </div>
+</div>
+<div class="sect3">
+<h4 id="truehand-wiring-the-appication-code-from-the-diagram"><a class="anchor" href="#truehand-wiring-the-appication-code-from-the-diagram"></a>2.15.3. Hand wiring the appication code from the diagram</h4>
 <div class="paragraph">
-<p>Here is the diagram as entered into Xmind. You can click on the image to get a bigger version.</p>
+<p>First here is the startup code for a wired ALA application. It is very simple:</p>
+</div>
+<div class="literalblock">
+<div class="title">Application.cs</div>
+<div class="content">
+<pre>namespace Application
+{
+    public class Application
+    {
+        private MainWindow mainWindow;
+
+        [STAThread]
+        public static void Main()
+        {
+            Application app = new Application();
+            app.mainWindow.Run();
+        }
+
+        private Application()
+        {
+            // mainWindow = WireHelloWorld();
+            mainWindow = Calculator2RowHandWired();
+        }
+    }
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Here is an ALA Hello World application</p>
+</div>
+<div class="literalblock">
+<div class="title">Application.cs</div>
+<div class="content">
+<pre>private MainWindow WireHelloWorld()
+{
+    return new MainWindow().WireTo(new Text("Hello World"));
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Ok, now we are ready to hand wire the hand drawn calculator diagram shown above:</p>
+</div>
+<div class="literalblock">
+<div class="title">Application.cs</div>
+<div class="content">
+<pre>private MainWindow Calculator2RowHandWired()
+{
+    // To understand this code, you need the wiring diagram of the two row calculator
+
+    // First instantiate instances of abstractions we need to give names to. The rest can be anonymous.
+    StringConcat stringConcat = new StringConcat() { Separator = "," };
+    DataFlowConnector&lt;string&gt; stringConcatConnector = new DataFlowConnector&lt;string&gt;(); // Connectors are needed when there is fan-out or fan-in in the diagram
+    stringConcat.WireTo(stringConcatConnector, "output");
+    Formula[] formulas = { new Formula(), new Formula() }; // instantiate both the formulas up-front because we need to cross wire them
+
+
+    MainWindow mainWindow = new MainWindow("Calculator")
+        .WireTo(new Vertical()
+            .WireTo(WireRow(stringConcat, stringConcatConnector, formulas[0], formulas))
+            .WireTo(WireRow(stringConcat, stringConcatConnector, formulas[1], formulas))
+            );
+    return mainWindow;
+}
+
+
+private Horizontal WireRow(StringConcat stringConcat, DataFlowConnector&lt;string&gt; stringConcatConnector, Formula formula, Formula[] formulas)
+{
+    // To understand this code, you need the wiring diagram of the two row calculator
+
+    // first instantiate objects we need to give names to.  The rest can be anonymous.
+    Text result = new Text();
+
+    // Wire up a calculator row
+    Horizontal row = new Horizontal()
+        .WireTo(new TextBox()
+            .WireTo(new DataFlowConnector&lt;string&gt;()
+                .WireFrom(stringConcat, "inputs")
+            )
+        )
+        .WireTo(new TextBox()
+            .WireTo(new StringFormat&lt;string&gt;("({1})=&gt;{0}")
+                .WireTo(stringConcatConnector, "inputs")
+                .WireTo(formula
+                    .WireTo(new DataFlowConnector&lt;double&gt;()
+                        .WireFrom(formulas[0], "operands")
+                        .WireFrom(formulas[1], "operands")
+                        .WireTo(new NumberToString()
+                            .WireTo(result)
+                        )
+                    )
+                )
+            )
+        )
+        .WireTo(result)
+        .WireTo(new TextBox());
+    return row;
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Commentary on this wiring code</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The code is written in "fluent style". This is possible because the WireTo extension method returns its 'this' parameter, allowing you to use .WireTo() multiple times on an instance.</p>
+</li>
+<li>
+<p>The parts of the diagram that have a tree structure can be wired by using more .WireTos immediately inside the brackets of another WireTo. This is what causes the indented code.</p>
+</li>
+<li>
+<p>The previous two points allow much of the wiring to be done without having to think up names for the instances. The instances are anonymous just as they were on the diagram.</p>
+</li>
+<li>
+<p>Where the diagram has cross wires that formed a cycle, we need to give instances names so that we can complete all the wiring to them.</p>
+</li>
+<li>
+<p>Sometimes the WireTo method is given the port name of the first object. These are used when WireTo may get the wrong port if it were left to use the port types alone. (If an abstraction has multiple ports of the same type, WireTo doesn&#8217;t know which port to use.)</p>
+</li>
+<li>
+<p>Most abstraction have ports that can only be wired to one place, and ports that can only be wired from one place. (The UI abstractions are exceptions, for example, Horizontal can be wired to multiple children.) The hand drawn wiring diagram has several places where the wiring either 'fans out' from a port or 'fans in' to a port. Unfortunately C# does not support the concept of ports, so we improvise to make them work in normal C# code. The way this improvisation works for fan-in and fan-out is to use a connector.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>For fan-out you wire the output port to a new Connector. Then you can wire the connector to multiple places.</p>
+</li>
+<li>
+<p>For fan-in, the abstraction, instead of implementing the port, uses a list field of a type like IDataFlowB. The 'B" on the end means the flow of data is reversed from IDataFlow. Now to wire such an inputs port to an output port also requires a connector (a second use for connectors). When wiring an IDataFlowB, you wire from the input to the connector (the opposite way to the direction of data flow unfortunately).</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>As a convenience, you can use WireFrom. It reverses the two operands being wired compared to WireTo.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Handwritten wiring code like teh above can be managed for small applications. It is easy to get it wrong though. The code is not readable from the point of view of understanding teh application. That&#8217;s what the diagram is for. So every time you make a change to the requirements, you need to do it on the diagram, then update the hand-generated code. You are still better off doing this than not using ALA. If not using ALA, the relationships shown in our explicit diagram still exist. You just go without the diagram, and your hand-generated code is obscured and distributed inside your modules. And you end up with lots of relationships between those modules that come from the implicit diagram.</p>
+</div>
+<div class="paragraph">
+<p>But we don&#8217;t have to hand generate code. At the time of writing a hand written graphical IDE is under development.</p>
+</div>
+<div class="paragraph">
+<p>Here is the calculator row part of the diagram, which was successfully used to auto generate code:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/CalculatorRow-GALADE.png" alt="CalculatorRow-GALADE.png" width="800">
+</div>
+<div class="title">Figure 15. CalculatorRow abstraction internal wiring</div>
+</div>
+<div class="paragraph">
+<p>Before we had that tool, we used Xmind to do diagrams from which we could generated code. This is the approach described in the next section.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="trueautomatic-code-generation-from-the-diagram"><a class="anchor" href="#trueautomatic-code-generation-from-the-diagram"></a>2.15.4. Automatic code generation from the diagram</h4>
+<div class="paragraph">
+<p>Here is the diagram of the 2-row calculator as it was originally entered into Xmind. You can click on the image to get a bigger version.</p>
 </div>
 <div class="imageblock">
 <div class="content">
 <a class="image" href="images/Calculator2Rows.png"><img src="images/Calculator2Rows.png" alt="Calculator2Rows.png" width="1000"></a>
 </div>
-<div class="title">Figure 15. Calculator drawn in Xmind (two rows version)</div>
+<div class="title">Figure 16. Calculator drawn in Xmind (two rows version)</div>
 </div>
 <div class="paragraph">
 <p>Xmind is not the perfect tool to do this, but it has one huge advantage - it lays itself out. This is so important that it&#8217;s why we use it (until our new tool is ready). We will put up with the disadvantages, and the necessary conventions until then. Those conventions are documented in the wiki section of the project in Github here: <a href="https://github.com/johnspray74/ReactiveCalculator/wiki">https://github.com/johnspray74/ReactiveCalculator/wiki</a></p>
 </div>
 <div class="paragraph">
-<p>Entering the hand-drawn version of the diagram is a simple matter of copying and pasting the Xmind templates for the abstractions to the right place in the diagram. This connects most of the needed wiring from port to port. Xmind supports tree structured diagrams, so any cross tree wiring was done by using the red lines, which are quick to put in with cntrl-L.</p>
+<p>Entering the hand-drawn version of the diagram is a simple matter of copying and pasting the Xmind templates for the abstractions to the right place in the diagram. This connects most of the needed wiring from port to port. Xmind supports tree structured diagrams, so any cross tree wiring was done by using the red lines, which are quick to put in with a shortcut key.</p>
 </div>
 <div class="paragraph">
-<p>The Xmind version of the diagram is pretty much identical to the hand drawn version. The colored boxes are instances of abstractions. All the other nodes attached around the those colored boxes are the ports. The &lt; and &gt; signs in the ports are significant, and tell the automatic code generator which way to wire the instances. The asterisks are also significant, and tell the code generator that many wires can be wired to the one port.</p>
+<p>The Xmind version of the diagram is pretty much identical to the hand drawn version. The colored boxes are instances of abstractions. All the other nodes attached around those colored boxes are the ports. The &lt; and &gt; signs in the ports are significant, and tell the automatic code generator which way to wire the instances. The asterisks are also significant, and tell the code generator that many wires can be wired to the one port.</p>
 </div>
 <div class="paragraph">
 <p>The diagram done, it&#8217;s time to generate the code. A tool called XmindParser does this. It can be downloaded from the Github project main page. Here is the tool in use to generate a calculator from the diagram.</p>
@@ -2240,7 +2543,7 @@ namespace DomainAbstractions
 <div class="content">
 <img src="images/CalculatorXmindParserTool.png" alt="CalculatorXmindParserTool.png" width="800">
 </div>
-<div class="title">Figure 16. XmindParser tool in use</div>
+<div class="title">Figure 17. XmindParser tool in use</div>
 </div>
 <div class="paragraph">
 <p>The tool can put the generated code into your Application.cs file if you give it special markers like the one below.</p>
@@ -2295,7 +2598,7 @@ namespace DomainAbstractions
 </div>
 </div>
 <div class="sect3">
-<h4 id="truecalculator-with-10-rows"><a class="anchor" href="#truecalculator-with-10-rows"></a>2.15.2. Calculator with 10 rows</h4>
+<h4 id="truecalculator-with-10-rows"><a class="anchor" href="#truecalculator-with-10-rows"></a>2.15.5. Calculator with 10 rows</h4>
 <div class="paragraph">
 <p>The 6-row calculator is powerful compared to any normal calculator, but still wouldn&#8217;t do jobs like the one shown here which has 11 rows:</p>
 </div>
@@ -2303,7 +2606,7 @@ namespace DomainAbstractions
 <div class="content">
 <img src="images/CalculatorNRowsScreenshot.png" alt="CalculatorNRowsScreenshot.png" width="800">
 </div>
-<div class="title">Figure 17. Later version of the calculator to support an unlimited number of rows</div>
+<div class="title">Figure 18. Later version of the calculator to support an unlimited number of rows</div>
 </div>
 <div class="paragraph">
 <p>So it was time to do some maintenance, and solve that problem of the repetition in the diagram at the same time. During this maintenance, none of the existing abstractions changed. Their ports stayed the same. Their internals were improved a little in some cases but nothing significant. Formula was modified internally so that it could handle more than six operand inputs, although any one formula can still only use six of them.</p>
@@ -2318,19 +2621,10 @@ namespace DomainAbstractions
 <div class="content">
 <img src="images/CalculatorRowTemplate.png" alt="CalculatorRowTemplate.png" width="800">
 </div>
-<div class="title">Figure 18. CalculatorRow requirements abstraction</div>
+<div class="title">Figure 19. CalculatorRow requirements abstraction</div>
 </div>
 <div class="paragraph">
-<p>The implementation of CalculatorRow was done with a diagram. Here it is:</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="images/CalculatorRow-GALADE.png" alt="CalculatorRow-GALADE.png" width="800">
-</div>
-<div class="title">Figure 19. CalculatorRow abstraction internal wiring</div>
-</div>
-<div class="paragraph">
-<p>At the time of writing I was transitioning from using Xmind to a new diagramming tool for ALA. This tool was in very early beta, so it does not route the cross-wiring around the boxes. However it did generate correct code.</p>
+<p>The implementation of CalculatorRow was done with a diagram using the new Graphical ALA tool which was shown earlier.</p>
 </div>
 <div class="paragraph">
 <p>When you implement an abstraction by an internal diagram, there needs to be some extra code to wire from the ports (shown in the template above) to the internal wiring. I found this code quite tricky the first time and it took me a while. But there is a pattern to it. The new tool will be able to automatically generate this code as well, but for now I did it by hand.</p>
@@ -2379,7 +2673,7 @@ namespace DomainAbstractions
 </div>
 </div>
 <div class="sect3">
-<h4 id="truecalculator-with-n-rows"><a class="anchor" href="#truecalculator-with-n-rows"></a>2.15.3. Calculator with N rows</h4>
+<h4 id="truecalculator-with-n-rows"><a class="anchor" href="#truecalculator-with-n-rows"></a>2.15.6. Calculator with N rows</h4>
 <div class="paragraph">
 <p>Wouldn&#8217;t it be cool if the calculator started with say 4 rows, and had a button for adding additional rows? You will notice that the Multiple abstraction template above has a port called addRow. It takes an IEvent. If it receives an event on that port at run-time, it will create another row and call the lambda wiring functions to get that row wired in.</p>
 </div>
@@ -5014,7 +5308,25 @@ namespace GameScoring.DomainAbstractions
 <h2 id="truechapter-five-methodology"><a class="anchor" href="#truechapter-five-methodology"></a>5. Chapter five - Methodology</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="trueagility"><a class="anchor" href="#trueagility"></a>5.1. Agility</h3>
+<h3 id="truethe-first-few-strokes"><a class="anchor" href="#truethe-first-few-strokes"></a>5.1. The first few strokes</h3>
+<div class="paragraph">
+<p>As a software engineer contemplating a new project, I have often asked myself "Where do I start?" This also happens with legacy code, when contemplating the direction that refactorings should take. "If this software were structured optimally well, what would it look like?"</p>
+</div>
+<div class="paragraph">
+<p>Christopher Alexander, the creator of the idea of design patterns in building architecture, said, "As any designer will tell you, it is the first steps in a design process which count for the most. The first few strokes which create the form, carry within them the destiny of the rest". This has been my experience too.</p>
+</div>
+<div class="paragraph">
+<p>In Agile, where architecture is meant to emerge, this wisdom has been lost. ALA restores that wisdom to software development, and gives the software architect the exact process to follow for that little piece of up-front design. No more than one sprint is required to do this architectural work, regardless of the size of the project.</p>
+</div>
+<div class="paragraph">
+<p>Furthermore, once this architectural work is done, the Agile process works significantly better thereafter.</p>
+</div>
+<div class="paragraph">
+<p>My experience over several projects so far is that the initial architecture does not need to change as the development proceeds if good quality abstraction are invented.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="trueagility"><a class="anchor" href="#trueagility"></a>5.2. Agility</h3>
 <div class="paragraph">
 <p>ALA is inherently optimally agile (except for an Iteration zero which we will discuss next). By optimally agile, we mean that the amount of code that changes to change functional requirements is the minimum it can be. The amount of code that actuall depends on requirements is a small percentage of the total. This differs from the average application where most code depends on the requirements.</p>
 </div>
@@ -5022,7 +5334,7 @@ namespace GameScoring.DomainAbstractions
 <p>ALA achieves this at its first level of separation of concerns. This first  separation is to separate code that will just describe requirements from code that will implementation the abstractions needed to describe the requirements. This implementation code never has knowledge of any requirements, so it generally doesn&#8217;t change when requirements change. Only the code that describes requirements needs to change, and that code is optimally minimal.</p>
 </div>
 <div class="sect3">
-<h4 id="trueiteration-zero"><a class="anchor" href="#trueiteration-zero"></a>5.1.1. Iteration zero</h4>
+<h4 id="trueiteration-zero"><a class="anchor" href="#trueiteration-zero"></a>5.2.1. Iteration zero</h4>
 <div class="paragraph">
 <p>When a new project begins, the only new information we have is the requirements. Any design decisions that don’t depend on the specific requirements could already have been made beforehand. It is those decisions that form the ALA reference architecture. Therefore, when we get the requirements, that is our immediate and total focus. We may not know all of them, but we will only need a sample to build start inventing our domain abstractions.</p>
 </div>
@@ -5064,7 +5376,7 @@ namespace GameScoring.DomainAbstractions
 </div>
 </div>
 <div class="sect3">
-<h4 id="truehow-to-invent-domain-abstractions"><a class="anchor" href="#truehow-to-invent-domain-abstractions"></a>5.1.2. How to invent Domain Abstractions</h4>
+<h4 id="truehow-to-invent-domain-abstractions"><a class="anchor" href="#truehow-to-invent-domain-abstractions"></a>5.2.2. How to invent Domain Abstractions</h4>
 <div class="paragraph">
 <p>The most difficult part for people new to ALA is the skill of inventing the domain abstractions. You can fully understand the theory of ALA and why we need to invent abstractions, and still find it tricky to actually invent them. That&#8217;s because in this step in the process, we have to literally become inventors who are adding to the state of the art within your domain.</p>
 </div>
@@ -5168,7 +5480,7 @@ namespace GameScoring.DomainAbstractions
 </div>
 </div>
 <div class="sect3">
-<h4 id="true2nd-sprint"><a class="anchor" href="#true2nd-sprint"></a>5.1.3. 2nd Sprint</h4>
+<h4 id="true2nd-sprint"><a class="anchor" href="#true2nd-sprint"></a>5.2.3. 2nd Sprint</h4>
 <div class="paragraph">
 <p>In the second sprint we start converging on normal Agile. You pick one feature to implement first. Agile would say it should be the most essential feature to the MVP (minimum viable product), but this can be tempered by the need to choose one that requires a fewer number of abstractions to be implemented. Next, you design the interfaces that will allow those abstractions to plug together according to the wiring you already have from the first sprint. What messages will these paradigm interfaces need to pass at runtime between the unknown clients to make them work?</p>
 </div>
@@ -5189,7 +5501,7 @@ namespace GameScoring.DomainAbstractions
 </div>
 </div>
 <div class="sect3">
-<h4 id="truelater-sprints"><a class="anchor" href="#truelater-sprints"></a>5.1.4. Later sprints</h4>
+<h4 id="truelater-sprints"><a class="anchor" href="#truelater-sprints"></a>5.2.4. Later sprints</h4>
 <div class="paragraph">
 <p>Imagine going into a sprint planning meeting with a Product Owner, a small team of developers, and a mature ALA domain that already has all the common domain abstractions done. As the Product Owner explains the requirements, one of the team members writes them down directly as they would be represented in terms of the domain abstractions. Another team member watches and remembers any lost details without slowing the product owner down. A third member implements the acceptance tests in similar fashion, and a fourth provides him with test data. It would be nice to have a tool that compiles the diagram into the equivalent wiring code. With such a tool, the team could have it executing by the end of the meeting. At the end of the planning meeting the development team say to the product owner "Is this what you had in mind?". The team can get immediate feedback from the Product Owner that the requirements have been interpreted correctly.</p>
 </div>
@@ -5213,7 +5525,7 @@ namespace GameScoring.DomainAbstractions
 </div>
 </div>
 <div class="sect2">
-<h3 id="truetechnical-debt"><a class="anchor" href="#truetechnical-debt"></a>5.2. Technical debt</h3>
+<h3 id="truetechnical-debt"><a class="anchor" href="#truetechnical-debt"></a>5.3. Technical debt</h3>
 <div class="paragraph">
 <p>Technical debt is real. Convincing your non-technical manager that it is real is not realistic, especially when you tell him that this is based on estimates. He already knows about your 'estimates'. Even if you could measure it, and offer your manager a payback period for a one-day investment in refactoring, there is a problem. He is measured on this sprints performance. Or he is measured on some other criteria such as this years budgeted sales. Technical debt is tomorrow&#8217;s problem, and that is not his problem, not ever.</p>
 </div>
@@ -5231,7 +5543,7 @@ namespace GameScoring.DomainAbstractions
 </div>
 </div>
 <div class="sect2">
-<h3 id="truefolder-structure"><a class="anchor" href="#truefolder-structure"></a>5.3. Folder structure</h3>
+<h3 id="truefolder-structure"><a class="anchor" href="#truefolder-structure"></a>5.4. Folder structure</h3>
 <div class="literalblock">
 <div class="content">
 <pre>[tree,file="folderstructure.png"]
@@ -5258,7 +5570,7 @@ root
 </div>
 </div>
 <div class="sect2">
-<h3 id="trueconvention-over-configuration"><a class="anchor" href="#trueconvention-over-configuration"></a>5.4. Convention over configuration</h3>
+<h3 id="trueconvention-over-configuration"><a class="anchor" href="#trueconvention-over-configuration"></a>5.5. Convention over configuration</h3>
 <div class="paragraph">
 <p>When the application create an instance of an abstraction, most of the configuration of that abstraction should have defaults. In ALA, setters allow optional configuration, reducing the amount of information that would otherwise be required in the application to fully configure each abstraction. Any configuration that we wish to enforce goes into the constructor.</p>
 </div>
@@ -5267,12 +5579,12 @@ root
 </div>
 </div>
 <div class="sect2">
-<h3 id="trueknowledge-prerequisites"><a class="anchor" href="#trueknowledge-prerequisites"></a>5.5. Knowledge prerequisites.</h3>
+<h3 id="trueknowledge-prerequisites"><a class="anchor" href="#trueknowledge-prerequisites"></a>5.6. Knowledge prerequisites.</h3>
 <div class="paragraph">
 <p>When other programmer are doing maintenance on your code, you should make sure they have the knowledge they need. They will need knowledge of ALA. They will need to know about the programming paradigms used. They will need to know about the domain abstractions, and the insight of what each one does. And then they should know that the application diagram is the source code. It is up to you that every develop that follows will know all this.</p>
 </div>
 <div class="sect3">
-<h4 id="trueintellisence"><a class="anchor" href="#trueintellisence"></a>5.5.1. Intellisence</h4>
+<h4 id="trueintellisence"><a class="anchor" href="#trueintellisence"></a>5.6.1. Intellisence</h4>
 <div class="paragraph">
 <p>After they have modified the diagram, the maintaining developers will need to manually modify the corresponding code. Here they will see instances of abstractions being used all over the place, either 'new' keywords or function calls. If we have done our job with knowledge prerequisites, they will have been introduced to these abstractions. However, it doesn&#8217;t hurt to have brief reminders of what they are pop up when the mouse is hovered over them. So put in triple slash comments (or equivalent) describe the abstraction succinctly, with the intention of it being a reminder to someone who has already met the abstraction. Put a full explanation in the remarks and examples sections.</p>
 </div>
@@ -5282,7 +5594,7 @@ root
 </div>
 </div>
 <div class="sect2">
-<h3 id="truetwo-roles"><a class="anchor" href="#truetwo-roles"></a>5.6. Two roles</h3>
+<h3 id="truetwo-roles"><a class="anchor" href="#truetwo-roles"></a>5.7. Two roles</h3>
 <div class="paragraph">
 <p>ALA requires two roles. Both can be done by the same person, but always he should be wearing only one hat at a time. There is the role of the architect, and the role of the developer.</p>
 </div>
@@ -5298,7 +5610,7 @@ Perhaps, surprisingly, the architect&#8217;s main job is to focus on the require
 </div>
 </div>
 <div class="sect2">
-<h3 id="trueexample-project-a-real-device"><a class="anchor" href="#trueexample-project-a-real-device"></a>5.7. Example project - a real device</h3>
+<h3 id="trueexample-project-a-real-device"><a class="anchor" href="#trueexample-project-a-real-device"></a>5.8. Example project - a real device</h3>
 <div class="paragraph">
 <p>Unlike our previous example projects, this project is a real device and had previously been implemented without any knowledge of ALA. So this example serves to make comparisons between ALA and conventional software development. The original software was around 200 KLOC and took 3 people 4 years to write.</p>
 </div>
@@ -5315,7 +5627,7 @@ Perhaps, surprisingly, the architect&#8217;s main job is to focus on the require
 <p>The architecture in the original software, was somewhat typically organised into modules and patterns by its developers. Also somewhat typically, it had ended up with a high cost of modifiability - a big ball of mud. After the first release, the first incremental requirement was a 'Treatments' feature, which involved several new tables, new columns in existing tables, new data pages, new settings pages and some new business logic. This feature took a further 3 months to complete (actually 6 calendar months), which seemed out of proportion for the size of the feature. Somehow the Product Owner and managers seemed to have a sort of intuition that if similar things had been done before, such as menus or database tables, those things were already done, and the only new work was in the specific details of the new requirements. Those requirements could be communicated in a relatively short time, say of the order of one hour or one day if you include follow up discussions of abnormal scenarios.  So 6 months did not go down well. ALA, of course, works in exactly this intuitive way that managers hope for. All the things already done are sitting there in the domain abstractions, waiting to be reused, configured and composed into new requirements.</p>
 </div>
 <div class="sect3">
-<h4 id="trueiteration-zero-2"><a class="anchor" href="#trueiteration-zero-2"></a>5.7.1. Iteration zero</h4>
+<h4 id="trueiteration-zero-2"><a class="anchor" href="#trueiteration-zero-2"></a>5.8.1. Iteration zero</h4>
 <div class="paragraph">
 <p>During the development, there had a been a high number of changes required to the UI. It occurred to me at the time that the underlying elements of the UI were not changing. It was mainly the details of layout and navigation around the device&#8217;s many pages that were changing. The same could be said about the data and business logic. Only details were changing.</p>
 </div>
@@ -5354,7 +5666,7 @@ Perhaps, surprisingly, the architect&#8217;s main job is to focus on the require
 </div>
 </div>
 <div class="sect3">
-<h4 id="truetranslating-the-diagram-to-code"><a class="anchor" href="#truetranslating-the-diagram-to-code"></a>5.7.2. Translating the diagram to code</h4>
+<h4 id="truetranslating-the-diagram-to-code"><a class="anchor" href="#truetranslating-the-diagram-to-code"></a>5.8.2. Translating the diagram to code</h4>
 <div class="paragraph">
 <p>We hired a C++ student and proceeded with a 3-month experiment to answer this question.</p>
 </div>
@@ -5395,7 +5707,7 @@ Perhaps, surprisingly, the architect&#8217;s main job is to focus on the require
 </div>
 </div>
 <div class="sect3">
-<h4 id="truewriting-the-classes"><a class="anchor" href="#truewriting-the-classes"></a>5.7.3. Writing the classes</h4>
+<h4 id="truewriting-the-classes"><a class="anchor" href="#truewriting-the-classes"></a>5.8.3. Writing the classes</h4>
 <div class="paragraph">
 <p>We knew we wouldn&#8217;t have time to write all 50 classes, so we chose to implement the single feature shown below as a screen shot.</p>
 </div>
@@ -7715,7 +8027,7 @@ Once the code for the single user story is understood, some acceptance tests are
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-10-21 16:06:01 NZDT
+Last updated 2020-11-03 08:06:40 NZDT
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/Docco.min.css">
