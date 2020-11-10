@@ -35,7 +35,7 @@ Fundamentally, ALA is two architectural constraints when writing software:
 
 - All abstractions must be small - e.g. 100-500 LOC (or diagram nodes).
 
-Patterns and properties emerge from these two constraints, which are in many ways similar to ones we already know, but often with subtle but important differences. For example, one emergent property is "zero coupling and high cohesion". This is qualitatively different from our familiar "loose coupling and high cohesion".  
+Patterns and properties emerge from these two constraints. In many ways they are similar to ones we already know, which is not surprising. However, there is often subtle but important differences. For example, one emergent property is "zero coupling and high cohesion". This is qualitatively different to the familiar "loose coupling and high cohesion".  
 
 
 [big]#*Summary*#
@@ -45,38 +45,39 @@ Patterns and properties emerge from these two constraints, which are in many way
 
 ** These two constraints solve the "big ball of mud" problem by providing a pre-worked reference architecture (a meta-structure for code at the largest granularity scale). 
 
-** It pre-solves for the following quality attributes: Complexity, Readability, Maintainability, Testability
+** The meta-structure pre-solves for the following quality attributes: Complexity, Readability, Maintainability, Testability
 
 
 
 
-. Chapter 2, "What does the structure look like?". Without explaining why, this chapter describes the code structure that emerges after applying the two constraints:
+. Chapter 2, "What does the structure look like?". Without explaining why, this chapter describes the code structure that emerges from applying the two constraints:
 
 ** An abstraction is usually a function or class, but can be a small group of functions, classes, delegates, enums, even variables or objects, etc. The grouping is highly cohesive code that is unrestricted in its internal relationships. An abstraction is usually represented by a source file.
 
 ** A small number of discrete abstraction layers emerge. The layers are given the standard names: Application, Domain abstractions, Programming Paradigms, and Libraries. Folders are used for these layers. Dependencies only go down the layers, not across.
 
-** A common pattern that emerges is to explicitly wire together instances of abstractions that will communicate with each other at run-time through even more abstract 'abstract interfaces'.
+** The use of ports emerges.  An abstraction is often implemented as a class with ports. Ports are implemented using plain code. 
 
-** The emergent use of ports and how to give classes ports using plain code.
+** A common pattern that emerges is to explicitly wire together instances of abstractions that will communicate with each other at run-time through even more abstract interfaces. This is often done in the top layer, the application layer. Wiring in the top layer is done using a dependency injection operator, WireTo(). e.g. "new A().WireTo(new B());"
 
-** The emergent use of diagrams to wire instances of abstractions in the top layer using a dependency injection operator, WireTo(). Code is auto-generated from the diagram like: "new A().WireTo(new B());"
+** The emergent use of diagrams to describe the instantiation, configuration and wiring of abstractions. Code is auto-generated from the diagram. 
 
-** The use of programming paradigms when composing instances of abstractions. Programming paradigms are often implemented with simple, quite abstract interfaces such as "interface IEvent { void Execute(); }".
+** The use of programming paradigms when composing instances of abstractions. Programming paradigms are often implemented with simple, quite abstract interfaces. An example programming paradigm is "Event driven". The corresponding interface might be "interface IEvent { void Execute(); }".
 
 ** Multiple programming paradigms are used in an application. e.g. interfaces for user interface layout, events, data flows, activity flows, state machines, data schemas, and others.
 
-** An emergent property is the direct representation of requirements, like a DSL, which is then directly executable.
+** An emergent property is that the top layer code is a direct expression of requirements. Like a DSL, this direct expression of requirements is executable.
 
-** If the Application becomes large, we add a layer called StoryAbstrations, which provides abstractions to support separate diagrams, plugin style in the Application layer.
+** If the Application becomes large, we add a layer called StoryAbstrations, which provides abstractions to support separate diagrams. This supports a plug-in architectural style in the Application layer.
 
-** The ALA composition structure is analogous to real world composition structures such as Lego, electronic schematics, molecules. 
+** The ALA "composition of instances of abstractions" structure is analogous to real world composition structures such as Lego, electronic schematics, and molecules. 
 
-** All knowledge specific to the application ends up in the application layer. This is essentially just requirements. It si typically around 2% of the toal code. All knowledge for how to actually do anything goes in the domain abstractions layer. 
+** All knowledge specific to the application ends up in the application layer. This knowledge is essentially just the requirements. It is typically around 2% of the total code. All knowledge for how to actually do anything goes in the domain abstractions layer. 
 
-** Conventional libraries generally contain good abstractions, not necessarily because their designers set out to create good abstractions, but because they couldn't know anything about the code that will use them, so it was not possible for them to be specific to anything. ALA asks us to do that for one more layer before we write the application. We call that layer the domain abstractions layer.
+** Conventional libraries generally contain good abstractions, not necessarily because their designers set out to create good abstractions, but because they couldn't know anything specific about the code that will use them. So it was not possible for the classes to be specific to anything. ALA asks us to do that for one more layer before we write the application. We call that layer the domain abstractions layer.
 
-** Unlike the way we usually use library abstractions, we don't want the application to have to handle data itself. So we insert a layer below the domain abstractions layer called programming paradigms. This layer allows instances of domain abstractions to be wired together to communicate directly. Yet they still don't know anything about each other.
+** Library abstractions are generally used in isolation. The code that uses a library class must handle its input and output data. In ALA, we don't want to handle data in the application. That's why we insert a layer below the domain abstractions layer called programming paradigms. This layer allows instances of domain abstractions to be wired together to communicate directly at run-time (dependency injection). Yet the classes themselves still don't know anything about each other.
+
 
 ** Programming paradigms provide a grammar for the way instances of domain abstractions can be composed.
 
@@ -86,34 +87,33 @@ Patterns and properties emerge from these two constraints, which are in many way
 
 * While a number of internal validation experiments show promising results, the claim that ALA solves the software engineering problems outlined in chapter 1 is largely based on its design.
 
-* Just as understanding how a bridge is designed to eliminate all its points of failure can gives us confidence that it will stand, understanding how ALA eliminates known points of failure in software can give us confidence that the resulting architecture can stand long term maintenance.
+* Just as understanding how a bridge is designed to eliminate all its points of failure can gives us confidence that it will stand, understanding how ALA eliminates known points of failure in software can give us confidence that the resulting architecture can stand up to long term maintenance.
 
-* Chapter 5 explains the theory behind the design in terms of how our brains have evolved to use abstractions in our language to make sense of our complex world.
+* While chapter 6 focuses on what is an abstraction, and why are they so important, this chapter focuses on the properties that abstractions give us in code. We focus on the known failure points in software. These failure points are things we already largely recognise, but just find difficult to eliminate - coupling, system complexity, dependencies on the unstable, indirection, and the large gap between requirements and implementation.
 
-* This chapter focuses more on the known failure points in software. These failure points are things we already largely recognise, but just find difficult to eliminate - coupling, system complexity, dependencies on the unstable, indirection, and the large gap between requirements and implementation. Here we explain how the two fundamental constraints eliminate them.
+* Abstractions are learnable, stable and reusable.
 
-* Define what we mean by abstraction: A general concept. Abstractions are learnable, stable and reusable.
+** Learnable: In AlA, any code can be read as a stand-alone unit once the dependent abstractions have been learned. For example, we can read code that has a dependency on squareroot because we have learned what the squareroot abstraction is. We don't need to go and read the squarroot code. ALA constrains us to make ALL dependencies work this way.
 
-** Learnable: In AlA, any code can be read as a stand-alone unit once the dependent abstractions have been learned. For example, we can read code that has a dependency on squareroot because we have learned what the squareroot abstraction is. We don't need to go and read the squarroot code. ALA constrains us to make all dependencies work this way by using domain level abstractions.
-
-** Stable: In ALA, dependencies are always on stable concepts. Since stable concepts don't change, the dependent code is protected from ripple effects coming from it's dependencies. The stability of the concept of an abstraction is unrelated to the code that implements an abstraction. For example, the concept of squareroot has been stable for thousands of years.
+** Stable: In ALA, all dependencies are on stable concepts. Not stable code, stable concepts, such as the concept of squareroot or the concept of events. Since stable concepts don't change, the dependent code is protected from ripple effects coming from its dependencies. The stability of the concept of an abstraction is unrelated to the code that implements an abstraction. For example, the concept of squareroot has been stable now for thousands of years.
 
 ** Reusable: As Charles Krueger has pointed out, abstraction and reuse are two sides of the same coin. By constraining dependencies to be on abstractions, we then find these abstractions being reused, which creates more dependencies on them (a good thing), which helps us consolidate them as abstractions.  
 
 * The constraint that "dependencies are only allowed on abstractions" results in zero coupling. The code inside all abstractions in the system is zero coupled with one another. (So ALA achieves "Zero coupling and high cohesion", not "loose coupling and high cohesion.)
 
-* Zero coupling together with limited abstraction size eliminates complexity.
+* Zero coupling, together with limited abstraction size, eliminates complexity.
 
-* Conventional code typically contains both good and bad dependencies. Bad dependencies are the ones that are not on abstractions - they are commonly there for one of two reasons: 1) to facilitate communication from one part of a system to another at runtime. 2) to decompose a large component into smaller (but more specialized) pieces. Both these types of dependencies are on the potentially unstable. ALA eliminates all these bad dependencies.
+* Conventional code typically contains both good and bad dependencies. Good dependencies are the ones that are on abstractions. Bad dependencies are all the others. There are two common types of bad dependencies: 1) to facilitate communication from one part of a system to another at runtime. 2) to decompose a large component into smaller (but more specialized) pieces. Both these types of dependencies are on the potentially unstable. ALA eliminates all these bad dependencies.
 
-** Conventional architectural design uses a decomposition method e.g UI and business logic. Decomposition tends to result in coupling. ALA uses a composition method. The set of abstractions being composed start out with zero coupling.
+* Conventional architectural design uses a decomposition method. For example, it is common to separate UI and business logic. Decomposition tends to result in coupling. ALA uses a composition method. The set of abstractions being composed start out with zero coupling with one another.
 
-** Requirements typically inherently contain relationships that form a graph structure (a network). In conventional software, this network of relationships is distributed in the implementation code. This makes the graph itself quite obviscated. Furthermore, we try to eliminate circular dependencies by introducing either the wrong kind of layering and indirections. These make makes the graph even more obviscated. This appears as the common difficulty of tracing though a program when debugging. ALA makes these graph structures explicitly represented. Preferably they become simple diagrams. The graphs go inside their own abstractions in the top layer.
+* Requirements typically inherently contain relationships that form a graph structure (a network). In conventional software, this network of relationships is distributed in the implementation code. This makes the graph itself quite obviscated. Furthermore, we try to eliminate circular dependencies by introducing either the wrong kind of layering and indirections. These make makes the graph even more obviscated. This appears as the common difficulty of tracing though a program when debugging. ALA makes these graph structures explicitly represented. Preferably they become simple diagrams. The graphs go inside their own abstractions in the top layer.
 
-** ALA puts all code that has knowledge of the specific requirements in the top layer. But only code that carries details requirements is put in the top layer. Our experience is that this constitutes around 2% of the total code making up an application. So, once the set of domain abstractions is complete, changes to requirements are generally confined to this top layer.
+* ALA puts all code that has knowledge of the specific requirements in the top layer. But only code that carries details requirements is put in the top layer. Our experience is that this constitutes around 2% of the total code making up an application. So, once the set of domain abstractions is complete, changes to requirements are generally confined to this top layer.
 
-** Because the job of the top layer is just to express requirements, the gap between requirements and their implementation is small. There is usually a much more direct relationship between the requirements expressed in natural language and the requirements expressed in code as a simple composition of abstractions.
+* Because the job of the top layer is just to express requirements, the gap between requirements and their implementation is small. There is usually a much more direct relationship between the requirements expressed in natural language and the requirements expressed in code as a simple composition of abstractions.
 
+* An ALA application (top layer) is three things in one: The expression of requirements, the architecture documentation, and the executable.
 
 
 . Chapter 4, "Execution models". Explains how the underlying execution for each programming paradigm can be made to actually work.
@@ -151,7 +151,7 @@ Patterns and properties emerge from these two constraints, which are in many way
 
 ** Describes how the two fundamental architectural constraints are designed to mimic how our brains see the real world.
 
-** Composition of a small number of abstractions layers in the real world as an analogy: e.g. atoms, molecules, proteins, cells, bodies.
+** Composition of a small number of abstraction layers in the real world as an analogy: e.g. atoms, molecules, proteins, cells, bodies.
 
 ** ALA leverages how our brains have evolved to use abstractions to understand the real world. This enables us to understand our programs in the same way.
 
@@ -161,7 +161,6 @@ Patterns and properties emerge from these two constraints, which are in many way
 
 ** ALA does not use 'models' for its structure or architecture. Models, as the term implies, can leave out details arbitrarily. These details are unknowns and will come back to bite us. ALA only leaves out details by putting them inside abstractions, which renders them harmless. (Models differ from diagrams, which ALA can use.)
 
-** An ALA application (top layer) is three things in one: The architecture, the architecture documentation, and the executable.
 
 
 
