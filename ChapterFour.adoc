@@ -1,0 +1,960 @@
+:imagesdir: images
+
+== Chapter four - Programming paradigms
+
+=== Introduction to execution models
+
+ALA fundamentally begins with the premise of abstraction layers, with each layer significantly more abstract than the one above. So it is interesting to observe how these layers seem to emerge typical usage patterns, which in turn give rise to their names: Application layer, Domain abstractions layer, Programming Paradigms layer, and so on.
+
+image::JacquardLoom.jpg[JacquardLoom.jpg, 400, title="Jacquard loom as a programming paradigm", float="right"]
+
+The layer below the domain abstractions is really interesting in this respect. After the application has arranged and joined instances of domain abstractions to __represent user stories__, we now want them to actually execute. There are multiple ways things can execute:
+
+* simple events
+* data-flows
+* UI layouts
+* states machines
+* data schemas
+* functional programming
+* etc.
+
+These are all quite abstract concepts which suggests a new layer below. The domain abstractions need to use them extensively. So they make a new layer below the domain abstractions layer. Within the layer we will design interfaces for all these execution models so we will sometimes think of it as the execution models layer. But from the point of view of the application writer who is combining instances of abstractions, they look like programming paradigms. So we call the layer the "Programming Paradigms layer".
+
+The ways that programs can actually execute are by no means limited to the ones listed above. Slightly more custom ones such as "ConsistsOf" can be invented as needed (when they better express the requirements). We did this with the 'IConsistsOf' paradigm that we used in the project example for game scoring at the end of chapter two. 
+
+The "programming paradigms" layer may also contain other abstractions useful for building domain abstractions, such as a 'Persistence' abstraction. 
+
+It is an essential part of ALA to not only be able to have programming paradigms, but to use multiple programming paradigms in the same application, and in the same user story. This is referred to as polyglot programming paradigms. For most user stories, the most common paradigms needed are a combination of data-flow, UI layout, data schema and activity. 
+
+image::TaxonomyProgrammingParadigms.png[TaxonomyProgrammingParadigms.png, title="Taxonomy Programming Paradigms - cited from Van Roy"]
+
+We will seldom make use of the 'imperative' programming paradigm - the execution model of the native CPU hardware and most so-called high-level languages. Imperative means sequential, synchronous, execution flow of instructions or statements. (This paradigm does have a place in algorithms, however.) 
+
+Some programmers are so used to thinking in terms of sequential synchronous execution that it can be difficult to think in terms of other programming paradigms. Or, you keep wanting to know what the equivalent sequential synchronous code is in order to understand what is going on under the covers, in terms of what you already understand. Instead it is better to let go and just think in terms of the new programming paradigms. Certainly it is nice to know what is going on under the covers from a performance or resourcing point of view. But from a logical point of view, it is better to start expressing requirements directly in a range of new programming paradigms.
+
+Within each programming paradigm, there are generally some variations on how they can actually be made to execute. 
+
+The following sections are a selection of some of the more common programming paradigms. It is not an exhaustive list. There are no doubt many other possibilities waiting to be invented that better allow succinct expression of requirements. 
+
+
+=== Synchronous events
+
+We start with events because we want something that we can understand starting at the code level up. In this way we can get a concrete point of view of how these execution models can work. IEvent is the implementation of this simple yet very powerful and useful programming paradigm.
+
+Here is the interface. 
+
+....
+namespace ProgrammingParadigms
+{
+    public interface IEvent
+    {
+        void Execute();
+    }
+}
+....
+
+As you can see the interface for this execution model is very simple indeed - it's just a synchronous method call. Indeed it will be used to replace normal method calls between peer modules in conventional code.
+
+Let's complete our understanding at the code level by making two domain abstractions called A and B that use the interface:
+
+
+
+....
+using ProgrammingParadigms
+
+
+namespace DomainAbstractions
+{
+
+    class A
+    {
+        private IEvent Finished;
+    
+        public void Start()
+        {
+            // do my work
+            Finsihed.Execute();
+        }
+    
+    }
+    
+    
+    
+    class B : IEvent
+    {
+        IEvent Execute()
+        {
+            // do my work
+        }
+    }
+
+}
+....
+
+
+Now we can write an application
+
+....
+using DomainAbstractions
+
+class Application
+{
+    var program = new A().WireTo(new B());
+    program.Start();
+}
+....
+
+
+This will instantiate one instance of each of our domain abstractions, and wire them together. (If you have not seen the WireTo abstraction before, it is an extension method that uses reflection to search in class A for a private variable with a type that is an interface. It then sets it pointing to the instance of B if B implements the same interface. WireTo is not central to the current discussion, the IEvent interface is.  WireTo is discussed in more detail in the example projects of chapters 2 and 3.) 
+
+Despite it's simplicity, the IEvent interface is a powerful abstraction that has a huge impact on the quality of the architecture. The programming paradigm it gives us is, effectively, the UML Activity diagram.
+
+Notice just how abstract IEvent is. It's highly reusable, it's not specific to any domain abstraction or the application. It just knows how to transmit or receive an event. Because it is so abstract, it is stable. This makes it ok to have many domain abstractions depend on it.
+
+Many domain abstractions will use it, either by accepting the interface (as Class A does) or by implementing the interface (as Class B does). Then many instances of those domain abstractions can be connected together in an infinite variety of ways. This is called compositionality.     
+
+The interface fully decouples domain abstractions, because they only have to know about this interface. They do not need to know about each other. Unlike normal method calls, senders don't know who they are talking to. 
+
+The IEvent interface could be contrasted with the observer pattern (publish/subscribe) which also claims to achieve decoupling. However the observer pattern only reverses the dependency of a normal method call. Instead of the sender knowing about the receiver, the receiver has to know about the sender. If the sender and receivers are peers the observer pattern does not solve the problem. The IEvent interface decouples in both directions. The job of 'subscribing' is correctly moved to the application layer, because only the application should have the knowledge of what should be connected to what.
+
+There is normally a downside associated with decoupling, and that is that it becomes harder to follow the flow of control through the modules. That downside does not apply for the IEvent interface (or ALA in general). The reason is that the connections are still explicit - they are in the application layer that is wiring everything together. 
+
+In summary, the event driven programming paradigm used to connect instance of abstractions has the following properties over a conventional method call or observer pattern used between peer modules. 
+
+These properties are:
+
+* sender decoupled from receiver
+* receiver decoupled from sender
+* connections between instances are still explicit
+* wiring is all brought to one place instead of being distributed inside modules
+* compositionality
+
+=== State machines
+
+To get used to how different these programming paradigms can be, let's go now to something completely different - state machines. We wont be going into understanding them at the code level because we want to support hierarchical state machines, and the code for that is a little bit non-trivial, but we do want to get an understanding of how state machines are just another programming paradigm that allows us to wire together instance of abstractions. The meaning of the wiring is different than what it was for the event programming paradigm. 
+
+I assume a basic understanding of what state machines are.
+
+[.float-group]
+-- 
+image::FSM-generic.png[FSM-generic.png, title="State machine execution model", float="left"]
+
+At first it can be difficult to express the solution to a requirements problem as a state machine, even when the state machine is a suitable way to solve the problem. It takes some getting used to the first time. But it only takes a little bit of practice to begin to master it.
+--
+
+I once had to express a set of user stories that involved different things that could happen from the outside, either through the UI or other inputs. I knew these were the kind of user stories that were nicely expressed by a state machine, but I had no idea where to start. I only knew that the previously written C code to do the job was a big mess that could no longer be maintained. But I started drawing the state machine, first on paper and then in Visio, and everything started to fall into place very nicely. Before I knew it I had represented what used to be 5000 lines of C code by a single A3 sized state machine diagram. This diagram so well represented the user stories that it was easy to maintain for years to come. This experience was a big factor in the final conception of ALA.   
+
+Here is the diagram.
+
+image::BigStateMachine.pdf.jpg[BigStateMachine.pdf.jpg, title="My first significant state machine for a real embedded device"]
+
+Notice that the diagram makes heavy use of hierarchical states (boxes inside boxes). These turn out to be important in most of my state machines.
+
+State machine diagrams are drawn in their own unique way. The boxes of the diagram are instances of the abstraction "State". The lines on a state machine diagram are actually instances of another abstraction, "Transition". Out of interest, to relate a state machine diagram to a more conventional ALA wiring diagram, you would replace all the lines on the state machine with boxes representing instances of Transition. The event, guard and actions that associate with a transition then go inside the transition box to configure it. Lines would then wire the transition box to its source state instance and destination state instance. Hierarchy is drawn on the state machine by boxes inside boxes, but in the conventional ALA wiring diagram, the boxes would be drawn outside with lines showing the tree structure. This analogous to the tree structured wiring we have used in previous examples for expressing UIs, which are actually 'contains' relationships. 
+
+The graphical tool being developed will allow the drawing of hierarchical state machines. It will internally transform it to conventional wiring of instances of states and transitions. Interfaces called something like ITransitionSource, ITransitionDestination and IHiercharical would be used to make it execute. It is a simple matter to write code inside the state and transition abstractions to make them execute that would be adequately efficient for most purposes. 
+
+How to make hierarchical state machine execute in an optimally efficient way is a non-trivial problem, but I have worked out the templates for what the C code should look like. Generating this code is a topic for another web page.
+
+ 
+=== Imperative
+
+Now that we have a bit of a feel for different types of programming paradigms, let's cover the Imparative one, becasue it's the one we all know and use all the time (when we shouldn't).
+
+Imperative is the one provided by your programming language. It exists because it reflects the way the underlying machine works, not because it suits the expression of most user stories. Because it works the same way as the underlying machine, the imperative programming paradigm is efficient at runtime. This can be important for typically a small amount of the total code.
+
+Impareative means that connected elements are executed consecutively and synchronously as fast as the CPU can execute them. The connected elements are language statements, especially function or method calls. Functions and methods are executed 'synchronously', which means that execution is always passed with the messages. The receiver of a message gets both the message and the CPU resource to process it. The sender automatically waits until the receiver finishes using the CPU resource and returns it. 
+
+The imperative paradigm is only suitable when you know ahead of time the order that things will happen, and those things should happen as fast as possible in CPU time. There is not real-time or temporal concerns other than having the entire routine execute as quickly as possible. It is the paradigm to use to execute short running algorithms.
+
+
+=== Event driven
+
+We now return to 'Event driven' in the wider sense of the term than the synchronous event driven paradigm using the IEvent interface we discussed earlier.
+
+'Event driven' is an overloaded term in software engineering because it generally means both 'asynchronous' and 'decoupled'. Let's clarify these two aspect separately.
+
+==== coupled/decoupled
+ 
+One perspective of 'Event Driven' is simply 'breaking out' of the imperative 'synchronous & coupled' paradigm. In Imperative programming, function calls are  both synchronous (because the caller waits for it to return before continuing its own execution) and coupled (because the function caller refers directly to the function in another module or class by its name). 
+
+'Event driven' usually means both 'asynchronous' & 'decoupled'. Asynchronous means the receiver of the message can handle the message in it's own time. And the sender can do other things immediately. Decoupled means the sender does not name the recipient of the message. In most implementations if Event driven, the receiver usually names the event it is interested in. (Note that while this is considered 'decoupled' in Event Driven programming, it is not considered decoupled enough in ALA because the receiver (as an abstraction) still has to know about events in the outside world. In ALA we would use a fully decoupled implementation of the event driven programming paradigm.) 
+
+These two notions, synchronous/asynchronous and coupled/decoupled are actually independent of each other. All four combinations are possible, and sensible. In fact all four combinations can be used in ALA. 
+
+As we said, the term 'Event Driven' usually refers to the combination: asynchronous and decoupled, However in C#, events are synchronous and decoupled, which adds to the confusion. In C#, events are a synchronous implementation of the observer pattern - the sender waits until all receivers of the event have completed reacting to the event before continuing its own execution.
+
+==== synchronous/asynchronous 
+
+When something sends out an event or message there are two ways a receiver can get the message from a timing point of view.
+
+* Synchronous - the receiver processes the message immediately when the message is sent. The receiver must be waiting, doing nothing, ready to process the message. The time of processing is therefore said to be synchronised with the sender. 
+
+* Asynchronous - The receiver processes the message in its own time some time later. The receiver may be busy doing other things in the meantime. This implies the message must be stored somewhere until the receiver is ready. The time of processing is not synchronised with the sending of the event. 
+
+So synchronous is made of an event plus the receiver in a do-nothing-wait state. Asynchronous is made up of an event, a storage of the event, and a receiver taking the event when it is ready. 
+
+
+===== request/response pattern
+
+A common pattern is an orchestration of two messages, a request and a response. Usually both messages are processed synchronously or both messages are processed asynchronously.
+
+When both messages are processed synchronously it creates a very common pattern which we know of as a function call or method call. This pattern is efficient when running on a single thread because it is directly supported in silicon by the  subroutine call instruction. This instruction passes the event and the execution CPU resource to the receiver at the same time, and passes them both back for the response at the same time. It is actually a very nice invention, and a very effective and safe pattern. However, because the synchronous function call or method call is so common in programming languages, and is so efficient, the synchronous request/response pattern appears to be fundamental to most developers and tends to be over used for messaging in situations where asynchronous messaging would be better. 
+
+Let's unravelling when to use synchronous and when to use asynchronous.
+
+===== real world messaging
+
+In the real world we don't normally think about synchronous or asynchronous. If we are in a conversation, it is inherently synchronous. We naturally wait for the other person to stop talking, and then we talk. Synchronous can operate on slightly longer time scales as when go to the coffee machine and wait for the coffee. In synchronous, we may have to wait doing nothing at all for the receiver to be ready, as we do when we arrive for a doctors appointment. We basically do nothing until we are synchronised with the doctor. 
+
+
+On longer time scales everything is naturally asynchronous. We send an event out. It could be a letter, an e-mail, or dropping off our car. We don't wait, doing nothing, until the receiver is ready. We don't wait, doing nothing, for the response. The receivers react to our events in their own time. In the meantime we can do other things.
+
+If the response is not that important, like a request for a quote, the sender can simply never notice that there was no response. If it is important to get the response, like a payment of an invoice, the sender will generally time out if there is no response and then talk an alternative action. So timeouts frequently come into play with asynchronous messaging.
+
+Now notice that asynchronous events or messages are the fundamental form. An asynchronous message can be processed synchronously, but not the other way around. When you are waiting for the coffee machine, you are actually able to do asynchronous, just currently operating synchronously. If someone comes and talks to you, you can switch to asynchronous, and pick up the waiting coffee when you are ready rather when it is ready. In ALA we will be making use of this fundamental property of messaging so that we can build abstractions without having to know whether the abstraction we are talking to wants to handle it asynchronously or synchronously. 
+
+
+===== Event driven as a paradigm
+
+We have discussed two properties of event driven: asynchronous and decoupled. 
+
+The Event Driven programming paradigm also has third meaning attached to it that is at higher level. In this context, the opposite of 'event driven' might be called 'Orchestration'.
+
+The orchestration paradigm will be covered in the Activity programming paradigm in the next section. For now it just means that our application will prescribe what will happen in what order.
+
+The event driven paradigm is the opposite. In the application we don't know what will happen next (in either the outside world or what code will execute next). We will just wait until some event happens, and then react to it. Reacting to it usually changes some stored state. This state may change the way we will react to subsequent events. In other words, event driven and state machines work well together. 
+
+The Event driven paradigm allows events external to the system to happen at any time. We may be bust processing a previous event, so these events must be asynchronous. Events sent between modules in the system may be either asynchronous (treated like external events) or synchronous (let's do everything related to an external event now - called GALS - Globally Asynchronous locally synchronous) or a combination of both.  
+
+===== Why use synchronous?
+
+So if asynchronous is the more general and more flexible execution model, why use synchronous at all? As mentioned synchronous is efficient on a single thread, and is supported by the very common function or method statement of our common programming languages. These are sometimes good reasons to use synchronous. But there are other reasons to use synchronous locally. 
+
+* Synchronous allows orchestration to be coded more conveniently. After a function call, the next thing to happen is coded in the next line of code, which is very nice. If using asynchronous messages for orchestration logic, the code for what happens next ends up in a different place (where the response event arrives) (although languages that have async/await can do code orchestration using asynchronous messaging just as nicely). 
+
+* Single threaded synchronous messaging avoids certain potential problems because it is internally more deterministic - it orders the execution of everything that reacts to events. Asynchronous leaves the ordering of execution to be determined separately, which will generally appear less deterministic.
+
+===== Why use asynchronous?
+
+* Asynchronous avoids temporal coupling between sender and receiver. This can be hugely important, just as it's important not to have to wait for the receiver to be ready read your email before you send it, or to have to wait all day doing nothing while your car is being fixed.
+
+* Asynchronous allows separate explicit (rather than implicit) scheduling of all work for temporal or performance issues. This explicit scheduling is both a greater freedom and a greater responsibility.
+
+* A synchronous thread can't do anything else until it gets the response. This causes performance issues for long running routines. The connonical example is the UI that freezes while the single thread application executes a long synchronous algorithm. Synchronous generally involves temporal coupling. 
+
+* Synchronous theoretically can work across threads, processors or networks (by remote procedure calls), but becomes even more problematic in temporal coupling. A synchronous call may block execution of the sender for an arbitrary length of time. The more general asynchronous approach becomes very much preferred.
+
+==== ALA temporal decoupling between synchronous and asynchronous
+
+ALA can use both asynchronous and synchronous. It does not have rules for when to use one or the other. The rules remain more or less the same as in non-ALA applications. However, ALA is all about abstractions that are completely uncoupled. They know absolutely nothing about each other, and this applies equally to whether they use asynchronous or synchronous events or messaging. It is therefore desirable that abstractions that generate events and abstractions that listen to events can be connected regardless of their synchronous or asynchronous nature. The only way to do this is for interfaces to be all asynchronous, and then be used synchronously when required at runtime. Let's explore the consequences of this.
+
+Abstractions that receive events can implement the asynchronous interface either asynchronously or synchronously as they choose. If implementing synchronously, if the interface uses a callback, this means that they will call the callback function in the interface synchronously. If Tasks or Promises are used in the interface, it means they will return a Task or Promise already in the complete state. 
+
+Abstractions that send events can also use the asynchronous interface synchronously if they choose. To do they simply don't do anything else until the response comes. If callbacks are used, it needn't care if the callback is called back synchronously. If Tasks or Promises are used, it needn't care if the Task or Promise it gets back after it sends the event is already in the complete state. But for when the receiver behaves asynchronously, the sender must still implement either a callback or a promise.
+
+In this way senders and receivers do not need to be coupled with respect to synchronous/asynchronous. If two abstractions that don't know each other are connected in the same processor, they can execute synchronously. If they are connected in over a network, they can communicate asynchronously. 
+
+This all sounds good, but unfortunately, if you make an interface asynchronous in order for it to handle either asynchronous or synchronous, both ends must be written in the 'coding style' of asynchronous. If the sender wants to execute synchronously, the coding style looks awkward unless your language has async/await or a similar mechanism such as protothreads. This is especially true when there is a known sequence of activities to be done that is naturally expressed as sequential function calls. The other problem is that if you are in the happy position of having async/await available, the async functions can start spreading to everywhere.
+
+On the receiver side, when it wants to implement an asynchronous interface in a  synchronous manner, it can't simply return the value - it must call the callback or set the result in the promise object first.
+
+All this only affects code that is written inside domain abstractions. It doesn't affect things so much at the application layer. This is because in the application layer we have lifted ourself into the declarative realm of composition of instances of abstractions. We have abstracted away the execution model in the interfaces in the Programming Paradigms layer. If you are wanting to do something sequential (but not Imperative) in the application layer module, you do it using the 'Activity' execution model which we will describe in a later section of this chapter.   
+
+TBD
+==== Preemptive/non-premptive
+
+Before leaving the 'Event Driven' execution model, we just need to clarify two variants of asynchronous - preemptive or non-preemptive. An Event or Message can be sent and end up being executed on another thread or the same thread.  
+
+In ALA, when using asynchronous, it must be non-pre-emptive by default. This is to prevent thread safety causing coupling between abstractions. Preemtive asynchronous (using multiple threads) would only be used when it is the only way to solve the temporal constraints of the problem, which would be understood to be compromising the decoupling between abstractions. This is the same criteria you should use in any type of programming style. 
+
+////
+==== Is a call to a blocking function synchronous or asynchronous? 
+
+At this point there may be confusion in the situation where you have a multi-threaded program and a thread has a function call to a function that blocks. Is this synchronous or asynchronous? The code uses a synchronous programming style but is actually asynchronous because the execution model is that the caller does not get to continue execute return to the thread immediately. TBD
+////
+
+==== Examples of Event Driven
+
+There are many examples of usage of asynchronous event driven systems. Examples are Node.js, the reactor pattern, IEC 61499 function blocks and there is usually an Asynchronous Event Framework behind the scenes of state machines.
+
+=== Activity-flow
+
+The name Activity-flow comes from the UML activity diagram. Activities that are wired together execute in order. One starts when the previous one finishes. The activity itself may take a long time to complete (without holding the CPU). Activity flows can split, run in parallel or pseudo-parallel and recombine. 
+
+There are languages or libraries that support the Activity paradigm in text form so that the code looks like the Imperative paradigm but is actually more of the Activity paradigm. These are mechanisms such as async/await, yield, or coroutines such as Protothreads implemented using Duff's device in C.
+
+==== Work-flow
+
+Persisted Activity-flow. This includes long running activities within a business process such as an insurance claim.
+
+=== Data-flow
+
+A data-flow model is a model in which wired instances in the program (or connected boxes on a diagram) are a path of data without being a path of execution-flow. The execution flow is like in another dimension relative to the data flow - it may go all over the place.
+
+A stream of data flows between the connected components. Each component processes data at its inputs and sends it out of its outputs.
+
+Each input and output can be operated in either push or pull mode. Usually the system prescribes all pull (LINQ), all push (RX), all inputs pull and outputs push (active objects with queues) or all outputs pull and inputs push (active connectors). In ALA we can use a mix of these different mechanism when we define the programming paradigm interfaces.
+
+The network can be circular provided some kind of execution semantic finishes the underlying CPU execution at some point (see synchronous programming below).
+
+The data-flow paradigm raises the question of type compatibility and type safety. Ideally the types used by the components are either parameterised and specified by the application at each connection or determined through type inference.  
+
+
+==== IDataFlow<T>
+
+I frequently use data-flow execution models.
+
+Here is one variation which works well:
+
+TBD
+
+
+This variation has these properties:
+
+* On a diagram, the line (wire) represents a variable that holds the value.
+* Fan-out - one output can connect to multiple inputs. All inputs read the same output variable.
+* Fan-in - multiple outputs cannot connect to one input.
+* Each output is implemented by a single memory variable whose scope is effectively all the places connected by the line (wire).
+* Receivers can get an event when the value changes
+* Receivers can read and re-read their inputs at any time.
+* Operator don't need to have an output variable, they can pass the get through and recalculate every time instead. 
+
+Here is the version I use most often.
+
+TBD
+
+
+It has a number of useful properties.
+
+ 
+
+==== ITable
+
+This interface moves a whole table of data at once. The table has rows and columns. The columns are determined at runtime by the source. 
+
+TBD implemantation examples
+
+==== IIterator
+
+This data-flow interface allows moving a finite number of data values at once. It does so without having to save all the values anywhere in the stream, so has an efficient execution model that moves one data value at a time through the whole network.
+
+This is the ALA equivalent of both IEnumerator and IObserver as used by monads. ALA uses the WireTo extension method that it already has to do the Bind operation. So the IIterator interface is wired in the same consistent way as all the other paradigm interfaces. There is no need for IEnumerable and IObservable type interfaces to support Also unlike monads, multiple arbirary interfaces can be wired between two objects with a single wiring operation.
+
+IIterator has two variants that handle push and pull execution models. Either the A object can push data to the B object, or the A object can pull data from the B object. 
+
+TBD implementation examles
+
+==== Glitches
+
+All systems can have glitches when data flows are pushed in a diamond pattern. The diamond pattern occurs when an output is wired to two or more places, and then the outputs of those places eventually come back together. If they never come together, even both seen by a human, then we generally don't care what order everything is executed in. But when they come together, the first input that arrives with new data will cause processing, and use old data on the other inputs. This unplanned combination of potentially inconsistent data processed together is a glitch. It even happens in electronic circuits.
+
+The following composition of data-flow operators is meant to calculate (X+1)*(X+2)
+
+[plantuml,file="diagram-25.png"]
+----
+@startdot
+digraph foo {
+# edge [color=green]
+size="2!"
+graph [rankdir=LR]
+node [shape=Mrecord]
+Add1 [label="<f0> Add|<f1> 1"]
+Add2 [label="<f0> Add|<f1> 2"]
+D [style=invis]
+E [style=invis]
+F [style=invis]
+D -> X [style="invis"]
+X -> Add1
+X -> Add2
+Add1 -> Mul
+Add2 -> Mul
+Mul -> E [style="invis"]
+E -> F [style="invis"]
+}
+@enddot
+----
+
+When X changes, there can be a glitch, a short period of time, in which the output is (C~new~+1)*(C~old~+2).
+
+In imperative programming, this problem is up to the developer to manage. He will usually arrange the order of execution and arrange for a single function or method to be called at the place where the data-paths come back together. As he does this, he is introducing a lot of non-obvious coupling indisde the modules of the system, which is one of the big problems with imperative programming.
+
+When we have composability, we don't know inside the abstractions how data will propagate outside, and how it will arrive at its inputs. We want to execute whenever any of our inputs change, because as far as we know it may be the only change that might happen. So we really want the execution model to take care of eliminating glitches automatically for us.
+
+This is a work in progress for the IDataFlow execution model described above.
+In the meantime, as a work-around I take care of it at the application level using a pattern. When I know data-flows will re-merge in a potentially inconsistent manner, I wire in an instance of an abstraction called 'Order' between the output and all its destination inputs. This instance of order is configured to explicitly control the order that the output date stream events are executed in. Then I will use a second abstraction called 'EventBlock' at the end of all data paths except one, the one that executes last.    
+
+[plantuml,file="diagram-26.png"]
+----
+@startdot
+digraph foo {
+# edge [color=green]
+size="2!"
+graph [rankdir=LR]
+node [shape=Mrecord]
+Add1 [label="<f0> Plus|<f1> 1"]
+Add2 [label="<f0> Plus|<f1> 2"]
+X -> Order
+Order -> Add1 [label="1"]
+Order -> Add2 [label="2"]
+Add2 -> Mult
+Add1 -> EventBlock
+EventBlock -> Mult
+{rank=same Add1 Add2}
+}
+@enddot
+----
+By default multiple IDataFlows wired to a single output are executed in the order that they are wired anyway. On the diagram, they are drawn top to bottom in that order.  This improves the determinism but is a little too implicit for my liking, so that is why I use the order abstraction.
+
+
+=== Live-data-flow
+
+As used in the coffee-maker example earlier, this paradigm simulates electronic circuits instead of using the concept of discrete messages. Semantically the inputs have the values of the outputs they are wired to at all times. This type of flow is readily implemented with shared memory variables.
+
+FRP (Functional Reactive Programming) also is effectively a live data-flow execution model.
+
+
+=== Synchronous data-flow
+
+The use of the word synchronous here is different from its use in the discussion of synchronous/asynchronous events above. Here it means a master system clock clocks the data around the system on regular ticks. At each tick, every instance latches its own inputs and then processes them and places the results on their outputs. Data progresses through one operator per tick, so takes more time to get through the system from inputs to outputs. The result is a more deterministic and mathematically analysable system. 
+
+The execution timing and the timing of outputs occurs at a predictable tick time, albeit on a slower time scale than an asynchronous system. All timings are lifted into the normal design space.
+
+Glitches that could occur in an asynchronous system (discussed earlier) are eliminated at the level of single clock ticks. A fast glitch could not occur. A glitch would occur when different data paths had different lengths, and would last for at least one tick duration. Controlling glitches is therefore lifted into the normal design space.
+
+
+
+=== UI layout
+
+TBD
+
+=== UI navigation flow
+
+TBD
+
+=== Data schema
+
+TBD
+
+
+=== Example project - Ten-pin bowling
+
+The full source code for the bowling application can be viewed or downloaded from here: https://github.com/johnspray74/GameScoring[GameScoring code]
+
+
+
+The ten-pin bowling problem is a common coding kata. Usually the problem presented is just to return the total score, but in this example we will tackle the more complicated problem of keeping the score required for a real scorecard, which means we need to keep all the individual frame ball scores. We can afford to do this even for a pedagogical sized example because ALA can provide a simple enough solution.
+
+
+
+
+
+[plantuml,file="bowling_scorecard2.png"]
+----
+@startditaa --no-separation --no-shadows
+/-----+-----+-----+-----+-----+-----+-----+-----+-----+--------\
+|   1 |   2 |   3 |   4 |   5 |   6 |   7 |   8 |   9 |    10  |
++--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+| 1| 4| 4| 5| 6| /| 5| /|  | X| -| 1| 7| /| 6| /|  | X| 2| /| 6|
++  +--+  +--+  +--+  +--+  +--+  +--+  +--+  +--+  +--+  +--+--+
+|   5 |  14 |  29 |  49 |  60 |  61 |  77 |  97 | 117 |   133  |
+\-----+-----+-----+-----+-----+-----+-----+-----+-----+--------/
+
+                    A ten-pin bowling scorecard
+@endditaa
+----
+
+
+The ALA method starts by "describing the requirements in terms of abstractions that you invent". When we start describing the requirements of ten-pin bowling, we immediately find that "a game consists of multiple frames", and a "frame consists of multiple balls". Let's invent an abstraction to express that. Let's call it a "Frame". Instances of Frame can be wired together by a "ConsistsOf" relationship. So let's invent an abstract interface to represent that, and call it 'IConsistsOf'.
+
+Here is the diagram of what we have so far.
+
+////
+[plantuml,file="bowling.png"]
+----
+@startditaa --no-separation --no-shadows utf-8
+
+ nFrames==10     score==10 || nBalls==2
+   |              |
+   v              v
++-----+        +-----+
+|     |        |     |
+|Frame|------->|Frame|
+|     |        |     |    
++-----+        +-----+
+@endditaa
+----
+////
+
+[plantuml,file="diagram-bowling-1.png"]
+----
+@startdot
+digraph foo {
+graph [rankdir=LR]
+subgraph cluster_C {
+label="Ten-Pin Bowling"
+style=rounded
+#node [style=rounded]
+node [shape=Mrecord]
+game [label="Frame|\"game\"|nFrames==10"]
+frame [label="Frame|\"frame\"|balls==2 \|\| pins==10"]
+ball [label="SinglePlay|\"throw\""]
+game -> frame -> ball [label = "IConsistsOf"]
+}
+}
+@enddot
+----
+
+This is the first time we are using a diagram for an ALA application, so le's go through the conventions used.
+
+The name in the top of the boxes is the abstraction name. The name just beneath that is the name of an instance of the abstraction. For the bowling application above, we are using two instances of the Frame abstraction, one called "game" and one called "frame". Below the abstraction name and instance name go any configuration information of the instance.
+
+The Frame abstraction is configured with a lambda function to tell it when it is finished. The Frame abstraction works like this - when its last child is complete it will create a new one. It will stop doing that when the lambda expression is true. It will tell its parent it is complete when both the lambda expression is true and its last child Frame is complete. 
+
+The end of the chain is terminated with a leaf abstraction that also implements the 'IConsistsof' interface called 'SinglePlay'. It represents the most indivisible play of a game, which in bowling is one throw. Its job is to record the number of pins downed. 
+
+The concept in the Frame abstraction is that at run-time it will form a composite pattern. As each down-stream child frame completes, a Frame will copy it to start a new one. This will form a tree structure. The "game" instance will end up with 10 "frames", and each frame instance will end up with 1, 2 or 3 SinglePlays.
+
+Note, in reference to the ALA layers, this diagram sits entirely in the top layer, the Application layer. The boxes are instances of abstractions that come from the second layer, the Domain Abstractions layer. The arrows are instances of the programming paradigm, 'InConsistsOf', which comes from the third layer, the ProgrammingParadigms layer.  
+
+This diagram will score 10 frames of ten-pin bowling but does not yet handle strikes and spares. So let's do some 'maintenance' of our application. Because the application so far consists of simple abstractions, which are inherently stable, maintenance should be possible without changing these abstractions.
+
+The way a ten-pin bowling scorecard works, bonuses are scored in a different way for the first 9 frames than for the last frame. In the first nine frames, the bonus ball scores come from following frames, and just appear added to the frame's total. They do no appear as explicit throws. In the last frame, they are shown as explicit throws on the scorecard. That is why there are up to 3 throws in that last frame. 
+
+To handle the different last frame, we just need to modify the completion lambda expression to this. 
+
+ frameNum<9 && (balls==2 || pins==10) // completion condition for frames 1..9
+ || (balls==2 && pins<10 || balls==3) // completion condition for frame 10
+
+To handle bonuses for the first 9 frames, we introduce a new abstraction. Let's call it Bonuses. Although we are inventing it first for the game of ten-pin bowling, it is important to think of it as a general purpose, potentially reusable abstraction.
+
+What the Bonus abstraction does is, after its child frame completes, it continues adding plays to the score until its own lambda function returns true.
+
+The completed ten-pin bowling scorer is this:
+
+
+[plantuml,file="diagram-bowling-2.png"]
+----
+@startdot
+digraph foo {
+graph [rankdir=LR]
+subgraph cluster_C {
+label="Ten-Pin Bowling"
+style=rounded
+#node [style=rounded]
+node [shape=Mrecord]
+game [label="Frame|\"game\"|nFrames==10"]
+bonus [label="Bonus||score\<10 \|\| plays==3"]
+frame [label="Frame|\"frame\"|frameNum\<9 && (balls==2 \|\| pins==10)\n \|\|\ (balls==2 && pins\<10 \|\| balls==3)"]
+ball [label="SinglePlay"]
+game -> bonus -> frame -> ball
+}
+}
+@enddot
+----
+
+Note that the "game" instance (the left box of the diagram) implements IConsistsOf. This is where the outside world interfaces to this scoring engine. During a game, the number of pins knocked down by each throw is sent to this IConsistsOf interface. To get the score out, we would call a GetScore method in this interface. 
+The hard architectural work is done. We have invented abstractions to make it easy to express requirements. We have a diagram that describes the requirements. And the diagram is executable. All we have to do is put some implementation code inside those abstractions and the application will actually execute.  
+
+First let's turn the diagram into equivalent code. At the moment, there are no automated tools for converting such diagrams to code. But it is a simple matter to do it manually. We get the code below:
+
+....
+private IConsistsOf game = new Frame("game")
+    .setIsFrameCompleteLambda((gameNumber, frames, score) => frames==10)
+    .WireTo(new Bonus("bonus")
+        .setIsBonusesCompleteLambda((plays, score) => score<10 || plays==3)
+        .WireTo(new Frame("frame")
+            .setIsFrameCompleteLambda((frameNumber, balls, pins) => frameNumber<9 && (balls==2 || pins[0]==10) || (balls==2 && pins[0]<10 || balls == 3))
+            .WireTo(new SinglePlay("SinglePlay")
+    )));
+....
+
+All we have done is use the 'new' keyword for every box in the diagram. We have made the constructor take the instance name as a string. (This name is not used except to identify instances during debugging.) We use a method called "WireTo" for every line in the diagram. More on that in a minute. And we pass any optional configuration into the instances using setter methods. The WireTo method and the configuration setter methods all return the 'this' pointer, which allows us to write this code in fluent style. If you are not familiar with fluent style it is just making methods return the this reference, or another object, so that you can chain together method calls using dot operators.
+
+Not all ALA applications will be put together using the method in the previous paragraph, but I have found it a fairly good way to do it for most of them, so we will see this same method used for other example projects to come. 
+
+So far, this has been a fairly top-down, waterfall-like approach. We have something that describes all the details of the requirements, but we haven't considered implementation at all. Past experience tells us this may lead us into dangerous territory. Will the devil be in the details? Will the design have to change once we start implementing the abstractions? The first few times I did this, I was unsure. I was not even sure it could actually be made to work. The reason it does work is because of the way we have handled details. Firstly all details from requirements are in the diagram. The diagram is not an overview of the structure. It is the actual application. All other details, implementation details, are inside abstractions, where they are hidden even at design-time. Being inside abstractions isolates them from affecting anything else. So, it should now be a simple matter of writing classes for those three abstractions and the whole thing will come to life. 
+Implementing the three abstractions turns out to be straightforward.
+
+First, design some methods for the IConsistOf interface that we think we will need to make the execution model work:
+
+....
+    public interface IConsistsOf
+    {
+        void Ball(int score);
+        bool IsComplete();
+        int GetScore();
+        int GetnPlays();
+        IConsistsOf GetCopy(int frameNumber);
+        List<IConsistsOf> GetSubFrames();
+    }
+....
+
+The first four methods are fairly obvious. The Ball method receives the score on a play. The Complete, GetScore and GetnPlays methods return the state of the sub-part of the game. The GetCopy method asks the object to return a copy of itself (prototype pattern). When a child frame completes, we will call this to get another one. The GetSubFrames method is there to allow getting the scores from all the individual parts of the game as required.
+
+The SinglePlay and Bonus abstractions are very straightforward. 
+
+So let's code the Frame abstraction.
+Firstly, Frame both implements and accepts IConsistsOf. A field is needed to accept an IConsistsOf. The WireTo method will set this field: 
+
+....
+// Frame.cs
+private IConsistsOf downstream;
+....
+
+
+Frame has one 'state' variable which is the list of subframes. This is the composite pattern we referred to earlier, and what ends up forming the tree.
+
+....
+// Frame.cs
+
+private List<IConsistsOf> subFrames;
+private readonly Func<int, int, int, bool> isFrameComplete;
+private readonly int frameNumber = 0;
+....
+
+The second variable is the lambda expression that is a configuration passed to us by the application. It would be readonly (immutable) except that I wanted to use a setter method to pass it in, not the constructor, to indicate it is optional. 
+
+The third variable is the frameNumber, also immutable. It allows frame objects to know which child they are to their parent - e.g. 1st frame, 2nd frame etc. This value is passed to the lambda expression in case it wants to use it. For example, the lambda expression for a bowling frame needs to know if it is the last frame.  
+
+The methods of the IConsistsOf interface are now straightforward to write. Let's go over a few of them to get the idea. Here is the most complicated of them, the Ball method:
+
+....
+public void Ball(int player, int score)
+{
+    // 1. Check if our frame is complete, and do nothing
+    // 2. See if our last subframe is complete, if so, start a new subframe
+    // 3. Pass the ball score to all subframes
+
+    if (IsComplete()) return;
+
+    if (subFrames.Count==0 || subFrames.Last().IsComplete())
+    {
+        subFrames.Add(downstream.GetCopy(subFrames.Count)); 
+    }
+
+    foreach (IConsistsOf s in subFrames)
+    {
+        s.Ball(player, score);
+    }
+}
+....
+
+It looks to see if the last child frame has completed, and if so starts a new child frame. Then it just passes on the ball score to all the child objects. Any that have completed will ignore it.
+
+The IsComplete method checks two things: 1) that the last child object is complete and 2) that the lambda expression says we are complete:
+
+....
+private bool IsComplete()
+{
+    if (subFrames.Count == 0) return false; // no plays yet
+    return (subFrames.Last().IsComplete()) && 
+        (isLambdaComplete == null ||
+         isLambdaComplete(frameNumber, GetnPlays(), GetScore()));
+}
+....
+
+....
+
+....
+
+GetScore simply gets the sum of the scores of all the child objects:
+
+
+....
+private int GetScore()
+{
+    return subFrames.Select(sf => sf.GetScore()).Sum();
+}
+....
+
+The GetCopy method must make a copy of ourself. This is where the prototype pattern is used. This involves making a copy of our child as well. We will be given a new frameNumber by our parent.
+
+....
+IConsistsOf GetCopy(int frameNumber)
+{
+    var gf = new Frame(frameNumber);
+    gf.objectName = this.objectName;
+    gf.subFrames = new List<IConsistsOf>();
+    gf.downstream = downstream.GetCopy(0);
+    gf.isLambdaComplete = this.isLambdaComplete;
+    return gf as IConsistsOf;
+}
+....
+
+The few remaining methods of the IConsistOf interface are trivial. The implementation of IConsistsOf for the other two abstractions, SinglePlay and Bonuses, is similarly straightforward. Note that whereas Frame uses the composite pattern, Bonuses uses the decorator pattern. It implements and requires the IConsistsOf interface. The SinglePlay abstraction, being a leaf abstraction, only implements the IConsistsOf interface. 
+
+One method we haven't discussed is the wireTo method that we used extensively in the application code to wire together instances of our domain abstractions. The wireTo method for Frame is shown below:  
+
+....
+public Frame WireTo(IConsistsOf c)
+{
+    downstream = c;
+    return this;
+}
+....
+
+This method does not need to be implemented in every domain abstraction. I use an extension method for WireTo. The WireTo extension method uses reflection to find the local variable to assign to.
+
+The WireTo method will turn out to be useful in many ALA designs. Remember in ALA we "express requirements by composing instances of abstractions". If the 'instances' of 'abstractions' are implemented as 'objects' of 'classes', then we will use the wireTo method. If the 'instances' of 'abstractions' are 'invocations' of 'functions', as we did in the example project in Chapter One, we wont use WireTo obviously. In the coffeemaker example to come, 'instances' of 'abstractions' are 'references' to 'modules' because a given application would only have one of each abstraction.
+
+The wireTo method returns 'this', which is what allows the fluent coding style used in the application code. The configuration setter methods also return the this reference so that they too can be used in the fluent style. 
+
+Here is the full code for the Frame abstraction (with comments removed as we just explained everything above):
+
+....
+// Frame.c
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using GameScoring.ProgrammingParadigms;
+using System.Text;
+
+namespace GameScoring.DomainAbstractions
+{
+
+    public class Frame : IConsistsOf
+    {
+        private Func<int, int, int[], bool> isLambdaComplete;
+        private readonly int frameNumber = 0;
+        private IConsistsOf downstream;
+        private string objectName;
+        private List<IConsistsOf> subFrames = new List<IConsistsOf>();
+
+
+        public Frame(string name)  
+        {
+            objectName = name;
+        }
+
+
+
+
+        public Frame(int frameNumber)
+        {
+            this.frameNumber = frameNumber;
+        }
+
+
+
+        // Configuration setters follow. 
+
+        public Frame setIsFrameCompleteLambda(Func<int, int, int[], bool> lambda)
+        {
+            isLambdaComplete = lambda;
+            return this;
+        }
+
+
+
+
+
+        // Methods to implement the IConsistsOf interface follow
+
+
+        public void Ball(int player, int score)
+        {
+            if (IsComplete()) return;
+
+            if (subFrames.Count==0 || subFrames.Last().IsComplete())
+            {
+                subFrames.Add(downstream.GetCopy(subFrames.Count));
+            }
+
+            foreach (IConsistsOf s in subFrames)
+            {
+                s.Ball(player, score);
+            }
+        }
+
+
+
+
+        public bool IsComplete()
+        {
+            if (subFrames.Count == 0) return false; 
+            return (subFrames.Last().IsComplete()) && 
+                (isLambdaComplete == null || 
+                 isLambdaComplete(frameNumber, GetnPlays(), GetScore()));
+        }
+
+
+
+
+        public int GetnPlays()
+        {
+            return subFrames.Count();
+        }
+
+
+
+
+        public int[] GetScore()
+        {
+            return subFrames.Select(sf => sf.GetScore()).Sum();
+        }
+
+
+
+        List<IConsistsOf> IConsistsOf.GetSubFrames()
+        {
+            return subFrames;
+        }
+
+
+
+
+        IConsistsOf IConsistsOf.GetCopy(int frameNumber)
+        {
+            var gf = new Frame(frameNumber);
+            gf.objectName = this.objectName;
+            gf.subFrames = new List<IConsistsOf>();
+            gf.downstream = downstream.GetCopy(0);
+            gf.isLambdaComplete = this.isLambdaComplete;
+            return gf as IConsistsOf;
+        }
+
+    }
+}
+
+
+....
+
+
+
+
+
+=== Example project - Tennis
+
+Now let's modify the bowling application to score tennis. If the bowling game hadn't been implemented using ALA, you probably wouldn't contemplate doing this. But ALA excels for maintainability, and I want to show that off by changing Bowling to Tennis. The Frame and IConsistsOf abstractions look like they could be pretty handy for Tennis. A match consists of sets, which consists of games, which consists of SinglePlays.
+
+We will need to make a small generalization to the Frame abstraction first. This will allow it to keep score for two players. We just change the type of the score from int to int[]. The Ball method will be generalised to take a player parameter to indicate which player won a play. A generalization of an abstraction to make it more reusable is a common operation in ALA.
+
+The only other thing we will need to do is invent a new abstraction to convert a score such as 6,4 into a score like 1,0, because, for example, the winner of a game takes one point into the set score. This new abstraction is called WinnerTakesPoint (WTP in the diagram). 
+
+Here is the tennis scoring game:
+
+[plantuml,file="tennis1.png"]
+----
+@startdot
+digraph foo {
+graph [rankdir=LR]
+// subgraph cluster_C {
+label="Tennis scoring"
+style=rounded
+#node [style=rounded]
+node [shape=Mrecord]
+match [label="Frame|\"match\"|score.Max()==3"]
+wtp1 [label="WTP"]
+set [label="Frame|\"set\"|score.Max()\>=6 && \nMath.Abs(score[0]-score[1])\>=2"]
+wtp2 [label="WTP"]
+game [label="Frame|\"game\"|score.Max()\>=4 && \nMath.Abs(score[0]-score[1])\>=2"]
+play [label="SinglePlay"]
+match -> wtp1 -> set -> wtp2 -> game -> play
+// }
+}
+@enddot
+----
+
+The diagram expresses all the details of the requirements of tennis except the tiebreak.
+
+Here is the diagram's corresponding code:
+
+....
+private IConsistsOf match = new Frame()
+    .setIsFrameCompleteLambda((matchNumber, nSets, score) => score.Max()==3)
+    .WireTo(new WinnerTakesPoint()
+        .WireTo(new Frame()                     
+            .setIsFrameCompleteLambda((setNumber, nGames, score) => score.Max()>=6 && Math.Abs(score[0]-score[1])>=2)
+            .WireTo(new WinnerTakesPoint()
+                .WireTo(new Frame()          
+                    .setIsFrameCompleteLambda((gameNumber, nBalls, score) => score.Max()>=4 && Math.Abs(score[0]-score[1])>=2) 
+                    .WireTo(new SinglePlay()))))));
+....
+
+The new WinnerTakesPoint abstraction is easy to write. It is a decorator that implements and requires the IConsistsOf interface. Most methods pass through except the GetScore, which returns 0,0 until the down-stream object completes, then it returns either 1,0 or 0,1 depending on which player has the higher score.
+
+And just like that, the tennis application will now execute. The frame abstraction we invented for bowling is already done.
+
+==== Add tiebreak
+
+Now let's switch our attention back to another example of maintenance. Let's add the tiebreak feature. Another instance of Frame will score the tiebreak quite nicely. However we will need an abstraction that can switch us from playing the set to the tie break. Let's call it Switch, and give it a lambda function to configure it with when to switch from one subframe tree to another. Switch simply returns the sum of scores of its two subtrees. Here then is the full description of the rules of tennis:
+
+
+[plantuml,file="tennis2.png"]
+----
+@startdot
+digraph foo {
+graph [rankdir=LR]
+// subgraph cluster_C {
+label="Tennis scoring"
+style=rounded
+#node [style=rounded]
+node [shape=Mrecord]
+match [label="Frame|\"match\"|score.Max()==3"]
+wtp1 [label="WTP"]
+set [label="Frame|\"set\"|score.Max()\>=6 && \nMath.Abs(score[0]-score[1])\>=2"]
+wtp2 [label="WTP"]
+game [label="Frame|\"game\"|score.Max()\>=4 && \nMath.Abs(score[0]-score[1])\>=2"]
+play [label="SinglePlay"]
+switch [label="Switch||(setNumber\<4 &&\n score[0]==6 && score[1]==6"]
+wtp3 [label="WTP"]
+tiebreak [label="Frame|\"tiebreak\"|score.Max()==7"]
+play2 [label="SinglePlay"]
+match -> wtp1 -> switch -> set -> wtp2 -> game -> play
+switch:s -> wtp3:w
+wtp3 -> tiebreak -> play2
+{rank=same set wtp3}
+// }
+}
+@enddot
+----
+
+And here is the code version of that diagram. This application passes an exhaustive set of tests for the scoring of tennis.
+
+....
+private IConsistsOf match = new Frame("match")
+    .setIsFrameCompleteLambda((matchNumber, nSets, score) => score.Max()==3)
+    .WireTo(new WinnerTakesPoint("winnerOfSet")
+        .WireTo(new Switch("switch")
+            .setSwitchLambda((setNumber, nGames, score) => (setNumber<4 && score[0]==6 && score[1]==6))   
+            .WireTo(new Frame("set")                     
+                .setIsFrameCompleteLambda((setNumber, nGames, score) => score.Max()>=6 && Math.Abs(score[0]-score[1])>=2)
+                .WireTo(new WinnerTakesPoint("winnerOfGame")            
+                    .WireTo(new Frame("game")          
+                        .setIsFrameCompleteLambda((gameNumber, nBalls, score) => score.Max()>=4 && Math.Abs(score[0]-score[1])>=2) 
+                        .WireTo(new SinglePlay("singlePlayGame"))
+                    )
+                )
+            )
+            .WireTo(new WinnerTakesPoint("winnerOfTieBreak")
+                .WireTo(new Frame("tiebreak")          
+                    .setIsFrameCompleteLambda((setNumber, nBalls, score) => score.Max()==7)
+                    .WireTo(new SinglePlay("singlePlayTiebreak"))
+            )
+        )
+    )
+);
+....
+
+And just like that we have a full featured executable tennis scoring engine.
+
+==== Final notes
+
+Notice that I have added string names to the instances of Frame and other objects. This is not required to make the program function, but generally is a good habit to get into in ALA. It is because in ALA we typically use multiple instances of abstractions in different parts of the program. The names give us a way of identifying the different instances during any debugging. Using them I can Console.Writeline debugging information along with the object's name.
+
+Around 8 lines of code express the rules of ten-pin bowling and around 15 lines of code express the rules of tennis. That sounds about right for the inherent complexity of the two games. The two rule descriptions actually execute and pass a large battery of tests. 
+
+The domain abstractions are zero-coupled with one another, and are each straightforward to write by just implementing the methods of the IConsistOf interface according to what the abstraction does. The abstractions are simple and stable. So no part of the program is more complex than its own local part.
+
+The domain abstractions are reusable in the domain of game scoring. And, my experience was that as the details inside the abstractions were implemented, the application design didn't have to change. 
+
+Why two example applications? The reason for doing two applications in this example is two-fold. 
+
+. To show the decreasing maintenance effort. The Tennis game was done easily because it reused domain building blocks we had already created for bowling.
+
+. To emphasis where all the details of the requirements end up. The only difference between the bowling and tennis applications is the two diagrams, which are translated into two code files: bowling.cs and tennis.cs of 8 lines and 15 lines respectively. These two files completely express the detailed requirements of their respective games. No other source files have any knowledge of these specific games. Furthermore, Bowling.cs and Tennis.cs do not do anything other than express requirements. All implementation to actually make it execute is hidden in domain abstractions and programming paradigm abstractions. 
+
+
+
+Here is a link to the code on Github: https://github.com/johnspray74/GameScoring[GameScoring code]

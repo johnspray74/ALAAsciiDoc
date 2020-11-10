@@ -1,0 +1,750 @@
+:imagesdir: images
+
+== Chapter seven - ALA compared with...
+
+
+=== Physical boundaries
+
+I was listening to a talk by Eric Evans where he said that Microservices works because it provides boundaries that are harder to cross. We have been trying to build logical boundaries for 60 years, he said, and failed. So now we use tools like Docker that force us to use say REST style interfaces in oder to have physical boundaries. I have also heard it suggested that using multiple MCUs in an embedded system is a good thing because it provides physical boundaries for our software components. And I think, really? Is that the only way we can be create a logical boundary? I can tell you that multiple MCUs for this reason is not a good idea if only because all those MCUs will need updating, and the mechanisms and infrastructure needed to do that make it not worth it. Unless there is a good reason, such as to make different parts of your code independently deployable, the extra infrastructure required for physical boundaries that are just logical boundaries is not necessary. Furthermore, physical boundaries, like modules do not necessarily make good abstractions. The only boundary that works at design-time is a good abstraction. So ALA achieves it's design-time boundaries by using abstractions.
+
+=== Test Driven Development
+
+It is said that TDD's main advantage is not so much the testing, but the improvement in the design. In other words, making modules independently testable makes better abstractions. This is probably true, but in my experience, TDD doesn't create good abstractions nearly as well as pursuing that goal directly. The architecture resulting from TDD is better but still not great.
+
+
+=== Observer pattern and dependency inversion
+
+TBD
+
+
+
+anchor:ComparisonHexagonal[]
+
+=== Hexagonal Architecture (ports and adapters)
+
+In the previous section we intimated that the sideways chains of interfaces going out in horizontal directions were the same as hexagonal architecture. While ALA shares this aspect of hexagonal architecture, there is still an important difference.
+
+ALA retains domain abstractions of the UI, Database, communication and so on. For instance, in our XR5000 example, we had a domain abstraction for a persistent Table. We had domain abstractions for UI elements such as Page, Softkey etc. We don't just have a port to the persistence adapter, we have an abstraction of persistence. We don't just have a port for the UI to bind to, we have abstractions of the UI elements. The implementation of these abstractions will then use ports to connect to these external system components. Why is it important that we have domain abstractions of these external components?
+
+. The Database and the UI will have a lot of application specific knowledge given them as configuration. Remember the creativity cycle. After instantiation of an abstraction comes configuration. The database will need a schema, and the knowledge for that schema is in the application. The Softkey UI elements will need labels, and that knowledge is in the application. By making domain abstractions for persistence and UI, the application can configure them like any other domain abstraction as it instantiates and wires up the application. To the application, these particular domain abstractions look like wrappers of the actual database and UI implementations, but they are more like proxies in that they just pass on the work. 
++
+The Persistence abstraction then passes this configuration information, via the port interface to the actual database. The Softkey abstraction then passes its label, via the port interface, to the softkeys. Otherwise the Application would have to know about actual databases and actual softkeys.
++
+If you need a design where the UI can change, you just make the UI domain abstractions more abstract. A softkey may be a command abstraction. It is still configured with a label. But it may be connected to a softkey, a menu item, a CLI command, a web page button, or a Web API command.
+
+. From the point of view of a DSL, it makes sense to have concepts of UI and persistence and communications in the DSL language. The application is cohesive knowledge of requirements. The UI and the need for persistence are part of the requirements. In fact, for product owners communicating requirements, the UI tends to be their view of requirements. They talk about them in terms of the UI. Many of the product owners I have worked with actually design the UI as part of the requirements (with the backing of their managers, who are easily convinced that software engineers can't design UIs. PO can't either, but that is another story.). The point here is that the UI layout, navigation, and connection to business logic is all highly cohesive. We explicitly do not want to separate that knowledge. 
++
+As a restatement of an earlier tenet of ALA, it is much better to compose the application with abstractions of Business logic, UI and persistence than to decompose the application into UI, persistence and business logic.
+
+. We want the application to have the property of composability. We have previously discussed how that means using programming paradigm interfaces for wiring up domain abstractions. By using domain abstractions to represent external components, the abstractions can implement the paradigm interfaces and then be composable with other domain abstractions. For example, the Table domain abstraction which represents persistence may need to be connected directly to a grid, or to other domain abstractions that map or reduce it. Indeed, the Table abstraction itself can be instantiated multiple times for different tables and be composed to form a schema using a schema programming paradigm interface. I have even had a table instance's configuration interface wired to a another Table instance. (So its columns can be configured by the user of the application.)     
+
+. The fourth reason why it is important for the application to not directly have ports for external components of the system is that we don't want the logical view of the architecture to become just one part of the physical view. If there is a communications port that goes to a different physical machine where there is more application logic, the application's logical view should not know about that. It may be presented as an annotation on the application (lines) connecting certain instances, but it shouldn't split the application up. At the application level, the collaboration between parts instantiated on different machines is still cohesive knowledge and belongs inside one place - the application.  
+
+
+=== Layer patterns
+
+==== MVC
+
+TBD
+
+==== Application, Services, Drivers, Hardware
+
+TBD
+
+=== Factory method pattern
+
+The Factory Method pattern in both the GOF book and in online examples has multiple variations. The only thing they seem to have in common is that the client doesn't use "new ConcreteProduct()". It just wants an object that implements an interface, IProduct. For any reason it doesn't want to be the one who will decides at design-time what that concrete product will be. 
+
+Here are some of the variations. 
+
+* Several ConcreteCreators exists to encapsulate knowledge of how to use the ConcreteProduct constructor which has many parameters, in a consistent way to make a valid ConcreteProduct. The common example is different named pizzas or sandwiches. 
+
+* The Client finds out at run-time what ConcreteProduct is needed (usually a string name). We want to move the switch statement out of the client and into a Creator class.)
+
+* The client knows when the objects are needed, but needs to be more stable. Which product is needed changes more often (although still known at design-time). So it goes into a class that changes. 
+
+In all cases we end up with two objects wired together through the IProduct interface. These two objects we will refer to as the Client and the ConcreteProduct (from the pattern terminology). To get them wired using the Factory Method pattern requires the use of a FactoryMethod. The FactoryMethod typically goes in an abstract class called ICreator, which may do the creating itself, or maybe overridden by one or more ConcreteCreators.
+
+In the context of abstraction layers, ALA gives more insight into the FactoryMethods pattern. Remeber we expect lower layers to more stable. The IProduct and ICreator interfaces are in the ProgrammingParadigms layer (lowest layer). The Client and all the different ConcreteProducts are in the DomainAbstractions layer (middle layer). The ConcreteCreator is in the Application layer and wires one of the ConcreteProducts to the client. So now when we want to change the ConcreteProduct, only the ConcreteCreator in the application layer has to change.
+
+But in ALA we typically accomplish that in a far simpler way. We commonly let the application code instantiate the right concrete class (that implements the interface, IProduct), and wire it to the Client object using the WireTo() method. This is nothing more than static wiring, but can only work when the required ConcreteProduct is known at design-time.
+
+
+==== case 1
+
+Now to the case in ALA where we have a client that needs a concrete product creating later than design-time, that is at run-time. Such a client is the Multiple Abstraction. It's job is to make many instances of a Domain Abstraction. But it is an abstraction so can be used to make instances of any object. They don't even have to implement a specific interface such as IProduct, because Multiple doesn't interact with these instances itself.
+
+==== case 2
+
+Let's say you have a Table domain abstraction that stores a table of data. In your application, you want to instantiate many Tables. Now lets suppose that we want these Table instances to persist their data. A database must be attached via an IPersistance interface. We don't want the Table class to know about concrete Databases. We want the application layer at the top to do that. But we don't want the application layer to have to wire the database to every instance that requires an IPersistance. We want the Application to be able to just use a Table as if it is a self-contained abstraction. We want the Table instances to take care of themselves for Persistence. So we make a Peristence abstraction in the Programming paradigms layer. The concept of Persistence is at the right abstraction level to go in this layer. The Table class can use this persistence abstraction through a FactoryMethod. A variable in the Persistence abstraction stores the IPeristence object. The application instantiates which database it wants to use and passes it to the Peristence abstraction.
+
+
+=== Interface segregation principle
+
+TBD
+
+=== Open Closed Principle and decorators
+
+TBD
+
+
+=== Bridge pattern 
+
+TBD
+
+
+=== Architecture styles
+
+I am not an expert at these so called 'Architectural styles'. Any feedback about the accuracy of the following comparisons would be appreciated.
+
+==== Presentation, Business, Services, Persistence, Database
+
+TBD
+
+==== Presentation, Application, Domain, Infrastructure
+
+The middle two layers appear to be the same as ALA's. The Presentation (UI) only has run-time dependencies on the Application, and the Domain layer only has run-time dependencies on the Infrastructure (Persistence etc), so these layers are not present in ALA. 
+
+Instead Presentation is done in the same way as the rest of the application, by composing and configuring abstractions in the domain. The meaning of composition for UI elements (typically layout and navigation-flow) is different from the meaning of composition in the use-cases (typically work-flow or data-flow).
+
+In ALA, the foundation layer is also done in the same way as the rest of the application, at least a little. Domain abstractions that represent say a persistent table are in the Domain layer. The composition and configuration of them again goes in the Application layer. This time the meaning of composition is, for example, columns for the tables and schema relations.  
+
+If the implementation of any domain abstraction is not small (as is the case with the persistent Table abstraction mentioned above, which will need to be connected to a real database), it will be using other abstract interfaces (in the Programming Paradigms layer) connected to its runtime support abstractions in a technical domain, the same as in Hexagonal Architecture.
+
+==== Object Oriented Programming
+
+From my reading, it seems that the most characteristic feature of OOP is that when data and operations are cohesive, they are brought together in an object. Others may see it as enabling reuse, inheritance, and still others may see it as polymorphism. New graduates seem to be introduced to polymorphism in inheritance and not be introduced to interfaces at all, which is a shame because the concept of interfaces is much more important. 
+
+I have never been an expert at Object Oriented Design as I found the choice of classes difficult and the resulting designs only mediocre. But I think the most fundamental and important characterising feature of OOP is under-rated. That is the separation of the concepts of classes and objects. This separation is not so clearly marked when we use the terms modules or components. The separation is fundamentally important because it's what allows us to remove all dependencies except knowledge dependencies. In the way described earlier in this article, you can represent the knowledge of most dependencies as a relationship between instances completely inside another abstraction. What OOP should have done is represent relationships between objects completely inside another class. The problem is that OOP doesn't take advantage of this opportunity. Instead, it puts these relationships between objects inside those objects' classes, as associations or inheritance, thereby turning them into design-time dependencies, and destroying the abstract qualities of the classes. Abstractions, unlike classes, retain their zero coupling with one another.
+
+ALA addresses the problem by calling classes abstractions and objects instances. Abstractions differ from classes by giving us a way to have logical zero coupling, as if they were on different physical platforms. Instances differ from objects by having ports because their classes give them no fixed relationships with other objects.
+
+Of course, when you are writing ALA code, abstractions are implemented using classes, but you are not allowed associations or inheritance. Instances are implemented as objects but with ports for their connections. A port is a pair of interfaces that allow methods in both directions. The interfaces are defined in a lower layer.
+ 
+In ALA, the UML class diagram completely loses relevance. Because classes have no relationships with each other, bar knowledge dependencies, a UML diagram in ALA would just be a lot of boxes in free space, like a pallet of things you can use. You could show them in their layers and you could even draw the downward composition relationships that represent the knowledge dependencies, but there would be no point to this except in explaining the concepts of ALA. When you are designing an actual system, the real diagram is the one inside of an abstraction, especially the uppermost one, the application. It shows boxes for instances of the abstractions it uses, with the name of the abstraction in the box, the configuration information for those instances, and of course the lines showing how they are wired together. The names inside the boxes would not even need to be underlined as in UML, because the boxes in such diagrams would always be instances. 
+
+Such a diagram is close to a UML object diagram. However, a UML object diagram is meant to be a snapshot of a dynamic system at one point in time. In ALA, any dynamic behaviour is captured in a static way by inventing a new abstraction to describe that dynamic behaviour. Thus the design-time view is always static. So the object diagram is static. The application class specifies a number of objects that must be instantiated, configured, and wired together to execute at run-time. Since the structure is always static, ideally this would be done by the compiler for best efficiency, but there is no such language yet. So, in the meantime, it is done at initialization time. The object diagram can be fairly elegantly turned into code using the fluent coding style shown in the XR5000 example.
+
+=== DSLs
+
+We briefly discussed ALA as a DSL in the structure chapter <<DSL1, here>> 
+
+ALA includes the main idea of DSLs in that the fundamental method "represent[s] requirements by composition of domain abstractions". It shares the DSL property that you can implement a lot more requirements or user stories in a lot less code. 
+
+But ALA only tries to be a light-weight way of telling ordinary developers how to organise code written in your underlying language. Although the domain abstractions do form a language and the paradigm interfaces give it a grammar, ALA doesn't pursue the idea of a language to the point of textural syntactic elegance. Instead, you end up with explicit wiring methods to combine domain entities, or plain old functional composition, or some other form of composition in the wider sense of the word. Often, the text form is only a result of hand translation of an executable diagram. ALA certainly doesn't overlap with DSLs to the extent of an external DSL, nor does it try to sandbox you from the underlying language. It therefore does not require any parsing and doesn't need a language workbench, things that may scare away 'plain old C' developers.
+
+Like DSLs, ALA can be highly declarative depending on the paradigm interfaces being used to connect domain abstractions. It is better to have the properties of composition and composability in the your domain language even if they may not be in a perfectly elegant syntactic form. ALA may end up composing abstractions with calls to wireTo methods instead of spaces or dots. But often a diagram using lines is even better than spaces and dots.  
+
+In DSLs, it is important that different languages can be combined for different aspects of a problem. For example, a DSL that defines State machines (the state diagram) and a DSL for data organisation (Entity Relationship Diagram) may be needed in the same application. You don't want to be stuck in one paradigm. ALA recognises this importance by having paradigm interfaces that are more abstract than the domain abstractions. 
+
+DSLs probably work by generating a lot of code from templates whereas ALA works by reusing code as instances of abstractions. Both of these methods are fine from the point of view of keeping application specific knowledge in its place, and domain knowledge in its place. Howver, the distinction between ALAs domain layer and programming paradigms layer is probably not so as clearly made in the implementation of the templates.   
+
+It is an advantage of DSLs that they can sandbox when needed. An example from the wiring pattern earlier is that the ports of instances do not need to be wired. Therefore, all abstractions need to check if there is something wired to a port before making a call on it. Enforcing this is a problem I have not yet addressed.
+
+A possible solution, albeit inferior to a real DSL that would tell you at design-time, might be that when there are tools that generate wiring code from diagrams, they automatically put stubs on all unwired ports. These stubs either throw an exception at run-time, or just behave inertly. 
+
+ALA is different from external DSLs. ALA is just about helping programmers organise their code in a better way. It doesn't try to make a syntactically elegant language, as a DSL does. Certainly an external DSL will end up representing requirements in a more elegant syntax. But that is not the most important thing in ALA. The most important thing is the separation of code that has knowledge of the requirements, which will cause the invention of abstractions that have zero coupling (because the coupling was really in each requirement - that is why a requirement is cohesive). ALA also avoids taking the average imperative language programmer out of their comfort zone. It does not require a language workbench and does not sandbox you from the underlying language.
+
+ALA probably does fit into the broadest definition of an internal DSL. However, again, it does not target syntactic convenience in the expression of requirements so much as just separating the code that knows about those requirements from the code that implements them. An internal DSL usually aims to have a mini-language that is a subset of the host language, or it tries to extend the host language through clever meta-programming to look as if it has new features. ALA is about abstraction layering. It is about this design-time view of knowledge dependencies: what abstractions in lower layers are needed to understand a given piece of code.
+
+
+=== Dependency injection
+
+==== Similarities
+
+In ALA you inject run-time required objects via setters.
+
+==== Differences
+
+ALA uses explicit wiring, never automatic wiring. For one thing, the wiring is required to compose from a pallet of domain abstractions. But secondly, and more importantly, you do not want the knowledge that the wiring represents to disappear into the abstractions themselves, not even as meta-data. That would destroy the abstractions.
+
+In ALA, the explicit wiring can't be XML or JSON, even if it can be modified at run-time. Usually, because a network structure will be required, the explicit wiring must be a diagram. However, it can be a projection editor, so that the structure is entered in text form (preferably not XML or JSON) and live viewed in graphical form.  
+
+In ALA, abstraction pairs don't have their own interfaces for their instances to communicate. So we don't have the situation where class A has a dependency on class B, and so an object of class B (or one of its subclasses) is injected into class A. Similarly, we wouldn't have the situation where class A requires an interface that is implemented by class B.
+
+In ALA the dependencies can only be on paradigm interfaces, which are a whole abstraction layer more abstract. So we need to be thinking that if class A accepts or implements a certain paradigm interface, there could be any number of other abstraction instances that could be attached. Furthermore, we could build arbitrarily large assemblies - composability. Or we don't have to connect an instance at all. So it doesn't really make sense to call what we are injecting 'dependencies'. We just think of it as wiring things up, like electronic components.
+
+
+=== Component Based Software Engineering
+
+ALA uses many of the same methods found in component based engineering or the Components and Connector architectural style.
+
+
+===== Similarities
+
+* Components are Abstractions.
+
+* Reusable software artefacts.
+
+* Connection ports for I/O.
+
+* Composability
+
+* Both instantiate components, specialize them by configuration, and compose them together to make a specific system.
+
+* ALA's 3rd layer has interfaces used to wire abstractions in the 2nd layer, so at a lower level (more abstract) level. They represent something more like programming paradigms. The equivalent pattern in components engineering is "Abstract Interactions".  
+
+* The architecture itself is composed of a generic part and a specific part. The general part is the ALA reference architecture itself and the components or the connectors architectural style. The specific part is the wiring diagram of the full system.
+
+===== Differences
+
+* Component based engineering technologies such as CORBA primarily solve for platform and language interoperability in distributed system whereas ALA brings some of the resulting concepts and properties to everyday small-scale, non distributed development as well, where the only separation is logical.
+
+* In ALA there is perhaps more particular emphasis on making components clearly more abstract than the systems they are used in, and making the interfaces clearly more abstract than the components. The components are pushed down a layer and the interfaces down to a layer below that. Then all dependencies must be strictly downwards in these layers. In component based engineering, this structure is not necessarily enforced. If the components are just a decomposition of the system, then the system, components and interfaces may all be at the same level of abstraction, making the system as a whole complex.
+
+* ALA depends on the 'abstractness property' of components to get logical separation, and so calls them 'Abstractions' and not components to help them retain that property. Even if there will only be one use and one instance, it is still called an abstraction. This keeps them zero coupled and not collaborating with other abstractions they will be wired to.
+
+* ALA layers are knowledge dependency layers.  Components may still be arranged in layers according to run-time dependencies, such as communication stacks. In ALA run-time dependencies are always implemented as explicit wiring inside another higher layer component.
+
+* ALA's top layer must be a straight representation of the requirements, whereas components may tend to be decomposed pieces of the system.
+
+* ALA's 2nd layer of components are designed for expressiveness of user stories or requirements, and provide DSL-like properties. ALA puts emphasis on the 2nd layer of components having the scope of a domain as the means of explicitly controlling the expressiveness of the pallet of components.
+
+* ALA is not fractal. In ALA the components of components are abstractions that become more abstract and thus ubiquitous and reusable. ALA therefore uses abstraction layers rather than hierarchies.
+
+* ALA forces decisions about which abstraction layers the software artefacts go into, and then controls knowledge (semantic) dependencies accordingly.
+
+* ALA tries to make the abstraction layers discrete and separated by a good margin. 
+
+* ALA puts greater emphasis on wiring being able to represent any programming paradigm that suits the expression of requirements, and the use of many different paradigms in the same wiring diagram.
+
+* ALA emphasises the cohesion of functional parts of a system such as UI, logic and Data, by bringing them all together in one small diagram using domain level components
+
+* Instead of 'required' interfaces, in ALA they are called 'accepts' interfaces. This is because the abstractions are more abstract and composable, so, as with Lego blocks, there isn't necessarily a connection to another instance.
+
+==== Domain Driven Design
+
+Domain Driven Design's "Bounded Contexts" and ALA's Domain Abstractions layer have the same goal, that of encapsulation of the domain specific knowledge.
+
+Domain driven design appears to concentrate on common languages to allow  pairs of elements to communicate, which ALA explicitly avoids. ALA tries to abstract the languages so that they are more abstract and fundamental than the domain, and more like programming paradigms.
+
+// TBD Discuss with a DDD expert the comparison between ALA and DDD.
+
+=== Microservices
+
+TBD
+
+
+=== Hexagonal Architecture (Ports and Adapters)
+
+ALA includes the basic idea of hexagonal architecture, but with modification using the Bridge Pattern to keep cohesive knowledge belonging to the application from being split. This was explained in an earlier section of this article. <<ComparisonHexagonal>>
+
+=== Architecture evaluation methods
+
+Methods such as ATAM tell us how to evaluate an architecture for quality attributes such as maintainability, for instance by giving it modification scenarios to test how difficult the modifications would be to implement. There are several scenarios based methods to do this such as ATAM. Using this we could, theoretically, iteratively search over the entire architecture design space to find a satisfactory solution. It's a bit analogous to numerically solving for the maxima of a complex algebraic formula. In contrast, ALA is analogous to an 'algebraic solution'. If the desired quality attributes, and all the software engineering topics listed above are the equations, ALA is the algebraic solution. It simplifies them down into a parameterised template architecture, ready for you to go ahead and express your requirements.
+
+
+anchor:Monads[]
+
+=== Monads
+
+We have talked about monads a few times because they are an important example of composition of instances of abstractions. Also, like ALA, they use the concept of separating (in time) composition from execution. You can bind monads together, and it builds a structure that you can then execute. ALA is a generalisation of monads. In the same way, you can wire instances of domain abstractions together, and it builds a structure that you can later execute. In this respect they are similar. 
+
+When you execute a monad structure (generally by calling a function on the last monad you binded), it (usually) terminates with its value (or values). It is only executes again if it is wired up again. An exception is when using hot observables, such as an IO monad. The monad structure stay in existence, and it executes whenever there is input or output. ALA is more similar to this second case. When you start execution of a wired ALA structure, it (usually) starts running continuously.
+
+Each monad binding is restricted to a data-flow of a single type, and in a fixed direction. Each ALA wiring is arbitrary in its meaning, according to whatever is most useful to describe requirements. A single wired connection can carry data as needed in both, or the composition may be about something other than data-flow.  
+
+Often when monads are used, the execution is done immediately following the binding. So the deferred nature of the execution is not always obvious.  I found that the separation between composition and execution of monads to be an important aspect to understand when comparing with ALA composition. In ALA all composition takes place at initialization time. There is a very clear separation between that and run-time. 
+
+This much separation is not so common with monads. Monads use the separation primarily as a way to do composition with pure functions, and have all the dirty work contained and abstracted away in well tested reusable classes. 
+
+Where you might compose (bind) IObservable or Task monads for almost immediate execution following, in ALA you would tend to compose (wire up) data streams or event sources at initialization time that can then execute many-times thereafter. 
+
+Another difference is syntax. Monads are composed using a dot operator, a method call, and configured with lambda function passed to the method:
+
+ source.Filter(x=>x>=0).Select(x=>sqrt(x))
+
+
+This code filters out values from the source that are negative and then calculates the squareroots. In ALA, because composition is generalised, the syntax would look like this:
+
+ source.WireIn(new Filter(x=>x>=0)).WireIn(new Select(x=>sqrt(x))
+
+But usually this code is generated from a diagram.
+
+In functional programming, the binding code that builds the structure is pure functions. When you ask the structure to 'execute' all the dirty code is contained inside these reusable abstractions called Monads. The code that constrauts a particular application is clean and free of side effects. ALA makes use of this same property of reuable abstractions, and its wiring code is pure functional. 
+
+ 
+==== Understanding monads
+
+
+Monads are notoriously hard to learn, but they are nice simple insight once you get there. Monads actually seem to have this property that you cannot understand any explanation of them until you first understand them. Thus it is a bootstrapping problem. Here is my experience of going through that bootstrapping process in case it is useful. I am not going to try to explain monads myself, because, even it was possible, others would do that far better than I would. 
+
+. First understand that Monads are like physics. Physicists explain that you never really understand physics, you just get used it. Unless you are a mathematician or otherwise gifted, the same is true for monads. 
+
+. The way to get used to new concepts is to read multiple web-sites on the topic. Read each one until you get lost then swap to another one. Keep going like this. For average concepts like design patterns I use this technique and it requires maybe five websites. For monads it took me maybe ten. You will need to return to some of them iteratively to get further each time.
+
+. If you don't know Haskell, prefer the web sites that explain them in the language you already know.
+
+. The common essential ideas in those websites will start to embed themselves in your brain.
+
+. Eventually, and fairly suddenly, the simple insight that is monads will happen.
+
+I thought few of the web-sites that I used adequately emphasised the monad property of separation (in time) of composition and execution. They did use examples of it such as IEnumerable and Task. They represent what they can do in the future, without actually doing it now. That's why the binding functions are called bind in the functional world, because it doesn't (necessarily) do anything except build a structure that can later be executed to actually do the work. 
+
+
+=== Reactive Extensions
+
+In ALA, when you wire together 
+
+
+
+
+=== WPF's XAML
+
+TBD
+
+=== Functional programming
+
+TBD
+
+=== Functional programming with monads
+
+TBD
+
+=== Functional Reactive Programming
+
+TBD
+
+=== Multi-tier Architecture
+
+TBD
+
+=== Onion Architecture
+
+TBD
+
+=== Clean Architecture
+
+TBD
+
+
+=== Example project - Game scoreboard
+
+For the example project for this chapter, we return to the ten-pin bowling and tennis scoring engines that we used in Chapter two, and add a scoreboard feature (well a simple ASCII scoreboard in a console application rather than real hardware).
+
+As the requirement, say we want a console application that displays ASCII scoreboards that look like these examples:
+
+....
+Ten-pin
+
+ -----+-----+-----+-----+-----+-----+-----+-----+-----+--------
+|   1 |   2 |   3 |   4 |   5 |   6 |   7 |   8 |   9 |    10  |
++--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+| 1| 4| 4| 5| 6| /| 5| /|  | X| -| 1| 7| /| 6| /|  | X| 2| /| 6|
++  +--+  +--+  +--+  +--+  +--+  +--+  +--+  +--+  +--+  +--+--+
+|   5 |  14 |  29 |  49 |  60 |  61 |  77 |  97 | 117 |   133  |
+ -----+-----+-----+-----+-----+-----+-----+-----+-----+--------
+....
+
+....
+Tennis
+
+ -----++----+----+----+----+----++--------
+|   1 ||  4 |  6 |  5 |    |    ||    30  |
+|   2 ||  6 |  4 |  7 |    |    ||  love  |
+ -----++----+----+----+----+----++--------
+....
+
+
+
+As usual in ALA, our methodology begins with expressing those requirements directly, and inventing abstractions to do so. So, we invent a 'Scorecard' abstraction. It will take a configuration which is an ASCII template. Here are the ascii templates that would be used for ten-pin and tennis:
+
+....
+ -------+-------+-------+-------+-------+-------+-------+-------+-------+-----------
+|   1   |   2   |   3   |   4   |   5   |   6   |   7   |   8   |   9   |     10    |
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+|F00|F01|F10|F11|F20|F21|F30|F31|F40|F41|F50|F51|F60|F61|F70|F71|F80|F81|F90|F91|F92|
++   +---+   +---+   +---+   +---+   +---+   +---+   +---+   +---+   +---+   +---+---+
+|  T0-  |  T1-  |  T2-  |  T3-  |  T4-  |  T5-  |  T6-  |  T7-  |  T8-  |    T9-    |
+ -------+-------+-------+-------+-------+-------+-------+-------+-------+-------------
+....
+
+....
+ -----++----+----+----+----+----++--------
+| M0  ||S00 |S10 |S20 |S30 |S40 || G0---  |
+| M1  ||S01 |S11 |S21 |S31 |S41 || G1---  |
+ -----++----+----+----+----+----++--------
+....
+
+The scorecard ASCII template has letter place-holders for the scores. (A single letter is used so it doesn't take up much space on the template design.) Different letters are used for different types of scores. Digits are used to specify where multiple scores of the same type are arranged on the scoreboard. They are like indexes. Either 1-dimensional or 2-dimensional indexes can be used in the scoreboard template. For example, the frame scores in ten-pin bowling have scores for each ball for each frame, F00, F01 etc, as shown in the example above.
+
+The scorecard abstraction needs functions it can use to get the actual scores. The functions are configured into little 'binding' objects that we then wire to the scoreboard. The binding objects are configured with the letter that they return the score for. 
+
+==== Ten-pin
+
+Having invented the Scorecard and Binding abstractions, we can now do the ten-pin application diagram:
+ 
+
+[plantuml,file="diagram-bowling-3.png"]
+----
+@startdot
+digraph foo {
+rankdir=LR
+
+#note rankdir does not work inside subgraphs
+subgraph cluster_C {
+fontsize=20
+label="Ten-Pin Bowling                                                            "
+style=rounded
+
+node [shape=Mrecord]
+console [label="ConsoleGameRunner|\"Enter number of pins\""]
+
+scoreboard [fontsize=14,label=<
+<table border='0' cellborder='1' cellspacing='0'>
+<tr><td colspan="21" sides="B"><font point-size="14">Scorecard</font></td></tr>
+<tr><td colspan="2">1</td><td colspan="2">2</td><td colspan="2">3</td><td colspan="2">4</td><td colspan="2">5</td><td colspan="2">6</td><td colspan="2">7</td><td colspan="2">8</td><td colspan="2">9</td><td colspan="3">10</td></tr>
+<tr><td sides="LTR">F00</td><td>F01</td><td sides="LTR">F10</td><td>F11</td><td sides="LTR">F20</td><td>F21</td><td sides="LTR">F30</td><td>F31</td><td sides="LTR">F40</td><td>F41</td><td sides="LTR">F50</td><td>F51</td><td sides="LTR">F60</td><td>F61</td><td sides="LTR">F70</td><td>F71</td><td sides="LTR">F80</td><td>F81</td><td sides="LTR">F90</td><td>F91</td><td>F92</td></tr>
+<tr><td colspan="2" sides="LBR">T0</td><td colspan="2" sides="LBR">T1</td><td colspan="2" sides="LBR">T2</td><td colspan="2" sides="LBR">T3</td><td colspan="2" sides="LBR">T4</td><td colspan="2" sides="LBR">T5</td><td colspan="2" sides="LBR">T6</td><td colspan="2" sides="LBR">T7</td><td colspan="2" sides="LBR">T8</td><td colspan="3" sides="LBR">T9</td></tr>
+</table>
+>]
+
+framebind [label="Binding|F"]
+totalbind [label="Binding|T"]
+game [label="Frame|\"game\"|nFrames==10"]
+
+node [shape=record]
+function1 [label="GetSubFrames()\n.Select(sf =\> sf.GetScore()[0])\n.Accumulate()"]
+function2 [label="GetSubFrames()\n.Select(f =\> f.GetSubFrames()\n.Select(b =\> b.GetScore()[0])"]
+translate [label="Translate\nX,/,- etc"]
+
+console -> game  [label = "IConsistsOf"]
+console -> scoreboard [constraint=false, label = "IPullDataFlow"]
+scoreboard -> framebind -> translate -> function2 -> game
+scoreboard -> totalbind -> function1 -> game
+
+{rank=same console scoreboard}
+{rank=same framebind totalbind}
+{rank=same function1 function2}
+
+}
+}
+@enddot
+----
+
+An abstraction we didn't mention yet is the ConsoleGameRunner. Its job is to prompt for a score from each play, display the ASCII scoreboard, and repeat until the game completes. 
+
+The 'game' instance of the Frame abstraction on the right of the diagrams is the scoring engine we developed in Chapter Two. Together with this engine, we now have a complete application. 
+
+The rounded boxes in the diagram are instances of domain abstractions as usual for ALA diagrams. The sharp corner boxes are instances of Application layer abstractions. They are the mentioned functions for the Bindings. That code is application specific so goes in the application layer. They just do a simple query on the scoring engine.
+
+Now tranlate the diagram into code. Here is the entire application layer code for ten-pin:
+....
+consolerunner = new ConsoleGameRunner("Enter number pins:", (pins, engine) => engine.Ball(0, pins))
+.WireTo(game)
+.WireTo(new Scorecard(
+"-------------------------------------------------------------------------------------\n" +
+"|F00|F01|F10|F11|F20|F21|F30|F31|F40|F41|F50|F51|F60|F61|F70|F71|F80|F81|F90|F91|F92|\n" +
+"|    ---+    ---+    ---+    ---+    ---+    ---+    ---+    ---+    ---+    ---+----\n" +
+"|  T0-  |  T1-  |  T2-  |  T3-  |  T4-  |  T5-  |  T6-  |  T7-  |  T8-  |    T9-    |\n" +
+"-------------------------------------------------------------------------------------\n")
+.WireTo(new ScoreBinding<List<List<string>>>("F", 
+    () => TranslateFrameScores(
+        game.GetSubFrames().Select(f => f.GetSubFrames().Select(b => b.GetScore()[0]).ToList()).ToList())))
+.WireTo(new ScoreBinding<List<int>>("T", 
+    () => game.GetSubFrames().Select(sf => sf.GetScore()[0]).Accumulate().ToList()))
+);
+....
+
+....
+....
+If you compare this code with the diagram, you will see a pretty direct correspondence. 
+Remember 'game' is the reference to the scoring engine project in the previous chapter.
+
+That's pretty much all the code in the application. Oh there is the 'translate' function, but it is pretty straight forward once you know the way a ten-pin scorecard works. For completeness here it is.
+
+....
+
+/// <summary>
+/// Translate a ten-pin frame score such as 0,10 to X, / and - e.g. "-","X".
+/// </summary>
+/// <example>
+/// 7,2 -> "7","2"
+/// 7,0 -> "7","-"
+/// -,3 -> "-","7"
+/// 7,3 -> "7","/" 
+/// 10,0 -> "",X
+/// 0,10 -> "-","/"
+/// additional ninth frame translations:
+/// 10,0 -> "X","-"
+/// 7,3,2 -> "7","/","2"
+/// 10,7,3 -> "X","7","/"
+/// 0,10,10 -> "-","/","X"
+/// 10,10,10 -> "X","X","X"
+/// </example>
+/// <param name="frames">
+/// The parameter, frames, is a list of frames, each with a list of integers between 0 and 10 for the numbers of pins.
+/// </param>
+/// <returns>
+/// return value will be exactly the same structure as the parameter but with strings instead of ints
+/// </returns>
+/// <remarks>
+/// This function is an abstraction  (does not refer to local variables or have side effects)
+/// </remarks>
+private List<List<string>> TranslateFrameScores(List<List<int>> frames)
+{ 
+    // This function looks a bit daunting but actually it just methodically makes the above example tranlations of the frame pin scores 
+    List<List<string>> rv = new List<List<string>>(); 
+    int frameNumber = 0;
+    foreach (List<int> frame in frames)
+    {
+        var frameScoring = new List<string>();
+        if (frame.Count > 0)
+        {
+            // The first 9 frames position the X in the second box on a real scorecard - handle this case separately
+            if (frameNumber<9 && frame[0] == 10)
+            {
+                frameScoring.Add("");
+                frameScoring.Add("X");
+            }
+            else
+            {
+                int ballNumber = 0;
+                foreach (int pins in frame)
+                {
+                    if (pins == 0)
+                    {
+                        frameScoring.Add("-");
+                    }
+                    else
+                    if (ballNumber>0 && frame[ballNumber]+frame[ballNumber-1] == 10)
+                    {
+                        frameScoring.Add(@"/");
+                    }
+                    else
+                    if (pins == 10)
+                    {
+                        frameScoring.Add("X");
+                    }
+                    else
+                    {
+                        frameScoring.Add(pins.ToString());
+                    }
+                    ballNumber++;
+                }
+
+            }
+        }
+        rv.Add(frameScoring);
+        frameNumber++;
+    }
+    return rv;
+}
+....
+
+
+==== Tennis
+
+
+So now that we have these domain abstractions for doing console game scoring applications, let's do tennis:
+
+
+////
+[plantuml,file="diagram-bowling-4.png"]
+----
+@startdot
+digraph foo {
+graph [rankdir=LR]
+#subgraph cluster_C {
+label="Ten-Pin Bowling"
+style=rounded
+#node [style=rounded]
+node [shape=Mrecord]
+game [label="Frame|\"game\"|nFrames==10"]
+bonus [label="Bonus||score\<10 \|\| plays==3"]
+frame [label="Frame|\"frame\"|frameNum\<9 && (balls==2 \|\| pins==10)\n \|\|\ (balls==2 && pins\<10 \|\| balls==3)"]
+ball [label="SinglePlay"]
+game -> bonus -> frame -> ball
+}
+}
+@enddot
+----
+////
+
+
+[plantuml,file="diagram-tennis-3.png"]
+----
+@startdot
+digraph foo {
+graph [rankdir=LR]
+subgraph cluster_C {
+label="Tennis"
+style=rounded
+
+node [shape=Mrecord]
+console [label="ConsoleGameRunner|\"Enter winner of play\""]
+
+scoreboard [label="Scoreboard| -----++----+----+----+----+----++--------\n\| M0  \|\|S00 \|S10 \|S20 \|S30 \|S40 \|\| G0---  \|\n\| M1  \|\|S01 \|S11 \|S21 \|S31 \|S41 \|\| G1---  \|\n -----++----+----+----+----+----++--------\n"]
+
+gamebind [label="Binding|G"]
+setbind [label="Binding|S"]
+matchbind [label="Binding|M"]
+match [label="Frame|\"match\"|score.Max()==3"]
+
+node [shape=record]
+function1 [label="GetScore()"]
+function2 [label="GetSubFrames()\n.Select(sf =\> sf.GetSubFrames().First())\n.Select(s =\> s.GetScore()).ToList()"]
+function3 [label="GetGameOrTieBreakScore\n(see function)"]
+
+console -> scoreboard [constraint=false, label = "IPullDataFlow"]
+console -> match [label = "IConsistsOf"]
+scoreboard -> setbind -> function2
+scoreboard -> matchbind -> function1
+scoreboard -> gamebind -> function3
+function1 -> match
+function2 -> match
+function3 -> match
+
+{rank=same console scoreboard}
+
+}
+}
+@enddot
+----
+
+////
+[plantuml,file="tennis4.png"]
+----
+@startdot
+digraph foo {
+graph [rankdir=LR]
+// subgraph cluster_C {
+label="Tennis scoring"
+style=rounded
+#node [style=rounded]
+
+node [shape=Mrecord]
+match [label="Frame|\"match\"|score.Max()==3"]
+wtp1 [label="WTP"]
+set [label="Frame|\"set\"|score.Max()\>=6 && \nMath.Abs(score[0]-score[1])\>=2"]
+wtp2 [label="WTP"]
+game [label="Frame|\"game\"|score.Max()\>=4 && \nMath.Abs(score[0]-score[1])\>=2"]
+play [label="SinglePlay"]
+switch [label="Switch||(setNumber\<4 &&\n score[0]==6 && score[1]==6"]
+wtp3 [label="WTP"]
+tiebreak [label="Frame|\"tiebreak\"|score.Max()==7"]
+play2 [label="SinglePlay"]
+match -> wtp1 -> switch -> set -> wtp2 -> game -> play
+switch:s -> wtp3:w
+wtp3 -> tiebreak -> play2
+{rank=same set wtp3}
+
+// }
+}
+@enddot
+----
+////
+
+I left the code out of the GetGameOrTieBreakScore box as it is a little big for the diagram here. It is similar to the other queries but it must first determine if a tie break is in progress and get that if so. Also it translates game scores from like 1,0 to "15","love".
+
+And here is the code for the Tennis diagram:
+....
+consolerunner = new ConsoleGameRunner("Enter winner 0 or 1", (winner, engine) => engine.Ball(winner, 1))
+.WireTo(match)
+.WireTo(new Scorecard(
+        "--------------------------------------------\n" +
+        "| M0  |S00|S10|S20|S30|S40|S50|S60|  G0--- |\n" +
+        "| M1  |S01|S11|S21|S31|S41|S51|S61|  G1--- |\n" +
+        "--------------------------------------------\n")
+    .WireTo(new ScoreBinding<int[]>("M", () => match.GetScore()))
+    .WireTo(new ScoreBinding<List<int[]>>("S", () => 
+        match.GetSubFrames()
+            .Select(sf => sf.GetSubFrames().First())
+            .Select(s => s.GetScore())
+            .ToList())
+    .WireTo(new ScoreBinding<string[]>("G", () => GetGameOrTiebreakScore(match)))
+);
+
+....
+
+If you compare this code with the diagram, you can see a pretty direct correspondence. match comes from the scoring engine project in Chapter two.
+
+==== Concluding notes
+
+Although the diagrams must be turned into text code to actually execute, it is important in ALA to do these architecture design diagrams first. They not only give you the application, they give you the architectural design by giving you the domain abstractions and programming paradigms as well. If you try to design an ALA structure in your head while you write it directly in code, you will get terribly confused and make a mess. Using UML class diagrams will make it even worse. Code at different abstraction levels will end up everywhere, and run-time dependencies will abound. Our programming languages, and the UML Class diagram, are just not designed to support abstraction layered thinking - it is too easy to add bad dependencies (function calls or 'new' keywords) into code in the wrong places.
+
+Note that at run-time, not all data-flows have to go directly between wired up instances of domain abstractions. The data can come up into the application layer code, and then back down. This was the case when we did the functional composition example in Chapter One. In this application we are doing that with the code in the square boxes that get the score from the engine. The important thing is that all the code in the application is specific to the application requirements.  
+
+
+
+
+////
+
+
+////
+
+
+////
+Now let's have a look at some of the code in the two of the new domain abstractions. Here is the essence of the Scoreboard domain abstraction (remember we are down a layer now, so it has no knowledge of bowling):
+
+....
+public string GetScorecard()
+{
+    var matches = Regex.Matches(ASCIITemplate, "(([A-Z][0-9][0-9])|([A-Z][0-9])|([A-Z]))-*"); // The regular expression matches e.g. A, B1, C12, D-, E00--
+    var rv = ASCIITemplate;
+    foreach (Match match in matches)
+    {
+        char id = match.Value[0];
+        foreach (IScoreBinding sg in scoreGetters)
+        {
+            if (id == sg.Label[0])
+            {
+                if (match.Length>=2 && char.IsDigit(match.Value[1]))
+                {
+                    if (match.Length >= 3 && char.IsDigit(match.Value[2])) // e.g. A11
+                    {
+                        rv = rv.Replace(match.Value, sg.GetScore(Convert.ToInt32(match.Value[1]) - Convert.ToInt32('0'), Convert.ToInt32(match.Value[2]) - Convert.ToInt32('0')).PadLeft(match.Length));
+                    }
+                    else // e.g. A1
+                    {
+                        rv = rv.Replace(match.Value, sg.GetScore(Convert.ToInt32(match.Value[1]) - Convert.ToInt32('0')).PadLeft(match.Length));
+                    }
+                }
+                else // e.g just A, no index
+                {
+                    rv = rv.Replace(match.Value, sg.GetScore().PadLeft(match.Length));
+                }
+            }
+        }
+    }
+    return rv;
+}
+....
+
+The ScoreBinding domain abstraction has three overloads of GetScore - one for two indexes, one for one index, and one for zero indexes. Here is the code for the one that has one index. The other two are similar. Because we are given one index, we expect the function that we have been wired to will return a one dimensional something. It could be a List or array, of type int or string. T tells us what type it is. Our job is to index into whatever it is, and return it as a string:
+
+....
+public string GetScore(int x)
+{
+    object temp = function();
+    if (typeof(T) == typeof(List<int>))
+    {
+        List<int> list = (List<int>)temp;
+        if (x < list.Count) return list[x].ToString();
+    }
+    if (typeof(T) == typeof(int[]))
+    {
+        int[] array = (int[])temp;
+        if (x < array.Length) return array[x].ToString();
+    }
+    if (typeof(T) == typeof(List<string>))
+    {
+        List<string> list = (List<string>)temp;
+        if (x < list.Count) return list[x];
+    }
+    if (typeof(T) == typeof(string[]))
+    {
+        string[] array = (string[])temp;
+        if (x < array.Length) return array[x];
+    }
+    return "";
+}
+....
+
+
+////
+
+That completes our discussion of the console applications for ten-pin and tennis. The full project code can be viewed or downloaded here:
+
+https://github.com/johnspray74/GameScoring[GameScoring code]
+

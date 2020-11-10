@@ -1,0 +1,934 @@
+:imagesdir: images
+
+== Chapter two - What does the structure look like?
+
+In this section we describe the anatomy of the ALA structure without trying to explain too much about why it looks that way. That will be covered in Chapter three.
+
+We describe it from several different perspectives. We all have different experiences or different prior knowledge on which we learn new ideas through comparison. So we will each have a different light that comes on. This chapter has about 10 different perspectives, some concrete, some high level, some analogies, and finally some in code. Don't give up if most of them make no sense. Just use the best explains the insight for you. 
+
+=== ALA uses just one relationship type
+
+ALA has a core fundamental premise from which everything else is derived. That premise is to use a single type of relationship:
+
+
+[plantuml,file="diagram-05a.png"]
+----
+@startdot
+digraph foo {
+// size="3!"
+subgraph cluster_1
+{
+label="Abstraction A"
+labeljust=l
+labelloc=b
+style=rounded 
+A [ style = invis ];
+}
+B [label="Abstraction B"; shape = rect; style=rounded ]
+A -> B  [dir="both", arrowhead="open", arrowtail="tee", color=green, label=" requires knowledge of to understand"]
+}
+@enddot
+----
+
+That relationship is "requires knowledge of to understand".
+
+B must be more abstract than A. "More abstract" means more general, not specific to A, have a greater scope of reuse than A. (For now just think of abstractions as synonymous with either classes or functions in conventional programming.)
+
+The relationship means that, to read and understand the code inside A, you must know the abstraction B - not how the insides of abstraction B work, just what B does, the concept. The word "abstraction" implies that it should be learnable in a short time.
+
+An example: A is an abstraction that calculates standard deviation. B is an abstraction that calculates squareroot. The code in A "requires knowledge of the [squareroot concept] to understand".
+
+This "requires knowledge of to understand" relationship applies at design-time. So you can never use a relationship for run-time dependencies. And you can never break a module up into pieces arbitrarily, only pull out abstractions. From now on we will call this type of relationship a "knowledge dependency".
+
+Notice how in the diagram the relationship arrow comes from inside A. It is only the code inside A that requires knowledge of the abstraction. 
+
+Architectures generally work by applying constraints. ALA's constraint is that you have this one type of relationship. This fundamental constraint emerges all of ALA's properties and patterns that we will explain in the rest of this chapter. A few of these these are:
+
+. When data or events need to move from one part of a program to another, you can't use a relationship to do it. Abstractions don't know where their data comes from, nor where it goes. This implies using a concept of ports.
+
+. Because the target of a knowledge dependency must be more abstract, abstractions arrange themselves into layers. This is what gives the architecture its name: Abstraction Layered Architecture. Because these dependencies have nothing to do with run-time dependencies, these layers are very different from the ones you might find in a conventional program that uses a layering pattern. Abstraction basically means reusable. As you go down the layers, abstraction increases and so does scope of reuse. 
+
+. Because the target abstraction must be clearly more abstract, the abstraction layers form themselves into discrete levels. Only a small number of abstraction levels are needed. ALA generally uses four levels. The layers are given standard names that describe their level of abstraction, e.g. The Domain Abstractions layer.
+
+. ALA has zero coupling between the code inside all abstractions. Unfortunately there is a meme in the software engineering industry that there must be some coupling between software 'modules' if the system is to do anything. We hear of "loose coupling" as being the target ideal. This is completely incorrect. ALA uses zero coupling. In our A & B example above, the code inside B knows nothing of A. The code inside A, while it knows about the concept of abstraction B, knows nothing about the code inside B. So we already know how to do zero-coupling. ALA just constrains us to do this all the time.
+
+. Relationships are always represented simply by using the name of the abstraction (the same as you would use the name Sqrt). You would never use a line on a diagram to a box representing squareroot. And so it is that in ALA you never use a line or arrow in a diagram to use an abstraction (as we did with A and B above). This has the surprising consequence that a UML class diagram of an ALA program would have no lines or arrows at all. If drawn, it would consist of disconnected classes arranged in space.
+
+. The knowledge dependency relationship differs from the UML class composition relationship, or any UML relationship for that matter. Although it is often implemented as a UML composition relationship (directed arrow with filled diamond), the meaning is far more constrained. It must be "requires knowledge of to understand". In the UML you can use associations for getting data at run-time, but in ALA you can't. 
+
+. A conventional program will typically have many many dependencies. They are there because data, messages, events, execution flow, etc, need to get from one place to another in the program. Or they are there because we have tried to separate responsibilities arbitrarily. None of these dependencies exist in an ALA program. The whole difficult concept of dependency management simply vanishes. So where do these relationships go? How can the program still work?  How is it possible for messages and events to travel around at run-time if there is absolute zero coupling? In later chapters we will go into detail on how this works, but for now, the short answer is that all these relationships become a line of code inside an abstraction in the layer above. 
+
+. In saying ALA has zero coupling, of course there may be leakage coupling. The quality of the abstractions is important. There is no such thing as black and white abstraction or not-abstraction. Abstraction quality is somewhat subjective, because they are for the human brain. For example, the code inside abstraction A could potentially tell how long B takes to execute. If it is sensitive to that, this is not a problem with ALA, but with the leaky abstraction. The design needs to be changed to eliminate the dependency on that leakage, or, if that is not possible, the coupling managed. But for the vast majority of code, the coupling between the insides of any two abstractions really is zero. 
+
+. An abstraction's implementation can consist of a group of artefacts: local variables, enums, function protoypes, interfaces, methods, classes, etc. These artefacts have high cohesion with one another. They are all considered the code for the one abstraction. They interconnect with each other, unconstrained. There are no dependency rules among them inside an abstraction. The only constraint ALA makes is that their total must be small - of the order of 100-500 lines of code. This applies to all abstractions, including the one that is the application itself in the top layer. Later we will discuss the forces that drive this optimal size.
+
+. ALA has no concept of hierarchies or nesting. Abstractions cannot be contained by other abstractions. They are never nested. The reason they are never nested is simple. An abstraction being used must be more abstract than the abstraction using it. Therefore it must be outside the abstraction using it so it can be reused elsewhere. ALA uses abstraction layers instead of encapsulation hierarchies. In this respect abstractions differ from components in that a component can be a specific part of another component. In other words components can be completely contained (conceptually) by the component that uses it. Abstractions in ALA cannot be.
+
+. Abstractions are the units of code in ALA. They are the only type of 'encapsulation' that works for our brains. Programming languages don't support any concept that corresponds with this idea of an abstraction. So we need to improvise to create abstractions in code, even it can't be understood as an abstraction by the compiler. Classes are the main way to implement most of an abstraction, but we need to add the concept of ports to them. Functions can be natural abstractions. (Note that namespaces are not encapsulations, and play no role except to make abstraction names unique). I usually use a source file to represent an abstraction.
+
+. If the code inside an abstraction becomes too large, we factor out an abstraction. The factored out abstraction must be more abstract, and so not have any implicit coupling to the code it came from. It can know nothing of the specifics of the abstraction from which it was factored. It goes in a lower layer, where it can be reused. When the application itself gets too large, we look for abstractions that allow us to make our 'features' separated. For example, if we are building a weather station, we can make an abstraction out of the instance of the display area of the UI, and another for the menu. The different features, thermometer, anonomter etc, can then 'plug-in' to these abstractions.
+
+. Despite the apparent simplicity of the "Standard deviation uses squareroot" example, the constraint of only being allowed to use knowledge dependencies is not trivial to do all of the time. But once the emergent programming paradigms and patterns are practised, it becomes relatively easy.
+
+. There is one aspect of ALA that is hard to master - the invention of appropriate abstractions is relatively difficult. The reason why the "standard deviation uses squareroot" example seems easy is that the squareroot abstraction was already invented, and we know it so well. In ALA you will need to invent your own domain level abstractions. In other engineering disciplines, new abstractions come along only every few years, or hundreds of years sometimes. In software engineering, we have to do it every day in the first two weeks of a project in a new domain, and probably every iteration after that for a few iterations. But all whom I have taught how to do this have found it worth the effort, and all get much better at doing it. Working in the resulting zero-coupled code becomes a joy. 
+
+. The effect of change to any one part of the program, whether in higher layers or lower ones, has greatly reduced ripple effects when compared with conventionally written programs. A ripple generally stops at an abstraction. And since all relationships are just uses of abstractions, ripples usually stay inside a single abstraction. Since abstractions are just concepts they are relatively stable. The quality of the abstractions is important however. The most common change that ripples outside of an abstraction is to make an abstraction more abstract to increase its versatility for greater reuse. This can usually be accomplished without breaking the existing abstraction interface (e.g. by adding optional parameters or properties).
+
+. We know that ALA requires you to break up your entire application only by factoring out abstractions. So what does the application that's left in the top layer look like when this is done? Well if anything abstract has been removed, what remains must be details specific only to this application. Essentially these details equate with the requirements. The application becomes just a formal expression of the requirements. There will be some information there that wasn't perhaps explicitly stated in the requirements, but they were requirements none-the-less. For example, it may not have been stated that a sensor is connected to port 2. Perhaps unusually, an ALA application will have this detail in the very top layer, or at least in a one feature in the top layer (as a configuration parameter to an instance of an adc channel). Or it may not be stated in the requirements that a number displayed on the UI should not change its value frequently - it should be smoothed. So the application will end up with a filter wired into the data-flow. It is an emergent property of ALA that the application itself ends up being just a succinct, formal representation of the requirements. That specification of the requirements also happens to be executable.
+
+=== Code organisation into folders
+
+
+Now a practical viewpoint of ALA - how it organises code into folders.
+
+I am appalled when I see C programs with folders for .h files and folders for .c. .h files have close cohesion with .c files.   
+
+If you see an ALA application, you will find three to five folders that correspond with the abstraction layers (described in the previous section):
+
+* Application
+* StoryAbstractions
+* DomainAbstractions
+* ProgrammingParadigms
+* Library
+
+
+
+Continuing with the idea of knowledge dependencies, the class in the Application folder will have knowledge dependencies on the classes in the DomainAbstractions folder. In other words, you need to know what the classes in the DomainAbstractions folder do in order to read the application code. Similarly the classes in the DomainAbstractons folder have knowledge dependencies on the interfaces in the ProgrammingParadigms folder. There are no dependencies between classes within a folder. 
+
+There should also be a readme file that points to this website (or equivalent documentation). In ALA, we are explicit about what knowledge is needed before a given piece of code can be understood (knowledge dependencies). To understand an ALA application, you need a basic understanding of ALA (from this chapter). So that's why there should be a readme file.
+
+In the Application folder, you will often find a diagram. This diagram describes the requirements. The diagram is 'complete' in that it describes all details of the requirements - it is not just an overview. The diagram is itself 'executable'. ALA is just a way of writing requirements that are executable.
+
+It should be quite easy to read the diagram as it only describes the requirements and does not involve itself with implementation. The boxes are instances of the DomainAbstractions (objects). The lines make a specific composition of instances. (Note that the lines in this diagram are not relationships between design-time artefacts. They are nothing more than equivalent to adjacent lines of code.)
+
+There should be a code file that exactly represents the diagram. It is generated from the diagram. So the diagram is the source. However, looking at this code file may clarify how the diagram is represented in code.
+
+Every box in the diagram is an instance of one of the classes in the DomainAbstractions folder. These classes are called abstractions rather than modules or components because they have zero knowledge of each other and zero knowledge about the specific application. Their abstraction level is more general than the application, and so they are reusable within a domain. For now a domain can just mean your company. 
+
+The lines in the diagram represent connections using one of the interfaces from the ProgrammingParadigms folder. There is usually more than one interface, but no more than a few. Each represents a 'programming paradigm' such as event flow, data flow, a UI composition, or a schema relationship. The abstraction level of the ProgrammingParadigms folder is more general again than the DomainAbstractions - each paradigm should be useful for a type of computing problem in many different domains. This is the 'abstract interactions' pattern.
+
+This small set of interfaces allows instances of domain abstractions to be wired together in an infinite variety of ways - the property of composability.
+
+
+
+=== How classes are used
+
+This is another practical viewpoint, this time on how classes are used in ALA programs.
+
+In ALA, a class's public interface (it's public methods and properties) are only used to instantiate and configure the class. It is not used for anything the class actually does. The public interface is 'owned' by the class. It is specific to the configuration of that class. The public interface is only used from a class in a layer above. Only that layer knows what should be instantiated, how it should be configured, and how the instantiated objects are composed together to make a system.
+
+All other operations are done through interfaces. Class don't 'own' these  interfaces. They are not specific to any one class. They are not about what any one class does, or needs. They are more general so that typically many different classes will implement/accept them. Objects of different classes can then be connected together using these more general interfaces in a variety of ways. The implication is that classes do not have association relationships. The lines that you would normally see dominating most UML class diagrams are completely absent if you drew a class diagram of an ALA application. 
+
+ALA doesn't need or use inheritance either. So the only relationship between classes is composition. If you drew a class diagram in ALA, you wouldn't draw lines for composition. This is because you are composing abstractions. You wouldn't draw a line to a square-root function every time you used it. It's the same thing when using any abstraction. So it turns out that if you did try to draw a class diagram in ALA, it would have no lines at all. So there's no point.
+
+Any given class will typically implement/accept more than one of the generic interfaces. For the data-flow interfaces at least, think of them as I/O ports. This is the interface segregation principle, except that we do not refer to the other objects as clients. Only the class in the layer above (that uses the public interface) has the status of a client. The objects to which an object is wired are peers.
+
+=== Abstraction Layers
+
+In contrast to the previous two sections that talk about the use of folders and classes, this section gives the most abstract perspective we will use. I introduce it now because it is the one that gives ALA its name.
+
+This figure shows the abstraction layers:
+
+image::Layers.png[Layers.png, title="The four ALA layers", width=75%]
+
+The first problem in understanding abstraction layers is understanding what abstraction means. Unfortunately the software industry has misused the word to the point where we get things upside down. This comes about because it sees hardware or alternatively the database at the bottom, and since hardware and databases are 'concrete', we argue are the least abstract. And so we build things on top of those that supposedly get more abstract. Whatever is at the very top, we argue, being the farthest away from the concrete silicon, must be the most abstract.
+
+This thinking is completely wrong. We will look in depth at what 'abstract' means in a later section, but for now, just suspend everything you think you know about abstraction. In ALA we will say that 'more abstract' means 'more ubiquitous', 'more reusable' and 'more stable'. The application, at the top, is the least abstract. Also suspend everything you think you know about layers. In ALA, the hardware is never at the bottom. And neither is the database. Your programming language is.
+
+Because this perspective probably doesn't really connect with anything you already do, we will just list three key takeaway points from this section. These will become clearer later. In ALA:
+
+. The only dependencies you are allowed are on abstractions (shown as green arrows on the figure) and referred to as 'knowledge dependencies' or 'design-time dependencies' (as opposed to run-time dependencies).
+
+. The first three abstraction layers are Application, Domain Abstractions, and Programming Paradigms.
+
+. The layers get more abstract as you go down, and therefore more ubiquitous, more reusable, and more stable.
+
+
+=== Four important SW engineering ideas brought together
+
+ALA is the bringing together of four important software engineering ideas. All are absolutely essential: 
+
+* Abstraction
+* Composition
+* Direct expression of requirements
+* Polyglot Programming Paradigms (execution models)
+
+Surprisingly, none of these four are particularly main-stream (relative to other memes in SW engineering). And I have never seen all four used together anywhere else, so that is what makes ALA unique. Using all four together is incredibly powerful. 
+
+(Polyglot = 'uses multiple different')
+
+
+
+
+=== Executable Description of Requirements
+
+If I had just two minutes to explain what ALA is, this is the perspective I would use: 
+
+This perspective puts the focus on your input information - the requirements. ALA is a methodology that finds a way to directly describe requirements. It describes all the details in the requirements. Instead of having two artefacts, one for requirements capture and one for software source, ALA combines them as a single document and a single source of truth. BDD (Behavioural Driven Design) does something similar, but only achieves it for requirements and their tests. ALA goes one step further and makes the expressed requirements also the solution.
+
+The description of the requirements itself has no implementation details. It just describes all details of requirements. The amount of code that describes requirements is typically about 2% of the entire application. When requirements change, you only need to change this 2%.
+
+The description of the requirements is executable. Even though the description has no implementation details, it still executes directly. The expressed requirements is also the application.
+
+
+=== Self documenting architecture
+
+The executable description of requirements in the top layer is also the architecture or the design. (I do not make a distinction between architecture and design.) There is no separate artefact or documentation of the architecture, no model, no "high level" design. The same artefact that describes the requirements and is executable is also the application's architecture. One source of truth for everything.
+
+
+=== Create and Compose
+
+If I had ten minutes to explain what ALA is, this is the perspective I would use.
+
+A common cliché for tackling complexity is "divide and conquer". Now here is a surprise. In ALA we do not divide and conquer. Instead we "Create and Compose". 
+
+Here are a few examples of composing:
+
+* When we write code in a general purpose programming language, we are composing with statements. Statements are low level (fine grained) elements and only support a single programming paradigm, which we could describe as 'imperative', but by composing instances of them in different ways we can create something. The structure is linear or a tree.
+
+* In functional programming, we are composing with functions, so the elements are higher level things that you create. But the programming paradigm is still imperative. The structure is linear or a tree.
+
+* When programming with monads, we are composing with amplified data types. These are usually low-level elements. But the programming paradigm has changed from imperative to data-flow. The structure is usually linear. (You don't need to understand or use Monads to use ALA. however,   
+<<Monads,See my method to understand Monads in Chapter Six>>
+
+* When programming using the UML class diagram, we are composing high-level classes. The programming paradigm is associations. The syntax is graphical. The structure is a network.
+
+////
+footnote:[See my method to learn monads in Chapter Six]. 
+////
+
+* When programming with XAML, we are composing with fundamental UI elements. The programming paradigm is UI layout.
+
+
+Let's list the different properties present in these composition methods:
+
+* low-level/high-level - A fixed set of fundamental elements versus elements that you can create.
+* Programming paradigm: The meaning of a composition relationship is fixed in each case. It can be Imperative, Data-flow, UI layout etc. 
+* Linear/Tree/Network: The structure built by the composition relationships can be linear, a tree structure or a general network. 
+* Syntax: The syntax for the composition relationship can be using spaces, dots or boxes and lines and we can use various types of bracketing or indenting for the text form of tree structures.
+
+In ALA, we are setting up the top layer so we can do composition that
+
+* Composes high-level elements that you create.
+* Allows use of many programming paradigms, and allows new ones that you can create.
+* Uses the same syntax for all composition relationships.
+* Allows linear, tree or network structures.
+
+ALA can therefore be described as 'generalised create and compose'. 
+
+Generally, compositions are 'instances of abstractions' 'connected' together in a specific way. This can be thought of as a graph. A graph is most easily imagined as a box and line drawing. In the common examples of composition that we mentioned above, sequential execution flow, monads, UI layout etc, the composition using text readily supports graphs that are linear or small tree structures. Arbitrary graph structures can usually be done by adding connections in a special way - by naming some of the nodes and then connecting by their identifier. However this method is somewhat inconvenient and unreadable in text form. ALA therefore can use diagrams to allow compositions to be arbitrary graphs. We are going to need that in any non-trivial application.
+
+To support generalised composition, ALA dedicates the top layer to the composition itself, a layer below it for the abstractions from which instances can be composed, and a layer below that for the different types of composition paradigms. 
+The middle layer is usually plain old classes and the bottom layer is usually plain old interfaces, although there are many other ways to do ALA. 
+
+
+=== Layers instead of hierarchical decomposition
+
+In the previous section, we discussed how ALA uses 'Create and Compose' rather than 'Divide and Conquer'.
+
+In this section, let's have a look at the other side of that coin and explore what is wrong with decomposition.
+
+Consider this phrase, often found near definitions of software architecture.
+
+[WARNING]
+====
+"[red]#*decomposition*# of a system into [red]#*elements*# and [red]#*_their_*# [red]#*relations*#".
+====
+
+Notice the word 'their', which I have italicised to emphasis that the relations are inferred to be between the said elements. It implies that the elements know something about each other. It implies they collaborate. This is a really bad meme. ALA is the antithesis of this meme.
+
+Here is how to reword the meme for ALA:
+
+[TIP]
+====
+"[green]#*abstractions*# and [green]#*composition*# of their [green]#*instances*#".
+====
+
+Strictly speaking the wording of the decomposition meme does not preclude this meaning, but it is at best misleading. This seemingly subtle shift causes a huge change in the structure, as described in the two contrasting diagrams below: 
+
+
+==== ALA structure is not this
+
+An architecture based on decomposition into elements and their relations looks something like this:
+
+image::Slide8.jpg[Slide8.jpg, title="Decomposition into elements and their relations", align="center"]
+
+The figure shows five modules (or components) and their relations (as interactions). Study almost any piece of software, and this is what you will find (even if it adheres to the so-called layering pattern).
+
+The structure generally can be viewed as 'clumping'. Like galaxies, certain areas have higher cohesion, and so go inside boxes. Other areas are more loosely coupled, and so are represented by lines between the boxes. The difference between high cohesion and loose coupling is only quantitative.
+
+Software health in this type of architecture is effectively management of the resulting coupling between the cohesive clumps. Allocate code to boxes in such a way as to minimize coupling. This coupling management has two conflicting forces. One is the need to have interactions to make the modules work as a system. The other is to minimize the interactions to keep the modules as loosely coupled as possible. As maintenance proceeds, the number of interactions inevitably increases, and the interfaces get fatter. The clumping is gradually eroded. Any so-called encapsulations become more or less transparent.
+
+Various architectural styles are aimed at managing this conflict. Most notably:
+
+* layering pattern
+* MVC pattern
+* Dependency rules
+. Avoid circular dependencies.
+. Avoid high fan-in and high fan-out on a single module.
+. Avoid dependencies on unstable interfaces.
+
+Note that none of this 'dependency management' actually avoids circular coupling. To some extent there will always be 'implicit coupling' in both directions between modules of a decomposed system. This is because the modules are the opposite of abstractions - specific 'parts' designed to interact and therefore collaborate. For example, a function of a decomposed system will tend to be written to do what its caller requires even if there is no explicit compile-time dependency on its caller. So circular coupling may be avoided at compile-time, but will still be present at design-time. That is why in the diagram above, couplings are drawn from the insides of each of the modules in both directions. This indicates that the code inside has some inherent design-time collaborative coupling. To the compiler or a dependency graphing tool, the lines may appear to be in one direction, and therefore 'layered', but it is not telling you the whole story of the coupling.
+
+
+==== ALA structure looks like this
+
+When you use abstractions instead of modules, the qualitative difference is that there are no interactions, no collaboration, no coupling between your abstractions at all:
+
+image::Slide9.jpg[Slide9.jpg, title="Abstraction do not interact", align="center"]
+
+The word 'modules' has been changed to the word 'abstractions'. All the dependencies are gone. And with them all their problems, and all their management. The implicit coupling that we talked about earlier is also gone. It no longer has a 'clumping' structure. Loose coupling is replaced with zero coupling.
+
+The obvious question now is how can the system work? Where do all the  interactions between elements that we had before go? The answer is they become normal code, completely contained inside one additional abstraction:
+
+image::Slide10.jpg[Slide10.jpg, title="Abstractions and composition of their instances", align="center"]
+
+Interactions or collaboration should never be implemented in your abstractions. That just destroys them as abstractions. They are implemented inside another new abstraction at a different, more specific, abstraction level. Being contained inside that new abstraction the interactions are not coupling. They are just a composition of instances. They are cohesively together in one place where they belong because they are the specific information about the specific application. That small amount of code has all the knowledge about the specific application. The abstractions no longer know about the specific application.  
+
+ALA overturns the conventional meme about decomposition into elements and their relations. It is unnecessary to write software that way. The only relationship that remains is the 'use of an abstraction'. This is, of course, a dependency but it is a good dependency. We will discuss from the point of view of good and bad dependencies in a later section. For now, dependencies are good if we want more of them. The more of them the better. For example if you have a library function or class, say squareroot, the more it is used the better, because the more useful the library function must have been. This type of dependency, the 'use of an abstraction', is the only one you need to build a system.
+
+
+[TIP]
+====
+Software engineering should [red]#*not*# be about [red]#*managing coupling*#.
+
+It should be about [green]#*inventing abstractions*#. 
+====
+
+
+
+anchor:DSL1[]
+
+=== DSLs
+
+ALA's succinct expression of requirements in the top layer sounds similar to the way requirements might be represented in a DSL (Domain Specific Language). Under the broader definition of a DSL, ALA's domain abstractions layer is a DSL. But ALA is also different from a DSL. ALA, as its name suggests, is fundamentally about layering of abstractions. It layers them in a small number of layers, according to their abstraction level. When you do this, the top two layers emerge as the specific application and the domain. Therefore ALA happens to converge on the same solution as DSLs for these top two layers.
+
+In coming to this same solution from a different direction it has a different emphasis than a DSL has. It does not pursue the idea of an external DSL (new syntax), nor even the syntactic elegance of DSLs. It doesn't move application development away from the developer as DSLs are often designed to do. You don't get a different language such as XAML that a UI specialist designer can learn. These things may still be desirable qualities and ALA does not preclude them, it is just not what ALA is about. ALA says that just getting the abstraction layering right is enough to deal with complexity and maintainability.
+
+As a DSL, in ALA you usually just wire together plain old objects, or functions in a way that is confined by a grammar. The classes (the domain abstractions) and the 3rd layer interfaces collectively form the DSL. The grammar is defined by which classes use which interfaces. This sets the rules for composition.
+
+By the way, ALA also emerges other already discovered architectural styles such as CBE (Component Based Engineering), and composability. These are discussed later.
+
+=== SMITA (Structure Missing in the Action)
+
+The problem in most large code bases is that the system structure, the in-the-large structure, is not explicit. It is distributed inside the modules themselves. If there is any collaboration between modules, it is implicitly hidden inside them. Finding this structure, even for a single user story can be time consuming. I have often spent a whole day doing that, doing countless all-files searches, just to change one line of code. Many developers I have spoken to can identify with this experience.
+
+It can get a lot worse as the system gets larger. In a bizarre twist, the more loosely coupled you make the elements, the harder it gets to trace a user story through them (because of the indirections). Some people conclude that loose coupling and being able to trace through a user-story are naturally in conflict.
+
+I call this situation SMITA (Structure Missing in the Action). This hidden structure is sometimes partially brought out as a model, a sort of high-level documentation of the internal structure. But such models are a secondary source of truth.
+
+ALA completely eliminates this problem and this conflict. The structure is explicitly coded in one place, without any indirections. Yet the abstractions are zero-coupled. 
+
+
+=== Diagrams vs text
+
+// TBD - there are two sections called Diagrams vs Text
+
+In ALA we will often use a diagram instead of text for the source code in the application (top) layer. 
+
+Text is effective only when the relationships between instances of abstractions (words in the text) is a linear sequence or a relatively shallow tree (represented by indenting). If the relationships are an arbitrary graph or a deep tree, diagrams are far more effective. Becasue of this, part of what ALA is about is easily supporting programming with diagrams (sometimes called models, but I will avoid this ambiguous term). ALA diagrams show everything in an applciation, UI, event flow, dataflows, state machines, etc. 
+
+If a diagram is used, it is the 'source'. A code form of the diagram is generated from it for execution.
+
+We will delve into greater detail on why our brains work better with diagrams, and graphing tools to support diagrams in chapter three.
+
+=== Real world metaphors
+
+==== Atoms and molecules
+
+Here are two atom abstractions:
+image:oxygen.png[Oxygen atom, 200, title="Oxygen atom"]
+image:hydrogen.png[Hydrogen atom, 200, title="Hydrogen atom"]
+
+Instances can be composed to make a molecule:
+image:water_molecule.jpg[Water molecule, 300, title="Water molecule"]
+
+
+If water was implemented in the same way we typically write software, there would be no water molecule per se; the oxygen atom would be modified to instantiate hydrogen atoms and interact with them. Even if dependency injection is used to avoid the instantiating, it is still unlikely that a water abstraction would be invented to do that, and there would still be the problem of the oxygen module being modified to interact with hydrogen's specific interface. Either way, the oxygen module ends up with some implicit knowledge of hydrogen. And hydrogen probably ends up with some implicit knowledge of oxygen in providing what it needs. 
+
+This implicit knowledge is represented by the following diagram. The relationship is shown coming from the inner parts of the modules to represent implicit knowledge of each other.
+
+[plantuml,file="diagram-o-h.png"]
+----
+@startdot
+digraph foo {
+graph [rankdir=LR]
+subgraph cluster_o { 
+style="rounded"
+margin="16"
+Oxygen [style="setlinewidth(0)"]
+}
+subgraph cluster_h { 
+style="rounded"
+margin="16"
+Hydrogen [style="setlinewidth(0)"]
+}
+edge [color=red]
+Oxygen -> Hydrogen [dir="both", arrowhead="dot", arrowtail="dot"]
+}
+@enddot
+----
+
+
+
+While oxygen and hydrogen are modules, they are not abstractions because oxygen is implicitly tied to hydrogen and vice-versa. They can't be used as building blocks for any other molecules.
+
+To keep oxygen as abstract as it is in the real world, an interface must be conceived that is even more abstract than oxygen or hydrogen. In the molecule world this is called a polar bond.
+
+The corresponding software would look like this:
+
+
+image::Slide15.jpg[Slide15.jpg, title="", align="center"]
+
+The water molecule has a "uses instances of" relationship with the two atoms, and the atoms have a "uses instance of" relationship with the even more abstract polar bond. Polar bond is an example of what we call an 'abstract interaction'.
+
+==== Lego
+
+The second real world metaphor is Lego. Shown in the image below is the same three layers we had above for molecules, atoms and bonds.
+
+image::Slide16.jpg[Slide16.jpg, title="", align="center"]
+
+The domain abstractions are the various lego pieces, instances of which can be assembled together to make things. Lego pieces themselves have instances of an abstract interface, which is the stud and tube. There is a second abstract interface, the axle and hole. We also call the abstract interface the 'execution model' and here with the lego metaphor we start to see why it can be thought of in this way - when the model runs, stud and tube interface executes the holding of the model together and the axle and hole interface executes turning.
+
+==== Electronic schematic
+
+The third real world metaphor comes from electronics. The abstractions are electronic parts, instances of which can be composed as a schematic diagram:  
+
+image::Slide17.jpg[Slide17.jpg, title="", align="center"]
+
+In this domain, the abstract interfaces (execution models) are both digital signals and analog voltage levels.
+
+==== A clock
+
+The forth and final real world metaphor is a clock. In this diagram, we show the process of composition of abstractions to make a new abstraction. The process is a circle because instances of the new abstraction can themselves be used to make still more specific abstractions. Each time around the circle adds one layer to the abstraction layering.
+
+image::Slide18.jpg[Slide18.jpg, title="", align="center"]
+
+Let's go round the circle once. We start with abstract parts such as cog wheels and hands. Instances of these have abstract interfaces that allow them to interact at run-time, such as spinning on axles and meshing teeth. The next step is to instantiate some of these abstractions and configure them. For example, configure the size and number of teeth of the cog wheels. Next comes the composition step, where they are assembled. Finally we have a new abstraction, the clock. Instances of them can be used to compose other things such as a scheduling things during your day, but that is a whole different abstraction. 
+
+There are many other instances of this pattern in the real world, and in nature. In fact almost everything is composed in this way.
+
+
+
+
+=== Example project - Calculator
+
+
+
+This project came from a workshop on ALA. Apart from being a cool example of the use of ALA, the calculator itself is cool. This calculator is in Github, as a work in progress, so you can clone it or download it, run it, and look at any of the details of how it, or any of the domain abstractions work here: https://github.com/johnspray74/ReactiveCalculator[https://github.com/johnspray74/ReactiveCalculator]
+
+The development was done in a hurry for the workshop, so here we tell the story of the development as well as how the calculator is designed. 
+
+When I was first asked to do the workshop, I needed to think of a suitable pedagogical sized project. It was suggested to me to do a calculator. Ok, I thought, if we have the domain abstractions in place, and a rehearsed application, we should be able to write a calculator application in a workshop. 
+
+When we think of a calculator application, we usually imagine a simulated version of a handheld calculator with a one line display and a keypad. We certainly could have built that calculator (primarily using a state machine programming paradigm). But that problem has already been solved by Miro Samek. Besides, such a calculator would be boring and useless.
+
+As an aside, I once had a love affair with HP calculators. The first programmable anything I ever owned was a calculator. I have owned many top end models at one time or another, and even own some SwissMicro modernized copies. But as their displays got larger, I became more and more disappointed with how they used that display real-estate. They just used it as a stack. The calculator I wanted shows the algebraic expression (formula) you used to get the result (so you can check what you did). You could edit the formula. You could label your formulas. You could use the result of one formula in another. When you change a formula or label, all results would be updated in situ. You could enter in RPN style but have it displayed in textbook or algebraic. The HP prime was the pinnacle of this disappointment. What a waste of space.  
+
+So I drew a sketch of what I thought the HP Prime should have been. Here is the actual sketch: 
+
+image::CalculatorRequirements.png[Calculator3.png, 900, title="Calculator requirements"]
+
+
+Here is a screenshot of the working calculator as it was two half-days later:
+
+image::CalculatorScreenshot.png[CalculatorScreenshot.png, 900, title="Calculator screenshot"]
+
+
+The first step in the design of the calculator was to express the requirements (UI plus behaviours), inventing any needed abstractions to do so. Here is the actual first sketch: 
+
+image::Calculator2Rows-HandDrawing.png[Calculator2Rows-HandDrawing.png, 900, title="Calculator (2 Rows only shown)"]
+
+As we shall see, this diagram is practically executable code. The calculator is practically done. We don't know if the invented domain abstractions will work yet, but let's go through how this calculator works anyway. 
+
+First notice how the entire calculator is here. Every detail about this particular calculator cohesively works together, so it all belongs together. This is an important aspect of ALA designs. All the UI and all the data flows to make a working calculator are in this one diagram. What is not here is the details we left to the domain abstractions. None of these abstractions is specific to a calculator. They can be used for all sorts of things. Even the Formula abstraction would be useful in any application where a calculation needs to be changed at run-time. For example an insurance application may need configurable calculations.
+
+The left side shows two instances of the abstraction, Horizontal. These arrange their children horizontally in the UI. To the left of those (not shown) is an instance of Vertical, which arranges the two Horizontals vertically. And to the left of that would be an instance of MainWindow.   
+
+Each Horizontal has 3 instances of TextBox and one Text. The TextBoxs allow you to enter a string. The abstraction, Text, can only display a string. I see at this point, I hadn't put in the TextBox for the description. 
+
+===== How the calculator works
+
+We can ignore the use of labels for a moment and just enter a formula containing constants into the first row TextBox. Let's say we type in "2+1". The string "2+1" goes along the data flow wire to the StringFormat instance on its port 0. The StringFormat is configured with the format string "({1}=>{0})". StringFormat uses this format string in the same way as an interpolated string in C#. The {0} is substituted with the string coming in on port 0. The {1} is substituted with the string coming in on port 1. Since we have no string on port 1, the output from the StringFormat will be "()=>2+1". This is simply a lambda expression with no parameters. This string is fed into the instance of Formula. Formula is an abstraction that knows how to evaluate a lambda expression. Actually it will accept just a formula (such as "2+1" as well). We can ignore the other input of Formula for the moment. Formula will evaluate "()=>2+1" and produce the number 3 on its output. This output is a data-flow of type double. This number is fed to an instance of NumberToString, and from there it goes to the instance of Text that knows how to display a string.
+
+Now let's follow the use of labels in the calculator. Let's put the labels "a" and "b" into the TextBoxs for labels on the two rows. "a" and "b" are fed to the Concat instance. Concat's input port can have any number of string data-flows wired into it. In this diagram it has only two. What Concat does is concatenate all its inputs adding a separator. In this case the separator is configured to be a comma. The output of the Concat is "a,b". The concatenated list of labels is fed into port 1 of both StringFormat instances. 
+
+Now let's put the formula "a*3" into the 2nd row of the calculator. The output of the StringFormat for that row will be "(a,b)=>a*3". That lambda expression will be fed to the Formula instance, which will evaluate it, using the first value on its input port for the value of 'a'. The output will appear on the corresponding Text in the 2nd row.
+
+So that's all there is to understanding how the calculator works. At this point it takes a leap of faith that the abstractions can all be made to work, and that the two programming paradigms used, the UI layout and the data-flow, can be made to work. Not withstanding that, all the information required in the design of the calculator is captured.
+
+At this point I drew little drawings of all the invented abstractions. Actually I reused TextBox, Text, Vertical, Horizontal and FormatString from a previous project. And I had already made the UI and data-flow programming paradigm interfaces in previous projects, so I reused them as well. Of course all those reused domain abstractions used those interfaces. 
+
+
+
+
+image::CalculatorDomainAbstractionsHandDrawings.png[CalculatorDomainAbstractionsHandDrawings.png, 300, title="Calculator Domain Abstractions"]
+
+I see I forgot to draw Concat. I had to write that one. Here is its template as it was in my Xmind templates diagram.
+
+image::CalculatorStringConcatTemplate.png[CalculatorStringConcatTemplate.png, 400, title="StringConcat template"]
+
+The two ports are both drawn on the right hand side unfortunately - a limitation of using Xmind as the drawing tool. Drawing the templates makes the ports clearer ready for implementation.  
+
+==== Implementing the domain abstractions
+
+
+Many abstractions are trivial to implement because they are zero coupled with anything. They are like tiny stand-alone programs. Here is the full code for StringConcat.
+
+.SringConcat.cs
+[source,C#]
+....
+using ProgrammingParadigms;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace DomainAbstractions
+{
+    /// <summary>
+    /// Outputs the input strings concatenated together
+    /// Whenever an input strings changes, a new output is pushed.
+    /// ---------------------------------------------------------------------------------------------------------
+    /// Ports:
+    /// 1. List<IDataFlowB<string>> inputs: inputs (indefinite number of string inputs)
+    /// 2. IDataFlow<string> output: output
+    /// </summary>
+
+
+
+    public class StringConcat
+    {
+        // Properties ---------------------------------------------------------------
+        public string InstanceName { get; set; } = "Default";
+        public string Separator { private get; set; } = "";
+
+        // Ports ---------------------------------------------------------------
+        private List<IDataFlowB<string>> inputs;
+        private IDataFlow<string> output;
+
+
+        /// <summary>
+        /// Outputs a boolean value of true when all of its inputs are true. Null inputs are treated as false.
+        /// </summary>
+        public StringConcat() { }
+
+        // This function is called immediately after each time the inputs port is wired to something
+        private void inputsPostWiringInitialize()
+        { 
+            inputs.Last().DataChanged += () =>
+            {
+                var result = "";
+                bool first = true;
+                foreach (IDataFlowB<string> input in inputs)
+                {
+                    if (!first) result += Separator;
+                    first = false;
+                    result += input.Data;
+                }
+                output.Data = result;
+            };
+        }
+
+    }
+}
+....
+
+
+The code in Concat is straightforward if you know C#, except for a few conventions which are to do with the use of ALA (which I was already proficient with):
+
+. We put a property "InstanceName" in every domain abstraction. It's not required, but the reason is because abstractions get reused. So you are likely to end up with multiple instances of an abstraction all over your application. If you name the instances, it makes debugging a lot easier because you can see it in the debugger and know which instance you are in.
+
+. All the IO for the abstraction is in a section called "Ports". Usually an abstraction would have some ports that are private fields of the type of an interface, and some that are an implemented interface. It just so happens that StringConcat has no implemented interface ports.
+
+. The two ports are private, and yet they get wired by the application code to other objects. This may seem a little bit magic. The reason they are private is to indicate they are not for use by anything else. The application will use a method called WireTo() to achieve the wiring. WireTo is an extension method on all objects. It uses reflection to find and assign to these "port" fields.
+
+. Notice that the "inputs" port uses IDataFlowB (not IDataflow). The B on IDataflowB indicates a tricky workaround for a limitation in the C# language. What we would have liked to do is implement IDatFlow. But we would have needed to implement IDataFlow multiple times. You can't do that in C# (although there is no reason why not in theory, and hopefully all languages will have this feature to support the concept of ports one day).
+
+. Notice that the method, inputsPostWiringInitialize, is private and apparently unused. When the WireTo operation wires a port "xyz" it looks for a private method called xyzPostWiringInitialze and invokes it immediately. This gives us the opportunity to set up handlers on any events that may be in the interface. In this case, the IDataFlowB interface has a DataChanged event (that tells us when there is new data on the inputs).    
+
+. It doesn't make sense to use a StringConcat without wiring its output to something. So the line "output.Data = result" will throw an exception if the application has not wired it. Often times, abstractions have ports that are optional to wire, in which case we would use "outputs?.Data = result"
+
+
+For reference, here is the IDataFlow interface, which lives in the ProgrammingParadigms folder, and is used by most of the domain abstractions including the StringConcat abstraction:
+
+
+.IDataFlow.cs
+[source,C#]
+....
+namespace ProgrammingParadigms
+{
+    public interface IDataFlow<T>
+    {
+        T Data { get; set; }
+    }
+}
+....
+
+As you can see, this interface is simple, but its importance in giving us a data-flow programming paradigm is huge. It allows objects to be wired together so that data can flow from object to object without the abstractions knowing anything about each other. Note that IDataflow uses a 'push' execution model. This means that the source always initiates the transfer of data on its output (by using 'set'). The IDataFlowB interface is a little more complicated, so we wont go into how it works just now. But it achieves exactly the same purpose of the data-flow programming paradigm, just in a different way that allows more than one input port of the same type. .
+
+
+The other domain abstraction I needed to write for the first time was Formula. Here is the template as used in Xmind: 
+
+
+image::CalculatorFormulaTemplate.png[CalculatorFormulaTemplate.png, 500, title="Formula template"]
+
+
+Once again, one of the input ports is shown on the right when we would prefer it to be on left.
+
+Formula can be configured with an optional C# lambda expression when it is instantiated by the application, for example:
+
+.Application.cs
+[source,C#]
+....
+new Formula() {Lambda = (x,y) => x+y; }
+....
+
+If used in this way, the formula is fixed at design-time. But its real power comes from the fact that it can take a formula as a string at run-time. Formula has an input data-flow port called "formula". 
+
+The Formula abstraction has to parse the formula string and then evaluate it. I used Roslyn to do this in a few lines of code. These lines of code took me a few hours to figure out however: 
+
+.Formula.cs
+[source,C#]
+....
+
+using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Scripting;
+using static System.Math;
+
+namespace DomainAbstractions
+{
+    using LambdaType = Func<double, double, double, double, double, double, double>;
+
+    public class Formula
+    {
+        public LambdaType Lambda { private get; set; }
+
+
+        // Other code omitted from here
+
+
+        private async void Compile(string formula)
+        {
+            var options = ScriptOptions.Default;
+            options = options.AddImports("System.Math");
+            try
+            {
+                Lambda = await CSharpScript.EvaluateAsync<LambdaType>(formula, options);
+            }
+            catch (CompilationErrorException e)
+            {
+                Lambda = null;
+            }
+        }
+    }
+}
+....
+
+As you can see, currently the Formula abstraction can only handle formulas that use a maximum of six parameters. The calculator application can use any number - it's just that any one formula is limited to using only six.
+
+The rest of the code in the Formula abstraction is mostly dealing with this requirement of exactly six parameters used by LambdaType. But that's all internal to the abstraction. An instance of the Formula abstraction can handle any number of operands from zero to many. The Formula abstraction is also tolerant of the string on the formula input port being either just a formula such as "2*(3+1)" (implying it's not using any operand inputs), or a proper lambda expression such as "(x,y,z)=>x*(y+z).
+
+Now that we have our needed domain abstractions, let's return to the application layer, and see if we can get this calculator running.
+
+
+==== Hand wiring the appication code from the diagram
+
+First here is the startup code for a wired ALA application. It is very simple:
+
+
+
+.Application.cs
+[source C#]
+....
+namespace Application
+{
+    public class Application
+    {
+        private MainWindow mainWindow;
+
+        [STAThread]
+        public static void Main()
+        {
+            Application app = new Application();
+            app.mainWindow.Run();
+        }
+
+        private Application()
+        {
+            // mainWindow = WireHelloWorld();
+            mainWindow = Calculator2RowHandWired();
+        }
+    }
+}
+....
+
+
+
+Here is an ALA Hello World application
+
+
+.Application.cs
+[source C#]
+....
+private MainWindow WireHelloWorld()
+{
+    return new MainWindow().WireTo(new Text("Hello World"));
+}
+....
+
+Ok, now we are ready to hand wire the hand drawn calculator diagram shown above:
+
+
+.Application.cs
+[source C#]
+....
+private MainWindow Calculator2RowHandWired()
+{
+    // To understand this code, you need the wiring diagram of the two row calculator
+
+    // First instantiate instances of abstractions we need to give names to. The rest can be anonymous.
+    StringConcat stringConcat = new StringConcat() { Separator = "," };
+    DataFlowConnector<string> stringConcatConnector = new DataFlowConnector<string>(); // Connectors are needed when there is fan-out or fan-in in the diagram
+    stringConcat.WireTo(stringConcatConnector, "output");
+    Formula[] formulas = { new Formula(), new Formula() }; // instantiate both the formulas up-front because we need to cross wire them
+
+
+    MainWindow mainWindow = new MainWindow("Calculator")
+        .WireTo(new Vertical()
+            .WireTo(WireRow(stringConcat, stringConcatConnector, formulas[0], formulas))
+            .WireTo(WireRow(stringConcat, stringConcatConnector, formulas[1], formulas))
+            );
+    return mainWindow;
+}
+
+
+private Horizontal WireRow(StringConcat stringConcat, DataFlowConnector<string> stringConcatConnector, Formula formula, Formula[] formulas)
+{
+    // To understand this code, you need the wiring diagram of the two row calculator
+
+    // first instantiate objects we need to give names to.  The rest can be anonymous.
+    Text result = new Text(); 
+
+    // Wire up a calculator row
+    Horizontal row = new Horizontal()
+        .WireTo(new TextBox()
+            .WireTo(new DataFlowConnector<string>()
+                .WireFrom(stringConcat, "inputs")
+            )
+        )
+        .WireTo(new TextBox()
+            .WireTo(new StringFormat<string>("({1})=>{0}")
+                .WireTo(stringConcatConnector, "inputs")
+                .WireTo(formula
+                    .WireTo(new DataFlowConnector<double>()
+                        .WireFrom(formulas[0], "operands")
+                        .WireFrom(formulas[1], "operands")
+                        .WireTo(new NumberToString()
+                            .WireTo(result)
+                        )
+                    )
+                )
+            )
+        )
+        .WireTo(result)
+        .WireTo(new TextBox());
+    return row;
+}
+....
+
+
+Commentary on this wiring code
+
+* The code is written in "fluent style". This is possible because the WireTo extension method returns its 'this' parameter, allowing you to use .WireTo() multiple times on an instance.
+
+* The parts of the diagram that have a tree structure can be wired by using more .WireTos immediately inside the brackets of another WireTo. This is what causes the indented code.
+
+* The previous two points allow much of the wiring to be done without having to think up names for the instances. The instances are anonymous just as they were on the diagram.
+
+* Where the diagram has cross wires that formed a cycle, we need to give instances names so that we can complete all the wiring to them.
+
+* Sometimes the WireTo method is given the port name of the first object. These are used when WireTo may get the wrong port if it were left to use the port types alone. (If an abstraction has multiple ports of the same type, WireTo doesn't know which port to use.)
+
+* Most abstraction have ports that can only be wired to one place, and ports that can only be wired from one place. (The UI abstractions are exceptions, for example, Horizontal can be wired to multiple children.) The hand drawn wiring diagram has several places where the wiring either 'fans out' from a port or 'fans in' to a port. Unfortunately C# does not support the concept of ports, so we improvise to make them work in normal C# code. The way this improvisation works for fan-in and fan-out is to use a connector.
+
+** For fan-out you wire the output port to a new Connector. Then you can wire the connector to multiple places.
+
+** For fan-in, the abstraction, instead of implementing the port, uses a list field of a type like IDataFlowB. The 'B" on the end means the flow of data is reversed from IDataFlow. Now to wire such an inputs port to an output port also requires a connector (a second use for connectors). When wiring an IDataFlowB, you wire from the input to the connector (the opposite way to the direction of data flow unfortunately). 
+
+* As a convenience, you can use WireFrom. It reverses the two operands being wired compared to WireTo.
+
+
+Handwritten wiring code like teh above can be managed for small applications. It is easy to get it wrong though. The code is not readable from the point of view of understanding teh application. That's what the diagram is for. So every time you make a change to the requirements, you need to do it on the diagram, then update the hand-generated code. You are still better off doing this than not using ALA. If not using ALA, the relationships shown in our explicit diagram still exist. You just go without the diagram, and your hand-generated code is obscured and distributed inside your modules. And you end up with lots of relationships between those modules that come from the implicit diagram.
+
+But we don't have to hand generate code. At the time of writing a hand written graphical IDE is under development. 
+
+Here is the calculator row part of the diagram, which was successfully used to auto generate code:
+
+
+image::CalculatorRow-GALADE.png[CalculatorRow-GALADE.png, 800, title="CalculatorRow abstraction internal wiring"]
+
+Before we had that tool, we used Xmind to do diagrams from which we could generated code. This is the approach described in the next section. 
+
+
+
+==== Automatic code generation from the diagram
+
+Here is the diagram of the 2-row calculator as it was originally entered into Xmind. You can click on the image to get a bigger version.
+
+image::Calculator2Rows.png[Calculator2Rows.png, 1000, title="Calculator drawn in Xmind (two rows version)", link=images/Calculator2Rows.png]
+
+
+Xmind is not the perfect tool to do this, but it has one huge advantage - it lays itself out. This is so important that it's why we use it (until our new tool is ready). We will put up with the disadvantages, and the necessary conventions until then. Those conventions are documented in the wiki section of the project in Github here: https://github.com/johnspray74/ReactiveCalculator/wiki[https://github.com/johnspray74/ReactiveCalculator/wiki]
+
+Entering the hand-drawn version of the diagram is a simple matter of copying and pasting the Xmind templates for the abstractions to the right place in the diagram. This connects most of the needed wiring from port to port. Xmind supports tree structured diagrams, so any cross tree wiring was done by using the red lines, which are quick to put in with a shortcut key.
+
+The Xmind version of the diagram is pretty much identical to the hand drawn version. The colored boxes are instances of abstractions. All the other nodes attached around those colored boxes are the ports. The < and > signs in the ports are significant, and tell the automatic code generator which way to wire the instances. The asterisks are also significant, and tell the code generator that many wires can be wired to the one port.
+
+The diagram done, it's time to generate the code. A tool called XmindParser does this. It can be downloaded from the Github project main page. Here is the tool in use to generate a calculator from the diagram.
+
+image::CalculatorXmindParserTool.png[CalculatorXmindParserTool.png, 800, title="XmindParser tool in use"]
+
+The tool can put the generated code into your Application.cs file if you give it special markers like the one below.
+
+
+
+.Application.cs
+[source,C#]
+....
+private void Calculator2Rows()
+{
+    // BEGIN AUTO-GENERATED INSTANTIATIONS FOR Calculator2Rows.xmind
+    // END AUTO-GENERATED INSTANTIATIONS FOR Calculator2Rows.xmind
+
+    // BEGIN AUTO-GENERATED WIRING FOR Calculator2Rows.xmind
+    // END AUTO-GENERATED WIRING FOR Calculator2Rows.xmind
+}
+....
+
+The markers contain the name of the Xmind diagram they get code from. This allows several diagrams to be used for one application.
+
+I usually put the markers inside a function so that all the instantiated objects are private to the function.
+
+Here is the code again with three lines of generated code shown in each section.
+
+
+.Application.cs
+[source,C#]
+....
+private void Calculator2Rows()
+{
+    // BEGIN AUTO-GENERATED INSTANTIATIONS FOR Calculator2Rows.xmind
+    Formula Formula1 = new Formula() { InstanceName = "Formula1" };
+    Formula Formula2 = new Formula() { InstanceName = "Formula2" };
+    Horizontal id_24914ab245484fe1b70af8020ca2e831 = new Horizontal() { InstanceName = "Default" };
+    // END AUTO-GENERATED INSTANTIATIONS FOR Calculator2Rows.xmind
+
+    // BEGIN AUTO-GENERATED WIRING FOR Calculator2Rows.xmind
+    mainWindow.WireTo(id_b02d2caea938499b997b9bfcb80fb0e9, "iuiStructure");
+    id_b02d2caea938499b997b9bfcb80fb0e9.WireTo(id_24914ab245484fe1b70af8020ca2e831, "children"); 
+    Formula1.WireTo(dfc1, "result");
+    // END AUTO-GENERATED WIRING FOR Calculator2Rows.xmind
+
+}
+....
+
+
+Completing the diagram had taken another morning of work. But the calculator was now working and I was ready for the workshop.
+
+I made a diagram with six rows, but it was getting pretty large, and the duplication was pretty clumsy.
+
+
+==== Calculator with 10 rows
+
+The 6-row calculator is powerful compared to any normal calculator, but still wouldn't do jobs like the one shown here which has 11 rows:
+
+image::CalculatorNRowsScreenshot.png[CalculatorNRowsScreenshot.png, 800, title="Later version of the calculator to support an unlimited number of rows"]
+
+So it was time to do some maintenance, and solve that problem of the repetition in the diagram at the same time. During this maintenance, none of the existing abstractions changed. Their ports stayed the same. Their internals were improved a little in some cases but nothing significant. Formula was modified internally so that it could handle more than six operand inputs, although any one formula can still only use six of them.
+
+There were two major changes though. One was to put the repeated wiring for a calculator row inside its own abstraction. This abstraction is called "CalculatorRow". This abstraction is less abstract than the Domain abstractions it uses, but more abstract than the application, which will use it multiple times. Other version of the calculator alos reused it. So it goes into its own layer between the two. This new layer is called "Requirements Abstractions". We don't make new layers lightly, but we had had the experience in a larger project that the diagram got too large. We needed to factor out some of it as 'Feature level abstractions'. These abstractions needed a new layer between the Application layer and the Domain abstractions layer. So I was reasonably happy to make use of this new layer in the calculator to reduce a now quite large diagram.
+
+Here is the Xmind template for the CalculatorRow abstraction showing its ports:
+
+image::CalculatorRowTemplate.png[CalculatorRowTemplate.png, 800, title="CalculatorRow requirements abstraction"]
+
+
+The implementation of CalculatorRow was done with a diagram using the new Graphical ALA tool which was shown earlier.
+
+
+When you implement an abstraction by an internal diagram, there needs to be some extra code to wire from the ports (shown in the template above) to the internal wiring. I found this code quite tricky the first time and it took me a while. But there is a pattern to it. The new tool will be able to automatically generate this code as well, but for now I did it by hand.
+
+I tested the completed CalculatorRow abstraction by making an application that uses it twice:
+
+
+image::Calculator2ARows.png[Calculator2ARows.png, 1000, title="Calculator drawn in Xmind using the new CalculatorRow requirements abstraction", link=images/Calculator2ARows.png]
+
+Because this test calculator has only two rows we can directly compare it with the 2-row calculator above and see how the two rows are now represented by two instances of this new CalculatorRow abstraction. However we are still not there to building a calculator with 10 rows. If we were to instantiate CalculatorRow 10 times, it would need 100 wirings in Xmind to connect all ten results to every rows input. Having thought the 36 wirings of the 6 row calculator was nuts, there was no way I was going to do 100 of them by hand.
+
+So the next step was to invent a domain abstraction called 'Multiple'.
+
+What 'Multiple' does is you instantiate it in your application and configure it with the number you want. In this case N:10. Multiple has a port called factory which uses a new interface called IFactory. Then what you do is add a small Factory class inside any abstraction that you want multiple instances of. In this case we want multiple instances of CalculatorRow, so I added a small class to that abstraction called CalculatorRowFactory. CalculatorRowFactory implements IFactory (which resides in the Programming Paradigms layer). Multiple can now create many instances of the abstraction that is wired to it. But these instances now have to be wired into the rest of the wiring in the application diagram as needed. To accomplish that, multiple is configured with two methods. These methods, which are part of the application, know how to wire the new instances into the rest of the wiring.
+
+Here is the Xmind template for Multiple:
+
+image::CalculatorMultipleTemplate.png[CalculatorMultipleTemplate.png, 500, title="CalculatorRow requirements abstraction"]
+
+Using the new Multiple abstraction, we can now build a 10-row calculator. Here is the new diagram: 
+
+image::Calculator10Rows.png[Calculator10Rows.png, 1000, title="Calculator drawn in Xmind using the new Multiple domain abstraction to create as many rows as we like", link=images/Calculator10Rows.png]
+
+You can see inside the instance of Multiple that it is configured to make 10 of whatever is attached to its factory port. The CalculatorRow abstraction is shown next to the CalculatorRowFactory so you can see what it makes. You can see inside Multiple the two methods that Multiple calls when it makes a new instance. These methods are used to wire the CalculatorRow into the rest of the application wiring.
+
+Getting to this point had taken another two Saturday mornings of work. It was mainly spent on thinking out the patterns for how the internal wiring inside CalculatorRow should get wired to CalculatorRows own border ports. Also in the initial attempt I had allowed temporal coupling to creep in between abstractions. It mattered whether the application wiring was done first. And if you let coupling creep in bugs will happen. The temporal coupling was resolved by making CalculatorRow not care whether or not the external wiring is done when it is instantiated.    
+
+==== Calculator with N rows
+
+Wouldn't it be cool if the calculator started with say 4 rows, and had a button for adding additional rows? You will notice that the Multiple abstraction template above has a port called addRow. It takes an IEvent. If it receives an event on that port at run-time, it will create another row and call the lambda wiring functions to get that row wired in.
+
+Here is the calculator wiring with the button added to the UI. This is the calculator from which the screen shot shown above was taken.
+
+image::CalculatorNRows.png[CalculatorNRows.png, 800, title="Later version of the calculator to support an unlimited number of rows"]
+
+I wanted the Button to be at the bottom, so I added another instance of Vertical to act as the wiring point for new row to be attached to the UI. The output of the Button is another programming paradigm interface called an IEvent. 
+
+Here is the source code of IEvent:
+
+.IEvent.cs
+[source,C#]
+....
+namespace ProgrammingParadigms
+{
+    public interface IEvent
+    {
+        void Execute();
+    }
+}
+....
+
+Again, considering that this interface enables a whole programming paradigm, it is extremely simple and abstract, consisting of only a synchronous function call. It allows any objects that can produce events to be wired to any object that can receive event. In the CalculatorNRows example, it allows a Button to be Wired to a Multiple. When the Button is pressed, Multiple creates a new row.  
+
+There is one major Programming Paradigm that we have not explained yet. It is the one that allows UI instances to be wired together. The meaning of wiring two UI objects together is that one contains the other. Here is the IUI interface that implements this programming paradigm.
+
+.IUI.cs
+[source,C#]
+....
+using System.Windows;
+
+namespace ProgrammingParadigms
+{
+    public interface IUI
+    {
+        UIElement GetWPFElement();
+    }
+}
+....
+
+The interface simply allows a containing UI instance to get the WPF (Windows Presentation Foundation) element from the contained UI instance it is wired to.
+
+Making Multiple able to add rows to the calculator at runtime took yet another Saturday morning. But it was worth it to solve the challenge of learning how to change the wiring at run-time. The wiring diagram now statically describes how it dynamically changes itself.
+
+That concludes the story of the development of the calculator using ALA. The full source code, and all the diagrams for every version along the way are in the Github project at
+https://github.com/johnspray74/ReactiveCalculator[https://github.com/johnspray74/ReactiveCalculator]
+
+
+// TBD why not use #defines?

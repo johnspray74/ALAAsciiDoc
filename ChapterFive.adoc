@@ -1,0 +1,497 @@
+:imagesdir: images
+
+== Chapter five - Methodology
+
+
+=== The first few strokes
+
+As a software engineer contemplating a new project, I have often asked myself "Where do I start?" This also happens with legacy code, when contemplating the direction that refactorings should take. "If this software were structured optimally well, what would it look like?"
+
+Christopher Alexander, the creator of the idea of design patterns in building architecture, said, "As any designer will tell you, it is the first steps in a design process which count for the most. The first few strokes which create the form, carry within them the destiny of the rest". This has been my experience too.
+
+In Agile, where architecture is meant to emerge, this wisdom has been lost. ALA restores that wisdom to software development, and gives the software architect the exact process to follow for that little piece of up-front design. No more than one sprint is required to do this architectural work, regardless of the size of the project.
+
+Furthermore, once this architectural work is done, the Agile process works significantly better thereafter. 
+
+My experience over several projects so far is that the initial architecture does not need to change as the development proceeds if good quality abstraction are invented.
+
+
+
+
+=== Agility
+
+ALA is inherently optimally agile (except for an Iteration zero which we will discuss next). By optimally agile, we mean that the amount of code that changes to change functional requirements is the minimum it can be. The amount of code that actuall depends on requirements is a small percentage of the total. This differs from the average application where most code depends on the requirements.
+
+ALA achieves this at its first level of separation of concerns. This first  separation is to separate code that will just describe requirements from code that will implementation the abstractions needed to describe the requirements. This implementation code never has knowledge of any requirements, so it generally doesn't change when requirements change. Only the code that describes requirements needs to change, and that code is optimally minimal.
+
+
+
+==== Iteration zero
+
+When a new project begins, the only new information we have is the requirements. Any design decisions that don’t depend on the specific requirements could already have been made beforehand. It is those decisions that form the ALA reference architecture. Therefore, when we get the requirements, that is our immediate and total focus. We may not know all of them, but we will only need a sample to build start inventing our domain abstractions. 
+
+Looking at the available new information as a whole first instead of taking it a bit at a time during the project's sprints will make a huge difference to the quality of the abstractions we invent, and eventually the quality of the application's architecture.
+
+The process in the first iteration takes requirements one by one, and represents them, in all their detail. Domain abstractions will be invented as you go, and they will have parameters or properties that will handle those details from requirements. 
+
+For the first green field application, you spend a maximum of one sprint. After that you do need to find out if your design works. So you may not get through all the known requirements. That does not matter. 
+
+To know whether knowledge from your design goes in the application layer or the domain abstractions layers, you consider what the scope of that knowledge is. Is the knowledge specific to this one requirement in the one application, or is it potentially reusable in the same or other applications? A softkey label is clearly specific and goes in the application. The concept of softkeys is clearly a domain abstraction. 
+
+The output of the first sprint does not implement any of the invented abstractions, but it does include all details of the requirements that are looked at. In so doing, you design the first approximation of a DSL. The DSL may be refined later as more requirements are looked at.
+
+Each abstraction will eventually be implemented as a class, but initially we just record the names of the abstractions, and a short explanation that provides the insight into what the abstraction does. 
+
+By the end of the first sprint the requirements will have become easier and easier to represent, as the set of abstractions will have taken shape. Sometimes you will generalise an abstraction further to enable it to be useful in more parts of the application.
+
+By keeping moving through the requirements at a much faster pace than in normal development (say one feature per hour instead of one per week), we can keep representing them in a coherent way, revising abstraction ideas we have already invented. Ideally, we will end up with a set of domain abstractions that can be wired together in different ways to represent the requirement space - the space of all possible requirements. That space, which we call the domain, will grow slightly as time goes on and it accommodates a growing family of products, but we don’t want it to grow beyond that. We don’t want to invent ways of implementing things we will never do.
+
+On the other hand, we do want to invent quite a few abstractions during this first iterations so that we end up with a coherent set of them that will compose together in an infinite variety of ways.
+
+The output of sprint zero is usually a diagram showing the wiring of instances of abstractions, together with configuration information for those instances.
+
+It doesn’t matter if some of the requirements are wrong. Chances are they are still useful for scoping out the domain space. What we are actually producing in this phase are the necessary abstractions for the Domain Abstractions layer. If the requirements change later, it will be trivially simple to change them as only the Application layer wiring should change.
+
+Once this process has started to become easy, which should happen within the first sprint, the burning question in our minds will become “Will all this actually work?” We have to trust that there will be a way to write those abstractions to make the whole system execute.
+
+==== How to invent Domain Abstractions
+
+The most difficult part for people new to ALA is the skill of inventing the domain abstractions. You can fully understand the theory of ALA and why we need to invent abstractions, and still find it tricky to actually invent them. That's because in this step in the process, we have to literally become inventors who are adding to the state of the art within your domain.
+
+So the biggest insight I can offer here is don't expect it to come without effort. Put your inventors hat on. Deliberate about the problem over a long period of time. Leave it overnight. Come back to it afresh in a week. Be patient. 
+
+I sometimes find that a solution will pop out of nowhere while reading about something completely unrelated. Once the human mind has been deliberating for some time, it remembers the whole context of the problem, and seems to carry on pattern matching for potential solutions in the background. I am reminded of the story of the Dam Busters. The British wanted to bomb the German dams to flood the industrial valleys below them. They worked out that they could deliver the bombs to the face of dam by skipping them across the surface of the lake. But they couldn't get their bomber low enough to the water at night to get them to skip, because they had no way of knowing their height above the water.
+
+Then one of the pilots was attending a play. He saw the spotlights pointing at the actor from different angles. And suddenly he had the solution. By mounting spotlights at the nose and the tail of the aircraft at a certain angle, they would know when they were at the correct height when the two spots came together at the surface of the water.  
+
+In my experience, there is always a solution, and it is always worth the effort. Just as good inventions are like gold, good abstractions are like gold in your application.
+
+This section offers some practical tips on where to start.
+
+* You start by simply expressing requirements. You are inventing domain abstractions to allow you to express the requirements succinctly, but including all their details. 
+
+* Draw a diagram that describes the requirements. You will draw boxes with lines. The boxes are your invented domain abstractions. The lines are your invented programming paradigms.
+
+* Look at the English version of the requirements for words that recur. These are candidates for abstractions. 
+
+* Your diagram should have about the same amount of information as the English requirements. It will be succinct, even though it will include lots of detail such as text strings that come from requirements. Anything else that even begins to look like implementation or how it will work or execute is the beginning of an idea for an abstraction. Don't worry about them. Just concentrate on making a description of requirements. 
+
+* Always keep in mind that reusability and abstraction are two sides of the same coin. Your invented abstractions are anything that is potentially reusable.
+
+* Start with the user interface. Sketch multiple parts of the UI to make it more concrete. Then it is relatively easy to invent abstractions for your UI. They are things that will recur in different parts of the UI that you will always want to be done the same way. We can draw inspiration from the many widgets we already find in UI frameworks. ALA will often have equivalent ones that are just a little more specialised to your domain. Buttons may have a consistent size and style in your domain. Or your domain may need Softkeys, which are not usually part of a UI framework.
++
+ALA UI abstractions will usually be composed together in a tree structure representing the containment structure. This is similar to the tree structure of XAML, but in ALA we will usually do it as a diagram that is just one part of the entire application diagram.
+
+* Once you have designed some UI, you will then want to connect the UI elements that display data to some data sources. These data source are candidates for abstractions. For example, a data source that represents a disk file can be an abstraction that handles a disk file format. You will start to have dataflows between instances of data sources, be they UI elements or other source/destinations.
+
+* Between your data end points, data may need to be transformed, aggregated, filtered, sorted, validated or transacted (transacted means either all of it or none of it). All of these are great candidates for domain abstractions.
+
+* Sometimes a data source or destination will involve a protocol. A protocol is a domain abstraction. One abstraction should be invented to know about the protocol so that no other abstraction needs to know anything about the protocol. Sometimes there are protocols on top of protocols. For example, on top of a serial data stream protocol such as line terminated text, you may have another protocol that specifies the expected content of the first line.
++
+This same idea applies to file formats. A file format, such as a CSV file becomes an abstraction. If there is further formatting expected on top of the basic CSV format, such as a header row, that becomes a second abstraction.
++
+As with all abstractions, these abstractions know all about the details of something, e.g. a protocol or a format, and become the only thing in the entire application that does know about it.
++
+As a result these types of abstractions will usually handle the data going in both directions - sending and receiving, reading and writing.   
+
+* If you have hardware devices, each will become an abstraction. For example, an ADC device will become a domain abstraction. The abstraction will know all the detail about the device (everything that is in the datasheet for the device). No other part of the program will know these details.
++
+If you have an ADC device that has an SPI interface, that will become two abstractions, one that knows all the details of the device, and one that knows all the details of the basic SPI interface. 
+
+* Sometimes a section of requirements will seem like it should become a 'module' or 'function' - for example to parse a string. Try to turn the module or function into something more generally useful. Even if you still end up having only one instance of it for now, by separating that module or function into a general part and a configuration part (that has the information for it's specific use in the one part of your application), you will make the general part easier to know what it does - simply because it is more abstract. In time you will often generalise it further and start to have instances of it elsewhere.   
+
+* If all else fails, just start writing code that implements the requirements in the old fashioned way, not worrying about how messy it gets. When it is functioning as you want, then refactor it to ALA as follows. This is actually quite a straightforward process.
++
+Any code that has details that come from requirements, move that to the application layer, leaving behind generalised functions or classes that have parameters or configuration properties that the application will pass in.
++
+At first the generalised classes may have only one instance each. Look for ones that have similar functionality and combine them. The difference between them become further configuration properties, sometimes in the form of lambda expressions. 
++
+Now refactor the generalised classes or functions so that they do not call each other directly.
++
+** In the case of functions, this step will involve adding new 'wiring' parameters that themselves take functions. The application will pass in the function that it needs to be wired to. These wiring parameters will usually either be to pull the input or push the output. The wiring function signatures should be even more generalised to allow Lego-like composition of functions by the application. They become interfaces in the programming paradigms layer. Section 1.11 has a worked example of refactoring of functions to ALA. 
++
+** In the case of classes, this step will involve adding dependency injection setters. These will be used by the application to specify what class and instance it will talk to. This step removes all uses of the "new" keyword from the class (except ones that are instantiating classes in a lower abstraction layer such as your framework). 
++
+If you have any uses of the observer pattern (publish/subscribe pattern), move the code that does the actual registering or subscribing up to the application. Provide a dependency injection setter for it to use.
++
+The dependency injection setters should all take generalised interfaces as thier parameter to allow Lego-like composition of class instances by the application.
+
+Your classes and functions are now proper abstractions because they don't know anything about the outside world, including who they are wired to, making them reusable.
+
+
+
+==== 2nd Sprint
+
+In the second sprint we start converging on normal Agile. You pick one feature to implement first. Agile would say it should be the most essential feature to the MVP (minimum viable product), but this can be tempered by the need to choose one that requires a fewer number of abstractions to be implemented. Next, you design the interfaces that will allow those abstractions to plug together according to the wiring you already have from the first sprint. What messages will these paradigm interfaces need to pass at runtime between the unknown clients to make them work?
+
+It may take several sprints to produce the first working feature, depending on the number of abstractions it uses. 
+
+At first this sounds as if it might be just the waterfall method reincarnated. Do an overall design, document it or model it, and then write lots of code before everything suddenly starts working. But the design we created in iteration zero is very different from what a normal waterfall would produce, and is resilient to the sorts of problems waterfall creates. Instead of a ‘high level’ design of how the implementation will work which is lacking in detail, the design is a representation of requirements, in full detail. The design is not a model. It is executable.
+
+There is one more important thing that the design phase in Iteration Zero does. While it deliberately doesn’t address any implementation, it does turn the remainder of the implementation into abstractions, and those abstractions are zero coupled. To convert from executable to actually executing, it only remains to implement these now completely separate parts. You can give these abstractions to any developer to write.  Together the developers will also easily be able to figure out the paradigm interface methods needed to make them work, and the execution models to take care of the execution flow through them with adequate performance.
+
+Often when a project is split into two phases, the first phase turns out to be waste. The devil is in the details so to speak. This happens because the implementation details in phase two are coupled back to and affect the design in phase one. As learnings take place during implementation, the design must change. In ALA the output from phase one is primarily abstractions, which are inherently stable and therefore hide details that can't affect the overall design. If the abstractions are good, phase two will typically have little effect on the work done in phase one.
+
+Once the first feature is working, several abstractions will have been implemented. The second feature will take less time because some of the abstractions are already done. In ALA velocity increases as time goes on and keeps increasing until new features only involve instantiating, configuring and wiring domain abstractions in new ways. This velocity acceleration is the complete opposite of what happens in monolithic code.
+
+==== Later sprints
+
+Imagine going into a sprint planning meeting with a Product Owner, a small team of developers, and a mature ALA domain that already has all the common domain abstractions done. As the Product Owner explains the requirements, one of the team members writes them down directly as they would be represented in terms of the domain abstractions. Another team member watches and remembers any lost details without slowing the product owner down. A third member implements the acceptance tests in similar fashion, and a fourth provides him with test data. It would be nice to have a tool that compiles the diagram into the equivalent wiring code. With such a tool, the team could have it executing by the end of the meeting. At the end of the planning meeting the development team say to the product owner "Is this what you had in mind?". The team can get immediate feedback from the Product Owner that the requirements have been interpreted correctly. 
+
+Of course, the planning meeting itself would only produce 'normal' functionality. Usually it is up to the development team, not the Product Owner, to uncover all the abnormal scenarios that can happen, and that is usually where most of the work in a software system goes. Having said that, in a mature domain, the validation of data already has decorator abstractions ready to go.
+
+
+[chart,line,file="effort_curve.png", opt="title=Effort per user-story,x-label=months"]
+--
+//Big ball of mud
+1,	5
+2,	5
+3,	6
+4,	6
+5,	7
+6,	8
+7,	9
+8,	10
+9,	12
+10,	13
+11,	15
+12,	17
+13,	19
+14,	21
+15,	24
+16,	28
+17,	32
+18,	37
+19,	43
+
+//Cocomo
+1,	16
+2,	17
+3,	17
+4,	18
+5,	18
+6,	19
+7,	19
+8,	19
+9,	19
+10,	20
+11,	20
+12,	20
+13,	20
+14,	20
+15,	20
+16,	20
+17,	21
+18,	21
+19,	21
+20,	21
+21,	21
+22,	21
+23,	21
+24,	21
+
+//ALA
+1,	30
+2,	21
+3,	17
+4,	15
+5,	13
+6,	11
+7,	10
+8,	9
+9,	8
+10,	8
+11,	7
+12,	7
+13,	6
+14,	6
+15,	5
+16,	5
+17,	4
+18,	4
+19,	3
+20,	3
+21,	3
+22,	2
+23,	2
+24,	2
+--
+
+The graph shows the effort per user story against months into a green-field project. The left axis is arbitrary - the shape of the curves is what is important. For a big ball of mud, experience tells us that the effort increases dramatically and can asymptote at around 2 years as our brains can no longer handle the complexity, and the project must be abandoned.
+
+The COCOMO model, which is an average of industry experience, has a power relationship with program size, with an exponent of around 1.05 to 1.2. I have used the mid point, 1.1, for this graph. The model appears to imply that getting lower than 1.0 is a barrier, but there is no reason to believe this is the case. Reuse can make the power become less than 1. The range of 1.05 and 1.2 probably results from some reuse mitigating some ever increasing complexity.
+
+ALA takes advantage of the fact that zero-coupled abstractions can keep complexity relatively constant and drastically increase reuse. A spectacular fall in effort per user story is thus possible.  
+
+=== Technical debt
+
+Technical debt is real. Convincing your non-technical manager that it is real is not realistic, especially when you tell him that this is based on estimates. He already knows about your 'estimates'. Even if you could measure it, and offer your manager a payback period for a one-day investment in refactoring, there is a problem. He is measured on this sprints performance. Or he is measured on some other criteria such as this years budgeted sales. Technical debt is tomorrow's problem, and that is not his problem, not ever.
+
+A better answer would be to not generate technical debt in the first place. In Agile we are taught that the architecture depends on the what we learn as we write the code. The Definition of Done is supposed to tell us to clean it up as we learn. But it is also possible that we will learn something that requires previous sprint's of work to be cleaned up. A refactoring could need changes to the structure at the largest granularity level. 
+
+So here is a better solution. What if, as far as possible, we know a meta architecture that all software programs should follow. It is a big scale meta-architecture, so it gets things into the right places in the big scale. 
+
+So now you just get it right in the first place. Isn't that better?
+
+Now some will argue that they do that already. Their large scale structure is layering, or it is MVC or it something else. I have been told that this doesn't work because we fail to actually keep to the prescribed architecture. But think it is because up till now, these architectural patterns have not worked very well.
+
+
+
+=== Folder structure
+
+....
+[tree,file="folderstructure.png"]
+root
+|--Application1
+|  `--application.cpp
+|--Application2
+|  `--application.cpp
+|--DomainAbstractions
+|  |--abstraction1.cpp
+|  |--abstraction1.h
+|  |--abstraction2.cpp
+|  `--abstraction2.h
+`--ProgrammingParadigms
+   |--Paradigm1.h
+   `--Paradigm2.h
+....
+
+
+
+////
+....
+[tree,file="folderstructure.png"]
+root
+|--Domain1
+|  |--Application1
+|  |  `--application.cpp
+|  |--Application2
+|  |  `--application.cpp
+|  |--DomainAbstractions
+|  |  |--abstraction1.cpp
+|  |  |--abstraction1.h
+|  |  |--abstraction2.cpp
+|  |  `--abstraction2.h
+|--Domain2
+`--ProgrammingParadigms
+   |--Paradigm1.h
+   `--Paradigm2.h
+....
+////
+
+
+////
+[tree,file="folderstructure.png"]
+#root
+##DomainProjects
+###Application1
+####Application.cpp
+###Application2
+###DomainAbstractions
+####abstraction1.cpp
+####abstraction1.h
+####abstraction2.cpp
+####abstraction2.h
+##HardwareDomain
+##ConnectivityDomain
+##DatabaseDomain
+#ProgrammingParadigms
+##Paradigm1.h
+##Paradigm2.h
+////
+// (TBD - The folder structure feature of AsciiDocFX causes it to hang)
+
+This is a suggested folder structure for ALA. Because ALA does not use decomposition, you don't end up with components that are contained by the applications, so there are no subfolders under the application. Instead, you end up with Domain Abstractions outside the application, so they go in their own folder in a flat structure.
+
+Similarly, the Programming Paradigms code is not contained by an application, or even by the domain, so would not be contained by the domain's projects folder.
+
+=== Convention over configuration
+
+When the application create an instance of an abstraction, most of the configuration of that abstraction should have defaults. In ALA, setters allow optional configuration, reducing the amount of information that would otherwise be required in the application to fully configure each abstraction. Any configuration that we wish to enforce goes into the constructor.
+
+There is a counter argument that says that all configuration should be explicit so that nothing can be forgotten. ALA prefers optional configuration because we want the application to just express the requirements. Also optional configuration allows abstractions to default to their simplest form, making them easier to learn.
+
+
+=== Knowledge prerequisites.
+
+When other programmer are doing maintenance on your code, you should make sure they have the knowledge they need. They will need knowledge of ALA. They will need to know about the programming paradigms used. They will need to know about the domain abstractions, and the insight of what each one does. And then they should know that the application diagram is the source code. It is up to you that every develop that follows will know all this.
+
+==== Intellisence
+
+After they have modified the diagram, the maintaining developers will need to manually modify the corresponding code. Here they will see instances of abstractions being used all over the place, either 'new' keywords or function calls. If we have done our job with knowledge prerequisites, they will have been introduced to these abstractions. However, it doesn't hurt to have brief reminders of what they are pop up when the mouse is hovered over them. So put in triple slash comments (or equivalent) describe the abstraction succinctly, with the intention of it being a reminder to someone who has already met the abstraction. Put a full explanation in the remarks and examples sections. 
+
+The class name after a new keyword is actually the constructor name, so you must duplicate the summary section there. Often in ALA, the class name is not referred to at all in the application.
+
+=== Two roles
+
+ALA requires two roles. Both can be done by the same person, but always he should be wearing only one hat at a time. There is the role of the architect, and the role of the developer.
+
+The role of the architect is harder than that of the developer, that's why we have the role. Expect it to be hard.
+Perhaps, surprisingly, the architect's main job is to focus on the requirements, and the developers main job is to implement the abstractions (which know nothing of the requirements). In describing the requirements, the architect invents domain abstractions. 
+
+The architect also has a role in helping the developer to design the interface's methods. In other words, how at runtime the system will be made to work. 
+
+This aspect of ALA can also be difficult at times. I have sometimes got stuck for a day or so trying to figure out how the interfaces should work, while still keeping them more abstract than the domain abstractions. The ALA constraints are that these interfaces should work between any two domain abstractions for which it may be meaningful if they are composed together in an application. However, the problem has always been solvable, and once solved, it always seems to have a certain elegance, as if you have created a myriad of possibilities at once. Implementation of the interfaces by the relevant domain abstractions becomes easy. Development then proceeds surprisingly quickly.     
+
+
+=== Example Project - Coffee machine
+
+Robert Martin posed an interesting pedagogical sized embedded system problem about a coffee maker in his book “Agile Software Development: Principles, Patterns and Practices”. The original chapter is called “Heuristics and Coffee”.
+
+In the original chapter, the worked solution to this problem uses decomposition into three modules that collaborate or interact with one another. The ALA solution follows the opposite philosophy. It has three abstractions (which correspond with the three modules), but they do not collaborate or interact with one another. Being abstractions, they don't know anything about each other. As domain abstractions, they also know nothing about the coffee machine. The coffee machine is then constructed (as another abstraction in the top layer) that makes use of the three domain abstractions. 
+
+This example uses different execution models from the 'consistsof' and 'dataflow' ones that we used in previous examples. Here we will use some extremely simple, yet quite interesting electronic-signal-like execution models that have a simple main-loop polling type implementation, just as Robert Martin's original solution also had.
+
+Reading an ALA application requires first knowing the pre-requisite knowledge you need from lower layer abstractions. So before presenting the application, let's first familiarise ourselves with the abstractions we need from the domain layer, and the Programming Paradigms layer.
+
+==== Domain abstractions layer
+
+Here are the three domain abstractions:
+
+image::Coffee%20Maker%20Domain%20Components.vsd.jpg[Coffee Maker Domain Components.vsd.jpg, title="Coffee maker domain abstractions"]
+
+Take a moment to look at these three abstractions:
+
+-- The UI has a lamp you can control, and a push button which outputs an event (should have been two separate abstractions).
+
+-- There is a WarmerPlate. It tells you whether or not a container is on the warmer plate, and whether or not it is empty. It controls its own heater. 
+
+-- There is a  Boiler. It can be turned on or off. It will tell you when it is empty of water. And you can stop water flow instantly with a steam release valve. It will turn its own heater off if it runs out of water, or the valve is opened. 
+
+That's all there is to know about the three domain abstractions.
+
+==== Programming Paradigms layer
+
+We have three programming paradigms
+
+-- live-data-flow (works like an electronic circuit)
+
+-- events
+
+-- simple state machine
+
+The API for the Programming Paradigms layer is described in the key on the right of the diagram below. It gives you all the knowledge from this layer to be able to read the diagram. So, for example, a solid line is a data-flow; the rounded box is state with the states enumerated inside it.
+
+The details of how to turn the diagram into code is explained in a project document, also provided in the Programming Paradigms layer.
+
+
+==== Application layer
+
+Now that we have understood the knowledge dependencies in all lower layers, we can read the diagram that resides in the top layer, the application layer:
+
+
+
+image::Coffee%20Maker%20Dataflow%20diagram.vsd.jpg[CoffeeMaker Dataflow diagram, title="Coffee maker solution"]
+
+The diagram to the left is the application itself. Instances of the three domain abstractions, UI, Boiler and Warmer plate are shown as boxes.
+
+Follow me now as we go through the user stories by looking at the lines on the diagram:
+
+* When the UI push button is pressed, we set the state to Brewing, provided the Boiler has water and the pot is on the Warmerplate. 
+
+* When the state is brewing, it turns on the boiler, and coffee making starts.
+
+* If someone takes the pot off, the valve is opened to momentarily release pressure from the boiling water, which stops the water flow. 
+
+* When the boiler becomes empty, the state is set to Brewed. When the state is Brewed, the light in the UI is turned on.
+
+* When the coffee pot is replaced empty, the state goes back to the idle state where we began.
+
+That's all there is to reading this application. The code for the coffee machine can be read and understood in about one minute. Compare that with reading other solutions to the coffee machine problem.
+
+Note that the paragraph above is pretty much a restatement of the requirements in English. It could have been the requirements. The amount of information in the English form (or the diagram form) is about the same, thus the Domain Abstractions gave us the correct level of expressiveness. Further confirmation of this is if the level of expressiveness allows us to modify it.
+
+For example, say a requirement was added that a coin device was to enable the machine to be used. The coin device is an abstraction that provides an output when a coin is given, and has a reset input. Looking at the diagram, and being able to reason about its operation so easily, you can see that the coin device's output would intercept the Pushbutton using another instance of an AND gate. And to reset the coin device, you could use the boiler empty output event.
+
+==== Execution
+
+To make it actually execute, we apply the manual procedure documented in “Execution models.doc”. This document is in the Programming Paradigms layer. It will generate these 6 lines of code:
+
+    if (userInterface.Button && warmerPlate.PotOnPlate && !boiler.Empty) { state = Brewing; } userInterface.Button = false;
+    boiler.OpenSteamReleaseValve = !warmerPlate.PotOnPlate;
+    boiler.On = state==Brewing;
+    if (boiler.Empty && !prevBoilerEmpty) { state = Brewed; } prevBoilerEmpty = boiler.Empty;
+    if (warmerPlate.PotEmpty && !prevPotEmpty) { state = Idle; } prevPotEmpty = warmerPlate.PotEmpty;
+    userInterface.LightOn = state==Brewed;
+ 
+
+There is a one-to-one correspondence between the lines in the diagram and the lines in the code. 
+
+As you can see, the execution model is a simple one. The 6 lines of code are continually executed in a loop. This execution model is effective and appropriate for this small application.
+
+The 6 lines of code can be built into a complete program shown below:
+
+....
+ #ifndef _COFFEE_MAKER_H_
+ #define _COFFEE_MAKER_H_
+ // Coffee Maker domain abstraction
+ #include "CoffeeMakerAPI.h"  // original hardware abstraction supplied by hardware engineers
+ // Knowledge dependencies :
+ // "PolledDataFlowProgrammingParadigm.doc" -- explains how to hand compile a data flow diagram of this type to C code
+ // Following are 3 Domain abstractions that the application has knowledge dependencies on
+ 
+ 
+ 
+ #include "UserInterface.h"
+ #include "Boiler.h"
+ #include "WarmerPlate.h"
+ 
+ 
+ 
+ class CoffeeMaker
+ {
+ private:
+    enum {Idle, Brewing, Brewed} state;
+    Boiler boiler;
+    UserInterface userInterface;
+    WarmerPlate warmerPlate;
+    bool prevBoilerEmpty, prevPotEmpty;
+    void _Poll();
+ public:
+    CoffeeMaker()
+        : state(Idle), prevBoilerEmpty(boiler.Empty), prevPotEmpty(warmerPlate.PotEmpty)
+    {}
+    void Poll();
+ };
+ #endif //_COFFEE_MAKER_H_
+....
+ 
+....
+ // CoffeeMaker.c
+ // This is not source code, it is code hand compiled from the CoffeeMaker application diagram
+ #include "CoffeeMaker.h"
+ 
+ void CoffeeMaker::_Poll() <1>
+ {
+    if (userInterface.Button && warmerPlate.PotOnPlate && !boiler.Empty) { state = Brewing; } userInterface.Button = false;
+    boiler.OpenSteamReleaseValve = !warmerPlate.PotOnPlate;
+    boiler.On = state==Brewing;
+    if (boiler.Empty && !prevBoilerEmpty) { state = Brewed; } prevBoilerEmpty = boiler.Empty;
+    if (warmerPlate.PotEmpty && !prevPotEmpty) { state = Idle; } prevPotEmpty = warmerPlate.PotEmpty;
+    userInterface.LightOn = state==Brewed;
+ }
+ 
+ 
+ 
+ void CoffeeMaker::Poll()
+ {
+    // get inputs processed
+    userInterface.Poll();
+    boiler.Poll();
+    warmerPlate.Poll();
+    // run application
+    _Poll();
+    // get outputs processed
+    userInterface.Poll();
+    boiler.Poll();
+ }
+....
+
+<1>  The 6 lines of code appear in the "CoffeeMaker::_Poll()" function.
+
+
+If you are using a diagram as we are in this solution, you always change the diagram first when the requirements change. It provides the expressiveness needed to see the application’s requirements represented in a clear, concise and coherent way. There the logic can be ‘reasoned’ with. It is not documentation, it is the source code representation of the requirements, and executable, both important aspects of ALA.
+
+The next step is to implement the three abstractions. These are straightforward using the same execution model as was used for the application, so are not shown here.
+
+The resulting application passes all of Martin's original acceptance tests plus a number of additional tests of behaviour gleaned from his original text.

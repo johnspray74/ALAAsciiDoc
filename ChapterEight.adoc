@@ -1,0 +1,135 @@
+:imagesdir: images
+
+== Chapter eight - Surrounding Topics
+
+=== Recursive abstractions
+
+ALA enforces a strictly layered (non-circular) knowledge dependency structure. It encourages a small number of  abstraction layers at discrete well separated levels of ubiquity as a framework for the knowledge dependencies. This would appear to exclude the possibility of the powerful abstraction composition technique of recursion, where the meaning of an abstraction is defined in terms of itself. (Or an abstraction implementation may need knowledge of another abstraction, which in its turn has an implementation that needs knowledge of the first abstraction. This appears to require circular knowledge dependencies.
+
+Circular knowledge dependencies happen all the time in functional programming where recursion replaces iteration. This is generally when a function needs to call itself or a class needs to use 'new' on itself. For example, a recursive descent compiler will have a function, 'statement', which will implement specific statements such as 'compound statement', 'if statement' and so on, and in those there will be a recursive call to the function, 'statement'. The following Syntax diagram represents part of the implementation of function 'statement'.
+
+[plantuml,file="diagram-24.png",title=Syntax Diagram showing implementation of statement using recursion]
+--
+@startdot
+
+digraph foo {
+node [fontname="Arial"]
+// nodesep = 10
+graph [rankdir=LR]
+node [group=main]
+Statement1 OpenBrace 
+node [group=""]
+
+OpenBrace [label="{"]
+CloseBrace [label="}"]
+OpenBracket [label="("]
+CloseBracket [label=")"]
+Semi [label=";"]
+End1 [style=invis]
+End2 [style=invis]
+Statement1 [label=statement]
+Statement2 [label=statement]
+Statement3 [label=statement]
+
+Statement1 -> OpenBrace -> Statement2 -> CloseBrace
+Statement2:e -> Semi:e
+Semi:w -> Statement2:w
+CloseBrace -> End1 
+{rank=same Statement2 Semi}
+
+edge [len=0.1]
+Statement1 -> if -> OpenBracket -> expression -> CloseBracket -> Statement3 -> End2
+}
+@enddot
+--
+
+In ALA, we want to preserve the idea of clear layers defining what knowledge is needed to understand what. Resolving this dilemma could get a bit philosophical. Since abstractions are the first class artefacts of the human brain, it may be best to think about how the brain does it. The brain must actually have two abstractions with the same name but at different levels. The first is analogous to a 'forward declaration' in a language to allow a compiler to know about something that will be referred to in a more abstract way before it finds out about it in a more specific way.
+
+By this analogy, ALA sometimes requires the concept of a forward-declared-abstraction, something that is clearly more abstract than the concrete implementations. Therefore, we can put this forward declaration in the next layer down, just as we would a paradigm interface. In the recursive descent compiler example, we would first have the abstract concept of a statement, meaning a unit of executable code as an interface in a lower layer. Then the specific abstractions, compound statement, if statement and so on are in a higher layer. They both provide and accept the interface.
+
+Another language example is that an expression is composed of terms, a term is composed of factors, and a factor can be composed of expressions (enclosed in round brackets). If we model these compositions as direct knowledge dependencies, we would have too many layers - and they would not be becoming more abstract as we go down. The existence of the recursion at the end reinforces that. It seems that all three, expressions, terms and factors, should have abstract interface versions at a lower level.
+
+Not all cases of recursion would require these interfaces. If, for example, in your old way of doing things there is a long chain of function calls, with the last one calling the first one, all of them are probably run-time dependencies, not knowledge dependencies at all. So in ALA, they should all be changed to be wirable, and wired together by an abstraction in a higher layer. The paradigm interface that is used to allow them to be wired  may be,for example, data-flow. So recursion does not necessarily require different interfaces for each different abstraction involved in the circular dependency.
+
+////
+With that in mind, we return to expression - term - factor - expression example and ask ourselves if there are really knowledge dependencies involved at all. Do we think have to know about terms to understand what an expression is? The answer is probably no. Besides, adding terms is only one way of making an expression. What if we think of expressions, terms and factors as language elements that are wirable using a paradigm interface called 'can consists of'. That's probably more like how our brains think of it. We could even draw a diagram of the language using 'can consiste of' relationships between elements. The result is an Abstract Sytax tree instead of the Sytax diagram above.
+////
+
+=== Abstraction of Port I/O properties
+
+This is an advanced topic that allows abstractions to be written without knowing details of the implementation of the communications. The idea is for the language to support logical or abstracted I/O ports that work for any type of technical communication properties such as described in the sections below. If we allow these properties to be binded late, say at compile-time, they can be changed independently of the domain abstractions. This allows tuning of performance or physical deployment of the abstractions to different processes or hardware. 
+
+I have been looking into how this could be accomplished using a conventional language, but it seems quite hard.
+
+==== Push or Pull
+
+Say an abstraction has a single logical input that can be wired to and a single logical output that can be wired from. Both the input and the output could be used in either a push or a pull manner.
+
+For the input, push means we will be called with the data.  Pull means we will call out to get the data.
+
+For the output, push means we will call out with the data, and pull means that something will call us to get the data.
+
+There are four combinations possible:
+
+* push push : push through
+* pull pull : pull through
+* push pull : internally buffer the input or output
+* pull push : active object
+
+Let's imagine we have a function that processes the data inside the abstraction.
+
+The four combinations would require the function to run as a result of a function call from the input, or a function call from the output. The function result may be put into an internal buffered or be pushed out. The function may need to receive its input from an input buffer or by pulling. The function may need to run via a 3rd input that is polled or called by a timer.
+
+We could conceivably write an abstract I/O class with an output interface and an input interface and a configuration interface that allows it to be configured late on how to do the I/O. This abstract I/O object would call the function to do the work at the right time according to its configuration.
+
+==== Synchronous or Asynchronous
+
+==== Buffered or unbuffered
+
+==== Shared memory or messaging
+
+==== Exposed state plus notification
+
+==== Synchronous Request/Response
+
+
+=== Working with legacy code
+
+In old (non-ALA) legacy code, abstractions, if they ever existed, have usually been destroyed by coupling. If there is no model left by the original designer, or it is out of date, I first create one. I usually have to 'reverse engineer' the model by doing many 'all files searches' and trying to build a mental picture of how everything fits together. It can quickly become mentally taxing if the user story is non-trivial. So I build a UML class diagram from the searches (their one useful application) as the background (using light lines), and a tree of method calls for the specific user story on top of it (using heavier lines). These diagrams can end up looking pretty horrific, because the knowledge of the user-story has become so scattered, especially when inheritance is involved. The tree of method calls will come into the base class but leave from a subclass method.
+
+This process can take several hours to a day for a single user story.
+Once the code for the single user story is understood, some acceptance tests are put in place for it, by putting in insertion points as close as practical to the inputs and outputs for the user story. 
+
+The next step is to factor out the method call tree for the user story into a new abstraction. This typically contains a sequence of new abstract activities or data transformations. These new abstractions are pitched at the domain level. Sometimes, if in C#, I will use Reactive Extensions. The user story may become a single RX sequence. The abstractions are then implemented, with tests, by copying and pasting useful code snippets from the original classes into the new abstractions. The old classes are marked for deprecation. 
+
+Conversion of user stories takes place iteratively.  
+
+
+
+=== Writing tests architected in ALA
+
+TBD
+
+=== Debugging ALA programs
+
+Because in ALA you can get multiple instances of the same class used in multiple places, and multiple implementations of the same interface used in different places, debugging is easier if the instances are able to identify themselves. For this reason I tend to have a local property in every class called Name. The property is immutable and set by the constructor.
+
+=== ALA language features
+
+One of my first hobby programming projects was a compiler for a C-like high level language for embedded systems. At the time I had lots of energy to write the compiler and optimize the object code (written in itself, the performance of both compiling and of object code execution beat the first C compilers to later appear by around a factor of ten) but I lacked a lifetime of experience to design a language. Forty years later, I feel as if it's partially the other way around, at least for language feature that would support good architecture. The language I should have implemented way back then should have been an ALA language - one that supported ALA architecture by having the needed constraints.
+
+It would have had Abstractions and Instances as first class elements. The name Abstraction is to reinforce the obvious use of the only type of element that the brain uses at design-time for any kind of separation of concerns.
+
+It would support a single type of relationship - a knowledge dependency. You would have to define your four layers, and keep them in separate folders so you would be forced to decide at what abstraction level any given piece of design-time knowledge would go. Of course, it would only allow knowledge dependency relationships from one layer to a lower layer. If you wanted to add an extra layer to the chain of dependencies, that would be a bad design decision. For example, if your application is getting too large, you could create a layer between it and the domain abstractions layer called 'plug-ins'. 
+
+Instances would work like components in that they would have ports for I/O. Like interfaces, ports are defined in a lower layer. The only way of instantiating abstractions and connecting them together is inside an abstraction in a higher layer.
+
+Abstractions would support multiple ports of the same interface. Current languages have the difficulty that you can only implement one interface of a given type, which we had to workaround by having connector objects.
+
+Ports would support late configuration of all communication properties such as push, pull, asynchronous, synchronous (explained above) without changing the Abstraction. 
+
+Such a language would overcome many of the problems of current languages that encourage non-ALA compliant practices. But the invention of good abstractions in the first sprint of any green-field project would still be a skilled phase requiring an innate ability to abstract.
+
+////
+TBD: Direct representation of diagrams as text. Can use symbolic references (that represent what would be lines on the equavalent diagram) within a  local scope only. The target of such symbolic references are not abstractions and therefore do not need to be moved to a lower layer. Typically there will be at most 2 or 3 connections to the element. e.g. local variables, a local struct definition, or a local function that you would ideally liked to have been anonymous. In fact in the equivalent diagram, these elements would be anonymous.
+////
