@@ -37,9 +37,11 @@ Fundamentally, ALA is two architectural constraints when writing software:
 
 Patterns and properties emerge from these two constraints. In many ways they are similar to ones we already know, which is not surprising. However, there is often subtle but important differences. For example, one emergent property is "zero coupling and high cohesion". This is qualitatively different to the familiar "loose coupling and high cohesion".  
 
+---
 
 [big]#*Summary*#
 
+{empty} +
 
 *Chapter 1, "What problem does ALA solve?"*
 
@@ -48,7 +50,7 @@ Patterns and properties emerge from these two constraints. In many ways they are
 ** The meta-structure pre-solves for the following quality attributes: Complexity, Readability, Maintainability, Testability
 
 
-
+{empty} +
 
 *Chapter 2, "What does the structure look like?". Without explaining why, this chapter describes the code structure that emerges from applying the two constraints:*
 
@@ -81,7 +83,7 @@ Patterns and properties emerge from these two constraints. In many ways they are
 
 * Programming paradigms provide a grammar for the way instances of domain abstractions can be composed.
 
-
+{empty} +
 
 *Chapter 3, "Why the structure works". Explains the theory behind the two fundamental architectural constraints:*
 
@@ -115,6 +117,7 @@ Patterns and properties emerge from these two constraints. In many ways they are
 
 * An ALA application (top layer) is three things in one: The expression of requirements, the architecture documentation, and the executable.
 
+{empty} +
 
 *Chapter 4, "Execution models". Explains how the underlying execution for each programming paradigm can be made to actually work.*
 
@@ -134,7 +137,7 @@ Patterns and properties emerge from these two constraints. In many ways they are
 
 
 
-
+{empty} +
 
 *Chapter 5, "Methodology". Describes ALA in terms of where it fits into Agile software development*
 
@@ -145,7 +148,7 @@ Patterns and properties emerge from these two constraints. In many ways they are
 ** How to go about 'inventing' domain abstraction for the first time in a new domain.
 
 
-
+{empty} +
 
 *Chapter 6, "The philosophy behind ALA". Gives the theory of why ALA works from the perspective of complex systems and how our brains work.*
 
@@ -163,7 +166,7 @@ Patterns and properties emerge from these two constraints. In many ways they are
 
 
 
-
+{empty} +
 
 *Chapter 7, "ALA compared with...".*
 
@@ -179,6 +182,7 @@ Patterns and properties emerge from these two constraints. In many ways they are
 
 ** It is interesting to compare and/or contrast ALA with all these conventional engineering styles and patterns. 
 
+{empty} +
 
 *Examples*
 
@@ -422,12 +426,19 @@ link:Abstraction_Layered_Architecture_Paper_ECSA_2018.pdf[ALA Paper presented at
 
 
 include::ChapterOne.adoc[]
+
 include::ChapterTwo.adoc[]
+
 include::ChapterThree.adoc[]
+
 include::ChapterFour.adoc[]
+
 include::ChapterFive.adoc[]
+
 include::ChapterSix.adoc[]
+
 include::ChapterSeven.adoc[]
+
 include::ChapterEight.adoc[]
 
 
