@@ -35,7 +35,7 @@ Fundamentally, ALA is two architectural constraints when writing software:
 
 - All abstractions must be small - e.g. 100-500 LOC (or diagram nodes).
 
-Patterns and properties emerge from these two constraints. In many ways they are similar to ones we already know, which is not surprising. However, there is often subtle but important differences. For example, one emergent property is "zero coupling and high cohesion". This is qualitatively different to the familiar "loose coupling and high cohesion".  
+Patterns and properties emerge from these two constraints. In many ways they are similar to ones we already know, which is not surprising. However, there are often subtle but important differences. For example, one emergent property is "zero coupling and high cohesion". This is qualitatively different from the familiar "loose coupling and high cohesion".  
 
 ---
 
@@ -91,11 +91,11 @@ Patterns and properties emerge from these two constraints. In many ways they are
 
 * Just as understanding how a bridge is designed to eliminate all its points of failure can gives us confidence that it will stand, understanding how ALA eliminates known points of failure in software can give us confidence that the resulting architecture can stand up to long term maintenance.
 
-* While chapter 6 focuses on what is an abstraction, and why are they so important, this chapter focuses on the properties that abstractions give us in code. We focus on the known failure points in software. These failure points are things we already largely recognise, but just find difficult to eliminate - coupling, system complexity, dependencies on the unstable, indirection, and the large gap between requirements and implementation.
+* While chapter 6 focuses on what abstractions are, and why they are so important, this chapter focuses on the properties that abstractions give us in code. We focus on the known failure points in software. These failure points are things we already largely recognise, but just find difficult to eliminate - coupling, system complexity, dependencies on the unstable, indirection, and the large gap between requirements and implementation.
 
 * Abstractions are learnable, stable and reusable.
 
-** Learnable: In AlA, any code can be read as a stand-alone unit once the dependent abstractions have been learned. For example, we can read code that has a dependency on squareroot because we have learned what the squareroot abstraction is. We don't need to go and read the squarroot code. ALA constrains us to make ALL dependencies work this way.
+** Learnable: In AlA, any code can be read as a stand-alone unit once the dependent abstractions have been learned. For example, we can read code that has a dependency on squareroot because we have learned what the squareroot abstraction is. We don't need to go and read the squareroot code. ALA constrains us to make ALL dependencies work this way.
 
 ** Stable: In ALA, all dependencies are on stable concepts. Not stable code, stable concepts, such as the concept of squareroot or the concept of events. Since stable concepts don't change, the dependent code is protected from ripple effects coming from its dependencies. The stability of the concept of an abstraction is unrelated to the code that implements an abstraction. For example, the concept of squareroot has been stable now for thousands of years.
 
@@ -105,11 +105,11 @@ Patterns and properties emerge from these two constraints. In many ways they are
 
 * Zero coupling, together with limited abstraction size, eliminates complexity.
 
-* Conventional code typically contains both good and bad dependencies. Good dependencies are the ones that are on abstractions. Bad dependencies are all the others. There are two common types of bad dependencies: 1) to facilitate communication from one part of a system to another at runtime. 2) to decompose a large component into smaller (but more specialized) pieces. Both these types of dependencies are on the potentially unstable. ALA eliminates all these bad dependencies.
+* Conventional code typically contains both good and bad dependencies. Good dependencies are the ones that are on abstractions. Bad dependencies are all the others. There are two common types of bad dependencies: 1) dependencies that facilitate communication from one part of a system to another at run-time. 2) dependencies that decompose a large component into smaller (but more specialized) pieces. Both these types of dependencies are on the potentially unstable. ALA eliminates all these bad dependencies.
 
-* Conventional architectural design uses a decomposition method. For example, it is common to separate UI and business logic. Decomposition tends to result in coupling. ALA uses a composition method. The set of abstractions being composed start out with zero coupling with one another.
+* Conventional architectural design uses a decomposition method. For example, it is common to separate UI and business logic. Decomposition tends to result in coupling. ALA uses a composition method. The abstractions being composed start out with zero coupling with one another.
 
-* Requirements typically inherently contain relationships that form a graph structure (a network). In conventional software, this network of relationships is distributed in the implementation code. This makes the graph itself quite obviscated. Furthermore, we try to eliminate circular dependencies by introducing either the wrong kind of layering and indirections. These make makes the graph even more obviscated. This appears as the common difficulty of tracing though a program when debugging. ALA makes these graph structures explicitly represented. Preferably they become simple diagrams. The graphs go inside their own abstractions in the top layer.
+* Requirements typically contain relationships that form a graph structure (a network). In conventional software, this network of relationships is distributed in the implementation code. This makes the graph itself quite obfuscated. Furthermore, we try to eliminate circular dependencies by introducing either the wrong kind of layering and indirections. These make the graph even more obfuscated. This appears as the common difficulty of tracing though a program when debugging. ALA makes these graph structures explicitly represented. Preferably they become simple diagrams. The graphs go inside their own abstractions in the top layer.
 
 * ALA puts all code that has knowledge of the specific requirements in the top layer. But only code that carries details requirements is put in the top layer. Our experience is that this constitutes around 2% of the total code making up an application. So, once the set of domain abstractions is complete, changes to requirements are generally confined to this top layer.
 
@@ -184,7 +184,7 @@ Patterns and properties emerge from these two constraints. In many ways they are
 
 {empty} +
 
-*Examples*
+*Example*
 
 Each chapter ends with an example project or two. These projects show the architecture in real code. Unlike most pedagogical sized examples, these examples are progressively non-trivial. Yet because of ALA's power, they remain uncomplicated and easy to understand. 
 
@@ -253,15 +253,16 @@ interface IDataFlow<T>
 [source,C#]
 // library
 ....
-public static T WireTo<T>(this T a, object b)
+public static object WireTo(this object a, object b)
 {
     // using reflection:
     // 1. Find a private field in object a that matches in type an interface implemented by object b.
     // 2. Assign object b to that field.
+    return a;
 }
 ....
 
-Note: You can get the source for the WireTo method from one of the example projects of later chapter on GitHub.
+Note: You can get the source for the WireTo extension method from one of the example projects of later chapters on GitHub.
 
 Note: Because of the zero coupling between abstractions, our experience has been that abstractions such as the Switch and Light above are easy to write, even enjoyable to write and maintain, and also testable, as is the application itself.
 
@@ -300,7 +301,7 @@ interface IPoll
 
 Note: The astute reader will notice that the AndGate can't implement IDataFlow<bool> twice. In later projects, we will show how we solve this implementation problem, and allow more than one input port of the same type.
 
-Note: The astute reader will notice that the fanout from the output of the AndGate to both the Light and the Indicator won't work. We show how this problem is solved in later projects also.
+Note: The astute reader will also notice that the fanout from the output of the AndGate to both the Light and the Indicator won't work. We show how this problem is solved in later projects also.
 
 
 
@@ -313,7 +314,7 @@ Requirement: Turn on the light from a tick item in the Tools menu of a PC applic
 .Application.cs
 [source,C#]
 ....
-var indicator = new Indicator("Light is On");
+var indicator = new Indicator( {"Light is off", "Light is On"} );
 new MainWindow()
     .WireTo(new Menu())
         .WireTo(new Menu("Tools")
@@ -331,7 +332,7 @@ new MainWindow()
 
 Note: We just invented another programming paradigm for "UI layout". It is used between all the UI elements: MainWindow, Menu, Tickbox, StatusBar, Indicator.
 
-Let's do an application to browse for and display a (dynamic content) CSV file on a grid, filtered by a user specified name, and sorted by Names. The CSV file has headings that will display in the grid.
+Let's do an application to browse for and display a (dynamic content) CSV file on a grid, filtered by a user specified name, and sorted by names. The CSV file has headings that will display in the grid.
 
 
 .Application.cs
@@ -339,7 +340,7 @@ Let's do an application to browse for and display a (dynamic content) CSV file o
 ....
 var grid = new Grid();
 var csvReaderWriter = new CsvReaderWriter
-var filter = new Filter() {columnlambda = (name)};
+var filter = new Filter() {Column = "Name"};
 new MainWindow()
     .WireTo(new Menu()
         .WireTo(new Menu("File")
