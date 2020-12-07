@@ -55,6 +55,40 @@ Installed chocolatey using instruction on the web.
 Installed python using instructions 
 
 
+=== Modification to the css files
+
+"C:\Program Files\AsciidocFX\conf\public\css\asciidoctor.css"
+"C:\Users\John\.AsciidocFX-1.7.3\css\asciidoctor-default.css"
+"C:\Program Files\AsciidocFX\conf\public\css\asciidoctor-default.css"
+
+
+For headings weight and colour:
+
+from
+h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{font-family:"Open Sans","DejaVu Sans",sans-serif;font-weight:300;font-style:normal;color:#ba3925;text-rendering:optimizeLegibility;margin-top:1em;margin-bottom:.5em;line-height:1.0125em}
+h1 small,h2 small,h3 small,#toctitle small,.sidebarblock>.content>.title small,h4 small,h5 small,h6 small{font-size:60%;color:#e99b8f;line-height:0}
+to
+h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{font-family:"Open Sans","DejaVu Sans",sans-serif;font-weight:600;font-style:normal;color:#ba3925;text-rendering:optimizeLegibility;margin-top:1em;margin-bottom:.5em;line-height:1.0125em}
+h1 small,h2 small,h3 small,#toctitle small,.sidebarblock>.content>.title small,h4 small,h5 small,h6 small{font-size:60%;color:#914f0f;line-height:0}
+
+i.e change font-weight from 300 to 600
+change color from #e99b8f to #914f0f 
+
+
+For code block colour:
+
+from
+.literalblock pre,.listingblock>.content>pre:not(.highlight),.listingblock>.content>pre[class="highlight"],.listingblock>.content>pre[class^="highlight "]{background:#f7f7f8}
+to
+.literalblock pre,.listingblock>.content>pre:not(.highlight),.listingblock>.content>pre[class~="highlight"]{background:#fefced}
+
+i.e. remove ,.listingblock>.content>pre[class^="highlight "]
+add ~
+change background from #f7f7f8 to #fefced
+
+
+
+
 == Old / redundant
 
 === Generating HTML output

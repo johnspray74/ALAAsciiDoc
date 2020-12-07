@@ -56,7 +56,7 @@ Now we will make a simple change that causes both functions to become abstractio
      // complicated code
  }
 
-Suddenly understandability is absolutely transformed! The code inside the each of the two functions goes from fully-coupled to zero-coupled. 
+Suddenly understandability is absolutely transformed! The code inside each of the two functions goes from fully-coupled to zero-coupled. 
 
 * In the downward direction, coupling goes to zero because the standard deviation function need only know the concept of the squareroot abstraction, not the code inside it.
 
@@ -66,7 +66,7 @@ There are other benefits too:
 
 * Abstraction and stability go hand in hand. The Sqrt abstraction is as stable as the concept of squareroot. That's a pretty stable concept. So, all dependencies in an ALA program are toward the more stable.  
 
-* Abstraction and reuse go hand in hand (as poited out by Krueger). The more abstract abstraction on the bottom is reusable. Code reuse in this ALA programs increases markedly.  
+* Abstraction and reuse go hand in hand (as pointed out by Krueger). The more abstract abstraction on the bottom is reusable. Code reuse in ALA programs increases markedly.  
 
 The complicated code inside SQRT no longer matters. It is completely isolated by the abstraction. If your brain already knows the SQRT concept (I had to choose one that I knew you already knew), there is no need to follow the indirection when reading the code inside StandardDeviation. The reader just continues reading the next line of code after the Sqrt invocation as if Sqrt is just like any other line of code in their base language. That's what abstraction does.
 
@@ -81,13 +81,13 @@ Doing this isn't always easy because unfortunately there are many established ar
 
 There are two situations that commonly cause coupling:
 
-. In the above example, if xyz789 is just a source or destination for messages, then abc123 cannot be an abstraction because it cannot be reused without dragging xyz789 with it. abc123,as an abstraction, doesn't care where the data comes from or goes to. To fix this, xyz789 must be passed into abc123 by something else above both of them. This can be passing in a function, passing in an object (dependency injection), or other mechanism such as the WireTo operator that we will use a lot in our ALA example projects.
+. In the above example, if xyz789 is just a source or destination for messages, then abc123 cannot be an abstraction because it cannot be reused without dragging xyz789 with it. abc123, as an abstraction, doesn't care where the data comes from or goes to. To fix this, xyz789 must be passed into abc123 by something else above both of them. This can be passing in a function, passing in an object (dependency injection), or other mechanism such as the WireTo operator that we will use a lot in our ALA example projects.
 +
-A benefit over and above the zero coupling is that the data flow relationship between abc123 and xyz789 used be hidden inside abc123. In ALA that relationship has to be an explicit line of code (inside another abstraction above) that wires together two instances. There, it will be cohesive with other similar relationships that work together in a collaborative way to make the application. 
+A benefit over and above the zero coupling is that the data flow relationship between abc123 and xyz789 used to be hidden inside abc123. In ALA that relationship has to be an explicit line of code (inside another abstraction above) that wires together two instances. There, it will be cohesive with other similar relationships that work together in a collaborative way to make the application. 
 +
 Often these collected together wirings form a graph, making diagrams rather than code an even better way to describe the application.
 
-. If xyz789 provides a part of the implementation of abc123 such that it is specific to abc123, then xyz789 is more specific than abc123. This is because abc123 could be reused many times, whereas xyz789 could only ever be used once (only by abc123). xyz789 needs to be more abstract than abc123 or it will be coupled to it.
+. If xyz789 provides a part of the implementation of abc123 such that it is specific to abc123, then xyz789 is more specific than abc123. Sometimes such a function or class is called a helper or submodule. This is because abc123 could be reused many times, whereas xyz789 could only ever be used once (only by abc123). xyz789 needs to be more abstract than abc123 or it will be coupled to it.
 +
 This is contrary to what we are taught. We are taught to "divide and conquer" or to separate out the responsibilities in abc123. If we do this arbitrarily, we will end up with specific pieces (such as UI and business logic) which are highly coupled with each other, and with the specific application. We need to work hard to separate only by finding abstractions - potentially reusable artefacts. Then we configure instances of those abstractions for each specific use by passing application details into them.  
 
@@ -116,7 +116,7 @@ All *software architectures* should contain *two concepts* for its *elements*  e
 
 ALA makes abstraction and instances fundamental. 
 
-Abstractions are separate, zero coupled, design-time elements. Abstraction, therefore, cannot exchange data themselves. The concept of instances must be added. An instances is nothing more than the use of an abstraction by referring to its name. 
+Abstractions are separate, zero coupled, design-time elements. Abstractions, therefore, cannot exchange data themselves. The concept of instances must be added. An instances is nothing more than the use of an abstraction by referring to its name. 
 
 Object oriented programming does has these two concepts in classes and objects. Functional programming has the two concepts in terms of the function definition and the function invocation. But many discussions on software architecture seem to combine them into one term, such as modules, components or layers. They may implicitly contain the separate concepts, as components may, but not having them explicit will inevitably lead to confusion. 
 
@@ -143,13 +143,13 @@ We can distinguish two types of dependencies. One is run-time dependencies. Thes
 
 A simple example of a run-time dependency is a module that calculates the average rainfall then calls a display module to display the result. The Display module needs to be present at run-time. But to understand the code that calculates the average rainfall requires no knowledge about displays, nor even where the result will be sent. The dependency is only there to make the system work at run-time.
 
-A simple example of a design-time knowledge dependency is some code that calculates the average rainfall. It uses an abstraction that takes a data stream as input and outputs a running average. To understand the rainfall code needs knowledge of averaging filter. This is a design-time, or knowledge dependency. Any application needing to reduce data to an average could use the same abstraction. 
+A simple example of a design-time knowledge dependency is some code that calculates the rainfall using an averaging filter. It uses an abstraction that takes a data stream as input and outputs a running average. To understand the rainfall code needs knowledge of averaging filter. This is a design-time, or knowledge dependency. Any application needing to reduce data to an average could use the same abstraction. 
 
 We find both types of dependencies in conventional code. A typical program is chock full of the run-time dependencies. But whether a knowledge dependency or a run-time dependency, they all just look like a function call or a 'new' keyword. We generally don't distinguish between them. In fact we are not normally taught to tell the difference. They are all just called dependencies. We lump them together when we talk about dependency management, loose coupling, layering, fan-in & fan-out, or circular dependencies. Dependency graphing tools just show them both. 
 
 These two different types of dependencies are not just good and bad. They are really good and really bad. So it's doubly important that we learn to tell the difference. What's more it's entirely possible to build a system using only the good dependencies. 
 
-A knowledge dependency is good because it's only dependent on an abstract concept. Abstractions are easy to learn. The more dependencies you have on an abstraction, the more abstract it is,and the more reuse you are getting.
+A knowledge dependency is good because it's only dependent on an abstract concept. Good abstractions are easy to learn. The more dependencies you have on an abstraction, the more abstract it is, and the more reuse you are getting.
 
 Run-time dependencies are bad because they completely destroy abstractions. They are bad because they cause explicit and implicit coupling. And they are bad because they obscure the structure of the application by distributing that structure throughout its modules. Instead, we want that structure to be explicit and in one place.
 
@@ -165,9 +165,7 @@ Consider the diagram below:
 @startditaa --no-separation --no-shadows --scale 1.1
 Application
 
-
-
-/----\     /----\     /----\     /----\     /----\
+/----\     /----\     /----\     /----\     /----\.
 | A  |     | B  |     | C  |     | D  |     | E  |
 |ADC |<----|Avg |<----|Conv|---->|Accu|---->|Disp|
 |    |     |    |     |    |     |    |     |    |
@@ -189,7 +187,7 @@ Now consider this diagram.
 ----
 @startditaa --no-separation --no-shadows --scale 1.1
 
-       /---------------------------\
+       /---------------------------\.
        |Application                |
        |                           |
        | A --- B --- C --- D --- E |
@@ -200,7 +198,7 @@ Now consider this diagram.
 --------------------------------------------------
 Abstractions
 
-/----\     /----\     /----\     /----\     /----\
+/----\     /----\     /----\     /----\     /----\.
 | A  |     | B  |     | C  |     | D  |     | E  |
 |ADC |     |Avg |     |Conv|     |Accu|     |Disp|
 |    |     |    |     |    |     |    |     |    |
@@ -210,7 +208,7 @@ Abstractions
 --------------------------------------------------
 Programming Paradigms
 
-                    /---------\
+                    /---------\.
                     |         |
                     |IDataflow|
                     |         |
@@ -220,7 +218,7 @@ Programming Paradigms
 
 There are five knowledge dependencies (the top layer uses five abstractions in the second layer), but no run-time dependencies (because the connections between the instances are completely inside another abstraction).
 
-The letters used in the top layer represent instances. (In UML they would be underlined.) You never draw arrows for knowledge dependencies - only ever refer to the abstraction by its name. (Just as you would never draw an arrow to a box representing the squareroot function - you would just use SQRT by its name.)
+The letters used in the top layer represent instances. (In UML they would be underlined.) You never draw arrows for knowledge dependencies - only ever refer to the abstraction by its name. (Just as you would never draw an arrow to a box representing the squareroot function - you would just use Sqrt by its name.)
 
 In common programming languages, the run-time dependencies in the first diagram and the knowledge dependencies in the second diagram are both syntactically written in the same form, either new A() or just a function call, A(). The only difference is in where those function calls or new keywords are. This simple change makes a huge difference in the quality of the code.
 
@@ -234,24 +232,34 @@ In common programming languages, the run-time dependencies in the first diagram 
 |====================
 | Run-time dependencies version | Knowledge dependencies version
 | Knowledge about the specific application is spread through all modules. | Knowledge about the specific application is only in one place. The abstractions no nothing of each other or the specific application. 
-| The class or function names A, B, D and E will relate to what they do (which is fine). For example, they may be the specific hardware chips used in the case of drivers. The calling module must know these names, creating a fixed arrangement between the modules. The modules are loosely coupled. | No peer abstractions refer to these names. There is no fixed arrangement between abstractions. Abstractions are zero coupled. The code that knows that a particular hardware chip is used in this application is where it belongs, in the application code.
-| Since there is a fixed arrangement, responsibilities can be blurred. For example, it may be unclear whether to add something to B or C. Or C can make assumptions about details in B, causing collaborative coupling. | With no relations between abstractions, responsibilities are clear. Something to be added clearly belongs in one or other of the abstractions, or in a new abstraction. C cannot make any assumptions about some details of B. It cannot have collaborative coupling with B 
-| Although there is no explicit dependency from, for example, B to C, the fixed arrangement is likely, over time, to make B implicitly collaborate with C (do what C requires), resulting in implicit coupling. | No implicit coupling can develop over time because there is no relationship between them. B cannot collaborate with C (do what C specifically requires), or have implicit coupling with C.
-| The arrangement between A, B, C, D and E is not obvious in the code. It is buried inside of B, C and D. | The arrangement between instances of A, B, C, D and E is explicitly coded in one place.
+| The class or function names A, B, D and E will relate to what they do (which is fine). For example, they may be the specific hardware chips used in the case of drivers. The calling module must know these names, creating a fixed arrangement between the modules. The modules are only loosely coupled. | No abstractions refer to the names of peer abstractions. There is no fixed arrangement between abstractions. The abstractions are zero coupled. The code that knows that a particular hardware chip is used in this application is where it belongs, in the application layer.
+| Since there is a fixed arrangement, responsibilities can be blurred. For example, it may be unclear whether to add something to B or C. | With no relations between abstractions, responsibilities are clear. Something to be added clearly belongs in one or other of the abstractions, or in a new abstraction that may be wired in between the two.
+| The fixed dependency from C to B will encourage implicit coupling. B can make assumptions about details inside B resulting in collaborative coupling. | C cannot make any assumptions about some details of B. It cannot have collaborative coupling with B 
+| Although there is no dependency from, for example, B to C, if B is only used by C, the fixed arrangement is likely, over time, to make B implicitly collaborate with C (do what C requires), resulting in callaborative coupling. | No implicit coupling can develop over time because there is no relationship between them. B cannot collaborate with C (do what C specifically requires).
+
+| The arrangement between A, B, C, D and E is not obvious in the code. It is buried inside of B, C and D. All must be read to find the application's data flow structure | The arrangement between instances of A, B, C, D and E is explicitly coded in one place. It is cohesive information that belongs in one place.
+
 | Only A and E can potentially be abstractions. | All of A, B, C, D and E are abstractions.
+
 | Arbitrarily, only the two ends of the data flow chain can be reused independently . | All of A, B, C, D and E are independently reusable.
+
 | Difficult to insert another module between, say, B and C. | Easy to insert a new instance of some operator between B and C, etc. 
-| If the observer pattern is used (in the mistaken belief that it reduces the coupling), it only mirrors the same problems. For example B would now have a dependency on C when it registers. But because it adds indirection, the observer pattern makes the program even harder to understand. | If the observer pattern is used (as the means to implement the wiring between the instances), the receivers do not do the registering, the application does (not strictly the observer pattern). The abstractions themselves don't get more difficult to understand because, being abstractions, they only have knowledge as far as their interfaces anyway. The application does not get harder to understand either. The arrangement of the instances is still explicitly and in one place.
+
+| If the observer pattern is used (in the mistaken belief that it reduces the coupling), it only mirrors the same problems. For example B would now have a dependency on C when it registers. But because it adds indirection, the observer pattern makes the program even harder to understand. | If the observer pattern is used (as the means to implement the wiring between the instances), the receivers do not do the registering, the application does (not strictly the observer pattern). The abstractions themselves don't get more difficult to understand because, being abstractions, they only have knowledge as far as their interfaces anyway. The application does not get harder to understand either, because the arrangement of the instances is still explicit and in one place.
+
 | If dependency injection is used with automatic wiring, the arrangement is still somewhat fixed, but is now even more obscure. All classes can still be collaborating with one another. A smell that this is happening is that over time the interfaces, IA, IB, ID and IE change as the requirements of the system change.  | If dependency injection is used, the application does the wiring explicitly. It is the only place that should know who will talk to whom at run-time for this specific application. There are no specific interfaces between pairs of modules to change over time, because they all just use a stable abstract interface.  
+
 | Each module has its own interface. But they are all doing essentially the same thing, getting data. | Uses a single more abstract interface called IDataflow.  
+
 | The arrangement between the modules cannot easily be changed, both because the wiring code is buried inside the modules and because the interfaces are essentially specific to pairs of modules. | The composition can very easily be changed. Instances of abstractions can be re-wired in any combination.
-| There is no diagram of the arrangement between A, B, C, D, E, or if there is, it is likely a high level overview, lacking in detail, and a second source of truth that gets out of date. | There is a diagram. It is the one source of truth. It includes all details about the specific application.
+
+| There is no diagram of the arrangement between A, B, C, D, E, or if there is, it is likely a high level overview, lacking in detail, and a second source of truth that gets out of date. | There is a diagram that shows the arrangement of the instances of A, B, C, D and E. It is the one source of truth. It includes all details about the specific application.
 |====================
 
 
 During code creation, run-time dependencies are easily introduced, and never seem too terrible at the time. But when they accumulate to hundreds or even thousands of them, as they do in most typical applications, that's when the system, as described on the left side of the table, just appears as a monolith.
 
-==== Notes
+===== Notes
 
 The application level module either moves the data between the instances of A, B, C, D, E itself, or wires them together using the even more abstract interfaces, such as the one shown called IDataflow. These abstract interfaces are not specific to any of A, B, C, D or E. This is the abstract interactions pattern. The interface design is such that there could potentially be many abstractions that implement it or accept it, or both.
 
@@ -285,20 +293,22 @@ The code inside an abstraction in a higher layer makes use of an abstraction fro
 
 We call it a knowledge dependency because to understand the code in the higher layer, you must know about the abstraction. You don't have to know about the details inside the abstraction, you just need to know about the abstraction. This is the way the world works and the way our brains have evolved to make sense of it. And it's the way we need to structure our programs.
 
-When we write our programs using only knowledge dependencies, all the knowledge needed to understand a piece of code is explicit. It is right there in any function calls or new keywords. There is no knowledge needed from anywhere else, because there is no implicit coupling. 
+When we write our programs using only knowledge dependencies, all the knowledge needed to understand a piece of code is explicit. It is right there in any function calls or 'new' keywords. There is no knowledge needed from anywhere else, because there is no implicit coupling. 
 
 In ALA, knowledge dependencies form the layers. There are no run-time dependencies present, so that is why the ALA layers are significantly different from the layers you would normally find in a program trying to use the layering pattern. 
 
 
-The bottom layer is your general purpose programming language. You must know its abstractions such as if-else statements before you can understand any layer above. You can generally learn this once for a whole career.
+The bottom layer is your general purpose programming language. You must know its abstractions such as 'if' statements and its standard library before you can understand any layer above. You can generally learn this once for a whole career.
 
-You also need to know the next layer, which is at the abstraction level of programming paradigms. Examples are data-flow, state machines, database schemas, and UI trees. You would generally learn these as needed for different programming problems. A given domain will typically make use of several of them.
+You also need to know the next layer, which is at the abstraction level of programming paradigms. Examples are data-flow, event-driven, state machines, database schemas, UI layout, navigation flow, etc. You would generally learn these as needed for different types of programming problems. A given domain will typically make use of several of them.
 
 You also need to know the next layer, the domain layer where you have useful building blocks for solving problems in a specific domain. You would learn these when you start a new job.
 
-Finally we come to the top layer. Its abstraction level is a single application. The abstraction is what the user sees - a tool that does a job by meeting a set of requirements. The abstraction level of the top layer is the details of the requirements.
+Finally we come to the top layer. Its abstraction level is a single application. Understanding it requires knowledge of all the abstractions it uses. 
 
-To get the insight of ALA, you need to throw away any previous conceptions of layering you may have had as these will contain run-time dependencies. Think of run-time dependencies as just wiring in the top layer, tipped on its side.
+The application is itself an abstraction - what the user sees - a tool that does a job by meeting a set of requirements. The abstraction level of the top layer is the requirements.
+
+To get the insight of ALA, you need to throw away any previous conceptions of layering you may have had as these will contain run-time dependencies. All run-time dependencies just just become wiring in the top layer, as if their original leyers was tipped on its side.
 
 ==== Stability of dependencies.
 
@@ -306,7 +316,7 @@ Because all dependencies used in ALA are just 'uses of abstractions', dependenci
 
 ==== Dependency fan-in and fan-out
 
-One of the guidelines sometimes used for dependencies is that a class that has high fan-in should not have high fan-out. The argument goes that a class with high fan-in should have high stability but one with high fan-out would have low stability (presumably because dependencies are thought to be things that cause changes to propagate). Knowledge dependencies, becasue they are on abstractions do not have this property. An abstraction is something that insulates its dependants from its internal details. In ALA, it is perfectly fine, in fact really really good if a class in the middle layer can indeed have both high fan-in and high fan-out. It simply means that it is both useful to its users in higher layers, and making use of even more abstract things in lower layers. 
+One of the guidelines sometimes used for dependencies is that a class that has high fan-in should not have high fan-out. The argument goes that a class with high fan-in should have high stability but one with high fan-out would have low stability (presumably because dependencies are thought to be things that cause changes to propagate). Knowledge dependencies, becasue they are on abstractions do not have this property. An abstraction is something that insulates its dependents from its internal details. In ALA, it is perfectly fine, in fact really really good if a class in the middle layer can indeed have both high fan-in and high fan-out. It simply means that it is both useful to its users in higher layers, and making use of even more abstract things in lower layers. 
 
 If you think about your programming language as the bottom layer (on which everything depends), every reusable class you write has both high fan-in and high fan-out. This meme that not having high fan-in and high fan-out for the same class does not apply to knowledge dependencies. And if you apply it to run-time dependencies, what the meme should say is zero fan-in and zero fan-out.
 
