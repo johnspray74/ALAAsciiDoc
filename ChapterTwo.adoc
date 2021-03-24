@@ -635,7 +635,7 @@ First here is the startup code for a wired ALA application. It is very simple:
 
 
 .Application.cs
-[source C#]
+[source,C#]
 ....
 namespace Application
 {
@@ -665,7 +665,7 @@ Here is an ALA Hello World application
 
 
 .Application.cs
-[source C#]
+[source,C#]
 ....
 private MainWindow WireHelloWorld()
 {
@@ -677,7 +677,7 @@ Ok, now we are ready to hand wire the hand drawn calculator diagram shown above:
 
 
 .Application.cs
-[source C#]
+[source,C#]
 ....
 private MainWindow Calculator2RowHandWired()
 {

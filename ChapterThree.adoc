@@ -89,7 +89,7 @@ Often these collected together wirings form a graph, making diagrams rather than
 
 . If xyz789 provides a part of the implementation of abc123 such that it is specific to abc123, then xyz789 is more specific than abc123. Sometimes such a function or class is called a helper or submodule. This is because abc123 could be reused many times, whereas xyz789 could only ever be used once (only by abc123). xyz789 needs to be more abstract than abc123 or it will be coupled to it.
 +
-This is contrary to what we are taught. We are taught to "divide and conquer" or to separate out the responsibilities in abc123. If we do this arbitrarily, we will end up with specific pieces (such as UI and business logic) which are highly coupled with each other, and with the specific application. We need to work hard to separate only by finding abstractions - potentially reusable artefacts. Then we configure instances of those abstractions for each specific use by passing application details into them.  
+This is contrary to what we are taught. We are taught to "divide and conquer" or to separate out the responsibilities in abc123. If we do this arbitrarily, we will end up with specific pieces (such as UI and business logic) which are highly coupled with each other, and with the specific application. We need to work hard to separate only by finding abstractions - potentially reusable artefacts. Then we configure instances of those abstractions for each specific use by passing the application specific details into them.  
 
 In summary, ALA's starting premise is a constraint. The constraint is that you can only use one type of dependency - a dependency on an abstraction that is more abstract. This results in zero coupling throughout the abstractions of the entire program. 
 
@@ -99,33 +99,45 @@ The rest of this chapter expands on the points we mentioned briefly in this firs
 
 [IMPORTANT]
 ====
-*Abstractions* are the human brain's version of *encapsulation*.
+[green]#*Abstractions*# are the human brain's version of [green]#*encapsulation*#.
 ====
 
-The maintainability quality attribute is often thought of in terms of ripple effects of change. I don't think that is quite the right way to look at it. I have often had to make changes across a number of modules in poorly written code. The changes themselves just don't take that long. The problem I see is the time you have to spend understanding enough of the system to know where to make a change, even if it is one line of code. To make that small change with confidence that it wont break anything can take a long long time. The problem, in short is coupling. Even if the change is one line of code (which it often is), you may have had to understand a lot of code to figure that out. You have to understand all the code that is potentially coupled to that one line of code, which is essentially the complexity.
+The maintainability quality attribute is often thought of in terms of ripple effects of change. I don't think that is quite the right way to look at it. I have often had to make changes across a number of modules in poorly written code. The changes themselves just don't take that long. The problem I see is the time you have to spend understanding enough of the system to know where to make a change, even if it is one line of code. To make that small change with confidence that it wont break anything can take a long ime. The problem is coupling. Even if the change is one line of code (which it often is), you may have had to understand a lot of code to figure that out. You have to understand all the code that is potentially coupled to that one line of code, which is essentially the complexity.
 
-Unlike modules or encapsulation, abstractions contain and hide complexity at design-time. They give boundaries to how far you have to read code to understand code.
+Unlike modules or encapsulation, abstractions contain and hide complexity at design-time. They give boundaries to how far you have to read code to understand it.
 
 
 ==== Abstractions and Instances
 
 [IMPORTANT]
 ====
-All *software architectures* should contain *two concepts* for its *elements*  equivalent to *abstractions* and *instances*.
+[green]#*Software architecture*# should contain [green]#*two concepts*# for its [green]#*elements*#  equivalent to [green]#*abstractions*# and [green]#*instances*#.
 ====
 
 ALA makes abstraction and instances fundamental. 
 
 Abstractions are separate, zero coupled, design-time elements. Abstractions, therefore, cannot exchange data themselves. The concept of instances must be added. An instances is nothing more than the use of an abstraction by referring to its name. 
 
-Object oriented programming does has these two concepts in classes and objects. Functional programming has the two concepts in terms of the function definition and the function invocation. But many discussions on software architecture seem to combine them into one term, such as modules, components or layers. They may implicitly contain the separate concepts, as components may, but not having them explicit will inevitably lead to confusion. 
+Object oriented programming has these two concepts as classes and objects. Functional programming has the two concepts in terms of the function definition and the function invocation. But many discussions on software architecture seem to combine them into one term, such as modules, components or layers. They may implicitly contain the separate concepts, as components may, but not having them explicit will inevitably lead to confusion. 
 
-The problem is that when we become vague about the difference, we will create dependencies, such as to get or put data, between abstractions that should just be using two instances in a line of code somewhere. Adding dependencies between abstractions destroy them as abstractions. Composing two Instances of abstractions does not. If we don't have two separate and clear terms for abstractions and instances, we will end up with no abstractions.  
+The problem is that when we become vague about the difference, we will create dependencies between the abstractions, such as to get or put data, that should just be using two instances in a line of code somewhere. Adding dependencies between abstractions destroy them as abstractions. Composing two Instances of abstractions does not. If we don't have two separate and clear terms for abstractions and instances, we will end up with no abstractions.
 
-Nearly all architectural styles have this problem. For example, in layering, we put 'modules' into layers and then create unnecessary dependencies to move data between them. No, put abstractions into one layer. Then compose instances of them inside a new abstraction in the layer above to get the instances talking to each other.  
+Nearly all architectural styles have this problem. For example, in layering, we put 'modules' into layers and then create unnecessary dependencies to move data between them. No, put abstractions into one layer. Then compose instances of them inside a new abstraction in the layer above.  
 
-Another common example of the problem is the UML, which already has the separate concepts of objects and classes. But we tend to ignore objects and create associations between classes instead. The most important idea that OOP brought us was the idea of classes and objects. It has been ruined by the UML. Instead of associations between classes, instantiate objects and wire them together. Do that completely inside another class in the layer above. 
+Another common example of the problem is the UML, which already has the separate concepts of objects and classes. But we tend to ignore objects and create associations between classes instead. The most important idea that OOP brought us was the idea of classes and objects. It has been ruined by the UML class diagram. Instead of associations between classes, instantiate objects and wire them together. Do that completely inside another class in the layer above. 
 
+
+=== No loose coupling
+
+When we say _no_ loose coupling, it means there is _zero_ coupling. Zero coupling between the details contained inside any two abstractions. Abstractions are therefore free floating little independent programs. To understand any part of the code involves understanding only that part of the code.
+
+[TIP]
+====
+[green]#*To understand any part of the code should involve understanding only that part of the code.*#.
+====
+
+
+Since conventional programs are typically full of coupling of all sorts, this constraint on the architecture will obviously change how we write programs significantly. But surprisingly, things quickly get easier, not harder with these constraints.
 
 === Good versus bad dependencies
 
@@ -145,11 +157,11 @@ A simple example of a run-time dependency is a module that calculates the averag
 
 A simple example of a design-time knowledge dependency is some code that calculates the rainfall using an averaging filter. It uses an abstraction that takes a data stream as input and outputs a running average. To understand the rainfall code needs knowledge of averaging filter. This is a design-time, or knowledge dependency. Any application needing to reduce data to an average could use the same abstraction. 
 
-We find both types of dependencies in conventional code. A typical program is chock full of the run-time dependencies. But whether a knowledge dependency or a run-time dependency, they all just look like a function call or a 'new' keyword. We generally don't distinguish between them. In fact we are not normally taught to tell the difference. They are all just called dependencies. We lump them together when we talk about dependency management, loose coupling, layering, fan-in & fan-out, or circular dependencies. Dependency graphing tools just show them both. 
+We find both types of dependencies in conventional code. A typical program is chock full of the run-time dependencies. But whether a knowledge dependency or a run-time dependency, they all just look like a function call or a 'new' keyword. We generally don't distinguish between them. In fact we are not normally taught to tell the difference. They are all just called dependencies. We lump them together when we talk about dependency management, loose coupling, layering, fan-in, fan-out, or circular dependencies. Dependency graphing tools just show them both. 
 
 These two different types of dependencies are not just good and bad. They are really good and really bad. So it's doubly important that we learn to tell the difference. What's more it's entirely possible to build a system using only the good dependencies. 
 
-A knowledge dependency is good because it's only dependent on an abstract concept. Good abstractions are easy to learn. The more dependencies you have on an abstraction, the more abstract it is, and the more reuse you are getting.
+A knowledge dependency is good because it's only dependent on an abstract concept. Good abstractions are easy to learn. The more dependencies you have on such an abstraction, the more abstract it is, the more reuse you are getting, and the easier it is to learn.
 
 Run-time dependencies are bad because they completely destroy abstractions. They are bad because they cause explicit and implicit coupling. And they are bad because they obscure the structure of the application by distributing that structure throughout its modules. Instead, we want that structure to be explicit and in one place.
 
@@ -230,14 +242,20 @@ In common programming languages, the run-time dependencies in the first diagram 
 .Comparison of two approaches
 [width="100%",options="header,footer"]
 |====================
+
 | Run-time dependencies version | Knowledge dependencies version
-| Knowledge about the specific application is spread through all modules. | Knowledge about the specific application is only in one place. The abstractions no nothing of each other or the specific application. 
+
+| Knowledge about the specific application is spread through all modules. | Knowledge about the specific application is only in one place. The abstractions know nothing of each other or the specific application. 
+
 | The class or function names A, B, D and E will relate to what they do (which is fine). For example, they may be the specific hardware chips used in the case of drivers. The calling module must know these names, creating a fixed arrangement between the modules. The modules are only loosely coupled. | No abstractions refer to the names of peer abstractions. There is no fixed arrangement between abstractions. The abstractions are zero coupled. The code that knows that a particular hardware chip is used in this application is where it belongs, in the application layer.
+
 | Since there is a fixed arrangement, responsibilities can be blurred. For example, it may be unclear whether to add something to B or C. | With no relations between abstractions, responsibilities are clear. Something to be added clearly belongs in one or other of the abstractions, or in a new abstraction that may be wired in between the two.
+
 | The fixed dependency from C to B will encourage implicit coupling. B can make assumptions about details inside B resulting in collaborative coupling. | C cannot make any assumptions about some details of B. It cannot have collaborative coupling with B 
+
 | Although there is no dependency from, for example, B to C, if B is only used by C, the fixed arrangement is likely, over time, to make B implicitly collaborate with C (do what C requires), resulting in callaborative coupling. | No implicit coupling can develop over time because there is no relationship between them. B cannot collaborate with C (do what C specifically requires).
 
-| The arrangement between A, B, C, D and E is not obvious in the code. It is buried inside of B, C and D. All must be read to find the application's data flow structure | The arrangement between instances of A, B, C, D and E is explicitly coded in one place. It is cohesive information that belongs in one place.
+| The arrangement between A, B, C, D and E is not obvious in the code. It is buried inside of B, C and D. All must be read to find the application's data flow structure | The arrangement between instances of A, B, C, D and E is explicitly coded in one place. The data-flow between them is cohesive information that belongs in one place.
 
 | Only A and E can potentially be abstractions. | All of A, B, C, D and E are abstractions.
 
@@ -251,7 +269,7 @@ In common programming languages, the run-time dependencies in the first diagram 
 
 | Each module has its own interface. But they are all doing essentially the same thing, getting data. | Uses a single more abstract interface called IDataflow.  
 
-| The arrangement between the modules cannot easily be changed, both because the wiring code is buried inside the modules and because the interfaces are essentially specific to pairs of modules. | The composition can very easily be changed. Instances of abstractions can be re-wired in any combination.
+| The arrangement between the modules cannot easily be changed, both because the wiring code is buried inside the modules and because the interfaces are essentially specific to pairs of modules. | The composition can easily be changed. Instances of the abstractions can be re-wired in any combination.
 
 | There is no diagram of the arrangement between A, B, C, D, E, or if there is, it is likely a high level overview, lacking in detail, and a second source of truth that gets out of date. | There is a diagram that shows the arrangement of the instances of A, B, C, D and E. It is the one source of truth. It includes all details about the specific application.
 |====================
@@ -272,18 +290,6 @@ The only dependencies we have used on the right side of the table are knowledge 
 . The application should and must 'know' at design-time what abstractions it needs to compose to make a specific application.
 
 . The domain abstractions should and must know what kind of abstract interfaces to use for its inputs and outputs. 
-
-==== No loose coupling
-
-Since our conventional programs are typically full of coupling of all sorts, this constraint on the architecture will obviously change how we write programs significantly. But surprisingly, things quickly get easier, not harder with these constraints, a lot easier.
-
-When we say _no_ loose coupling, it means there is _zero_ coupling. Zero coupling between the details contained inside any two abstractions. Abstractions are therefore free floating little independent programs. To understand any part of the code involves understanding only that part of the code.
-
-[TIP]
-====
-[green]#*To understand any part of the code should involve understanding only that part of the code.*#.
-====
-
 
 ==== Knowledge dependency layers
 
