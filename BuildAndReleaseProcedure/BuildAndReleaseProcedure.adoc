@@ -22,6 +22,7 @@ Author Name
 . Upload any new images from the images folder to the images folder
 . Check the website and its images
 . Dont let images have capital letters in the extension - they wont be shown in the web site
+* check in to github
 
 == Starting Asciidoc
 

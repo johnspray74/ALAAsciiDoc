@@ -25,7 +25,7 @@ image::BOSS_Great_Wall.jpg[BOSS_Great_Wall.jpg,900, title="*The large scale stru
 
 John R Spray
 
-Last update: 2021-03-22
+Last update: 2021-05-13
 
 ---
 
@@ -42,17 +42,350 @@ Fundamentally, ALA is simply two architectural constraints:
 
 *Comments:*
 
-No other relationships are allowed (or needed). This implies that the only unit of code in ALA is an abstraction. The term 'module' is not used because modules tend to collaborate (are loosely coupled). The term "abstraction" is used instead because abstractions are zero-coupled with one another.
+No other relationships are allowed (or needed). This implies that the only unit of code in ALA is an abstraction. The term 'module' is not used because modules tend to collaborate (are loosely coupled). The term "abstraction" is used instead because abstractions are zero-coupled with one another. The dependency is always said to use an instance of the abstraction. Module dependencies tend to also have coupling.
 
-Because an abstraction that is depended on must be significantly more abstract, the abstractions form layers. We give them names: Application layer, Domain Abstractions layer and Programming Paradigms layer. A small number of other layers are sometimes used for large applications.
+Because an abstraction that is depended on must be significantly more abstract, the first structural property that emerges from the these constraints is that abstractions form into layers. These layers are not the same as the layers found in a conventional layered architecture because the dependencies themselves are different. We give them names that reflect the types of abstractions that tend to go in them like "Application" layer, "Domain abstractions" layer and "Programming paradigms" layer. A small number of other layers are sometimes used for large applications.
 
-There is no 'hierarchical' structure - abstractions cannot be contained within abstractions. We use layers instead because lower layer abstractions are more abstract, and therefore more reusable, and need to be public.
+There is no 'hierarchical' structure in ALA. Abstractions cannot be contained within abstractions. We use the layers instead because lower layer abstractions, being more abstract, are more reusable, and need to be public for use, not private for hiding. In other words all 'information hiding' is achieved through abstraction, not just encapsulation.
 
-These constraints may seem extreme at first, but it turns out to be surprisingly easy, and rewarding, to write code that conforms to them. 
+These constraints may seem extreme at first, but it turns out to be surprisingly easy, and rewarding, to write code that conforms to them once the patterns are established. 
 
-Patterns and properties emerge from these two constraints. In many ways these patterns are similar to ones we already know, which is not surprising - such things as Domain Specific Languages, Dependency Injection, Composite and Decorator patterns etc. However, there are often subtle but important differences. For example, in the observer pattern (publish subscribe), the observer cannot subscribe itself - a higher layer abstraction must do the subscribing for it. 
+Patterns and properties emerge from these two constraints. In many ways the patterns are similar to ones we already know, which is not surprising - such things as Domain Specific Languages, Dependency Injection, Composite and Decorator patterns etc. However, there are often subtle but important differences. For example, in the Observer pattern (publish subscribe), the observer cannot do the subscribing itself if it is in the same layer as the publisher - a higher layer abstraction must do the subscribing for it. 
 
-An emergent property is "zero coupling and high cohesion". This is qualitatively different from the familiar "loose coupling and high cohesion". What is implicit collaboration between modules in conventional code becomes explicit cohesive code contained within a more specific abstraction in a higher layer in ALA.
+An emergent property is "zero coupling and high cohesion". This is qualitatively different from the familiar "loose coupling and high cohesion". What was implicit collaboration between modules in conventional code becomes explicit cohesive code contained within a more specific abstraction in a higher layer in ALA.
+
+---
+
+
+*A tiny example*
+
+(Every chapter has an example, and we do the same here in the summary section. Unlike most pedagogical sized examples, these examples progressively become non-trivial. Yet because of ALA's power, they remain uncomplicated and easy to understand.) 
+
+Requirement: Make a switch control a light. 
+
+
+[plantuml,file="diagram-switch-light.png"]
+----
+@startdot
+digraph foo {
+# edge [color=green]
+size="1!"
+graph [rankdir=LR]
+node [shape=Mrecord]
+Switch -> Light
+}
+@enddot
+----
+
+In ALA, the diagram above is not a high-level architectural view of the solution. It is the solution. The diagram is literally compiled. Let's do that now by hand:
+
+*Application layer*
+
+.Application.cs
+[source,C#]
+....
+var application = new Switch().WireTo(new Light());
+application.Run();
+....
+
+It is not difficult to make that code execute.
+
+In conventional modular code, we would likely have made two modules, one for the switch and one for the light. The switch might directly call a method in the light, or vice versa. In ALA you can't do that. The concepts of Switch and Light, already handed to us as abstractions in the words of the requirements, must remain abstractions. They become domain abstractions and are placed in a domain abstractions layer and folder. They cannot know about each other, nor the applications they are used by.
+
+The application is also an abstraction. It is more specific than the domain abstractions, and its purpose is to know about the system, comprising a light and a switch connected together. It knows about switches and lights as abstract concepts and that they may be wired together but doesn't know anything about implementation details of them. It is simply a direct formal restatement of the requirements. So for this example the application abstraction is the simple diagram shown above. 
+
+The switch and the light can be handed off to different teams. They know nothing about each other. They do know about an even more abstract concept of data-flow, which lives in the programming paradigms layer below.
+
+Here is skeleton code of the two domain abstractions showing how 'ports' might be implemented. 
+
+
+*Domain Abstractions layer*
+
+
+.Switch.cs
+[source,C#]
+....
+
+// domain abstraction
+class Switch
+{
+    // port 1: output
+    private IDataFlow<bool> output;
+    
+    // called from internally when detect hardware change
+    private void SwitchChange(bool newState) { output.Send(newState); }
+    
+}
+....
+
+
+
+.Light.cs
+[source,C#]
+....
+
+// domain abstraction
+class Light : IDataFlow<bool>
+{
+    // port 1: input
+    IDataFlow<bool>.Send(bool data)
+    {
+        if (data) // turn on the light
+        else // turn off the light
+    }
+}
+....
+
+
+Our programming paradigms layer has a programming paradigm for data-flow:
+
+
+*Programming Paradigms layer*
+
+
+.DataFlow.cs
+[source,C#]
+....
+
+// Programming paradigm: DataFlow
+interface IDataFlow<T>
+{
+    void Send(T data);
+}
+....
+
+
+In ALA, we frequently use a *Wiring pattern*, which consists of instantiating domain abstractions and wiring them together by ports that use an even more abstract interface representing a programming paradigm. The wiring pattern is quite ubiquitous, and therefore comes from a Libraries layer that resides below the Programming Paradigms layer. That is where the WireTo operator resides. 
+
+
+*Libraries layer*
+
+
+.Wiring.cs
+[source,C#]
+// library
+....
+
+public static object WireTo(this object a, object b)
+{
+    // using reflection:
+    // 1. Find a private field in object "a" that matches in type an interface implemented by object "b".
+    // 2. Assign object "b" to that field.
+    // 3. Return object "a".
+}
+....
+
+Note: You can get the source for the WireTo extension method from one of the example projects of later chapters on GitHub.
+
+Now that we know how to express requirements by composition of domain abstractions, let's quickly demonstrate the ease of maintenance of our application:
+
+Requirement: Turn on a light when both the switch is on and a sensor says it is dark. And give a feedback indication:
+
+(For these small examples, we will manually generate code from the diagram.)
+
+
+[plantuml,file="diagram-switch-light-sensor.png"]
+----
+@startdot
+digraph foo {
+# edge [color=green]
+size="2"
+graph [rankdir=LR]
+node [shape=Mrecord]
+AndGate [label="AndGate"]
+Main -> Switch
+Main -> Sensor
+Sensor [label="<f0> Sensor|<f1> 0.5"]
+Switch -> AndGate -> Light
+Sensor -> AndGate -> Indicator
+}
+@enddot
+----
+
+
+
+.Application.cs
+[source,C#]
+....
+
+var andGate = new AndGate();
+new Main
+    .WireTo(new Switch()
+        .WireTo(andGate
+            .WireTo(new Light())
+            .WireTo(new Indicator())))
+    .WireTo(new Sensor(threshold:0.5)
+        .WireTo(andGate))
+    .Run();
+....
+
+
+We just invented some new domain abstractions: AndGate and Sensor, again directly implied by the requirements.
+
+We also just invented another programming paradigm. It is used between Main and its children, and could be made to work say by polling:
+
+.Poll.cs
+[source,C#]
+....
+
+// Programming paradigm: Poll
+interface IPoll
+{
+    void Poll();
+}
+....
+
+The astute reader will notice that the AndGate can't implement IDataFlow<bool> twice. In later projects, we will show how we solve this implementation problem, and we can allow more than one input port of the same type.
+
+You may also notice that the fanout from the output of the AndGate to both the Light and the Indicator won't work. We show how this implementation problem can be solved in later projects also.
+
+Now that we have some reusable domain abstractions and programming paradigms, let's quickly write another trivial application:
+
+
+Requirement: Turn on the light from a tick item in the Tools menu of a PC application, and give an indication in the status bar when the light is on.
+
+
+
+[plantuml,file="diagram-menu-light-status.png"]
+----
+@startdot
+digraph foo {
+# edge [color=green]
+size="3"
+graph [rankdir=LR]
+node [shape=Mrecord]
+MainWindow -> Menu1 -> Menu2 -> TickBox -> Light
+Indicator [label="<f0> Indicator|<f1> Light is Off | Light is On"]
+Menu1 [label="<f0> Menu"]
+Menu2 [label="<f0> Menu|<f1> Tools"]
+TickBox [label="<f0> TickBox|<f1> Light"]
+TickBox -> Indicator
+MainWindow -> StatusLine -> Indicator
+{rank=same Menu1 StatusLine}}
+@enddot
+----
+
+
+.Application.cs
+[source,C#]
+....
+
+var indicator = new Indicator( {"Light is off", "Light is On"} );
+new MainWindow()
+    .WireTo(new Menu())
+        .WireTo(new Menu("Tools")
+            .WireTo(new TickBox(label:"Light")
+                .WireTo(new Light())
+                .WireTo(indicator)
+            )
+        )
+    )
+    .WireTo(new StatusBar()
+        .WireTo(indicator) // put the indicator on the UI
+    )
+    .Run();
+....
+
+We just invented another programming paradigm for "UI layout". It is used between all the UI elements: MainWindow, Menu, Tickbox, StatusBar, Indicator. Wiring things together using that programming paradigm means things are arranged inside things on the UI.
+
+Let's do an application to browse for and display a (dynamic content) CSV file on a grid, filtered by a user specified name, and sorted by names. The CSV file has headings that will display in the grid.
+
+
+
+[plantuml,file="diagram-csv-to-grid.png"]
+----
+@startdot
+digraph foo {
+size="5"
+graph [rankdir=LR]
+node [shape=Mrecord]
+MainWindow -> Menu1 -> Menu2 -> MenuItem -> Browser -> CsvReadWriter -> Filter -> Sort -> Grid
+Menu1 [label="<f0> Menu"]
+Menu2 [label="<f0> Menu|<f1> File"]
+MenuItem [label="<f0> MenuItem|<f1> Open"]
+TextBox [label="<f0> TextBox|<f1> Label = Filter by name"]
+Filter [label="<f0> Filter|<f1> Column = Name"]
+Sort [label="<f0> Sort|<f1> Column = Name"]
+Browser [label="<f0> OpenFileBrowser|<f1> extensions=CSV" ]
+MainWindow -> TextBox -> Filter
+MainWindow -> Grid 
+{rank=same Menu1 TextBox Grid}}
+@enddot
+----
+
+
+.Application.cs
+[source,C#]
+....
+
+var grid = new Grid();
+var csvReaderWriter = new CsvReaderWriter
+var filter = new Filter() {Column = "Name"};
+new MainWindow()
+    .WireTo(new Menu()
+        .WireIn(new Menu("File"))
+        .WireIn(new MenuItem("Open"))
+        .WireIn(new OpenFileBrowser(extensions = {"csv"} ))
+        .WireIn(csvReaderWriter)
+        .WireIn(filter) 
+        .WireIn(new Sort() { Column="Name" })
+        .WireIn(grid) { Column="Name" }
+    )
+    .WireTo(new TextBox(Label="Filter by name")
+        .WireTo(filter)
+    )
+    .WireTo(grid)
+    .Run();
+....
+
+
+Because they are zero-coupled, the domain abstractions are easy to write. The Grid abstraction is able to pull rows of data from a table as needed.
+
+In addition to the new domain abstractions, we have two new programming paradigms, which we can call Events and PullTable.
+
+Note: WireTo() returns its first operand (this). WireIn() is the same as WireTo() except that it returns its second operand. These operators support the fluent coding style being used in these small applications.
+
+The methodology is that you write the application code first (or part of it), just focusing on expressing the requirements in a near 1 to 1 fashion. This causes you to invent domain abstractions and programming paradigms. Then you come up with a way to make the programming paradigms execute. Our experience so far is that this has never been difficult. For example, the two interfaces listed below might be what you would come up with for Event and PullTable. We then expect grid to have a field of type IPullTable<List<string>> and CsvFileReaderWriter to implement it. This interface is abstract. Both Filter and Sort will also have both input and output ports of type  IPullTable<List<string>>. The List represents one row of the table.
+
+.Event.cs
+[source,C#]
+....
+// Programming paradigm: Event driven
+interface IEvent
+{
+    void Execute();
+}
+....
+
+
+
+.PullTable.cs
+[source,C#]
+....
+// Programming paradigm: TableDataFlow
+interface IPullTable<T>
+{
+    event DataReadyDelegate SourceReady;
+    List<string> GetHeaderLabels();
+    IEnumerable<T> GetIEnumerable<T>();
+}
+....
+
+
+
+
+
+Don't worry, we won't be creating new programming paradigm abstractions at this rate for long. In fact we already have most of the ones we will ever use in all our example projects.
+
+Notice how in the above examples, we have used software engineering patterns we already know about, just in a different way. There is DSL (Domain Specific Language), Dependency Injection, Event driven programming, XAML-like UI layout (without the XML), RX (Reactive programming), monad-like wiring up of objects, fluent style. 
+
+Notice how the application diagram in each case is both a direct representation of the requirements and executable. The requirements themselves are cohesive, and so the application code that expresses them should also be cohesive. We do not try to separate UI, I/O, business logic, persistent data etc because they are highly cohesive in the requirements. Most other architectural patterns do separate in this way, which creates coupling. Instead we reduce the problem in a different way - through the use of domain abstractions. All knowledge and details from the requirements ends up in the application layer, but that's all that ends up in there. All implementation is inside domain abstractions.
+
+Note: Although the fluent style is nice for these small applications, code like this with indenting and nested brackets does not scale up well for large applications. (It is still much better than the tangled web of dependencies they would form in conventional modular code though.) But we can do better. We will not be hand-writing code like this for large applications - we will automatically generate the code from the diagrams. A network-like structure is showing up in these small applications because the requirements contain a network of connections. ALA embraces this and makes it explicit.
+
+Note: The Wiring pattern used in the examples above is only one possible way of meeting the fundamental ALA constraints. For example, ALA can also be applied to functional programming. Indeed monads use a comparable wiring pattern. But we will use the wiring pattern shown above quite often. ALA may appear to be synonymous with this wiring pattern, but actually ALA is just the two fundamental constraints stated at the beginning of this introduction. 
+
+
 
 ---
 
@@ -62,14 +395,21 @@ An emergent property is "zero coupling and high cohesion". This is qualitatively
 
 *Chapter 1, "What problem does ALA solve?"*
 
-** These two constraints solve the "big ball of mud" problem by providing a pre-worked reference architecture (a meta-structure for code at the largest granularity scale). 
+The two constraints solve the "big ball of mud" problem by providing a pre-worked reference architecture (a meta-structure for code at the largest granularity scale). 
 
-** The meta-structure pre-solves for the following quality attributes: Complexity, Readability, Maintainability, Testability
+The meta-structure pre-solves for the following quality attributes:
+
+* Complexity
+* Readability
+* Maintainability
+* Testability
 
 
 {empty} +
 
-*Chapter 2, "What does the structure look like?". Without explaining why, this chapter describes the code structure that emerges from applying the two constraints:*
+*Chapter 2, "What does the structure look like?"*
+
+Without explaining why, this chapter describes the code structure that emerges from applying the two constraints:
 
 * An abstraction is usually a function or class, but can be a small group of functions, classes, delegates, enums, even variables or objects, etc. The grouping is highly cohesive code that is unrestricted in its internal relationships. An abstraction is usually represented by a source file.
 
@@ -125,7 +465,9 @@ An emergent property is "zero coupling and high cohesion". This is qualitatively
 
 {empty} +
 
-*Chapter 3, "Why the structure works". Explains the theory behind the two fundamental architectural constraints:*
+*Chapter 3, "Why the structure works"*
+
+Explains the theory behind the two fundamental architectural constraints:
 
 * While an increasing number of internal validation experiments show promising results, the claim that ALA pre-solves for the software engineering problems outlined in chapter 1 is based largely on theory.
 
@@ -190,7 +532,9 @@ Actually, in practice we do some refactoring. We find ourselves improving the de
 
 {empty} +
 
-*Chapter 4, "Execution models". Explains how the underlying execution for each programming paradigm can be made to actually work.*
+*Chapter 4, "Execution models".*
+
+Explains how the underlying execution for each programming paradigm can be made to actually work.
 
 ** Explains the ways that the CPU executes the right code at the right time when the structures that emerge from ALA compose domain abstractions in a different or more declarative way compared to imperative execution flow.
 
@@ -210,7 +554,9 @@ Actually, in practice we do some refactoring. We find ourselves improving the de
 
 {empty} +
 
-*Chapter 5, "Methodology". Describes ALA in terms of how it fits into Agile software development*
+*Chapter 5, "Methodology"*
+
+Describes ALA in terms of how it fits into Agile software development.
 
 ** The primary methodology is that requirements are simply 'described' in terms of 'invented' domain abstractions.
 
@@ -221,7 +567,9 @@ Actually, in practice we do some refactoring. We find ourselves improving the de
 
 {empty} +
 
-*Chapter 6, "The philosophy behind ALA". Gives the theory of why ALA works from the perspective of complex systems and how our brains work.*
+*Chapter 6, "The philosophy behind ALA"*
+
+Gives the theory of why ALA works from the perspective of complex systems and how our brains work.
 
 ** Describes how the two fundamental architectural constraints are designed to mimic how our brains see the real world.
 
@@ -267,260 +615,6 @@ Actually, in practice we do some refactoring. We find ourselves improving the de
 
 {empty} +
 
-*A tiny example*
-
-Every chapter ends with an example project, and we do the same here. Unlike most pedagogical sized examples, these example projects are progressively non-trivial. Yet because of ALA's power, they remain uncomplicated and easy to understand. 
-
-Requirement: Make a switch control a light. 
-
-
-[plantuml,file="diagram-switch-light.png"]
-----
-@startdot
-digraph foo {
-# edge [color=green]
-size="1!"
-graph [rankdir=LR]
-node [shape=Mrecord]
-Switch -> Light
-}
-@enddot
-----
-
-In conventional code, we would make two modules for the switch and light, but the switch might  directly call the light, or vice versa. In ALA you can't do that. The concepts of Switch and Light are domain abstractions already handed to us in the words of the requirements. We must keep them as abstractions - they cannot know about each other, or any applications they are used in.
-
-The application, as stated by the requirement and represented by the diagram, is an abstraction in itself. It is clearly at a different abstraction level to either the switch or the light. Only it knows that our specific application is a switch and a light connected together. 
-
-In ALA, we frequently use a *Wiring pattern*, which consists of instantiating domain abstractions and wiring them together using an even more abstract interface representing a programming paradigm: 
-
-*Application layer*
-
-.Application.cs
-[source,C#]
-....
-
-var application = new Switch().WireTo(new Light());
-application.Run();
-....
-
-
-*Domain Abstractions layer*
-
-
-.Switch.cs
-[source,C#]
-....
-
-// domain abstraction
-class Switch
-{
-    // port 1: output
-    private IDataFlow<bool> output;
-    
-    // called from internally when detect hardware change
-    private void SwitchChange(bool newState) { output.Send(newState); }
-    
-}
-....
-
-
-
-.Light.cs
-[source,C#]
-....
-
-// domain abstraction
-class Light : IDataFlow<bool>
-{
-    // port 1: input
-    IDataFlow<bool>.Send(bool data)
-    {
-        if (data) // turn on the light
-        else // turn off the light
-    }
-}
-....
-
-
-
-*Programming Paradigms layer*
-
-
-.DataFlow.cs
-[source,C#]
-....
-
-// Programming paradigm: DataFlow
-interface IDataFlow<T>
-{
-    void Send(T data);
-}
-....
-
-
-
-*Libraries layer*
-
-
-.Wiring.cs
-[source,C#]
-// library
-....
-
-public static object WireTo(this object a, object b)
-{
-    // using reflection:
-    // 1. Find a private field in object "a" that matches in type an interface implemented by object "b".
-    // 2. Assign object "b" to that field.
-    // 3. Return object "a".
-}
-....
-
-Note: You can get the source for the WireTo extension method from one of the example projects of later chapters on GitHub.
-
-Now that we know the Wiring pattern, let's quickly demonstrate the ease of maintenance on our application:
-
-Requirement: Turn on a light when both the switch is on and a sensor says it is dark. And give a feedback indication:
-
-.Application.cs
-[source,C#]
-....
-
-var andGate = new AndGate();
-new Main
-    .WireTo(new Switch()
-        .WireTo(andGate
-            .WireTo(new Light())
-            .WireTo(new Indicator())))
-    .WireTo(new Sensor(threshold:0.5)
-        .WireTo(andGate))
-    .Run();
-....
-
-
-We just invented some new domain abstractions: AndGate and Sensor, again directly implied by the requirements.
-
-We also just invented another programming paradigm. It is used between Main and its children, and could be made to work say by poling:
-
-.Poll.cs
-[source,C#]
-....
-
-// Programming paradigm: Poll
-interface IPoll
-{
-    void Poll();
-}
-....
-
-The astute reader will notice that the AndGate can't implement IDataFlow<bool> twice. In later projects, we will show how we solve this implementation problem, and allow more than one input port of the same type.
-
-You may also notice that the fanout from the output of the AndGate to both the Light and the Indicator won't work. We show how this problem is solved in later projects also.
-
-Now that we have some reusable domain abstractions and programming paradigms, let's quickly write a another trivial application:
-
-
-Requirement: Turn on the light from a tick item in the Tools menu of a PC application, and give an indication in the status bar when the light is on.
-
-.Application.cs
-[source,C#]
-....
-
-var indicator = new Indicator( {"Light is off", "Light is On"} );
-new MainWindow()
-    .WireTo(new Menu())
-        .WireTo(new Menu("Tools")
-            .WireTo(new TickBox(label:"Light")
-                .WireTo(new Light())
-                .WireTo(indicator)
-            )
-        )
-    )
-    .WireTo(new StatusBar()
-        .WireTo(indicator) // put the indicator on the UI
-    )
-    .Run();
-....
-
-We just invented another programming paradigm for "UI layout". It is used between all the UI elements: MainWindow, Menu, Tickbox, StatusBar, Indicator.
-
-Let's do an application to browse for and display a (dynamic content) CSV file on a grid, filtered by a user specified name, and sorted by names. The CSV file has headings that will display in the grid.
-
-
-.Application.cs
-[source,C#]
-....
-
-var grid = new Grid();
-var csvReaderWriter = new CsvReaderWriter
-var filter = new Filter() {Column = "Name"};
-new MainWindow()
-    .WireTo(new Menu()
-        .WireTo(new Menu("File")
-            .WireIn(new MenuItem("Open"))
-            .WireIn(new OpenFileBrowser(extensions = {"csv"} ))
-            .WireIn(csvReaderWriter)
-        )
-    )
-    .WireTo(new TextBox()
-        .WireTo(filter)
-    )
-    .WireTo(new grid()
-        .WireIn(new Sort() { Column="Name" })
-        .WireIn(filter) 
-        .WireIn(csvReaderWriter) 
-    )
-    .Run();
-....
-
-
-Because they are zero-coupled, the domain abstractions are easy to write. The Grid abstraction is able to pull rows of data from a table as needed.
-
-In addition to the new domain abstractions, we have two new programming paradigms, which we can call Events and PullTable.
-
-Note: WireTo() returns its first operand (this). WireIn() is the same as WireTo() except that it returns its second operand. These operators support the fluent coding style being used in these small applications.
-
-The methodology is that you write the application code first (or part of it), just focusing on expressing the requirements in a near 1 to 1 fashion. This causes you to invent domain abstractions and programming paradigms. Then you come up with a way to make the programming paradigms execute. Our experience so far is that this has never been difficult. For example, the two interfaces listed below might be what you would come up with for Event and PullTable. We then expect grid to have a field of type IPullTable<List<string>> and CsvFileReaderWriter to implement it. This interface is abstract. Both Filter and Sort will also have both input and output ports of type  IPullTable<List<string>>. The List represents one row of the table.
-
-.Event.cs
-[source,C#]
-....
-// Programming paradigm: Event driven
-interface IEvent
-{
-    void Execute();
-}
-....
-
-
-
-.PullTable.cs
-[source,C#]
-....
-// Programming paradigm: TableDataFlow
-interface IPullTable<T>
-{
-    event DataReadyDelegate SourceReady;
-    List<string> GetHeaderLabels();
-    IEnumerable<T> GetIEnumerable<T>();
-}
-....
-
-
-
-
-
-Don't worry, we won't be creating new programming paradigms at this rate for long. In fact we already have most of the ones we will ever use in all our example projects.
-
-Notice how in the above examples, we have used software engineering patterns we already know about, just in a different way. There is DSL, Dependency Injection, Event driven programming, XAML-like UI layout (without the XML), RX (Reactive programming), monad-like wiring up of objects, fluent style. 
-
-
-Notice how the application code in each case is both a direct representation of the requirements and executable. The requirements themselves are cohesive, and so the application code that expresses it should be also. We do not try to separate UI, I/O, business logic, persistent data etc because they are highly cohesive in the requirements. Most other architectural patterns do separate in this way, which creates coupling. Instead we reduce the problem in a different way - through the use of domain abstractions. All knowledge and details from the requirements ends up in the application layer, and that's all that ends up in the application layer.
-
-Note: Although the fluent style is nice for these small applications, code like this with indenting and nested brackets does not scale up well for large applications. (It is still much better than the tangled web of dependencies they would form in conventional modular code though.) But we can do better. We will not be hand-writing code like this for large applications - we will switch to diagrams and automatically generated the code instead. A network-like structure is showing up in these small applications because the requirements contain a network of connections. ALA embraces this and makes it explicit.
-
-
-Note: The Wiring pattern used in the examples above is only one possible way of meeting the fundamental ALA constraints. For example, ALA can also be applied to functional programming. Indeed monads use a comparable wiring pattern. But we will use the wiring pattern quite often. ALA may appear to be synonymous with this Wiring pattern, but actually ALA is just the two fundamental constraints stated at the beginning of this introduction. 
 
 This web site is a work in progress. ALA is a research in progress. Please don't hesitate to provide feedback to the e-nail address given at the end.
 

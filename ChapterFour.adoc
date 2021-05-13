@@ -407,7 +407,7 @@ EventBlock -> Mult
 By default multiple IDataFlows wired to a single output are executed in the order that they are wired anyway. On the diagram, they are drawn top to bottom in that order.  This improves the determinism but is a little too implicit for my liking, so that is why I use the order abstraction.
 
 
-=== Live-data-flow
+=== Live data-flow
 
 As used in the coffee-maker example earlier, this paradigm simulates electronic circuits instead of using the concept of discrete messages. Semantically the inputs have the values of the outputs they are wired to at all times. This type of flow is readily implemented with shared memory variables.
 
