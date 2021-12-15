@@ -1,32 +1,72 @@
 :imagesdir: images
 
 
-== Chapter one - What problem does it solve?
+= Chapter one - What problem does it solve?
+
+If you already have some experience writing code, skip this chapter. If you already know about difficult to maintain code, big balls of mud or spaghetti code, skip this section. If you already find it hard to trace out the large scale structure through the modules of a design, skip this chapter. If you already find it hard to get your head around the plethora of design patterns and architectural styles, skip this section. However, the example at the end is pretty cool - it starts with the type of typical C code that I see most students write, and then refactors, it step by step, into ALA compliant code - you should take a look at that.
+
+The problem that ALA solves can be seen as any one of the following perspectives.
+
+== The Big Ball of Mud
+
+ALA is an in-the-large strategy to organise code. It provides the constraints needed for the code structure to never degenerate into sphagetti code, or what Brian Foote and Joseph Yoder describe as a "big ball of mud". As the software  life cycle continues, retaining the organisation becomes easier rather than harder.
 
 
 
-=== The Big Ball of Mud
+== Simplify down the overwhelming set of architectural styles, patterns, principles and paradigms
 
-ALA is an in-the-large strategy to organise code. It provides the constraints needed for the code structure to never degenerate into sphagetti code, or what Brian Foote and Joseph Yoder describe as a "big ball of mud". As the software  life cycle continues, retaining the organisation becomes easier rather than harder. This is because of increasing reuse of software artefacts within the organisation.
+There are many traditional so-called architectural styles, patterns, principles and paradigms. The problem of structuring software code to meet quality attributes involves mastering an overwhelming number of them. Here are some examples:  
 
 
+* loose coupling and high cohesion, information hiding, separation of concerns
+* DSLs, components and connectors, aspects, model driven, MVC, inversion of control, functional programming, UML Class diagrams, sequence diagrams, activity diagram.
+* Views, Styles, Patterns, Tactics, Models, ADL's, ADD, SAAM, ATAM, 4+1, Decomposition
+* CBD/CBSE, C&C, Pipes & Filters, n-tier, Client/Server, Plug-in, Microservices, Monolithic, Contracts, Message Bus
+* Modules, Components, Layers, Classes, Objects, Abstraction, Granularity 
+* Semantic coupling, Syntax coupling, Temporal coupling, existence coupling, Dependencies, Interactions, Collaboration
+* Interfaces, Polymorphism, Encapsulation, Contracts, Interface Intent
+* Execution models, Event-Driven, Multithreaded, Mainloop, Data-driven, Concurrency, Reactor pattern, Race condition, Deadlock, Priority Inversion, Reactive 
+* Principles: SRP, OCP, LSP, ISP, DIP; MVC, MVP, etc 
+* Design Patterns: Layers, Whole-Part, Observer, Strategy, Factory method, Wrapper, Composite, Decorator, Dependency Injection, Callbacks, Chain of Responsibility, etc
+* Expressiveness, Fluency, DDD, Coding guidelines, Comments
+* Programming Paradigms, Imperative, Declarative, Object oriented design, Activity-flow, Work-flow, Data-flow, Function blocks, Synchronous, State machine, GUI layout, Navigation-flow, Data Schema, Functional, Immutable objects, FRP, RX, Monads, AOP, Polyglot-Programming Paradigms
+* Messaging: Push, Pull, Synchronous, Asynchronous, Shared memory, Signals & Slots
+* Memory management, Heap, Persistence, Databases, ORMs
+* Waterfall, Agile, Use cases, User stories, TDD, BDD, MDSD
 
-=== Existing architectural patterns
+Mastering all these topics takes time. Even if you can, juggling them all and being able to use the right ones at the right time is extremely taxing on any developer. Add to that the mastering of technologies and tools, keeping to agile sprint deadlines, and commitment to your team and management, it is an almost impossible task. 'Working code' tends to be what the team is judged on, especially by project managers or product owners who have no direct interest in architecture or even the Definition of Done. They don't want to know about the rather negative sounding term, "technical debt".
 
-There are many existing architectural styles, patterns, or principles: loose coupling and high cohesion, information hiding, layers, decomposition, DSLs, components, aspects, models, event-driven, MVC, composite, inversion of control, functional programming, object oriented design, UML Class diagrams are all examples.
+Most texts will tell you that these are all tools and that you need to use the right tools for each job. It all depends, they say, on the particular system, and its particular functional and non-functional requirements. In most cases they end up being used in an ad-hoc manner that doesn't work well. In some cases their use is actually harmful.
 
-This set is sufficient, but there is no overarching strategy that tells you how to combine tham all in a coherent way. in most cases they are used in an ad-hoc manner that doesn't work. In some cases their use is actually harmful. ALA provides a large scale organisational framework into which all of these fit.
+ALA says this is incorrect. There exists a meta-architecture consisting of two fundamental constraints that all software should follow. Then styles, patterns, principles and paradigms like the ones listed above will emerge easily. Some, like MVC, will be revealed as being bad.
 
-=== An optimal reference architecture
+Being a pre-worked recipe of the aforementioned styles and patterns, ALA actually contains no truly novel ideas. Some ingredients are accentuated in importance more than you might expect (such as abstraction). Some are relatively neutral. Some are purposefully left out. The biggest surprise for me during the conception process of ALA was that some well-established software engineering memes seemed to be in conflict. Eventually I concluded that they were in-fact bad. We will discuss these in detail in subsequent chapters.
 
-ALA is a reference architecture. It is independent of any specific domain, so it is a general reference architecture. The reference architecture is 'optimal' for certain non-functional requirements. By optimal, I mean that it makes these qualities as good as they can be.
+Like any good recipe, the ingredients work together to form a whole that is greater than the sum of parts. The resulting code quality is significantly ahead of what the individual memes do by themselves. It continues to surprise me just how effective, and enjoyable, it is. 
 
-** Complexity
+
+== An optimal reference architecture for quality attributes
+
+ALA is a reference architecture. It is independent of any specific domain, so it is a general reference architecture. The reference architecture is 'optimal' for certain non-functional requirements. By optimal, I mean that it makes these qualities as good as they can be:
+
 ** Readability
+** Complexity
 ** Maintainability
 ** Testability
+** Understandability
+** Modifiability
+** Extensibility
+** Dependability
 
 If other non-functional requirements are also important, ALA provides a good starting point. Even if the ALA structure must be compromised for other qualities, it is still better to start with these quality attributes optimised and deviate from them as necessary. As it happens, the maintainability resulting from ALA frequently makes other quality attributes easy to achieve as well. For example, in an ALA application it is often easy to make performance optimizations in the execution model that don't affect the application code. Or, you can port an application without changing the application code.  
+
+** Performance
+** Availability
+** Scalability
+** Portability
+** Security
+** Usability
+** Fault-tolerance
 
 
 ==== Readability 
@@ -120,9 +160,9 @@ This is a qualitative graph comparing the complexity of an ALA application with 
 
 The maintainability effort over time should qualitatively follow the green curve in the graph below because as software artefacts are written, their reuse should reduce the effort required for other user stories. Product owners seem to have an innate sense that we manage to organise our code such that this happens. That is why they get so frustrated when things seem to take longer and longer over time, and they often ask us "haven't we done this before". In practice, too often we follow the red curve. Maintenance eventually gets so difficult that we want to throw it away and start again. We reason we can do better. My experience is that we don't do better when we rewrite. We just create another mess. It is just a psychological bias on the part of the developer caused by a combination of a) the Dunning Kruger effect and b) the fact that it is easier to read our own recently written code than someone else's.
 
-If we apply all the well known styles and principles, the best we seem to be able to manage is the orange curve, which still has maintenance effort continuously increasing with an exponential factor.
+If we apply all the well known styles and principles, the best we seem to be typically manage is the orange curve, which comes from the COCOMO models, and which still has maintenance effort continuously increasing.
 
-However, whenever we have done an experimental re-write using ALA, it comes out spectacularly better.
+When we did an experimental re-write of a legacy application using ALA, and measured its maintainability attribute, it comes out as improving over time by several different measures.
 
 
 
@@ -207,28 +247,46 @@ ALA is based on the theoretical architectural constraints needed to follow the g
 
 ==== Testability
 
+In ALA all code is testable. ALA makes it clear when to mock and when to test with dependencies in place. All dependencies are left in place, because all dependencies are design-time or knowledge dependencies. 
 
-=== Domain oriented
+Therefore, when testing the application layer abstractions, they are tested with their domain abstraction dependencies. In other words, testing the application is acceptance testing.
 
-As has been found useful in other methodologies such as Domain Specific Languages, Domain Driven Design, Model Driven Software Development and Language Oriented Programming, ALA provides a way to be 'domain oriented'. 
+Testing domain abstractions is easy with units tests because abstractions are zero-coupled. Mocks objects are wired to ports.
 
-But unlike most of the other domain oriented methodologies, ALA provides a way to be domain oriented with ordinary code, and with the same development environment. It is just a way to organise ordinary code to be domain oriented.
 
-=== The software engineer's trap
 
-Typical bright young engineers come out of university knowing C++ or Java (or other C*, low-level, imperative, language that mimics the silicon), and are confident that, because the language is Turing-complete, if they string together enough statements, they can accomplish anything. At first they can. Agile methods only require them to deliver an increment of functionality. There hardly seems a need for a software architect to be involved. And besides, we are told that any design can emerge through incremental refactoring.
+== Structure hidden inside the modules
+
+The problem in most large code bases is that the system structure, the in-the-large structure, is not explicit. It is distributed inside the modules themselves. If there is any collaboration between modules, it is implicitly hidden inside them. Finding this structure, even for a single user story can be time consuming. I have often spent a whole day doing that, doing countless all-files searches following function calls or method calls of the user story through many modules just to end up changing one line of code. Many developers I have spoken to can identify with this experience.
+
+It can get a lot worse as the system gets larger. In a seemingly bizarre twist, the more loosely coupled you make the elements, the harder it gets to trace a user story because of the indirections. Some people conclude that loose coupling and being able to trace through a user-story are naturally in conflict.
+
+I call this situation SMITA (Structure Missing in the Action). The internal structure is sometimes drawn as a model - high-level documentation of the hidden structure. But such models are a secondary source of truth.
+
+ALA completely eliminates this problem and this conflict. The structure is explicitly coded in one place, without any indirections. Yet the abstractions are zero-coupled. 
+
+
+
+
+
+
+
+== The software engineer's trap
+
+Typical bright young engineers come out of university knowing C++ or Java (or other C*, low-level, imperative, language that mimics the silicon), and are confident that, because the language is Turing-complete, if they string together enough statements, they can accomplish anything. At first they can. There hardly seems a need for a software architect to be involved. And besides, we are told that a design can emerge through incremental refactoring.
 
 image::Cynefin.jpg[Cynefin.jpg,800, title="Code can quickly get complex"]
 
-As the program gets larger, things are getting a little more complicated, but the young developer's brain is still up to the task, not realizing he has already surpassed anyone else's ability to read the code. He is still able to get more and more features working. One day the code suddenly 'transitions'. It transitions from the complicated quadrant into the complex quadrant. And now it is trapped there. It is too complex for the in-the-large refactoring that would be required to make it transition back. This pattern happens over and over again in almost all software.
+As the program gets larger, things get a little more complicated, but the young developer's brain is still up to the task, not realizing he has already surpassed anyone else's ability to read his code. He is still able to get more features working. One day parts of the 'transition'. It becomes somewhere you don't want to go. On the Cynfin diagram, it has transitioned from the complicated quadrant to the complex quadrant. And now it is trapped there. It is too complex for refactoring.  
 
 The incremental effort to maintain starts to eat away and eventually exceed the incremental increase in value. This now negative return causes the codebase itself to eventually lose value, until it is no longer an asset to the business. 
 
-When a new bright young engineer who knows C* arrives, he looks at the legacy codebase and is convinced that he can do better. And the cycle repeats. This is the CRAP cycle (Create, Repair, Abandon, rePlace). ALA is the only method I know that can prevent the CRAP cycle.
+It has transitioned to chaos. It will be abandoned. When a new bright young engineer who knows C* arrives, he looks at the legacy codebase and is convinced that he can do better. And the cycle repeats. This is the CRAP cycle (Create, Repair, Abandon, rePlace). ALA is the only method I know that can prevent the CRAP cycle.
 
-=== A short history of ALA
 
-From early on in my career, I experienced the CRAP cycle many times. Each time I wanted to find a way to not fall into it. I would research and use all the architectural styles and principles I could find. I would come across things like 'loose coupling', and I remember asking myself, yes but how does one accomplish that?, and still fail.
+== A short history of ALA
+
+From early on in my career, I experienced the CRAP cycle, not so much rewriting applications, but trying to avoid the mess when writng new ones. Each time I wanted to find a way to not fall into it. I would research and use all the architectural styles and principles I could find. I would come across things like 'loose coupling', and I remember asking myself, yes but how does one accomplish that?, and still fail.
 
 I started searching for a pre-worked, generally applicable, 'template architecture' that would tell me what the organisation of the code should look like for any program. I searched for such a thing many times and never found one. Some would say that this is because the highest level structure depends on project specific requirements.
 
@@ -241,36 +299,7 @@ Analysing the common properties of those two code bases, gave clues that eventua
 Subsequently, I ran some experiments to see if the maintainability and non-complexity could be predictably reproduced. These experiments, which have worked spectacularly well so far, are discussed as a project at the end of every chapter.
 
 
-=== Simplify the overwhelming software architecture styles, patterns & principles
-
-Currently the problem of structuring software code to meet quality attributes involves mastering an overwhelming number of software engineering topics. Here are just a few examples:  
-
-* Understandability, Readability, Maintainability, Modifiability, Testability, Extensibility, Dependability, Performance, Availability, Scalability, Portability, Security, Usability, Fault-tolerance
-* Views, Styles, Patterns, Tactics, Models, UML, ADL's, ADD, SAAM, ATAM, 4+1, Decomposition
-* CBD/CBSE, C&C, Pipes & Filters, n-tier, Client/Server, Plug-in, Microservices, Monolithic, Contracts, Message Bus
-* Modules, Components, Layers, Classes, Objects, Abstraction, Granularity 
-* Information hiding, Separation of Concerns, Loose Coupling & High Cohesion 
-* Semantic coupling, Syntax coupling, Temporal coupling, existence coupling, Dependencies, Interactions, Collaboration
-* Interfaces, Polymorphism, Encapsulation, Contracts, Interface Intent
-* Execution models, Event-Driven, Multithreaded, Mainloop, Data-driven, Concurrency, Reactor pattern, Race condition, Deadlock, Priority Inversion, Reactive 
-* Principles: SRP, OCP, LSP, ISP, DIP; MVC, MVP, etc 
-* Design Patterns: Layers, Whole-Part, Observer, Strategy, Factory method, Wrapper, Composite, Decorator, Dependency Injection, Callbacks, Chain of Responsibility, etc
-* Expressiveness, Fluency, DDD, Coding guidelines, Comments
-* Programming Paradigms, Imperative, Declarative, OO, Activity-flow, Work-flow, Data-flow, Function blocks, Synchronous, State machine, GUI layout, Navigation-flow, Data Schema, Functional, Immutable objects, FRP, RX, Monads, AOP, Polyglot-Programming Paradigms
-* Messaging: Push, Pull, Synchronous, Asynchronous, Shared memory, Signals & Slots
-* Memory management, Heap, Persistence, Databases, ORMs
-* Up-front design, Agile, Use cases, User stories, TDD, BDD, MDSD
-
-Mastering all these topics takes time. Even if you can, juggling them all and being able to use the right ones at the right time is extremely taxing on any developer. Add to that the mastering of technologies and tools, keeping to agile sprint deadlines, and commitment to your team and management, it is an almost impossible task. 'Working code' tends to be what the team is judged on, especially by project managers or product owners who have no direct interest in architecture or even the Definition of Done. They don't want to know about the rather negative sounding term, "technical debt".
-
-ALA works by pre-solving most of these software engineering topics into a single 'meta-style'. This meta-style provides a simple set of architectural constraints. 
-
-Being a pre-worked recipe of the aforementioned list of styles and patterns, ALA contains no truly novel ideas. Some ingredients are accentuated in importance more than you might expect (such as abstraction). Some are relatively neutral. Some are purposefully left out. The biggest surprise for me during the conception process of ALA was that some well-established software engineering memes seemed to be in conflict. Eventually I concluded that they were in-fact plain wrong. We will discuss these in detail one at a time in subsequent chapters. But to wet your appetite here is one meme that ALA definitely banishes to furtherest of evil kingdoms: the UML class diagram. Read on to find out why.
-
-Like any good recipe, the ingredients work together to form a whole that is greater than the sum of parts. The resulting code quality is significantly ahead of what the individual memes do by themselves. It continues to surprise me just how effective, and enjoyable, it is. 
-
-
-=== Example project - Thermometer
+== Example project - Thermometer
 
 In this example project, we will first do conventional code using functions, then refactor it into abstraction layers, and finally improve on that using classes. The ALA layering rules work the same for both functions or classes.  
 
@@ -298,7 +327,7 @@ In this example project, we will first do conventional code using functions, the
 
 // The top layer describes requirements and that's all it does (like a DSL). It composes functions from the lower layers, and configures them for a specific purpose according to the requirements. 
 
-Functions have an execution model we are already familiar with, making this first example easier to understand. However, keep in mind that, for whole programs, this execution model does not usually make a good programming paradigm. An emergent property of ALA its support of multiple and diverse poogramming paradigms including your own. We do this to improve expressivness of the of requirements. 
+Functions have an execution model we are already familiar with, making this first example easier to understand. However, keep in mind that, for whole programs, this execution model does not usually make a good programming paradigm. An emergent property of ALA its support of multiple and diverse poogramming paradigms including your own. We do this to improve expressiveness of the requirements. 
 
 Nevertheless, functional composition is a passable programming paradigm for a tiny, dedicated embedded program in a micro-controller such as our thermometer. Let's have a look at some typical code:
 
@@ -397,7 +426,7 @@ We are going to refactor the program using the ALA strategy:
 * those functions will not know anything about thermometer
 * those functions will, therefore, be more abstract than a thermometer 
 
-==== Toward ALA 
+==== Toward ALA code
 
 
 
@@ -470,7 +499,7 @@ We are going to refactor the program using the ALA strategy:
 
 The code now begins to be arranged into two abstraction layers, the application layer and the domain abstractions layer. The application is now the only function that knows about being a thermometer. (It is still doing some logic work - the 'for loop' and 'if statement', which we we will address soon.) 
 
-All the other functions are now more abstract - they know nothing about thermometers - GetAdcReadings, OffsetAndScale, SampleEvery, Filter, FloatToString, and Display. Notice that the word 'thermometer' has been removed from their names, and none of them contain constants that are specific to a thermometer. 
+All the other functions are now more abstract - they know nothing about thermometers - GetAdcReadings, OffsetAndScale, SampleEvery, Filter, FloatToString, and Display. Notice that the word 'thermometer' has been removed from their names, and none of them contain constants or any other references that are to do with a thermometer or temperature. 
 
 These abstract functions give you six things:
 
@@ -486,7 +515,7 @@ Now let's go one more step and create an abstraction to do what that for loop do
 
 
 
-==== Toward ALA code 2
+==== Further toward ALA code
 
 
 .application.c
@@ -528,7 +557,7 @@ Now let's go one more step and create an abstraction to do what that for loop do
 
 
 
-Now let's deal with that problematic "func1". "func1" is not an abstraction - you cannot give it a name and learn a simple concept of what it does. That's why I gave it a non-descript name. The content of func1 is cohesively just part of the thermometer application. The relationship from main() to func1 is a symbolic indirection - nothing more than a wiring between two points in the program. In this case func1 is immediately below where it is used in the same small file, but as the program grows, these wirings are always hard to follow. You would need to resort to text searches to find these connections. These types of connections can be numerous and unstructured in larger programs, and the best way to deal with them is usually diagrams. However, this particular one can be dealt with in text form. So let's go ahead and remove it by using an anonymous function directly as the second parameter of foreach: 
+Now let's deal with that problematic "func1". "func1" is not an abstraction - you cannot give it a name and learn a simple concept of what it does. That's why I gave it a non-descript name. The content of func1 is cohesively just part of the thermometer application. The name func1 only serves as a symbolic connection within cohesive code - nothing more than a wiring between two points in the program. In this case func1 is immediately below where it is used in the same small file, but as the program grows, these symbolic wirings are always hard to follow. You would need to resort to text searches to find these connections. These types of connections can be numerous and unstructured in larger programs, and the best way to deal with them is usually diagrams. However, this particular one can be dealt with in text form. So let's go ahead and remove it by using an anonymous function directly as the second parameter of foreach: 
 
 
 
@@ -557,13 +586,13 @@ Now let's deal with that problematic "func1". "func1" is not an abstraction - yo
  }
 
 
-It uses he lambda syntax '()=>{}', which if you are not already familiar with, is worth getting used to because we will end up using it a lot in ALA programs to get code into the right layers according to their knowledge abstraction level.
+It uses the lambda syntax '()=>{}', which if you are not already familiar with, is worth getting used to. It really helps to get code into the right layers according to their abstraction level.
 
 The next thing we want to do is get rid of the while loop, get rid of the indenting, and stop handling the data that is being passed from one function to another. None of them have anything to do with a thermometer. All those intermediate holding variables, adcs, temperatureCelcius, etc are all just symbolic connections. They are too much work when we just want to compose our thermometer from abstractions.
 
 The while loop and all the indenting are there only because we have 'execution flow' tied in with our composition of abstractions.
 
-To do this we will use monads in an intermediate step. Don't worry if you don't understand monads, we don't really need this step to understand our final goal. But for those who do know monads, it is interesting to visit this step to see why the functional programming guys invented them. 
+To do this we will first show how its done using monads. Don't worry if you don't understand monads, we don't really need this step to understand our final goal. But for those who do know monads, it is interesting to visit this step to see why the functional programming guys invented them. In the next step we will use ordinary classes, which will be more versatile than monads.
 
 ////
 <1> The application function is readable in isolation (without having to go and read code inside any of the abstractions.
@@ -637,7 +666,7 @@ It gets us closer from a composition of abstractions point of view, but all that
 
 ////
 
-==== Composing with monads
+==== Brief detour: composing with monads
 
 .application.c
 [source,C]
@@ -658,7 +687,7 @@ It gets us closer from a composition of abstractions point of view, but all that
 
 
 
-Monads have allowed us to separate execution flow from composition flow. The composition flow is now a data-flow paradigm. Data will flow from the ADC to the display, so that is directly represented by the composition. How it executes is now separated out, and we will go into how that works shortly. Let's first understand the 'composition' and why this is so important.
+Monads have allowed us to separate execution flow from composition flow. The composition flow is now a pure data-flow paradigm. Data will flow from the ADC to the display, so that is directly represented by the composition. How it executes is now separated out, and we will go into how that works shortly. Let's first understand the 'composition' and why this is so important.
 
 Even if you don't understand how the monads work, you can see that syntactically the program is now very nice because all it does is compose instances of abstractions, and configure them with constants to be a thermometer. The composition is not declarative - it is 'data-flow', because data-flow suits how to describe the thermometer.
 
@@ -678,11 +707,11 @@ It is common to use multi-threading as the solution to the first four problems i
 
 ////
 
-We are using the word 'composition' here to mean the things we are joining together in adjacent lines of code. It can also mean joining boxes with lines in a diagram. Think of a composition as analogous to the adjacent notes in a music score, which are always played successively. If the lines of code are statements or function calls, we are composing things for successive synchronous execution by the CPU. 
+We are using the word 'composition' here to mean the things we are joining together in adjacent lines of code. It can also mean joining boxes with lines in a diagram. Think of a composition as analogous to the adjacent notes in a music score, which are always played successively. If the lines of code are statements or function calls, we are composing things for successive synchronous execution by the CPU. If the lines of code are data processors, we are composing things for successive processing of data and passing their output to the next data processor. 
 
-Here we are composing for successive processing of data, or data-flow composition. If we are stuck with thinking in terms of imperative execution flow, the only way of thinking in the C language, we will need to try hard to let that go, and realize that in ALA, 'composition' can be anything you want.  
+Here we are composing for successive processing of data, or data-flow composition. If we are stuck with thinking in terms of imperative execution flow (the only way of thinking in the C language) we will need to try hard to let that go, and realize that in ALA, 'composition' can be any programming paradigm you want.  
 
-Also notice that the first statement just builds the program. Then the second statement sets it running. This two stage aspect of monads is common in the programming paradigms we will use in ALA. It is because the underlying execution flow is not the same as the flow of the program. We first wire it up, and then we tell it to 'execute'.
+Also notice that the first statement just builds the program. Then the second statement sets it running. This two stage aspect of monads is common in the programming paradigms we will use in ALA. It is because the underlying execution flow is not the same as the flow of the programming paradigm. We first wire it up, and then we tell it to 'execute'.
 
 The while loop code version we had above handled the data itself. Each function returned the data which was stored in a local otherwise useless variable and then passed into the next function. The monad code doesn't do that. Instead, it creates and wires together objects which will, at run-time, send the data directly from one to another. This does not mean that the abstractions themselves know anything about each other - they are still zero coupled. 
 
@@ -690,18 +719,18 @@ Lastly, here's how monads actually execute - the execution model. Don't worry if
 
 Each function in the program statement (the function after each dot) executes once when the program starts. They are not executed when the program is running. Each of these functions first instantiates an object (using new), and secondly wires that object to the previous object. 
 
-The functions wire the objects together using a common abstract interface. Common interfaces used for this type of programming paradigm are like IEnumerable or IObservable. These interfaces support iteration of data, what we call a stream. If using the IEnumerable interface, there is a simple method in the interface that pulls data from the previous object. If using the IObseravble interface, there is a simple method in the interface that pushes data to the next object. The execution can be done either way. 
+The functions wire the objects together using a common abstract interface. Common interfaces used for monads are like IEnumerable or IObservable. These interfaces support iteration of data, by returning an IEnmerator or IObserver. If using the IEnumerator interface, there is a simple method in the interface that pulls data from the previous object. If using the IObseravble interface, there is a simple method in the interface that pushes data to the next object. The execution can be done either way. 
 
 
 
-==== Composing with objects
+==== Composing with plain objects
 
 
 ////
 The most common programming paradigm we will likely want to use is Data-flow. When we compose domain abstractions together using this paradigm, we mean that at run-time data will pass between adjacently wired instances. There may be waits, thread swaps, or IO along the way. It may take days for the data to flow through. But the flow is directly expressed as adjacent lines of code. A Data-flow implementation used in functional programming is monads. We wont learn further about monads here (many have attempted to explain monads and failed), except to say that this is what the Thermometer example might look like using them. 
 ////
 
-Here is the same program as above, but we are using plain objects instead of monads. We use the 'new' keyword ourselves to create the instances of abstractions, and explicitly wire them together using a wiring function. It's a little less succinct than the monad version, but easier to understand if you are not used to monads.: 
+Here is the same program as above, but we are using plain objects instead of monads. We use the 'new' keyword ourselves to create the instances of abstractions, and explicitly wire them together using a wiring function. It's a little less succinct than the monad version, but easier to understand, and more versatile when we want multiple ports and different programming paradigms. 
 
 .application.c
 [source,C]
@@ -725,19 +754,20 @@ The wireIn method is doing dependency injection.
 
 The WireIn method returns the new object, so it is possible to string WireIns together. This is called fluent syntax. 
 
-==== Composing using multiple programming paradigms:
+
+==== Using multiple programming paradigms:
 
 
-Monads are not versatile enough to handle arbitrary wirings of multiple programming paradigms, which we will want in ALA programs. They usually only give us data-flow. But what if we want to compose the UI? What if we want to compose the flow of navigation around an application? What if we want to compose transitions in a state machine? In ALA, we be able to do all this in the one application, in the same way - using whatever programming paradigms are the  best way to express the requirements. 
+Monads are not versatile enough to handle arbitrary wirings of multiple programming paradigms, which we will want in ALA programs. They usually only give us data-flow. But what if we want to compose the UI? What if we want to compose the flow of navigation around an application? What if we want to compose transitions in a state machine? In ALA, we are able to do all this in the one application, in the same way - using whatever programming paradigms are the best way to express the requirements. 
 
-Some instances of abstractions will need to take part in multiple paradigms, such as both UI and data-flow. When we boil down the description of our application to pure composition, our composition will often be a network. And when you have a network, your composition is best described by a diagram. 
+Some instances of abstractions will need to take part in multiple paradigms, such as both UI and data-flow. When we boil down the description of our application to pure composition, our composition will often be a network of relationships. And when you have a network, your composition is best described by a diagram. 
 
 To illustrate this let's add some UI to our thermometer:
 
 image::ThermometerDiagram.png[ThermometerDiagram.png,500, title="Thermometer application complete with UI"]
 
 
-The diagram has both UI composition and data-flow composition. Once we have this diagram, it is easy to conceive how we might add features. For example, we could add a button into the UI, and wire it a switcher abstraction that changes between Celcius and Faranheit.
+The diagram has both UI composition and data-flow composition. Once we have this diagram, it is easy to conceive how we might add features. For example, we could add a button into the UI, and wire it to a switcher abstraction that changes between Celcius and Faranheit.
 
 For the UI part of the composition, the lines obviously don't mean data-flow - they mean 'display inside'. So now different lines in our diagram have different meanings. Here is how that diagram is represented as text. 
 
@@ -764,8 +794,8 @@ For the UI part of the composition, the lines obviously don't mean data-flow - t
  }
 ....
 
-The text of the ALA thermometer still has a symbolic connection, which can be read in this small program, but doing that won't scale up. That is why we consider the diagram to be the source, and this text version is generated from it.
+The text of the ALA thermometer has a symbolic connection for one of the wirings, "temperature". This is ok in this small program, but doing that won't scale up. That is why we consider the diagram to be the source, and this text version is generated from it.
 
-Looking once again at the diagram, you can see that ALA how allowed us to keep all cohesive knowledge about a thermometer together, and quite succinctly. It contains all the details needed to describe a thermometer, but does so in terms of domain abstractions that are not specific to a thermometer at all. If you can see that point in the example code, then you are starting to understand ALA.
+Looking once again at the diagram, you can see that ALA has allowed us to keep all cohesive knowledge about a thermometer together, and quite succinctly. It contains all the details needed to describe a thermometer, but does so in terms of domain abstractions that are not specific to a thermometer at all. There is no implementation in the application code. All implementation is done by domain abstractions. If you can see that point in the example code, then you are pretty much understanding ALA.
 
 

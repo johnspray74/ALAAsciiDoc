@@ -1,9 +1,9 @@
 :imagesdir: images
 
-== Chapter five - Methodology
+= Chapter five - Methodology
 
 
-=== The first few strokes
+== The first few strokes
 
 As a software engineer contemplating a new project, I have often asked myself "Where do I start?" This also happens with legacy code, when contemplating the direction that refactorings should take. "If this software were structured optimally well, what would it look like?"
 
@@ -16,9 +16,11 @@ Furthermore, once this architectural work is done, the Agile process works signi
 My experience over several projects so far is that the initial architecture does not need to change as the development proceeds if good quality abstraction are invented.
 
 
+There is one aspect of ALA that is hard to master - the invention of appropriate abstractions in a new domain. The reason why the "standard deviation uses squareroot" example seems easy is that the squareroot abstraction was already invented, and we already know it. In ALA you will need to invent your own domain level abstractions. In other engineering disciplines, new abstractions come along only every few years, or hundreds of years sometimes. In software engineering, we have to do it every day in the first two weeks of a project in a new domain, and probably every iteration after that for a few iterations. But all whom I have taught how to do this have found it worth the effort, and all get much better at doing it. Working in the resulting zero-coupled code becomes a joy. 
 
 
-=== Agility
+
+== Agility
 
 ALA is inherently optimally agile (except for an Iteration zero which we will discuss next). By optimally agile, we mean that the amount of code that changes to change functional requirements is the minimum it can be. The amount of code that actuall depends on requirements is a small percentage of the total. This differs from the average application where most code depends on the requirements.
 
@@ -223,7 +225,7 @@ The COCOMO model, which is an average of industry experience, has a power relati
 
 ALA takes advantage of the fact that zero-coupled abstractions can keep complexity relatively constant and drastically increase reuse. A spectacular fall in effort per user story is thus possible.  
 
-=== Technical debt
+== Technical debt
 
 Technical debt is real. Convincing your non-technical manager that it is real is not realistic, especially when you tell him that this is based on estimates. He already knows about your 'estimates'. Even if you could measure it, and offer your manager a payback period for a one-day investment in refactoring, there is a problem. He is measured on this sprints performance. Or he is measured on some other criteria such as this years budgeted sales. Technical debt is tomorrow's problem, and that is not his problem, not ever.
 
@@ -237,7 +239,7 @@ Now some will argue that they do that already. Their large scale structure is la
 
 
 
-=== Folder structure
+== Folder structure
 
 ....
 [tree,file="folderstructure.png"]
@@ -305,14 +307,14 @@ This is a suggested folder structure for ALA. Because ALA does not use decomposi
 
 Similarly, the Programming Paradigms code is not contained by an application, or even by the domain, so would not be contained by the domain's projects folder.
 
-=== Convention over configuration
+== Convention over configuration
 
 When the application create an instance of an abstraction, most of the configuration of that abstraction should have defaults. In ALA, setters allow optional configuration, reducing the amount of information that would otherwise be required in the application to fully configure each abstraction. Any configuration that we wish to enforce goes into the constructor.
 
 There is a counter argument that says that all configuration should be explicit so that nothing can be forgotten. ALA prefers optional configuration because we want the application to just express the requirements. Also optional configuration allows abstractions to default to their simplest form, making them easier to learn.
 
 
-=== Knowledge prerequisites.
+== Knowledge prerequisites.
 
 When other programmer are doing maintenance on your code, you should make sure they have the knowledge they need. They will need knowledge of ALA. They will need to know about the programming paradigms used. They will need to know about the domain abstractions, and the insight of what each one does. And then they should know that the application diagram is the source code. It is up to you that every develop that follows will know all this.
 
@@ -322,7 +324,7 @@ After they have modified the diagram, the maintaining developers will need to ma
 
 The class name after a new keyword is actually the constructor name, so you must duplicate the summary section there. Often in ALA, the class name is not referred to at all in the application.
 
-=== Two roles
+== Two roles
 
 ALA requires two roles. Both can be done by the same person, but always he should be wearing only one hat at a time. There is the role of the architect, and the role of the developer.
 
@@ -334,7 +336,7 @@ The architect also has a role in helping the developer to design the interface's
 This aspect of ALA can also be difficult at times. I have sometimes got stuck for a day or so trying to figure out how the interfaces should work, while still keeping them more abstract than the domain abstractions. The ALA constraints are that these interfaces should work between any two domain abstractions for which it may be meaningful if they are composed together in an application. However, the problem has always been solvable, and once solved, it always seems to have a certain elegance, as if you have created a myriad of possibilities at once. Implementation of the interfaces by the relevant domain abstractions becomes easy. Development then proceeds surprisingly quickly.     
 
 
-=== Example Project - Coffee machine
+== Example Project - Coffee machine
 
 Robert Martin posed an interesting pedagogical sized embedded system problem about a coffee maker in his book “Agile Software Development: Principles, Patterns and Practices”. The original chapter is called “Heuristics and Coffee”.
 

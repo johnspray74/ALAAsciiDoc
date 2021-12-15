@@ -1,8 +1,8 @@
 :imagesdir: images
 
-== Chapter eight - Surrounding Topics
+= Chapter eight - Surrounding Topics
 
-=== Recursive abstractions
+== Recursive abstractions
 
 ALA enforces a strictly layered (non-circular) knowledge dependency structure. It encourages a small number of  abstraction layers at discrete well separated levels of ubiquity as a framework for the knowledge dependencies. This would appear to exclude the possibility of the powerful abstraction composition technique of recursion, where the meaning of an abstraction is defined in terms of itself. (Or an abstraction implementation may need knowledge of another abstraction, which in its turn has an implementation that needs knowledge of the first abstraction. This appears to require circular knowledge dependencies.
 
@@ -55,7 +55,7 @@ Not all cases of recursion would require these interfaces. If, for example, in y
 With that in mind, we return to expression - term - factor - expression example and ask ourselves if there are really knowledge dependencies involved at all. Do we think have to know about terms to understand what an expression is? The answer is probably no. Besides, adding terms is only one way of making an expression. What if we think of expressions, terms and factors as language elements that are wirable using a paradigm interface called 'can consists of'. That's probably more like how our brains think of it. We could even draw a diagram of the language using 'can consiste of' relationships between elements. The result is an Abstract Sytax tree instead of the Sytax diagram above.
 ////
 
-=== Abstraction of Port I/O properties
+== Abstraction of Port I/O properties
 
 This is an advanced topic that allows abstractions to be written without knowing details of the implementation of the communications. The idea is for the language to support logical or abstracted I/O ports that work for any type of technical communication properties such as described in the sections below. If we allow these properties to be binded late, say at compile-time, they can be changed independently of the domain abstractions. This allows tuning of performance or physical deployment of the abstractions to different processes or hardware. 
 
@@ -93,7 +93,7 @@ We could conceivably write an abstract I/O class with an output interface and an
 ==== Synchronous Request/Response
 
 
-=== Working with legacy code
+== Working with legacy code
 
 In old (non-ALA) legacy code, abstractions, if they ever existed, have usually been destroyed by coupling. If there is no model left by the original designer, or it is out of date, I first create one. I usually have to 'reverse engineer' the model by doing many 'all files searches' and trying to build a mental picture of how everything fits together. It can quickly become mentally taxing if the user story is non-trivial. So I build a UML class diagram from the searches (their one useful application) as the background (using light lines), and a tree of method calls for the specific user story on top of it (using heavier lines). These diagrams can end up looking pretty horrific, because the knowledge of the user-story has become so scattered, especially when inheritance is involved. The tree of method calls will come into the base class but leave from a subclass method.
 
@@ -106,15 +106,15 @@ Conversion of user stories takes place iteratively.
 
 
 
-=== Writing tests architected in ALA
+== Writing tests architected in ALA
 
 TBD
 
-=== Debugging ALA programs
+== Debugging ALA programs
 
 Because in ALA you can get multiple instances of the same class used in multiple places, and multiple implementations of the same interface used in different places, debugging is easier if the instances are able to identify themselves. For this reason I tend to have a local property in every class called Name. The property is immutable and set by the constructor.
 
-=== ALA language features
+== ALA language features
 
 One of my first hobby programming projects was a compiler for a C-like high level language for embedded systems. At the time I had lots of energy to write the compiler and optimize the object code (written in itself, the performance of both compiling and of object code execution beat the first C compilers to later appear by around a factor of ten) but I lacked a lifetime of experience to design a language. Forty years later, I feel as if it's partially the other way around, at least for language feature that would support good architecture. The language I should have implemented way back then should have been an ALA language - one that supported ALA architecture by having the needed constraints.
 
