@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NDHLGMM');</script>
+<!-- End Google Tag Manager -->
+<link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32" />
+<link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16" />
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -437,6 +446,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body class="article toc2 toc-left">
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NDHLGMM"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
 <div id="header">
 <h1>Abstraction Layered Architecture</h1>
 <div id="toc" class="toc2">
@@ -867,7 +880,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <p>John R Spray</p>
 </div>
 <div class="paragraph">
-<p>Last update: 2021-08-15</p>
+<p>Last update: 2021-12-16</p>
 </div>
 <div class="paragraph">
 <p>Feedback is welcome. Please send to johnspray274&lt;at&gt;gmail&lt;dot&gt;com</p>
@@ -3512,7 +3525,7 @@ namespace ProgrammingParadigms
 </td>
 <td class="content">
 <div class="paragraph">
-<p><span class="green"><strong>To understand any one part of the code should involve understanding only that one part of the code and the abstractions it uses.</strong></span></p>
+<p><span class="green"><strong>To understand any one part of the code should involve understanding only that one part of the code, and the abstractions it uses.</strong></span></p>
 </div>
 </td>
 </tr>
@@ -3529,11 +3542,11 @@ namespace ProgrammingParadigms
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/switch-light-bad.png" alt="switch light bad">
+<img src="images/diagram-switch-light-bad.png" alt="switch light bad">
 </div>
 </div>
 <div class="paragraph">
-<p>If instead, an abstraction, System, has code inside it like Light(Switch()), then Switch remains a good abstraction whose internal code is now only concerned with how a switch works. The code inside all three abstractions is now zero coupled. The design-time coupling that used to exist inside Switch is gone. Understanding the system no longer requires looking inside Switch.</p>
+<p>If instead, an abstraction, System, has code inside it like Light(Switch()), then Switch remains a good abstraction whose internal code is now only concerned with how a switch works. The code inside all three abstractions is now zero coupled. Understanding the system no longer requires looking inside Switch.</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -10669,7 +10682,7 @@ Once the code for the single user story is understood, some acceptance tests are
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-12-16 10:16:02 01300
+Last updated 2021-12-16 11:40:59 01300
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/Docco.min.css">

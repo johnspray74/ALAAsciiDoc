@@ -17,12 +17,12 @@ Author Name
 . (CPanel directly (case sensitive name) quicks34 fw2017)
 . Go to cPanel, then File Manager
 . Browse to public_html\abstractionlayeredarchitecture.com
-. Rename index.html to be deleted later
+. Upload any new images from the images folder in the project to the images folder under public_html\abstractionlayeredarchitecture.com
+. Rename index.html to index-backup.html be deleted later
 . Upload new index.html
-. Upload any new images from the images folder to the images folder
 . Check the website and its images
 . Dont let images have capital letters in the extension - they wont be shown in the web site
-* check in to github
+* check-in to github
 
 == Starting Asciidoc
 
@@ -56,6 +56,12 @@ Installed python using instructions
 
 
 === Modification to the css files
+
+I modified the css file used by asciidocfx to improve the headings weight and colour.
+Also I fixed the code blocks not showing up with a background highlight.
+
+For some reason this required changing three copies of css files:
+
 
 "C:\Program Files\AsciidocFX\conf\public\css\asciidoctor.css"
 

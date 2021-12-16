@@ -1,0 +1,4 @@
+BuildAndRelaseProcedure.adoc has details about changes to css files used by asciidocfx.
+This folder has a copy of the modified css file in case it is needed if I ever set up asciidocfx on another machine or if an asccidocfx update overwrites the files.
+
+ 

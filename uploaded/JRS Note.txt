@@ -1,0 +1,1 @@
+These files need to be uploaded to the website in the same folder as index.html

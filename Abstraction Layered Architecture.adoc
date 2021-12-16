@@ -24,7 +24,7 @@ image::BOSS_Great_Wall.jpg[BOSS_Great_Wall.jpg,900, title="*The large scale stru
 
 John R Spray
 
-Last update: 2021-08-15
+Last update: 2021-12-16
 
 Feedback is welcome. Please send to johnspray274<at>gmail<dot>com
 
@@ -99,7 +99,7 @@ Good dependencies are not just good - they are really good. We want as many of t
  When the idea that zero coupling could be achieved through the stated constraints first occurred to us, we did not know what it would be like, or even if it was possible, to create a working system. Our experience since then is that zero-coupling has always been possible, but coming up with the right abstractions is sometimes not obvious. Also, conventional habits, languages, patterns and architectural styles all conspire against you to break the constraints.
  
  
-[big]#*Layers*# 
+*Layers* 
 
 Because of the constraint that an abstraction that is depended on must be significantly more abstract, abstractions form layers. This gives the architecture its name: abstraction layered architecture. We give the layers names that reflect the types of abstractions that tend to go in them like _application layer_, _domain abstractions  layer_ and _programming paradigms layer_. A small number of other layers come into the picture as the application gets larger.
 
@@ -133,7 +133,7 @@ Inheritance is not used in ALA. We only use composition because inheritance brea
 ---
 
 
-*A tiny example*
+[big]#*A tiny example*#
 
  Every chapter has an example, and we do the same here in the summary section. Unlike most pedagogical sized examples, these examples progressively become non-trivial. Yet because of ALA's power, they remain uncomplicated and easy to understand.) 
 
