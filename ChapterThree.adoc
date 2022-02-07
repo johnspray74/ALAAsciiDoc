@@ -1,12 +1,12 @@
 :imagesdir: images
 
-= Chapter three - Why the structure works
+== Chapter three - Why the structure works
 
 In the previous chapter we described what the structure, the anatomy, of ALA looks like as if we were dissecting a dead body. We see where things are but we don't yet understand why they are there. In this chapter we explain why that structure works. Why does this way of organising code result in software that meets those non-functional requirements we listed in Chapter one?
 
 
 
-== A thought experiment
+=== A thought experiment
 
 Imagine you are reading the following function, abc123, and trying to understand it:
 
@@ -104,7 +104,7 @@ The rest of this chapter expands on the points we mentioned briefly in this firs
 
 
 
-== Abstraction as design-time encapsulation
+=== Abstraction as design-time encapsulation
 
 [IMPORTANT]
 ====
@@ -140,7 +140,7 @@ The quality of an abstraction's _concept_ or _idea_ is important. It is the exis
 ****
 
 
-== Zero coupling and higher cohesion
+=== Zero coupling and higher cohesion
 
 ALA has zero coupling between the code inside (or the code that implements) all abstractions. This is the case both horizontally between peers in the same layer, and vertically up or down the layers. 
 
@@ -238,7 +238,7 @@ In our experience, the most common type of change that still affects multiple ab
 
 
 
-== Good versus bad dependencies
+=== Good versus bad dependencies
 
 We can distinguish two types of dependencies. One is run-time dependencies. These are dependencies in the code that are there because one module will need another module to be present at run-time for the system to work. The other is design-time dependencies. These are dependencies on the knowledge you must have to even understand a given piece of code. I will often refer to this type as a "knowledge dependency" or "use of an abstraction". It is also sometimes called "semantic coupling".
 
@@ -350,7 +350,7 @@ The application abstraction can move the data between the instances of ADC, Avg,
 The interface used to connect the instances is called Dataflow. It's important that this interface is abstract. It is two layers down. It is not an interface specific to any one of the domain abstractions, ADC, Avg, etc.. This is the abstract interactions pattern. Many other domain abstractions can either implement it or accept it, or both.
 
 
-=== Comparison of good versus bad dependencies.
+==== Comparison of good versus bad dependencies.
 
 
 .Comparison of two approaches
@@ -402,7 +402,7 @@ Just to recap the only dependencies we have used are good design-time or knowled
 . The domain abstractions should and must know at design-time what programming paradigm it needs - the abstract interfaces to use for their input and output ports. 
 
 
-=== Stable dependencies principle
+==== Stable dependencies principle
 
 A dependency on an abstractions is a dependency on the concept or idea of that abstraction. A concept or idea is generally stable. So dependencies are toward the more stable. 
 
@@ -411,7 +411,7 @@ Even if the implementation details inside an abstraction are complicated or chan
 ALA therefore naturally conforms with the Stable Dependencies Principle (depend in the direction of stability). The SAP is mostly used in relation to packages, but ALA does not use hierarchical encapsulations. Here we are applying it at the level of the abstractions themselves.
 
 
-=== Dependency fan-in and fan-out
+==== Dependency fan-in and fan-out
 
 One of the guidelines sometimes used for dependencies in conventional code is that a class that has high fan-in should not have high fan-out (also called afferent and efferent coupling). Another is that modules higher in the layers should have low fan-in and those lower in the hierarchy have low fan-out.
 
@@ -424,7 +424,7 @@ If we are talking about dependencies in a conventional modular system that are u
 In chapter four we will also talk about fan-in and fan-out. Note that the fan-in and fan-out discussed in chapter four is different. In this chapter fan-in and fan-out is talking about dependencies on abstractions between layers. In chapter four we are talking about fan-in and fan-out in the wiring.
 
 
-=== Circular dependencies
+==== Circular dependencies
 
 Of course in ALA, with only knowledge dependencies present in the system, and the dependencies needing to go toward more abstract abstractions, you obviously cannot have circular knowledge dependencies. Nor would that even make sense. (Recursion appears to require circular knowledge dependencies but actually doesn't. We will visit that in the last chapter.) 
 
@@ -449,7 +449,7 @@ That concludes our discussion on why the ALA structure works from the point of v
 
 
 
-== Knowledge dependencies are on all layers below
+=== Knowledge dependencies are on all layers below
 
 Sometimes layers are used incorrectly as partitions or really just modules. We would be better off to just tip all such layering models on their side.  Because of this mistake, there is a meme that we should only have dependencies on the immediate layer below. For ALA layers this is incorrect.
 
@@ -480,7 +480,7 @@ It's nt necessarily the case that all lower layer knowledge is needed to underst
 
 
 
-== Executable expression of requirements
+=== Executable expression of requirements
 
 We have previously discussed this aspect of ALA in terms of structure. It is the top layer. And we have used this aspect as the starting point in the method to develop the example projects. But why does the succinct description of requirements in that top layer work?
 
@@ -515,7 +515,7 @@ ALA does not pursue the idea of an external DSL (a new syntax), nor even the syn
 Seen as a DSL, in ALA you wire together plain old objects or functions while conforming to a grammar. The grammar comes from the 3rd layer programming paradigms and from which classes use which programming paradigm for ports. This grammar defines the rules for their composition.
 
 
-== Diagrams vs text
+=== Diagrams vs text
 
 The fundamental rules of ALA don't prescribe the use of diagrams. But diagrams often emerge.
 So why do we often use a diagram instead of text in the application (top) layer of an ALA application?
@@ -608,7 +608,7 @@ In my experience, a low overhead drawing tool is essential during the iteration 
 
 
 
-== Composition, not decomposition
+=== Composition, not decomposition
 
 The conventional technique for tackling system complexity is "divide and conquer".
 
@@ -673,7 +673,7 @@ ALA can therefore be thought of as a 'generalised compose from abstractions' met
 
 
 
-== No Data coupling
+=== No Data coupling
 
 In conventional programming, data coupling is considered unavoidable.
 
@@ -705,7 +705,7 @@ If the situation is the other way around, if a 3rd party is providing the instal
 
 But, if the 3rd party is selling you sensors that you install yourself and selling you the MQTT communication infrastructure, then you could be provided with a more abstract 'configuration API' from the 3rd party. You would then write a domain abstraction that knows about that configuration API. Then, whenever you want to do a new user story, you can use an instance of that 'device configuration' abstraction. You can fully configure the MQTT topic itself, and its data format, then subscribe to it and process it. Everything specific to the user story is now cohesively contained inside a single abstraction once again. 
 
-== Composability and Compositionality
+=== Composability and Compositionality
 
 We have used the word _compose_ a lot so far in describing ALA. Now we look at the property of  _composability_ which enables us to compose. Composability means the ability to create an infinite variety of applications by combining instances of a finite number of domain abstractions.
 
@@ -722,7 +722,7 @@ As mentioned earlier, there are other software systems that have composability, 
 We can make an analogy with Lego bricks. Some Lego parts have the familiar little stud and tube connectors. Some will support axles and holes connections, either tight or loose. These different ways of connecting Lego parts are analogous to different programming paradigms. Each has a different behaviour at run-time. 
 
 
-== Some real dependency graphs
+=== Some real dependency graphs
 
 Our example project for this chapter is a real legacy application (that was maintained for approximately 10 years) that we decided to re-write using ALA. Normally, for reasons I won't go into here, I would never re-write an application. Maintenance had become difficult with this legacy code, and we wanted to run a research experiment to see if a rewrite using ALA could be successful. It would also give us a good basis for comparative metrics of the two code bases.
 

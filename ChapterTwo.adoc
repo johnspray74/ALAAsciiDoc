@@ -2,36 +2,102 @@
 :sectnum-start: 2
 
 
-= Chapter two - What does the structure look like?
+== Chapter two - The structure
 
-In this section we describe the anatomy of the ALA structure without trying to explain too much about why it looks that way. That will be covered in chapter three, and even more deeply in chapter six.
+In this section we describe the structure of ALA without trying to explain too much about why it looks that way. An analogy is if we described the physical anatomy of the human body without explaining how it works. How ALA works will be covered in chapter three, why this works in chapter six.  
 
-We describe it from several different perspectives. We all have different prior knowledge on which we build new knowledge. So we will each have a different insight on what ALA is. This chapter has about 10 different perspectives, some concrete, some more theoretical, some by analogy, and finally some by example in code. Use the one that makes the most sense. 
-
-
-== The unit of code is an abstraction
-
-The only unit code in ALA is an abstraction. Not module, not class, not function. An abstraction is different from a module or class in that it must have a 'generalized conceptual idea'. Many modules or classes in traditional code may already be abstractions, more likely if they follow the SRP (Single Responsibility Principle), but even the SRP is not sufficient. Good abstractions are learnable as a concept. Abstraction goes hand in hand with reuse. Krueger said that abstraction and reuse are two sides of the same coin. Abstractions tend to be stable, as stable as their conceptual idea.
-
-Internally abstractions are cohesive, which means highly interconnected (sticking together) for a single purpose.
-
-In ALA, abstractions are implemented as files. The name of the file is the name of the abstraction. The code that implements an abstraction needs no internal organisation. We do not care about dependencies inside an abstraction. In fact the more cohesive everything is the better. It will often be implemented as a single class or function, but may consist of a small number of items such as classes, functions, interfaces, enums, delegates, etc, as long as the total is small.
-
-The concept of information hiding shifts when using the word _abstraction_. A module or class can encapsulate information at compile-time but do not necessarily hide information at design-time. Abstraction is the only mechanism we know of that hides information at design-time.
-
-We will look more in depth at what 'abstraction' means in chapter six.
+We will describe the structure from several different perspectives. We all have different prior knowledge on which we build new knowledge. So we will each have a different insight on what ALA is. This chapter has about 10 different perspectives, some concrete, some more theoretical, some by analogy, and finally some by example in code. Use the one that makes the most sense. 
 
 
+=== The unit of code is an abstraction
+
+The only unit code in ALA is an abstraction. Not module, not class, not function. An abstraction is different from a module or class in that it must be a 'generalized conceptual idea'. It must be learnable as a concept. Many modules or classes in traditional code may already be abstractions, especially if they have no dependencies on peer modules. Abstraction goes hand in hand with reuse. Krueger said that abstraction and reuse are two sides of the same coin. Abstractions tend to be stable, as stable as their conceptual idea. When we have a dependency on an abstraction, it is simply a dependency on a conceptual idea.
+
+Here is an example abstraction called LowPassFilter, which smooths data arriving on its input and outputs it at a slower rate. Its internal code is understandable in itself except for the abstract concept it relies on : IDataFlow. The concept of IDataFlow is the flow of data by pushing it with a Push method. 
+
+.DomainAbstractions\LowPassFilter.cs
+[source,C#]
+....
+using ProgrammingParadigms;
+
+namespace DomainAbstractions
+{
+    /// <summary>
+    /// ALA Domain abstraction
+    /// Has one DataFlow input port and one DataFlow output port, both type double
+    /// Smooths the incoming data and outputs it at a lower frequency
+    /// The strength parameter sets the degree of filtering 
+    /// (cutoff frequency relative to input frequency)
+    /// and also sets the lower rate of output.
+    /// e.g. if Strength is set to 10, then there is one output for every 10 input
+    /// datas received.
+    /// You need to understand the programming paradigm abstraction, IDataFlow,
+    /// to understand this code.
+    /// </summary>
+    class LowPassFilter : IDataFlow<double>
+    {
+        public LowPassFilter(int strength, double initialState = 0.0)
+        {
+            this.strength = strength;
+            this.state = initialState;
+        }
+
+        // ports
+        private IDataFlow<double> output;
+
+        private int strength;
+        private double state = 0.0;
+        private int resampleCounter = 0;
+
+        void IDataFlow<double>.Push(double data)
+        {
+            state = (data + strength * state) / (strength+1);
+            if (resampleCounter==0)
+            {
+                resampleCounter += strength;
+                output?.Push(state);
+            }
+            resampleCounter--;
+        }
+    }
+}
+....
+
+The abstraction has two ports. The input port is the IDataFlow<double> interface that is implemented by the class. Incoming data arrives via a Push method in this interface. We never know where the data comes from. The output port is the private field named "output". This field will be set pointing at an IDataFlow<double> input of an instance of another abstraction somewhere. We will never know where that is. How this field gets set is described later.
+
+Because the abstraction uses ports, it has no knowledge of other peer abstractions, otherwise it would not be abstract. It is self-understandable at design-time, except for the even more abstract concepts on which it depends, the concept of DataFlow and the concept of Wiring. These are described more fully shortly.
+
+Internally, abstractions are cohesive, which means (sticking together) or highly interconnected code collaborating for a single purpose.
+
+In ALA, abstractions are implemented as files. The name of the file is the name of the abstraction. The code that implements an abstraction needs no internal organisation. We do not care about dependencies or any inter-relationships inside an abstraction. In fact the more cohesive everything is the better, as long as it is small. It will often be implemented as a single class or function, but may consist of a small number of items such as classes, functions, interfaces, enums, delegates, etc, as long as the total is small.
+
+The concept of information hiding shifts when using the word _abstraction_. An abstraction is the only mechanism we know of that hides information at design-time. A module or class can encapsulate information at compile-time but does not necessarily hide information at design-time. The code inside most modules end up both explictly and implicitly coupled because they are designed to collaborate. Abstractions do not collaborate.
+
+==== Meaning of abstraction
+
+Unfortunately, there are now two distinct meanings for the meme 'higher level of abstraction' in common usage in software engineering. We need to take a moment to understand the difference. In ALA, abstraction means the original dictionary meaning:
+
+ Etymology: abstract literally means _draw away_ [a common idea or concept from specific examples]
+
+ Miriam Webster: relating to or involving general ideas or qualities rather than specific people, objects or actions.
 
 
-== ALA uses just one relationship type
+The other meaning of 'higher level of abstraction' used in the software engineering community appears to be 'further away from the domain of the computer and closer to the problem domain'. For example, layers are often shown building up from the hardware. They can also build up from the database, or a physical communication medium, such as the layers of the OSI communications model. The application is considered the most abstract. For example, a 3-tier system or a communication stack uses this type of layering. The perception is that because we no longer have to deal with computer domain details such as data storage, communications protocols, hardware, etc, we must be more abstract. The problem with this is that the problem domain also deals with details. These details come from the real world and are described by detailed requirements. The modules that contain these details are no more abstract than those in the various domains of computing.
 
-ALA uses a single type of relationship - a dependency on an abstraction that is more abstract than the one using it.
+Conventional layering tends to use this second meaning of 'abstract'; layers are said to be more abstract as you go up. ALA layers use the original meaning of the word 'abstract' and layers get more abstract as you go down.
 
-This is a special type of dependency because it is the only one that has good properties. In chapter 3 we learn why it is the only type of dependency with zero coupling. We actually want more of this type of dependency because it means we are getting greater reuse of our abstractions.
+The layers are not the same either. To convert conventional layers to ALA, you generally just tip them on their side so that they are not layers but independent disconnected abstractions. Each of them knows about details of something but they are no longer directly connected in either direction. On their own they will do nothing. The layer above, whose job is to know the details of a specific application or system, composes instances of them by instantiating them, configuring them, and wiring them together. Conventional layers can be many. ALA layers are few.
 
-This type of dependency also tells us explicitly what other abstractions we need to know about in order to _understand_ code. For example, if abstraction A is the concept __standard deviation__ and abstraction B is the concept __square root__, then to understand the code that implements standard deviation requires knowledge of the concept square root. That's why we sometimes refer to it as a knowledge dependency. Such a dependency always applies at design-time, and also usually at compile-time and run-time. Some knowledge dependcies may apply at design-time only, for example the dependency may be on a convention, or it may be simply the knowledge of ALA. We want to be explicit and clear about knowledge dependencies for every bit of code inside every abstraction.
+A final note about abstractions versus the SRP (single responsibility principle). The SRP is not really a suitable way to think about abstractions. It is better to think about what details an abstraction implementation knows about. It can be a specific user story, a specific feature, a type of UI element, a type of database, a protocol, a hardware device, etc. It will contain all the cohesive knowledge about that thing. In doing so, it may have multiple responsibilities. For example an abstraction that knows about a protocol should have responsibility for both input and output. 
 
+We will look further at what 'abstraction' means in chapter six.
+
+
+
+
+=== ALA uses just one relationship type
+
+This is the second of the three fundamental constraints. ALA uses a single type of relationship - a dependency on an abstraction that is more abstract than the one whose implementation uses it.
 
 [plantuml,file="diagram-05a.png"]
 ----
@@ -46,124 +112,562 @@ labelloc=b
 style=rounded 
 A [ style = invis ];
 }
-B [label="Abstraction B"; shape = rect; style=rounded ]
+B [label="Abstraction\nconcept B"; shape = rect; style=rounded ]
 A -> B  [dir="both", arrowhead="open", arrowtail="tee", color=green, label=" requires knowledge of to understand"]
 }
 @enddot
 ----
 
+In terms of our previous example, LowPassFilter is Abstraction A and IDataFlow is Abstraction concept B.
+
+Notice how in the diagram the relationship arrow comes from inside A. This is significant. It is the code that implements A that requires knowledge of abstraction concept B. We never actually draw lines when using abstractions, so you wont see this type of line in ALA diagrams. We only use it here while describing this one relationship that we are allowed to use. 
+
 B must be more abstract than A. "More abstract" means more general, not specific to A, and have a greater scope of reuse than A.
 
 Because B is more abstract, it is more stable. ALA therefore automatically enforces the Stable Dependencies Principle. 
 
-The relationship means that, to read and understand the code inside A, you must know the abstraction B - not how the insides of abstraction B work, just what B is, its concept. The word "abstraction" implies that it should be learnable in a short time.
+The relationship means that, to read and understand the code inside A, you must know the abstraction concept B - not how the insides of abstraction B work. The word "abstraction" implies that it should be learnable in a short time and easy to retain. When we get an abstraction concept is sometimes described as a moment of insight. 
 
-Notice how in the diagram the relationship arrow comes from inside A. This is significant. It is the code that implements A that requires knowledge of abstraction concept B. We never actually draw lines when using abstractions, so you wont see this type of line in ALA application diagrams. We only use it here while describing this one relationship that we are allowed to use. 
+Here are somemore lagel dependancies, this time from the application layer to the domain abstractions layer.
 
-Architectures generally work by applying constraints. ALA's constraint is that you have this one type of relationship. From this fundamental constraint emerges many properties and patterns that we will explain in the rest of this chapter and in other chapters.
+.Application\Thermometer.cs
+[source,C#]
+....
+    new AnalogInput(channel: 2)
+    .WireIn(new LowPassFilter(strength: 10))
+    .WireIn(new OffsetAndScale(offset: -31, scale: 0.2))
+    .WireIn(new Display(label: "Temperature"));
+....
+
+Legal dependencies from a _Thermometer_ user story abstraction on abstractions _AnalogInput_, _LowPassFilter_, _OffsetAndScale_, _Display_ and _WireIn_. The user story takes input from an analog to digital converter, filters them to remove noise, scales them to be in degrees, and displays them.
+
+This type of dependency has zero coupling. Because of the way our brains have evolved to understand a complex world in terms of abstractions, abstractions are the only mechanism that hide knowledge at design-time. The dependency has zero coupling between all codes using the abstraction and the code that implements the abstraction.
 
 
-=== ALA's UML class diagram
+This type of dependency also tells us explicitly what other knowledge we need in order to _understand_ code. For example, if abstraction A is __standard deviation__ and abstraction B is __square root__, then to understand the code that implements standard deviation requires knowledge of the concept of square root. That's why we sometimes refer to it as a knowledge dependency. Such a dependency always applies at design-time, as well as compile-time and run-time. Some knowledge dependencies may be implicit and so apply at design-time only. For example a dependency may be on a convention, or it may be simply the knowledge of ALA. You need knowledge of those things to fully understand the code. We want to be explicit and clear about knowledge dependencies for every bit of code inside every abstraction, so we endeavour to always state implicit dependencies in comments.
 
-In ALA, the only legal UML relationship between classes is composition, and even then you are highly restricted - the composition must be on a more abstract class. If you drew a class diagram in ALA, you wouldn't draw lines for composition on more abstract classes, because you would just refer to the used class by name. It's exactly the same as why you wouldn't draw a line to a square-root function every time you use it. Similarly you wouldn't draw a line to an abstraction every time you reuse it. You only refer to abstractions by name. So it turns out that if you did try to draw a class diagram of an ALA application, it would just be boxes arranged in layers with no lines at all. The UML class diagram has no use in ALA.
+Architectures generally work by applying constraints that restrict the infinite variety of ways code could be organised. The ALA constraints seem severe at first, but after some practice they are exceedingly helpful in guiding the design. There is essentially one right way to organise the code. Sometimes the abstractions come easily and sometimes they require sustained inventive thought processes, especially in a new domain. In most domains, I usually start with the UI description in the requirements as they most readily reveal their abstractions. Then it becomes apparent that data flows must be connected to these instances of UI abstraction elements. Data transformation and state abstractions will then become apparent next. 
+
+
+==== ALA's UML class diagram
+
+All UML relationships except one are illegal in ALA. And that one is restricted to being a composition on a more abstract class. Such a relationship is always represented in code by just referring to the abstraction by name. You do not draw a line on a UML class diagram when using an abstraction. For example, you would never use a library abstraction such as _regex_ by drawing a line on a diagram to a box representing the regex class. You would just use the regex abstraction by name. If a UML class diagram were drawn of an ALA application, there would be no lines at all, just boxes in space arranged in layers.
+
+image::ALAClassDiagram.drawio.png[ALAClassDiagram.drawio.png, title="UML class diagrams for ALA have no relation lines.", width=90%]
+
+That diagram is not useful. That's not to say we can't use diagrams. Diagrams can be used in ALA to represent the internals of an abstraction. This is often done in the layer representing the application or user stories. It shows instances of lower layer abstractions wired together and so is close to a UML object diagram.
 
 Following are the UML relationships you cannot use, and what you do instead.
 
-* *Associations*: A conventional program will typically have many, many bad dependencies called associations in UML. Most are there because data, messages, events, execution flow, etc, need to get from one place to another in the program. These are simply illegal in ALA. The whole difficult concept of dependency management vanishes. But where do these relationships go? How can the program still work? How is it possible for messages and events to travel around at run-time? The short answer is that all these associations become a line of code inside an abstraction in the layer above. Or they become a line on a diagram composing two _instances_ of abstractions. Such lines are not relationships or dependencies - they are inside an abstraction, no different to a line of code that say calls one function and passes the result to another function. You cannot use associations between classes. Instead you can wire instances in a higher level abstraction. The abstractions themselves do not know where their data comes from, nor where it goes.
+* *Associations*: A conventional program will typically have many, many bad dependencies referred to as _associations_ in UML. Most are there because data, messages, events, execution flow, etc, need to get from one place to another in the program. These are simply illegal in ALA. The whole difficult concept of dependency management vanishes. But where do these relationships go? How can the program still work? How is it possible for messages and events to travel around at run-time? The short answer is that all these associations become a line of code inside an abstraction in the layer above. Or they become a line on a diagram composing two _instances_ of abstractions. Such lines are not relationships or dependencies - they are inside an abstraction, no different to a line of code that say calls one function and passes the result to another function. In ALA, you cannot use associations between classes. Instead you create objects in a higher level abstraction and then wire them together. The abstractions themselves will not know where their data comes from, nor where it goes.
 +
-Note that dependency injection or otherwise passing an object into another object doesn't remove an association relationship between the classes. It only changes the relationship from composition to association, neither of which is allowed. In other words, in ALA you are not allowed to know about the interface belonging to another object in the same layer, nor that of a base class object or even a small set of objects that implement the interface. Instead you use ports that use a much more abstract interface called a programming paradigm interface from a lower layer.
+Note that dependency injection or otherwise passing an object into another object doesn't remove an association relationship between the classes. It only changes the relationship from composition to association, neither of which is allowed between peer classes. In other words, in ALA you are not allowed to know about the interface belonging to another class in the same layer, nor that of an abstract base class or even an interface. Instead you use ports that use a much more abstract interface called a programming paradigm interface from a lower layer.
 
-* *Composition*: Although the knowledge dependency relationship can be implemented as a UML composition relationship (directed arrow with filled diamond), the knowledge dependency relationship differs is more constrained. It must be "requires knowledge of to understand". You cannot use a composition relationship unless it is using a more abstract abstraction. This means that you cannot break a module up into pieces arbitrarily. Instead, you factor out abstractions. The composition relationship when used correctly in ALA always goes down the layers, never across.
+* *Composition*: Although the knowledge dependency relationship used in ALA can be implemented as a UML composition relationship (directed arrow with filled diamond), the ALA knowledge dependency is more constrained. It must be instantiating a class in a lower, more abstract, layer. This means that you cannot break a module up into pieces arbitrarily. Instead, you must invent abstractions. The composition relationship in ALA can go down by one or more layers, but never within a layer.
 
-* *Inheritance*: ALA doesn't need or use inheritance. It would break the abstraction of the (more abstract) base class in the lower layer. Instead we always use composition. Inheritance provides a 'calling up the layers at run-time' mechanism with its virtual functions. In ALA, we do this with ordinary observer pattern (events in C#), or by passing in a method as a configuration (usually anonymously or as a lambda expression), or with the strategy pattern. 
+* *Inheritance*: ALA doesn't need or use inheritance. It would break the abstraction of the (more abstract) base class in the lower layer. Instead we always use composition. Inheritance is often used to provides a 'calling up the layers at run-time' mechanism by its use of virtual functions. In ALA, we do this with ordinary observer pattern (events in C#), or by passing in a method as a configuration (usually anonymously or as a lambda expression), or with the strategy pattern. 
 
-* *Packages*: ALA has no concept of hierarchies or nesting. Abstractions cannot be contained by other abstractions. They are never private. The reason they are never private is simple. In ALA, an abstraction being used must be more abstract than the abstraction using it. It must be outside and public so it can be reused. ALA uses abstraction layers instead of encapsulation hierarchies. In ALA, packages would only be used as a distribution mechanism, not as part of the architecture for information hiding.
+* *Packages*: ALA does not use hierarchies or nesting. In other words, abstractions cannot be contained by other abstractions. Abstractions are never private. The reason they are never private is simple. An abstraction that is depended on should be more abstract than the abstraction using it. A more abstract abstraction needs to be public so it can be reused. ALA uses abstraction layers instead of encapsulation hierarchies. In ALA, packages would only be used as a distribution mechanism, not as part of the architecture for information hiding.
++
+The word package means container. Packages are usually just a container of abstractions such as a library. We should not consider knowledge dependencies to be on the package because we can't generally learn a package. We should consider knowledge dependencies to be on the individual abstractions inside the package.
++
+Let's consider the situation where a conventional package is a good abstraction in itself. Because it was implemented as a package, it's internal implementation is large (Facade pattern). Let's say our conventional package hides a lot of complex implementation and contains  abstractions that we are not interested in using in the rest of our application. For example it could be a compiler that we can invoke from our application. The thing is, if the compiler abstraction is written using ALA, it will use lots of useful abstractions for the domain of compilers and parsing. We still want those abstractions to be public for reuse. It's just that we don't want them particularly visible to the rest of our application, which is in a different domain. To solve this problem we should still make the abstractions used by the compiler abstraction public, but put them into a different DomainAbstractions folder and namespace. When we do this, we will want the DomainAbstractions folders to be qualified with the name of the domain, such as CompilerDomainAbstractions.
 
-* *Namespaces*: Unlike packages, namespaces are not encapsulations. They only make abstraction names unique. In ALA we use the names of the layers as namespaces.  
-
-
-
-== Abstraction layers
-
-Because the target of a knowledge dependency must be more abstract, abstractions arrange themselves into layers. This is what gives the architecture its name: Abstraction Layered Architecture.
-
-Because the target abstraction of any dependency in ALA must be clearly more abstract, the abstraction layers form themselves into discrete levels. Only a small number of abstraction levels are needed. ALA generally uses about four levels. The layers are given standard names that describe their level of abstraction.
+* *Namespaces*: In ALA, namespaces are used for the layers. For example we use namespaces such as Application, DomainAbstractions and ProgrammingParadigms. This allows abstractions in different layers that happen to have the same name. The files that implement abstractions are put inside folders that have the same names as the namespaces.
++
+Note that unlike packages, namespaces are not encapsulations. Namespaces only make names unique. One 3rd party tool I used to generate dependency graphs showed dependencies on namespaces as if namespaces were abstractions. This gave a completely misleading view of the true nature of the dependencies in the code. I had to write a query for the tool to show the actual dependencies on the abstractions inside the namespaces.
 
 
-This figure shows the abstraction layers:
+=== Abstraction layers
+
+Because the target of a dependency must be more abstract, abstractions arrange themselves in discrete layers. This is what gives the architecture its name: Abstraction Layered Architecture.
+
+Only a small number of layers are needed. Consider that we can construct the human body with just six layers: Atoms, Molecules, Proteins, Cells, Organs, Body. Probably need another two or three to build the human brain from neurons. Small applications generally use four. The layers are given standard names that describe their level of abstraction:
 
 image::Layers.png[Layers.png, title="Abstraction layers", width=75%]
 
-_Abstraction_ goes hand in hand with _reuse_. As you go down the layers, abstraction increases and so does the scope of reuse.
 
-The dependencies shown in these layers are different from conventional dependencies in software that are there to get data, events or execution from one part of a program to another. So these layers are also different from the ones you might find in a conventional program.  
-
-****
-One problem in understanding abstraction layering is that, unfortunately, the software industry has misused the word _abstract_ to the point where we get layers upside down. This comes about because it usually puts hardware or alternatively the database at the bottom. This is done for dependencies needed to 'access' at run-time (a really bad reason). And since hardware and databases are considered 'concrete', we sometimes see the argument that they are the least abstract. And so we build things on top of those that supposedly get more abstract as you go up the layers. Whatever is at the very top, we argue, being the farthest away from the concrete silicon, must be the most abstract. This thinking is just wrong. In ALA, the application, at the top, is a specific thing, and is the least abstract. The hardware or database is never at the bottom. Your programming language is at the very bottom and is the most abstract, most ubiquitous and most reused set of abstractions. 
-****
-
-Layers become more abstract, and the abstractions they contain more reusable and stable as you go down.
-
-The first three abstraction layers are Application, Domain Abstractions, and Programming Paradigms (until you get to larger programs).
+These layers are not fixed by ALA. But we tend to return to these ones in our experience so far. Following is discussion of each layer together with example code to see how everything works.
 
 
 
-* Application layer
+=== Application layer
 
-** All the application layer does is create instances of the domain abstractions, configure each instance with any application specific details, and connect them together in an arrangement.
-
-** An emergent property is that the top layer code is a direct expression of requirements. All knowledge specific to the application ends up in the application layer. It is typically around 10% of the total code. 
-
-** Like a DSL (Domain Specific Language), this direct expression of requirements in the Application layer is executable.
-
-** An ALA application (top layer) is three things in one: The expression of requirements, the architecture documentation, and the executable.
-
-** Execution typically occurs in two phases (similar to monads). In the first phase the application wires together instances of abstractions. In the second phase the network of instances executes. 
+In describing example layers, we start with example code. This code will build into a complete running application so no holes are left in understanding the code level mechanics of how everything works. The accompanying bullet points then explain the high level theory of why the code is organised the way it is. The code is available here:
+https://github.com/johnspray74/Thermometer[https://github.com/johnspray74/Thermometer]
 
 
-* Domain abstractions layer
+.Application\Thermometer.cs
+[source,C#]
+....
+using DomainAbstractions;
+using ProgrammingParadigms;
+using Foundation;
 
-** All knowledge for how to actually do anything goes inside domain abstractions, which reside in the domain abstraction layer and folder. These are reusable in the domain, both within a single application and by other applications.
+namespace Application
+{
+    class Thermometer
+    {
+        public static async Task Main()
+        {
+            Console.WriteLine("Wiring application");
 
-** Conventional libraries generally contain good abstractions, not necessarily because their designers set out to create good abstractions, but because they couldn't know anything specific about the code that will use them. So it was not possible for the classes to be specific to any one application. ALA asks us to do the same thing to create a set of abstractions that are useful to express requirements of the type occuring in the domain. We call that layer the domain abstractions layer.
+            private ADCSimulator adc;
 
-** The use of ports emerges. A domain abstraction is often implemented as a class with ports. Ports are implemented in plain code. A port is a field of a type of an interface from the programming paradigms layer, or an implemtation of such an interface. 
+            adc = new ADCSimulator(channel: 2, period: 1000) { simulatedLevel = 400 };
+            adc.WireIn(new LowPassFilter(strength: 10))
+                .WireIn(new OffsetAndScale(offset: -200, scale: 0.2))
+                .WireIn(new DisplayNumeric<double>(label: "Temperature") { units = "C"} );
+
+            Console.WriteLine("Running application");
+            adc.Run();
+
+            Console.WriteLine("press any key to stop");
+            Console.ReadKey();
+        }
+    }
+}
+....
+
+To understand the code, you need to know the abstraction concepts on which it depends. These are:
+
+* Data flow and ports
+
+* ADCSimulator - simulates an analog to digital converter hardware peripheral. Has a single output port of type IDataFlow
+
+* LowPassFilter - we already met this at the beginning of this chapter
+
+* OffsetAndScale - has a single input port and a single output port, both IDataFlow<double>. Adds a value and Multiplies by another value the data stream passing through. 
+
+* DisplayNumeric = has one input port of type IDataFlow. Displays the value on the console with label and optional units.
+
+* WireIn - wires compatible ports of instances of abstractions by setting the private field in the first object that matches the interface implemented by the second object.
+
+* In this example, Run() is called on the ADC object. For data flow wiring, we prefer pushing data through the system (from ADC to display) unless there is good reason to do otherwise.
 
 
-* Programming paradigms layer
+The application is implemented by simply composing instances of domain abstractions. It instantiates domain abstractions, configures them with application specific details, and connects them together in the topology needed to express user stories or features.
 
-** Domain abstractions know nothing about each other at design-time, yet communication must occur between the instances at run-time. We don't really want the application to directly handle this run-time communication or its data. So we insert a layer below the Domain abstractions called Programming paradigms. This layer allows instances of domain abstractions to communicate directly at run-time (like dependency injection but without dependencies on specific interfaces). 
+The application layer contains all information at the abstraction level specific to the requirements. For example, if the user story is a thermometer, it cohesively has all the details of how to make a thermometer, but nothing else.
 
-** The Programming paradigms layer typically provides a small set of abstract interfaces, each having a separate meaning, for connections between instances of Domain abstractions (polyglot programming paradigms). Examples might be Data-flow, UI Layout, UI navigation flow, Event driven, State machine, Data schema. 
+The application layer is three things in one: The expression of requirements, the architecture, and the executable. In conventional software development, these are three separate artefacts.
 
-** Programming paradigms are often implemented just by a simple interface. An example is "Event driven". The corresponding interface might be "interface IEvent { void Execute(); }".
-
-
-** Programming paradigms control the way the application actually executes.
-
-** Programming paradigms provide the grammar for the way instances of domain abstractions can be composed by the application.
-
-
-* Libraries layer
-
-** The Libraries layer contains any very general code used to support ALA programs.
-
-** A common pattern I use is a WireTo() extension method in the libraries layer. The application layer uses it to wire together instances of Domain Abstractions by its ports. e.g. "new A().WireTo(new B());"
-
-
-* As an application grows larger, it is the application layer that will get too large for the second constraint. A new layer or two will be inserted below the application layer. One way to do this to support splitting the application into separate features or user stories in the new layer, with abstractions that support a 'plug-in' style architecture a layer below that.
+Execution typically occurs in two phases (similar to monads). In the first phase the application wires together instances of abstractions. In the second phase the network of instances executes (which is what the finalizing call to Run does in the example).
 
 
 
-== Folders, files, classes and interfaces
+=== Domain abstractions layer
+
+At the beginning of this chapter we had an example of a domain abstraction, LowPassFilter. Here is another example:
 
 
-If you see an ALA application, you will find three to five folders that correspond with the abstraction layers (described in the previous section):
+.DomainAbstractions\OffsetAndScale.cs
+[source,C#]
+....
+using ProgrammingParadigms;
+
+namespace DomainAbstractions
+{
+    /// <summary>
+    /// ALA domain abstraction
+    /// Has one input port of type IDataflow and one output port of type IDataflow
+    /// (both type double)
+    /// Performs y = m(x+c) like operation where x is the input and y is the output
+    /// If visualized as a straight line on an x,y graph, -c is the x axis intercept
+    /// and m is the slope. 
+    /// You need to understand the programming paradigm abstraction, IDataFlow,
+    /// to understand this code.
+    /// </summary>
+    class OffsetAndScale : IDataFlow<double>
+    {
+        public OffsetAndScale(double offset, double scale)
+        {
+            this.offset = offset;
+            this.scale = scale;
+        }
+
+        private double offset;
+        private double scale;
+
+
+        private IDataFlow<double> output;
+
+        void IDataFlow<double>.Push(double data)
+        {
+            output.Push((data + offset) * scale);
+        }
+    }
+}
+....
+
+Notes on the code:
+
+* In the particular application code above, an instance of LowPassFilter was wired to an instance of OffsetAndScale. When wired, the output field is set to the object it is  wired to, cast as the appropriate interface, in this case IDataFlow<double>.
+
+* The input port is the implemented interface.
+
+* The output port _output_ is private so that it does not appear as a configuration to the layer above. It is set by WireTo using reflection.
+
+* It has two configuration parameters. Compulsory configurations are passed in the constructor.
+
+
+
+For completeness, here are the other two domain abstractions that we used in the Thermometer application example:
+
+
+.DomainAbstractions\DisplayNumber.cs
+[source,C#]
+....
+using ProgrammingParadigms;
+
+namespace DomainAbstractions
+{
+    /// <summary>
+    /// ALA Domain Abstraction
+    /// Ouptuts incoming data to the console with a preceding label and optional units.
+    /// Has one input port of type IDataFlow which can take int, float, double
+    /// The label must be passed in the constructor.
+    /// The units property may be used to set the units.
+    /// fixPoint Property sets the number of decimal places.
+    /// You need to understand the programming paradigm abstraction, IDataFlow,
+    /// to understand this code.
+    /// </summary>
+    class DisplayNumeric<T> : IDataFlow<T>
+    {
+        public DisplayNumeric(string label)
+        {
+            this.label = label;
+        }
+
+        public int fixPoints { get; set; } = 0;
+
+        private string label;
+        public string units { get; set; }
+
+
+        void IDataFlow<T>.Push(T data)
+        {
+            double d = (double)Convert.ChangeType(data, typeof(double));
+            Console.WriteLine($"{label}: { d.ToString($"F{fixPoints}") } {units}");
+        }
+    }
+}
+....
+
+
+
+
+.DomainAbstractions\ADCSimulator.cs
+[source,C#]
+....
+using ProgrammingParadigms;
+
+namespace DomainAbstractions
+{
+    /// <summary>
+    /// ALA Domain Abstraction
+    /// Simulate a 10-bit ADC Analog to Digital converter)
+    /// Normally an ADC is a hardware peripheral, but here we just do a software
+    /// simulation of one
+    /// to use as a source of data for example applications.
+    /// A real ADC driver would have properties for setting the channel and period.
+    /// You would create one instance of this driver for each ADC channel.
+    /// It would output raw data in adc counts. Since it is a 10 bit ADC, the adc counts
+    /// are in the range 0-1023.
+    /// We retain the channel although it is not used by the simulated version.
+    /// The simulated version has two simulation properties, one to set the simulated
+    /// ADC reading
+    /// and one to set the level of noise in the simulated readings.
+    /// You need to understand the programming paradigm abstraction, IDataFlow,
+    /// to understand this code.
+    /// </summary>
+    class ADCSimulator
+    {
+        public ADCSimulator(int channel, int period = 100)
+        {
+            this.channel = channel;
+            this.period = period;
+        }
+
+        private int channel;  // unused on simulated ADC
+        private int period;   // milliseconds
+        public int simulatedLevel { get; set; } = 512; // 0 to 1023
+        public int simulatedNoise { get; set; } = 0; // 0 to 1023
+
+        private IDataFlow<int> output;
+
+        public void Run()
+        {
+            var setAndForget = RunAsyncCatch();
+        }
+
+        public async Task RunAsyncCatch()
+        {
+            // because we are the outermost async method, if we let exceptions go, they will be lost
+            try
+            {
+                await RunAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+
+        Random randomNumberGenerator = new Random();
+
+        public async Task RunAsync()
+        {
+            while (true)
+            {
+                // add a bit of noise to the adc readings
+                int data = simulatedLevel + randomNumberGenerator.Next(simulatedNoise) - simulatedNoise/2;
+                if (data < 0) data = 0;
+                if (data > 1023) data = 1023;
+                output.Push(data);
+                // throw new Exception("exception test");
+                await Task.Delay(period);
+            }
+        }
+
+    }
+}
+....
+
+
+
+As can be seen in the above examples, the domain abstractions layer contains concepts that can be composed into applications. These are typically building blocks for I/O, data transformations, and state, but many other types of abstractions are possible.
+
+Some of these types of things may also be found in general language libraries but domain abstractions are more specific to the types of applications we want to express with them. They are specific to a domain, making them more expressive, but less reusable than general purpose language abstractions. They are reusable both within a single application and by other applications in the same domain.
+
+Another difference between domain abstractions and typical library abstractions is the ports. This supports building functionality by simply composing them. While the composing code controls who will communicate with whom, it does not actually handle the data at run-time. The data moves directly between instances. 
+
+A further difference between domain abstractions and typical library abstractions is that when domain abstractions are composed, the meaning of composition can be a programming paradigm other than imperative. For example the application above uses a data-flow programming paradigm. Other common programming paradigms we use are UI layout and asynchronous events. Imperative is not usually a suitable programming paradigm for the expression of requirements. Being able to compose instances of domain abstractions together with meanings that you define in the programming paradigms layer is powerful.
+
+The domain abstractions layer and programming paradigms layer together are like a DSL (Domain Specific Language).  The domain abstractions are composable language elements with programming paradigms providing the grammar. 
+
+It is an internal DSL because it uses the underlying language (WireTo method, & new). This allows you to easily fall back on the great flexibility of the underlying language when you need to. For example, you can pass lambda expressions as configuration properties to a domain abstraction, or you can pass in an application specific object (which is the strategy pattern).
+
+Conventional libraries generally contain good abstractions. This is because their designers don't know anything about the specific applications that will use them. Writing domain abstractions is best done in the same way. If necessary pretend you don't know anything about the application. They need to be learnable abstractions embodying a learnable concept, not be modules designed as a partial implementation of a specific application.
+
+Through the use of ports, abstractions know nothing of each other at design-time, yet can still communicate directly with one another at run-time. It is the responsibility of the code in a layar above to know the meaning of the communication, but not to handle the data itself. 
+
+
+=== Programming paradigms layer
+
+For the Thermometer example application, we have now seen the application code that instantiated, configured and wired four instances of domain abstractions, and we have seen the code for the four domain abstractions. They all used only one programming paradigm, _synchronus data flow_. Here is the interface for that programming paradigm: 
+
+.IDataFlow.cs
+[source,C#]
+....
+namespace ProgrammingParadigms
+{
+    interface IDataFlow<T>
+    {
+        void Push(T data);
+    }
+}
+....
+
+Programming paradigms interfaces are often this simple. Another example programming paradigm is _synchronous event driven". The corresponding interface might be: 
+
+.IEvent.cs
+[source,C#]
+....
+namespace ProgrammingParadigms
+{
+    interface IEvent { void Execute(); }
+}
+....
+
+To get an idea of the variety of programming paradigms possible, here is the interface we use for the UI layout programming paradigm. In this programming paradigm, a parent UI element is wired to its contained child elements. The interface returns the WPF element of the child. This allows domain abstractions to construct the UI using underlying WPF elements. In effect, domain abstraction are wired together instead of using XAML. Both are descriptive, but XAML horrible.  
+
+
+.IUI.cs
+[source,C#]
+....
+namespace ProgrammingParadigms
+{
+    interface IUI { UIElement GetUIElement(); }
+}
+....
+
+The Programming paradigms layer typically provides only a small set of abstract interfaces. Each provides a different meaning when the application wires two instances of domain abstractions together. ALA is said to be polyglot in programming paradigms. Examples might be Data-flow, UI Layout, Event driven, State machine transition, Data schema. 
+
+Programming paradigms control the way the application actually executes. Execution models such as synchronous vs asynchronous, push vs pull, and fan-out and fan-in wiring are discussed in Chapter four.
+
+Programming paradigms provide the grammar for the way instances of domain abstractions can be composed by the application.
+
+Programming paradigms enable direct communication between instances of domain abstractions. They enable this without the abstractions themselves knowing anything about each other. 
+
+
+Domain abstractions know nothing about each other at design-time, yet instances of them can communicate at run-time. We could make the application handle these communications at run-time and sort of comply with ALA. The common example would be an applicaton that calls one function which returns a result, and then calls another function passing to it the result. But we don't really want the application to be concerned with this run-time communications. The application really just wants to connect instances of abstractions together. So we insert a layer below the Domain abstractions called Programming paradigms. This layer allows instances of domain abstractions to have compatible ports that in turn allow them to communicate directly with one another at run-time. The most common programming paradogm we use is IDataFlow<T>, but many other programming paradigms are possible.
+
+
+
+=== Foundation layer
+
+* The foundation layer contains any very general code used to support ALA programs.
+
+** A common pattern I use is a WireTo() extension method in the foundation layer. The application layer uses it to wire together instances of Domain Abstractions by its ports.
+
+Here is minimal code for the WireTo method.
+
+
+
+ Wiring.cs
+[source,C#]
+....
+namespace Foundation
+{
+    public static class Wiring
+    {
+        /// WireTo is an extension method on the type object
+        /// Wires instances of classes that have ports by matching interfaces
+        /// Port name can be optionally provided for the A side.
+        /// If object A has a private field of an interface, and object B implements that interface, 
+        /// and the private field not yet assigned, assigns B to the field in A.
+        /// uses reflection.
+        /// Returns this for fluent style programming.
+        public static T WireTo<T>(this T A, object B, string APortName = null)
+        {
+            // achieve the following via reflection
+            // A.field = B; 
+            // if 1) field is private, 2) field's type matches one of the implemented interfaces of B, and 3) field is not yet assigned
+
+            if (A == null)
+            {
+                throw new ArgumentException("A is null ");
+            }
+            if (B == null)
+            {
+                throw new ArgumentException("B is null ");
+            }
+
+            bool wired = false;
+            var BType = B.GetType();
+            var AfieldInfos = A.GetType().GetFields(System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance) // do the reflection once
+                .Where(f => (APortName == null || f.Name == APortName)).Where(f => f.GetValue(A) == null).ToList(); // filter to for given portname (if any) and not yet assigned 
+            var BinterfaceTypes = BType.GetInterfaces(); // do the reflection once
+
+            foreach (var AfieldInfo in AfieldInfos)
+            {
+                var BimplementedInterface = BinterfaceTypes.FirstOrDefault(interfaceType => AfieldInfo.FieldType == interfaceType);
+                if (BimplementedInterface != null)  // there is a matching interface
+                {
+                    AfieldInfo.SetValue(A, B);  // do the wiring
+                    wired = true;
+                    break;
+                }
+            }
+
+            if (!wired) // throw exception
+            {
+                var AinstanceName = A.GetType().GetProperties().FirstOrDefault(f => f.Name == "InstanceName")?.GetValue(A);
+                var BinstanceName = B.GetType().GetProperties().FirstOrDefault(f => f.Name == "InstanceName")?.GetValue(B);
+
+                if (APortName != null)
+                {
+                    // a specific port was specified - see if the port was already wired
+                    var AfieldInfo = AfieldInfos.FirstOrDefault();
+                    if (AfieldInfo?.GetValue(A) != null) throw new Exception($"Port already wired {A.GetType().Name}[{AinstanceName}].{APortName} to {BType.Name}[{BinstanceName}]");
+                }
+                throw new Exception($"Failed to wire {A.GetType().Name}[{AinstanceName}].\"{APortName}\" to {BType.Name}[{BinstanceName}]");
+            }
+            return A;
+        }
+
+
+        public static object WireIn<T>(this T A, object B, string APortName = null)
+        {
+            WireTo(A, B, APortName);
+            return B;
+        }
+    }
+}
+....
+
+=== Extra layers for larger applications
+
+If a single abstraction is used for the application, then as more and more user stories are added into it, it will eventually get too large for the size constraint. Meanwhile, domain abstractions and programming paradigms are stable and do not grow larger with overall program size. They may increase in number, but it is the application that will go over the 500 line complexity limit.
+
+ALA will need to be applied to the large application abstraction by adding a new layer below it. The requirements are likely already written in terms of abstractions, which we can use as the basis for the new layer. We call these abstractions _features_ or _user stories_ or _use cases_. We can make a layer called "Features" or "UserStories". The application abstraction becomes a composition of features. 
+
+==== Application layer
+
+* Instantiates a set of features or user stories for a particular application.
+
+* Wires together certain features instances that may need to interact at run-time. Feature abstractions would have ports to enable this. A common example would be to wire a feature instance's menu items to the an instance of a menu representing the main menu.
+
+* Another example is a feature abstraction that measures and displays a temperature may provide a port that exposes the temperature for use by anything else that needs it. Another feature abstraction that calculates a battery voltage may have an optional input port for temperature that it uses for compensation. The application could wire instances of these two abstractions together. 
+
+
+.Application\Applicaton.cs
+[source,C#]
+....
+using UserStories;
+
+namespace Application
+{
+ class Main
+ {
+  var mainMenu = new Menu();
+  var temperature = new Temperature();
+  temperature.WireTo(mainMenu); 
+  var batteryvoltage = new BatteryVoltage();
+  batteryVoltage.WireTo(mainMenu);
+  temperature.WireTo(voltage);
+ }
+}
+....
+
+
+
+==== Features layer
+
+* The Features layer abstractions independently express features or user stories in the requirements.
+
+* Creates instances of domain abstractions, configures each instance with application specific details, and connects them together as needed to express the feature story.
+
+* Features abstractions will have ports. The domain abstractions they use will also have ports. Sometimes an external port will need to connect directly to an internal port. 
+
+.Features\Temperature.cs
+[source,C#]
+....
+using DomainAbstractions
+
+namespace Features
+{
+  class Temperature
+  {
+    // ports    
+    IUI menu;
+    IDataFlow<int> output;
+   
+    displayField = new DisplayField<int>(label:"Temperature");
+
+    menuTickBox = new MenuTickBox(label:"Temperature", shortcut:'t');
+      .WireTo(displayField, "visible")
+      .WireToPort(menu);
+    new ADC(channel:2)
+      .WireIn(new Filter<int>(200))
+      .WireTo(displayField);
+      .WireToPort(output)
+  }
+}
+....
+
+
+
+=== Folders, files, classes and interfaces
+
+
+If you see an ALA application, you will find three to six folders that correspond with the abstraction layers (described in the previous section), for example:
 
 * Application
 * DomainAbstractions
 * ProgrammingParadigms
-* Libraries
+* Foundation
 
 Continuing with the idea of knowledge dependencies, the files in the Application folder have knowledge dependencies on the files in the DomainAbstractions folder. In other words, you need to know the abstractions in the DomainAbstractions folder in order to read the application abstraction's code. Similarly the code inside the files in the DomainAbstractons folder has knowledge dependencies on the files in the ProgrammingParadigms folder. There are no dependencies between the files in any folder. 
 
@@ -185,7 +689,7 @@ There should be a readme file that points to this website (or equivalent documen
 
 
 
-== Executable expression of requirements
+=== Executable expression of requirements
 
 This perspective puts the focus on your input information - the requirements. ALA is a methodology that finds a way to directly and succinctly describe requirements that is also executable. This is what the top layer does. It describes all the details in the requirements. Instead of having two documents, one for requirements capture and one for software source code, ALA combines them as a single artefact and a single source of truth. BDD (Behavioural Driven Design) does something similar, but only achieves it for requirements and their tests. ALA goes one step further to make the expressed requirements also the executable solution.
 
@@ -198,7 +702,7 @@ The executable description of requirements in the top layer is also the architec
 
 
 
-== Polyglot programming paradigms
+=== Polyglot programming paradigms
 
 Many programming systems use one programming paradigm. The paradigm solves some problems really well so the programming system is kept pure and simple. An example ladder logic. The problem is that some problems are hard to solve, and require many programming elements making the solutions themselves complex. So ALA takes the opposite approach. We want all requirements to be easily expressible. Therefore we will need multiple programming paradigms. 
 
@@ -212,7 +716,7 @@ ALA is said to be a polyglot programming paradigm architecture.
 
 
 
-== Diagrams vs text
+=== Diagrams vs text
 
 
 Generally in ALA, compositions of instances of domain abstraction form a graph or network. This is because a  requirement often contains a network of relationships. A graph is most easily represented as a diagram. In the trivial examples of composition that we already used we used text because they were mostly linear or tree structured. These structures can naturally be represented in text, although trees represented in text form become hard to read if too deep (too much indenting). For graphs, using text requires 'symbolic connections' or labels to connect the points. This method becomes hard to read beyond a few connections. Conventional code using modules can end up with thousands of method names that are little more than labels. All files searches are needed to find them. ALA therefore uses diagrams for non-trivial applications.
@@ -225,14 +729,14 @@ If a diagram is used for an ALA requirement or user story, it is the source code
 
 
 
-== Layers replace hierarchical decomposition
+=== Layers replace hierarchical decomposition
 
 In the next chapter we will discuss why ALA uses a 'create and then compose' approach rather than a 'hierarchical decomposition' or 'divide and conquer' approach.
 
 Here we describe the two different structures that result from these two different approaches.
 
 
-=== The hierarchical decomposition approach
+==== The hierarchical decomposition approach
 
 
 image::Slide8.jpg[Slide8.jpg, title="Decomposition into elements and their relations", align="center"]
@@ -256,7 +760,7 @@ Note that none of this 'dependency management' actually avoids circular coupling
 In the hierarchical decomposition appoach, wheever any of the inner modules becomes too large, your would decompose it into still smaller evern more specialized modules. This creates a hierarchical structure. Some make the analogy with zooming in on a map. The structure works looks like a fractal.
 
 
-=== The create abstractions and compose approach
+==== The create abstractions and compose approach
 
 When you use abstractions instead of modules, there is qualitative difference in how the structure is built. There is no need for interactions, collaboration, or coupling between your abstractions at all. 
 
@@ -290,9 +794,9 @@ It should be about [green]#*inventing abstractions*#.
 
 
 
-== Real world metaphors
+=== Real world metaphors
 
-=== Atoms and molecules
+==== Atoms and molecules
 
 Here are two atom abstractions:
 
@@ -342,7 +846,7 @@ image::Slide15.jpg[Slide15.jpg, title="", align="center"]
 
 The water molecule has a "uses instances of" relationship with the two atoms, and the atoms have a "uses instance of" relationship with the even more abstract polar bond. Polar bond is an example of what we call an 'abstract interaction'.
 
-=== Lego
+==== Lego
 
 The second real world metaphor is Lego. Shown in the image below is the same three layers we had above for molecules, atoms and bonds.
 
@@ -350,7 +854,7 @@ image::Slide16.jpg[Slide16.jpg, title="", align="center"]
 
 The domain abstractions are the various lego pieces, instances of which can be assembled together to make specific things. Lego pieces themselves have instances of an abstract interface, which is the stud and tube. There is a second abstract interface, the axle and hole. We also call the abstract interface the 'execution model' and here with the lego metaphor we start to see why it can be thought of in this way - when the model runs, stud and tube interface executes the holding of the model together and the axle and hole interface executes rotation.
 
-=== Electronic schematic
+==== Electronic schematic
 
 The third real world metaphor comes from electronics. The abstractions are electronic parts, instances of which can be composed as a schematic diagram:  
 
@@ -359,7 +863,7 @@ image::Slide17.jpg[Slide17.jpg, title="", align="center"]
 In this domain, we have two abstract interfaces (execution models), one for digital logic signals and one for analog signals.
 
 
-=== A clock
+==== A clock
 
 The forth and final real world metaphor is a clock. In this diagram, we show the process of composition of abstractions to make a new abstraction. The process is a circle because instances of the new abstraction can themselves be used to make still more specific abstractions. Each time around the circle adds one layer to the abstraction layering.
 
@@ -372,7 +876,7 @@ There are many other instances of this pattern in the real world, and in nature.
 
 
 
-== Example project - Calculator
+=== Example project - Calculator
 
 
 
@@ -409,7 +913,7 @@ The left side shows two instances of the abstraction, Horizontal. These arrange 
 Each Horizontal has 3 instances of TextBox and one Text. The TextBoxs allow you to enter a string. The abstraction, Text, can only display a string. I see at this point, I hadn't put in the TextBox for the description. 
 
 
-===== How the calculator works
+==== How the calculator works
 
 We can ignore the use of labels for a moment and just enter a formula containing constants into the first row TextBox. Let's say we type in "2+1". The string "2+1" goes along the data flow wire to the StringFormat instance on its port 0. The StringFormat is configured with the format string "({1}=>{0})". StringFormat uses this format string in the same way as an interpolated string in C#. The {0} is substituted with the string coming in on port 0. The {1} is substituted with the string coming in on port 1. Since we have no string on port 1, the output from the StringFormat will be "()=>2+1". This is simply a lambda expression with no parameters. This string is fed into the instance of Formula. Formula is an abstraction that knows how to evaluate a lambda expression. Actually it will accept just a formula string (such as "2+1") as well. We can ignore the other input of Formula for the moment. Formula will evaluate "()=>2+1" and produce the number 3 on its output. This output is a data-flow of type double. This number is fed to an instance of NumberToString, and from there it goes to the instance of Text that knows how to display a string.
 

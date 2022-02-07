@@ -1,6 +1,6 @@
 :imagesdir: images
 
-= Chapter six - Perspectives
+== Chapter six - Perspectives
 
 In this chapter, our aim is to look at ALA from the perspective of many existing principles, patterns and styles (PPS) one at a time.
 
@@ -11,7 +11,7 @@ In some cases we show how ALA satisfies the PPS automatically. In some cases we 
 PPSs take a long time for the average developer to grasp, and then only make incremental improvement to software quality, if any. Ultimately the aim is that ALA is a reference architecture that makes the PPSs redundant. 
 
 
-== Encapsulation, polymorhpism and inheritance
+=== Encapsulation, polymorphism and inheritance
 
 ALA replaces encapsulation with abstraction.
 
@@ -53,12 +53,12 @@ These five memes don't have anything to say about that. They are redundant with 
 The SRP, DIP amd OCP are discussed further in the sections below.
 
 
-== SOLID Principles
+=== SOLID Principles
 
 The SOLID principles collated by Robert Martin are confusing. Their one or two sentence descriptions don't describe them very well, so you have to go a read a lot to understand them. Unfortunately they are collected up into the catchy acrostic "SOLID" with a meaning that is undeserved. This has made the collection more well known than it deserves, as we shall explain.  
 
 
-===  Single Responsibility Principle
+====  Single Responsibility Principle
 
 The SRP strangly worded differently from it's name. It states that a module (function, class or package) should have only one reason to change. I find this s strange formulation of the name.
 
@@ -76,13 +76,13 @@ Examples:
 My advice is that the SRP is made redundant by thinking in terms of abstractions, which accomplishes the intention of the SRP better. 
 
 
-===  Open Closed Principle
+====  Open Closed Principle
 
 Talk about confusing. Firstly Betrand Meyer coins the phrase, which is impossible to understand without further reading. On further reading you find that Robert Martin has a completely different principle by exactly the same name. Then he has two verions of that, one for modules in the same compilation unit and one for when the client is in a different compilation unit and is already published. By the way, being already published was also the context of Meyers OCP.
 
 None of them are principles - they would need to be used in the right conext at best. They have associated patterns anyway (or anti-patterns relative to ALA).
 
-==== Martins version
+===== Martins version
 
 The sources of knowledge about the meanings of these memes are:
 
@@ -93,15 +93,15 @@ Kevlin Henny
 
 
 
-=== Liskov Substitution Principle
+==== Liskov Substitution Principle
 
 TBD
 
-===  Interface segregation principle
+====  Interface segregation principle
 
 TBD
 
-=== Dependency Inversion Principle
+==== Dependency Inversion Principle
 
 The DIP is stated:
 
@@ -184,7 +184,7 @@ The 2nd  ALA dependency rule is in a way less constraining than the DIP here. If
 In ALA, yes you would wire the specific database adapter and the specific middleware adapter (and the specific UI), but you wouldn’t wire in the framework. It doesn’t matter that the abstraction depended on is low level. I want to commit to only one implementation of the framework. It would be silly to have to use ports on every single domain abstraction so I can wire in a framework of my choice, and have to wire it to every single domain abstraction, when I want to commit to using one. This becomes more obvious as you get to even lower levels such as math libraries. I don’t need to allow for swapping out the math library implementation. So ALA allows dependencies on more abstract abstraction even if they are low-level modules. In fairness, Martin probably doesn’t mean to include all low-level modules in the DIP, just certain ones that should be decoupled.
 
 
-==  Dependency injection pattern
+===  Dependency injection pattern
 
 By know we know that ALA uses dependency injection. It uses it for wiring up all instances or all domain abstractions.
 
@@ -208,23 +208,23 @@ However, if the graph is mostly a tree structure (with a relatively few cross co
 
 
 
-==  Physical boundaries
+===  Physical boundaries
 
 I was listening to a talk by Eric Evans where he said that Microservices works because it provides boundaries that are harder to cross. We have been trying to build logical boundaries for 60 years, he said, and failed. So now we use tools like Docker that force us to use say REST style interfaces in oder to have physical boundaries. I have also heard it suggested that using multiple MCUs in an embedded system is a good thing because it provides physical boundaries for our software components. And I think, really? Is that the only way we can be create a logical boundary? I can tell you that multiple MCUs for this reason is not a good idea if only because all those MCUs will need updating, and the mechanisms and infrastructure needed to do that make it not worth it. Unless there is a good reason, such as to make different parts of your code independently deployable, the extra infrastructure required for physical boundaries that are just logical boundaries is not necessary. Furthermore, physical boundaries, like modules do not necessarily make good abstractions. The only boundary that works at design-time is a good abstraction. So ALA achieves it's design-time boundaries by using abstractions.
 
-==  Test Driven Development
+===  Test Driven Development
 
 It is said that TDD's main advantage is not so much the testing, but the improvement in the design. In other words, making modules independently testable makes better abstractions. This is probably true, but in my experience, TDD doesn't create good abstractions nearly as well as pursuing that goal directly. The architecture resulting from TDD is better but still not great.
 
 
-==  Observer pattern
+===  Observer pattern
 
 TBD
 
 
 
 
-==  Layer patterns
+===  Layer patterns
 
 ==== MVC
 
@@ -234,7 +234,7 @@ TBD
 
 TBD
 
-==  Factory method pattern
+===  Factory method pattern
 
 The Factory Method pattern in both the GOF book and in online examples has multiple variations. The only thing they seem to have in common is that the client doesn't use "new ConcreteProduct()". It just wants an object that implements an interface, IProduct. For any reason it doesn't want to be the one who will decides at design-time what that concrete product will be. 
 
@@ -262,21 +262,21 @@ Now to the case in ALA where we have a client that needs a concrete product crea
 Let's say you have a Table domain abstraction that stores a table of data. In your application, you want to instantiate many Tables. Now lets suppose that we want these Table instances to persist their data. A database must be attached via an IPersistance interface. We don't want the Table class to know about concrete Databases. We want the application layer at the top to do that. But we don't want the application layer to have to wire the database to every instance that requires an IPersistance. We want the Application to be able to just use a Table as if it is a self-contained abstraction. We want the Table instances to take care of themselves for Persistence. So we make a Peristence abstraction in the Programming paradigms layer. The concept of Persistence is at the right abstraction level to go in this layer. The Table class can use this persistence abstraction through a FactoryMethod. A variable in the Persistence abstraction stores the IPeristence object. The application instantiates which database it wants to use and passes it to the Peristence abstraction.
 
 
-== Decorator pattern
+=== Decorator pattern
 
 TBD
 
-==  Bridge pattern 
+===  Bridge pattern 
 
 TBD
 
 
-==  Architecture styles
+===  Architecture styles
 
 I am not an expert at these so called 'Architectural styles'. Any feedback about the accuracy of the following comparisons would be appreciated.
 
 
-=== Components and connectors
+==== Components and connectors
 
 David Garlan and Mary Shaw in their paper titled "An Introduction to Software Architecture" 1994 use components and connectors as a framework for viewing architectural styles. Depending on the style, the connectors can be a procedure call, event broadcast, database query, or pipe (which we call data-flow).
 
@@ -297,7 +297,7 @@ Examples using the UML component diagram, even though it uses the term ports, sh
 
 
 
-=== Component Based Software Engineering
+==== Component Based Software Engineering
 
 // TBD, some of this may be repeated
 
@@ -378,7 +378,7 @@ In ALA, the UML class diagram completely loses relevance. Because classes have n
 
 Such a diagram is close to a UML object diagram. However, a UML object diagram is meant to be a snapshot of a dynamic system at one point in time. In ALA, any dynamic behaviour is captured in a static way by inventing a new abstraction to describe that dynamic behaviour. Thus the design-time view is always static. So the object diagram is static. The application class specifies a number of objects that must be instantiated, configured, and wired together to execute at run-time. Since the structure is always static, ideally this would be done by the compiler for best efficiency, but there is no such language yet. So, in the meantime, it is done at initialization time. The object diagram can be fairly elegantly turned into code using the fluent coding style shown in the XR5000 example.
 
-==  DSLs
+===  DSLs
 
 We briefly discussed ALA as a DSL in the structure chapter <<DSL1, here>> 
 
@@ -406,12 +406,12 @@ ALA probably does fit into the broadest definition of an internal DSL. However, 
 
 
 
-==  Multi-tier Architecture
+===  Multi-tier Architecture
 
 TBD
 
 
-==  Clean Architecture
+===  Clean Architecture
 
 Clean architecture is initially viewed as concentric circles which are in effect layers. Entities are innermost, with business logic next, and the external system consisting of things like database, UI and communications on the outer. These layers are allowed to have dependencies going inwards. 
 
@@ -426,7 +426,7 @@ The business logic uses interfaces to communicate with the outside world. The pr
 From the point of view of the business logic only, this is compliant with ALA, except for the dependencies on entities, which is discussed below. The elements of the business logic, which in clean architecture are called use cases, can be considered abstractions that know about the business use cases and nothing else.
 
 
-=== Adapters
+==== Adapters
 
 In the clean architecture, dependencies, such as those between business logic and database, are reversed (following the dependency inversion principle) from what it would have been in conventional code. These reversed dependencies do not comply with ALA. I think most implementations recognise these as bad dependencies, and solve it by removing the dependencies altogether using adapters. This is now a lot closer to ALA compliance. 
 
@@ -434,7 +434,7 @@ Something must pass-in or inject the adapters into each of the business logic us
 
 In terms of ALA abstraction layers, the use cases, the database, the UI, and other IO are all about the same level of abstraction. They all know about different types of details. While the use cases know about the domain and it's requirements, the database knows about how to efficiently store data. They are all abstractions that are zero coupled with one another. The adapters go in a layer above, and are specific to a use case / external IO pairing. The main() (or a function it delegates) goes in a layer above that and wires everything up using (usually) constructor dependency injection on the use cases.
 
-=== Entities
+==== Entities
 
 Clean architecture allows dependencies of use cases on entities. This is incompatible with ALA.  
 
@@ -459,7 +459,7 @@ TBD do a simple 'task list' application on Github in both ALA and clean architec
 
 
 
-=== Primary separation
+==== Primary separation
 
 There is a second major difference between clean architecture and ALA. In clean architecture, the UI and other externals IO such as the database are considered to be separated first. That is how it is shown on an architecture diagram, almost as if they are separate packages. You hear of being able to switch between a GUI or CLI based UI. 
 
@@ -470,14 +470,14 @@ In ALA, the primary separation is by features first. The UI and the business log
 In the case that the UI design is not changing, but its implementation is, that involves swapping out the implementations of the UI domain abstractions. The abstraction themselves do not change, so the use cases wont change. But the new UI abstractions can shift to a different technology, shift from desktop to cloud, or the like. 
 
 
-=== DTOs
+==== DTOs
 
 DTOs have two different uses.
 
 - part of an interface to group together related data that is sent through the interface at one time. 
 - to collect data together to be transported together to cut down on the overhead of messaging.
 
-==== interface DTOs
+===== interface DTOs
 
 In ALA, DTOs are not generally abstractions in themselves. Therefore, they may not be put in a lower layer and shared by two abstractions to communicate. That would couple the knowledge inside the two abstractions. If many abstractions want to know about the same DTO, this is likely to be the case as new abstractions are added, then maybe it is sufficiently abstract to be in a lower layer and shared. 
 
@@ -487,11 +487,11 @@ Although this is ALA compliant, in ALA we generally prefer not to use adapters. 
 
 If a DTO can be avoided by, for example, having two data-flow ports that use primitive types, this will increase the abstraction level, reusability and composability of your abstractions. 
 
-==== transport DTOs
+===== transport DTOs
 
 In ALA you wouldn't use DTO for transport purposes. Instead, invent an abstraction say called multiplexer_demultiplexer for packing/unpacking (or serializing/deserializing) multiple input or output ports. Then instances of any two abstractions A and B, that would normally be compatible for wiring together, and which use asynchronous communications, can be physically deployed to opposite sides of the transport system. The wireTo operator, knowing they are in different physical locations, defers to a version that wire each of them to the respective multiplexer_demultiplexer instances.
 
-=== Stability of wiring/adapter/feature layers
+==== Stability of wiring/adapter/feature layers
 
 A system built from a wiring layer at the top, then an adapters layer below that, and then a layer below that for independent features, use cases, databases, UIs etc is ALA compliant. This is because the abstraction layers are more abstract as you go down. The top layer abstraction is a specific application. The second layer adapters are specific to pairs of things in the third. The third is the layer of fully reusable things. A database, even though we call it concrete, is a lot more reusable than a particular application, or a particular adapter.
 
@@ -499,7 +499,7 @@ An ALA application using these three types of layers is a little different from 
 
 The two styles of layering can be used together.
 
-=== Swapping out technology
+==== Swapping out technology
 
 In clean architecture, part of the reason for avoiding dependencies from business logic to things like a particular database or framework is to allow swapping out the technology. The database in the third layer can be exchanged for a completely different type - the coninical example is changing it from a relational database to a simple file. The business logic does not change. Only new adapters are needed, one for each use case. The top layer wiring of course also needs to change to use the different adapters.
 
@@ -530,13 +530,13 @@ In this case we could name all equivalent UI domain abstraction with the same na
 
 
 
-==  Onion Architecture
+===  Onion Architecture
 
 TBD
 
 
 
-==  Hexagonal Architecture (Ports and Adapters)
+===  Hexagonal Architecture (Ports and Adapters)
 
 ALA includes the basic idea of hexagonal architecture, but with modification using the Bridge Pattern to keep cohesive knowledge belonging to the application from being split. 
 
@@ -558,7 +558,7 @@ As a restatement of an earlier tenet of ALA, it is much better to compose the ap
 
 . The fourth reason why it is important for the application to not directly have ports for external components of the system is that we don't want the logical view of the architecture to become just one part of the physical view. If there is a communications port that goes to a different physical machine where there is more application logic, the application's logical view should not know about that. It may be presented as an annotation on the application (lines) connecting certain instances, but it shouldn't split the application up. At the application level, the collaboration between parts instantiated on different machines is still cohesive knowledge and belongs inside one place - the application.  
 
-== Domain Driven Design
+=== Domain Driven Design
 
 Domain Driven Design's "Bounded Contexts" and ALA's Domain Abstractions layer have the same goal, that of encapsulation of the domain specific knowledge.
 
@@ -569,46 +569,229 @@ Domain driven design appears to concentrate on common languages to allow  pairs 
 
 
 
-==  Microservices
+===  Microservices
 
 TBD
 
 
 
 
-==  Architecture evaluation methods
+===  Architecture evaluation methods
 
 Methods such as ATAM tell us how to evaluate an architecture for quality attributes such as maintainability, for instance by giving it modification scenarios to test how difficult the modifications would be to implement. There are several scenarios based methods to do this such as ATAM. Using this we could, theoretically, iteratively search over the entire architecture design space to find a satisfactory solution. It's a bit analogous to numerically solving for the maxima of a complex algebraic formula. In contrast, ALA is analogous to an 'algebraic solution'. If the desired quality attributes, and all the software engineering topics listed above are the equations, ALA is the algebraic solution. It simplifies them down into a parameterised template architecture, ready for you to go ahead and express your requirements.
 
 
 anchor:Monads[]
 
-==  Monads
+===  Monads
 
-We have talked about monads a few times because they are an important example of composition of instances of abstractions. Also, like ALA, they use the concept of separating (in time) composition from execution. You can bind monads together, and it builds a structure that you can then execute. ALA is a generalisation of monads. In the same way, you can wire instances of domain abstractions together, and it builds a structure that you can later execute. In this respect they are similar. 
+We have talked about monads a few times because they are an important example of composition of instances of abstractions. Also, like ALA, they can use the concept of separating (in time) composition from execution. You can bind functions to monads making new monads, and it builds a structure that you can then execute. ALA is like a generalisation of monads. In the same way, you can wire instances of domain abstractions together, and it builds a structure that you can later execute.
 
-When you execute a monad structure (generally by calling a function on the last monad you binded), it (usually) terminates with its value (or values). It is only executes again if it is wired up again. An exception is when using hot observables, such as an IO monad. The monad structure stay in existence, and it executes whenever there is input or output. ALA is more similar to this second case. When you start execution of a wired ALA structure, it (usually) starts running continuously.
+When you execute a monad structure (generally by calling a function on the last monad you binded), it (usually) terminates. It is only executes again if it is wired up again. An exception is when using hot observables, such as an IO monad. The monad structure stays in existence, and it executes whenever there is input or output. ALA is more similar to this second case. When you start execution of a wired ALA structure, it usually starts running continuously.
 
-Each monad binding is restricted to a data-flow of a single type, and in a fixed direction. Each ALA wiring is arbitrary in its meaning, according to whatever is most useful to describe requirements. A single wired connection can carry data as needed in both, or the composition may be about something other than data-flow.  
+Monads are restricted to generic types that have a single type of value. Each monad binding is restricted to stay in this generic type, and only the type of the internal data can change. The functions that are binded must take one parameter and have one return value. Data flows in one direction. 
 
-Often when monads are used, the execution is done immediately following the binding. So the deferred nature of the execution is not always obvious.  I found that the separation between composition and execution of monads to be an important aspect to understand when comparing with ALA composition. In ALA all composition takes place at initialization time. There is a very clear separation between that and run-time. 
+ALA wiring is more arbitrary in its meaning. It can be anything depending on the relationships that need to be expressed in the requirements. A single wired connection can carry data as needed in both directions, or the composition may be about something completely different from data-flow.  
 
-This much separation is not so common with monads. Monads use the separation primarily as a way to do composition with pure functions, and have all the dirty work contained and abstracted away in well tested reusable classes. 
+Often when monads are used, the execution is done immediately following the binding. So the deferred nature of the execution is not always obvious.  I found that the separation between composition and execution of monads to be an important aspect to understand when comparing with ALA composition. In ALA all composition takes place at a clear wiring phase time. Then comes run-time. 
 
-Where you might compose (bind) IObservable or Task monads for almost immediate execution following, in ALA you would tend to compose (wire up) data streams or event sources at initialization time that can then execute many-times thereafter. 
+For queries with monads you run code to compose (bind) IObservable or Task monads etc each time for a query. In ALA you would tend to compose (wire up) data streams once at the start and then initate them to re-run when needed with a wired event.
 
 Another difference is syntax. Monads are composed using a dot operator, a method call, and configured with lambda function passed to the method:
 
- source.Filter(x=>x>=0).Select(x=>sqrt(x))
-
+[source,C#]
+....
+source.Filter(x=>x>=0).Select(x=>sqrt(x))
+....
 
 This code filters out values from the source that are negative and then calculates the squareroots. In ALA, because composition is generalised, the syntax would look like this:
 
- source.WireIn(new Filter(x=>x>=0)).WireIn(new Select(x=>sqrt(x))
+[source,C#]
+....
+source.WireIn(new Filter(x=>x>=0)).WireIn(new Select(x=>sqrt(x))
+....
 
 But usually this code is generated from a diagram.
 
-In functional programming, the binding code that builds the structure is pure functions. When you ask the structure to 'execute' all the dirty code is contained inside these reusable abstractions called Monads. The code that constrauts a particular application is clean and free of side effects. ALA makes use of this same property of reuable abstractions, and its wiring code is pure functional. 
+In functional programming, the code that composes monads is pure functional code without side effects. The functions that are binded are pure functions. When the composed structure 'executes', that may not be pure functional code. It may change states, perform I/O or write to a database. But all that code is inside the well tested monads. Al the code you wrote to compose those monads was purely functional.  
+
+ALA makes use of this same property of reusable abstractions. Domain abstraction may not internally be purely functional. Being object oriented they are almost certainly not. But they can be tested to ensure they are correct. The code that uses them to build specific applications can be pure functional.  
+
+
+==== Monad syntax
+
+Sometimes in ALA, we will wire together domain abstractions that operate on data flows. Such domain abstractions as SelectMany, Select, Where, and OrderBy are possible. This is in the same problem space that monads also solve. So it is worth comparing the two systems. I am no expert on monads, but here is my current understanding of how ALA wiring and monad binding compare with each other.
+
+When we want to bind a function to a monad such as Nullable<T>, it's contained value can be immediately unwrapped, operated on, and then wrapped in a new monad Nullable<R>. When we want to bind a function to a monad such as IEnumerable<T>, we may not want to pull all the values out immediately. Instead we just want a new IEnumerable<R> that knows how to get values from the first IEnumerable<T> and perform the function on them. When we want to bind a function to a monad such as Task<T>, we can't immediately get its contents because the content wont be there until some time in the future. Instead we want a new Task<R> that knows how to wait for the first task and then apply the function to. In the second two examples, the binding to a monad is like wiring in ALA. The binding code creates a connected set of objects that collectively know how to do their work later. Same in ALA, the wiring code creates a connected set of objects which know how to do the job later. 
+
+We can try to compare the monad pattern's _bind_ with ALA's _WireIn_. 
+
+Let's assume for the ALA case, that the instanceB being wired converts objects from one type to another, the same as a function binded to monad does. So in both cases, we have a source of TAs and we want to convert them to TBs. 
+
+Both bind and WireIn have an object as their first argument. That object is a source for TAs. Both bind and WireIn can be written using the dot operator style:
+
+.Monad wiring code
+[source,C#]
+....
+objectA.bind(...)
+....
+
+
+.ALA wiring code
+[source,C#]
+....
+instanceA.WireIn(...) 
+....
+
+
+_bind_ and _WireIn_ are different in their second argument. _bind_ requires a function and WireIn requires an object. The function takes a TA and returns a TB wrapped in a monad. The object has an input port of type TA and an output port of type TB.
+
+.Monad wiring code
+[source,C#]
+....
+monadA.bind((a)=>(<TA,Monad<TB>>)
+....
+
+
+.ALA wiring code
+[source,C#]
+....
+instanceA.WireIn(instanceB) 
+....
+
+
+In the monad case, the bind function returns a new monad object. 
+In the ALA case, the WireIn function returns instanceB.
+Therefore, in both cases you can now chain additional operators using fluent style syntax:
+
+.Monad wiring code
+[source,C#]
+....
+monadA.bind(function<TA,Monad<TB>>).bind(...)
+....
+
+
+.ALA wiring code
+[source,C#]
+....
+instanceA.WireIn(instanceB).WireIn(...)
+....
+
+In the monad version, we often want to specify the function to return a TB instead of a Monad containing a TB. That is what Select is for in C#. Select uses bind but does the wrapping of the TB into a monad for you.
+
+.Monad wiring code
+[source,C#]
+....
+monadA.Select(functionB<TA,TB>)
+....
+
+In the ALA case, we will usually use a prexisting domain abstraction to perform the operation. But to get closer to the same problem that monads solve, lets assume we have no domain abstraction that does what we need, and we really do want to specify the mapping function in the application layer right in amongst the wiring. In other words we want to use a domain abstraction that is configured with a lambda function. In this case I sometimes use a domain abstraction called Lambda which requires a lambda function when it is constructed: 
+
+.ALA wiring code
+[source,C#]
+....
+instanceA.WireIn(new Lambda<TA,TB>(functionB<TA,TB>))
+....
+
+
+Just as _Select_ is a more specialized version of bind that changes the type, _Where_ is also more specialized version that removes records from the stream. It requires a predicate function that returns a bool:
+
+.Monad wiring code
+[source,C#]
+....
+monadA.Where(functionB<TA,bool>)
+....
+
+.ALA wiring code
+[source,C#]
+....
+instanceA.WireIn(new Where<TA>(function<TA,bool>))
+....
+
+
+You can see that the ALA syntax for solving these particular problems is now slightly more verbose. It requires the use of WireIn and the _new_ keyword.
+
+We could consider using the Monad syntax for all ALA wiring. What would happen if we did that:
+
+For example:
+
+.ALA wiring code
+[source,C#]
+....
+    adc.WireIn(new LowPassFilter(10)).WireIn(new OffsetAndScale(0,0.5));
+....
+
+
+.Monad wiring code
+[source,C#]
+....
+    adc.LowPassFilter(10).OffsetAndScale(0,0.5);
+....
+
+To accomplish this syntax, we would have to provide lots of additional methods with the same names as the classes. They perform the new operation and then the wiring operation. These methods could be defined directly on the domaina abstractions such as ADC, but that would pollute ADC with knowledge of LowPassFilter. Since there are many ways of wiring things, every abstraction would need methods for every other abstraction to which it could be wired. That would be ridiculous. 
+
+Instead we would make every domain abstraction implement an _IWireable_ interface. I think this inerface could be empty. Then all the wiring methods would be extension methods on _IWireable_. They would all return an _IWireable_ ready for fluently calling the next wiring method. Now the code for ALA would look like:
+
+[source,C#]
+....
+    (adc as IWireable).LowPassFilter(10).OffsetAndScale(0,0.5);
+....
+
+which is pretty much the same as the Monad code.
+
+
+The wiring methods would be fairly simple:
+
+[source,C#]
+....
+static class LowPassFilterExtensonMethod
+{
+    static IWireable LowPassFilter(this IWireable instanceA, int strength)
+    {
+        return instanceA.WireIn(new LowPassFilter(strength));
+    }
+}    
+....
+
+
+Note that IWireable is kind of analogous to IEnumerable in the monad examples we have been looking at. We call it IWireable because domain abstractions can have more than one output port, and we could be wiring any one of them, whereas monads generally only have one output such as IEnumerable.
+
+In ALA we prefer the explicit use of WireIn and new operators. The reasons are as follows.
+
+* In ALA, domain abstractions are written much more frequently than new monads are written. We don't really want the extra overhead of implementing _IWireable_ in every new domain abstraction and adding a corresponding extension method in a separate static class.
+
+* In ALA we can choose between WireIn and WireTo depending on whether we want to chain instances of abstractions or do fanout wiring.
+
+* We sometimes don't use the new keyword. If the wiring looks like a network rather than a tree, we will store some instances in a local variable, and then wire to them for their other ports. The same thing happens in monad wiring. Its not always a simple chain of operations.
+
+* Monads tend to be used only for _amplified types_ and for composing functions that have one parameter and one return value in chains. Monad functions look like operations on data, but hide the fact they are really just instantiating objects and wiring them together for the operation to occur later. Although confusing at first, it is readable once you are used to it. But imagine if it were used for all programming paradigms. Take for example the UI layout programming paradigm. The code below puts a TextBox and  grid inside a window.
+
+.ALA wiring code
+[source,C#]
+....
+    window.WireTo(new TextBox())
+          .WireTo(new Grid());
+....
+
+The equivalent monad style code would be confusing:
+
+
+.Monad style wiring code
+[source,C#]
+....
+    window.TextBox();
+    window.Grid();
+....
+
+
+
+* ALA wiring handles arbitrarily complex objects with multiple input and output ports. Using explict WireTo and WireIn operators directly reflects this mental model. Monads are at first quite difficult to understand because of what happens under the covers. For most people it is quite a learning curve. By using explicit _WireTo_ and _new_, ALA code is fairly obvious.
+
+* Domain abstractions can have multiple ports. WireIn allows us to specify which ports we want to wire when it could be ambiguous.
+
+* Inherent in the requirements of a typical application is really a network of relationships, which we can often represent with a diagram. Explicit WireIn and WireTo operators allow us to more easily see the one-to-one correspondence between the diagram and the code. Also, it is very easy for a diagramming tool to automatically generate wiring code containing .WireTo and new.
+
+
 
  
 ==== Understanding monads
@@ -629,30 +812,30 @@ Monads are notoriously hard to learn, but they are nice simple insight once you 
 I thought few of the web-sites that I used adequately emphasised the monad property of separation (in time) of composition and execution. They did use examples of it such as IEnumerable and Task. They represent what they can do in the future, without actually doing it now. That's why the binding functions are called bind in the functional world, because it doesn't (necessarily) do anything except build a structure that can later be executed to actually do the work. 
 
 
-==  Reactive Extensions
+===  Reactive Extensions
 
 In ALA, when you wire together 
 
 
 
 
-==  WPF & XAML
+===  WPF & XAML
 
 TBD
 
-==  Functional programming
+===  Functional programming
 
 TBD
 
-==  Functional programming with monads
+===  Functional programming with monads
 
 TBD
 
-==  Functional Reactive Programming
+===  Functional Reactive Programming
 
 TBD
 
-==  Example project - Game scoreboard
+===  Example project - Game scoreboard
 
 For the example project for this chapter, we return to the ten-pin bowling and tennis scoring engines that we used in Chapter two, and add a scoreboard feature (well a simple ASCII scoreboard in a console application rather than real hardware).
 

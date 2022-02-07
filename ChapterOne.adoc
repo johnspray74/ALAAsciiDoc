@@ -1,19 +1,19 @@
 :imagesdir: images
 
 
-= Chapter one - What problem does it solve?
+== Chapter one - What problem does it solve?
 
 If you already have some experience writing code, skip this chapter. If you already know about difficult to maintain code, big balls of mud or spaghetti code, skip this section. If you already find it hard to trace out the large scale structure through the modules of a design, skip this chapter. If you already find it hard to get your head around the plethora of design patterns and architectural styles, skip this section. However, the example at the end is pretty cool - it starts with the type of typical C code that I see most students write, and then refactors, it step by step, into ALA compliant code - you should take a look at that.
 
 The problem that ALA solves can be seen as any one of the following perspectives.
 
-== The Big Ball of Mud
+=== The Big Ball of Mud
 
 ALA is an in-the-large strategy to organise code. It provides the constraints needed for the code structure to never degenerate into sphagetti code, or what Brian Foote and Joseph Yoder describe as a "big ball of mud". As the software  life cycle continues, retaining the organisation becomes easier rather than harder.
 
 
 
-== Simplify down the overwhelming set of architectural styles, patterns, principles and paradigms
+=== Simplify down the overwhelming set of architectural styles, patterns, principles and paradigms
 
 There are many traditional so-called architectural styles, patterns, principles and paradigms. The problem of structuring software code to meet quality attributes involves mastering an overwhelming number of them. Here are some examples:  
 
@@ -45,7 +45,7 @@ Being a pre-worked recipe of the aforementioned styles and patterns, ALA actuall
 Like any good recipe, the ingredients work together to form a whole that is greater than the sum of parts. The resulting code quality is significantly ahead of what the individual memes do by themselves. It continues to surprise me just how effective, and enjoyable, it is. 
 
 
-== An optimal reference architecture for quality attributes
+=== An optimal reference architecture for quality attributes
 
 ALA is a reference architecture. It is independent of any specific domain, so it is a general reference architecture. The reference architecture is 'optimal' for certain non-functional requirements. By optimal, I mean that it makes these qualities as good as they can be:
 
@@ -255,7 +255,7 @@ Testing domain abstractions is easy with units tests because abstractions are ze
 
 
 
-== Structure hidden inside the modules
+=== Structure hidden inside the modules
 
 The problem in most large code bases is that the system structure, the in-the-large structure, is not explicit. It is distributed inside the modules themselves. If there is any collaboration between modules, it is implicitly hidden inside them. Finding this structure, even for a single user story can be time consuming. I have often spent a whole day doing that, doing countless all-files searches following function calls or method calls of the user story through many modules just to end up changing one line of code. Many developers I have spoken to can identify with this experience.
 
@@ -271,7 +271,7 @@ ALA completely eliminates this problem and this conflict. The structure is expli
 
 
 
-== The software engineer's trap
+=== The software engineer's trap
 
 Typical bright young engineers come out of university knowing C++ or Java (or other C*, low-level, imperative, language that mimics the silicon), and are confident that, because the language is Turing-complete, if they string together enough statements, they can accomplish anything. At first they can. There hardly seems a need for a software architect to be involved. And besides, we are told that a design can emerge through incremental refactoring.
 
@@ -284,7 +284,7 @@ The incremental effort to maintain starts to eat away and eventually exceed the 
 It has transitioned to chaos. It will be abandoned. When a new bright young engineer who knows C* arrives, he looks at the legacy codebase and is convinced that he can do better. And the cycle repeats. This is the CRAP cycle (Create, Repair, Abandon, rePlace). ALA is the only method I know that can prevent the CRAP cycle.
 
 
-== A short history of ALA
+=== A short history of ALA
 
 From early on in my career, I experienced the CRAP cycle, not so much rewriting applications, but trying to avoid the mess when writng new ones. Each time I wanted to find a way to not fall into it. I would research and use all the architectural styles and principles I could find. I would come across things like 'loose coupling', and I remember asking myself, yes but how does one accomplish that?, and still fail.
 
@@ -299,7 +299,7 @@ Analysing the common properties of those two code bases, gave clues that eventua
 Subsequently, I ran some experiments to see if the maintainability and non-complexity could be predictably reproduced. These experiments, which have worked spectacularly well so far, are discussed as a project at the end of every chapter.
 
 
-== Example project - Thermometer
+=== Example project - Thermometer
 
 In this example project, we will first do conventional code using functions, then refactor it into abstraction layers, and finally improve on that using classes. The ALA layering rules work the same for both functions or classes.  
 
@@ -392,12 +392,12 @@ Nevertheless, functional composition is a passable programming paradigm for a ti
  #include "configurations.h"
  void ConfigureTemperaturesAdc()
  {
-    // configure ADC port 2 to do DMA BATCHSIZE values at a time
+    // configure ADC channel 2 to do DMA BATCHSIZE values at a time
  }
  float GetTemperaturesFromAdc(int temperatures[]) 
  {
     for (i = 0; i<BATCHSIZE; i++) {
-        temperature[i] = Port(2);  / pseudocode here for the port access
+        temperature[i] = ReadAdcChannel(2);  // pseudocode here for the adc read
     }
  }
 
@@ -441,7 +441,7 @@ We are going to refactor the program using the ALA strategy:
     float smoothedTemperatureCelcius;
     while (1)
     {
-        GetAdcReadings(adcs, 2, DMABATCHSIZE);  // port=2
+        GetAdcReadings(adcs, 2, DMABATCHSIZE);  // channel=2
         for (i = 0; i<BATCHSIZE; i++) {
             temperatureInCelcius = OffsetAndScale(adc, offset=4, slope=8.3); 
             smoothedTemperatureCelcius = Filter(temperatureCelcius, 10); 
@@ -529,7 +529,7 @@ Now let's go one more step and create an abstraction to do what that for loop do
     ConfigureAdc(2, DMABATCHSIZE)
     while (1)
     {
-        GetAdcReadings(adcs, 2, DMABATCHSIZE);  // port=2 
+        GetAdcReadings(adcs, 2, DMABATCHSIZE);  // channel=2 
         foreach(adcs, func1);
     }
  }
@@ -573,7 +573,7 @@ Now let's deal with that problematic "func1". "func1" is not an abstraction - yo
     ConfigureAdc(2, DMABATCHSIZE)
     while (1)
     {
-        GetAdcReadings(adcs, 2, DMABATCHSIZE);  // port=2 
+        GetAdcReadings(adcs, 2, DMABATCHSIZE);  // channel=2 
         foreach(adcs, (adc)=>{
             temperatureInCelcius = OffsetAndScale(adc, offset=4, slope=8.3); 
             smoothedTemperatureCelcius = Filter(temperatureCelcius, 10); 
@@ -633,10 +633,10 @@ This can be accomplished (in a awkward manner) using anonymous lambda functions.
  #define DMABATCHSIZE 100
  void main()
  {
-    ConfigureAdc(Port=2, DMABATCHSIZE)
+    ConfigureAdc(Channel=2, DMABATCHSIZE)
     while (1)
     {
-        GetAdcReadings(Port=2, DmaBatchSize=DMABATCHSIZE, (values) => 
+        GetAdcReadings(Channel=2, DmaBatchSize=DMABATCHSIZE, (values) => 
             {
                 foreach(values, (value)=> 
                     { 
@@ -673,7 +673,7 @@ It gets us closer from a composition of abstractions point of view, but all that
 ....
  void main()
  {
-    program = new ADC(port=2, batchSize=100)
+    program = new ADC(channel=2, batchSize=100)
     .foreach()
     .OffsetAndScale(offset=4, slope=8.3)
     .Filter(strength=10)
@@ -737,7 +737,7 @@ Here is the same program as above, but we are using plain objects instead of mon
 ....
  void main()
  {
-    program = new ADC(port=2,batchSize=100)
+    program = new ADC(channel=2,batchSize=100)
         .WireIn(new Foreach())
         .wireIn(new OffsetAndScale(offset=4, slope=8.3))
         .wireIn(new Filter(strength=10))
@@ -778,7 +778,7 @@ For the UI part of the composition, the lines obviously don't mean data-flow - t
  {
     FloatField temperature;
  
-    program = new ADC(port=23)
+    program = new ADC(channel=2)
         .WireIn(new Foreach())
         .wireIn(new OffsetAndScale(offset=4, slope=8.3))
         .wireIn(new Filter(10))

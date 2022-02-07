@@ -1,10 +1,10 @@
 :imagesdir: images
 
 
-= Chapter seven - The philosophy behind ALA
+== Chapter seven - The philosophy behind ALA
 
 
-== The human brain
+=== The human brain
 
 In this perspective of ALA, we look at the problem of complexity in software in the context of how the human brain works.
 
@@ -30,7 +30,7 @@ Good domain abstractions, introduced and learned by new developers in the domain
 
 
 
-== Abstraction
+=== Abstraction
 
 Of the overwhelming list of engineering topics that we listed in Chapter One, this topic that is the most fundamental to ALA, and the one most needed for explaining it. It's also probably the vaguest and most misunderstood topic in software engineering, so we will spend some time understanding it.
 
@@ -150,7 +150,7 @@ Note that inputs and outputs are not necessarily on different ports. We may want
 
 
 
-== Complexity
+=== Complexity
 
 ==== Philosophy of complexity
 
@@ -245,7 +245,7 @@ The goal of software architecture should be to keep complexity constant.
 
 
 
-== No Loose Coupling
+=== No Loose Coupling
 
 Here we meet the first meme from our list of software engineering topics that we must throw out. To many, this will seem a surprising one. Yes, I am saying 'loose coupling' is undesirable.
 
@@ -382,7 +382,7 @@ When we want the knowledge of run-time dependencies to be moved inside another a
 Before going into the pattern, we need to round out the most important aspects of ALA.
 
 
-== Wiring pattern - Part one
+=== Wiring pattern - Part one
 
 We now introduce the pattern that both solves the congruence problem just discussed in the previous section, and provides the alternative to all those disallowed coupling types discussed earlier. This pattern is usually an important part of ALA. 
 
@@ -598,7 +598,7 @@ If A and B are static modules, this produces something like:
  }
 
 
-== Wiring pattern - part two 
+=== Wiring pattern - part two 
 
 We are half-way through explaining the wiring pattern. Now we turn our attention to how A and B can communicate without knowing anything about each other. 
 
@@ -962,7 +962,7 @@ TBD: change the following code to use an intermediary (framework) abstraction to
 ////
 
 
-== Expression of requirements
+=== Expression of requirements
 
 One of the fundamental aspects of ALA is that the abstraction level of the application is fixed and defined by:
 
@@ -984,7 +984,7 @@ This is what first gave rise to one of the core tenets in ALA. The first separat
 Of course this has a strong parallel with how DSLs work. Is ALA just DSLs? There are several differences. Firstly in ALA we don't try to create a sandbox language for a domain expert to maintain applications. We don't go as far as an external DSL. It's for the developer and we don't want to cut him off from the power he already has when it is needed. We just give him a way to organise the code and a process to get him there - describe the requirements knowledge in terms of abstractions and then trust that those abstractions, when written, will make it work.
 
 
-== No two modules know the meaning of data or a message. 
+=== No two modules know the meaning of data or a message. 
 
 The two modules will have collaborative knowledge. We reason that the sender must know the meaning to formulate the message, and the receiver must know the meaning to interpret the message. So how can it be avoided? The answer is to make the sender and receiver in same abstraction. They both know the same knowledge, so they are cohesive, so they should be together. In the logical view of the system, they are two instances of the one abstraction. We let the physical view fact that the sender and receiver will be deployed in different places drive them to be different modules. 
 
@@ -992,7 +992,7 @@ The two modules will have collaborative knowledge. We reason that the sender mus
 
 
 
-== Expressiveness
+=== Expressiveness
 
 Requirements are usually understated initially in terms of abnormal conditions. However, they are usually communicated quite quickly relative to the time to write the code. In ALA, they are separately represented. The precise expression of the requirements using the right programming paradigms should take about the same amount of information as the English explanation of them.
 
@@ -1002,7 +1002,7 @@ In general, ALA probably requires about the same amount of total code. But once 
 
 
 
-== No models
+=== No models
 
 [IMPORTANT]
 ====
@@ -1051,7 +1051,7 @@ This knowledge that Instances a and b will be communicating at run-time must of 
 The A and B inside C are the Instance aspect of A and B. Even if A and B are never actually explicitly instantiated (because they are written as static modules), C still deals with their Instance aspect. If A and B are written in such a way that they need to be explicitly instantiated, C will do that.  
 ////
 
-== Abstraction Layers
+=== Abstraction Layers
 
 ==== Layers pattern
 
@@ -1192,7 +1192,7 @@ The knowledge in each of the four layers has different change rates.
 * The Application layer has the fastest changing knowledge, the knowledge that changes at the rate that an application gets maintained.
 
 
-== Composition versus decomposition
+=== Composition versus decomposition
 
 Here we revisit the important idea introduced in chapter 3 to do with the pitfalls of thinking in terms of hierarchical decomposition. 
 
@@ -1358,15 +1358,15 @@ If the domain were for building model toys, the non-ALA method would start with 
 
 
 
-== 4+1 views
+=== 4+1 views
 
-=== Logical view
+==== Logical view
 
-=== Development view
+==== Development view
 
-=== Process view
+==== Process view
 
-=== Physical view
+==== Physical view
 
 
 If the system is deployed on multiple machines (this is the subject of the physical view), the ALA abstractions, layers and diagrams all remain identical. 
@@ -1375,7 +1375,7 @@ Ideally, the performance view also does not affect the ALA logical view. This is
 
 ALA usually works very well with aspects of the development view as discussed elsewhere. For example, the fact that domain abstractions have zero coupling greatly helps the allocation of teams. The teams need only cooperate on a common understanding of the programming paradigms used.   
 
-== No separation of UI
+=== No separation of UI
 
 In ALA we don't separate the UI unless there is a reason to do so. The amount of knowledge in the UI that comes from a particular application's requirements is usually quite small and that knowledge is usually quite cohesive and coupled with the business logic of the feature it belongs with. For example, the layout of the UI is a small amount of information, and the bindings of the UI elements to data are a small amount of information. So all that cohesive knowledge is kept together, encapsulated inside a feature. Instead, the UI is composed from Domain UI abstractions. Being domain specific, these abstractions have a little more knowledge to them than generic widgets. For example, their domain knowledge may include style, functionality and suitability to their domain context. For example, a softkey or menu item will have an appearance, functionality and suitability to the way UIs are designed in the domain. Using one in a specific application only requires a label and a binding to an action. They will also provide consistency in the domain.
 
@@ -1384,13 +1384,13 @@ If there is an actual requirement to have different UIs, say a command based UI 
 In the example project for this chapter, we will for the first time use multiple programming paradigms, a usual thing in real ALA projects.
 
 
-== Features
+=== Features
 
 You may have noticed throughout this article the word 'features' being used quite often instead of 'Application'. When the application is large, we can think of it as a composition of feature abstractions. This is exactly what happens in natural language in the domain when describing requirements. 'Features' is just the word we give the natural abstractions in the requirements, without even realizing it. Just go with this in the software itself.   
 
 
 
-== Inheritance
+=== Inheritance
 
 ALA doesn't use inheritance because in the real world things are composed of other things. The only place inheritance occurs is in the tree of life. The down sides of inheritance are well documented. The indirect (virtual) method calls (polymorphism) when indirection is not required makes programs hard to follow. ALA of course uses polymorphism in the extreme (by its use of abstract interfaces as programming paradigms), but its always used when going up an abstraction level and never used to replace what should be explicit wiring.
 
@@ -1410,7 +1410,7 @@ This is a topic for future research.
 
 
 
-== Horizontal domain partitions
+=== Horizontal domain partitions
 
 Say you are implementing a particularly large domain abstraction such as a 'Table', or are implementing a complicated programming paradigm. We would like to break these up into smaller components. Do we introduce a fractal type of structure to deal with this? Should we have hierarchical layers within layers contained completely inside the Table abstraction?
 
@@ -1553,12 +1553,12 @@ Physical -> Ethernet
 The technicalities may be incorrect but the diagram gives the idea of how the OSI 'layers', which are just run-time dependencies, would fit into the ALA layers. 
 
 
-== No hierarchical design
+=== No hierarchical design
 
 ALA does not use any form of hierarchical structure. Instead it uses abstraction layers, together with "Horizontal domain partitions" discussed earlier.
 
 
-== Domain oriented
+=== Domain oriented
 
 As has been found useful in other methodologies such as Domain Specific Languages, Domain Driven Design, Model Driven Software Development and Language Oriented Programming, ALA provides a way to be 'domain oriented'. 
 
@@ -1567,23 +1567,23 @@ But unlike most of the other domain oriented methodologies, ALA provides a way t
 
 
 
-== Product owner perspective
+=== Product owner perspective
 
 TBD
 
 
 
-== Reuse
+=== Reuse
 
 TBD
 
 
-== Documentation
+=== Documentation
 
 TBD
 
 
-== Symbolic indirection
+=== Symbolic indirection
 
 TIP: Avoid use of symbolic indirection without abstraction
 
@@ -1597,12 +1597,12 @@ Abstraction is almost a black and white type of property. It's either there or i
 
 Footnote: When the reader of your code meets your abstraction for the first time (usually a domain abstraction in a domain they have recently come into), ideally their IDE will give them the meaning in a little pop-up paragraph as their mouse hovers over any of its uses. Depending on the quality of the abstraction, after a single exposure, their brain will have the insight, like a light coming on, illuminating a meaning. The brain will form a new neuron to represent the concept. Since the reader will hopefully remain in the domain for some time, this overhead to readability shouldn't be large.
 
-== Everything through interfaces
+=== Everything through interfaces
 
 A class, in contrast to an abstraction, has an interface comprising all the public members. In ALA we only want this interface to be used by the application when it instantiates and configures an instance of an abstraction. All other inputs and outputs that are used at run-time are done through interfaces (abstract interfaces). 
 
 
-== What do you know about?
+=== What do you know about?
 
 Whenever I have only two minutes to give advice on software architecture, I use this quick tip. The tip is ALA reduced to its most basic driving principle.
 
@@ -1637,7 +1637,7 @@ The anthropomorphization helps the brain to see them as abstractions. The word '
 
 
 
-== Example project - a real device
+=== Example project - a real device
 
 Unlike our previous example projects, this project is a real device and had previously been implemented without any knowledge of ALA. So this example serves to make comparisons between ALA and conventional software development. The original software was around 200 KLOC and took 3 people 4 years to write. 
 

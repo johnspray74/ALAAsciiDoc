@@ -1,8 +1,8 @@
 :imagesdir: images
 
-= Chapter four - Programming paradigms and their execution models. 
+== Chapter four - Programming paradigms and their execution models. 
 
-== Introduction to programming paradigms
+=== Introduction to programming paradigms
 
 ALA fundamentally begins with the premise of using abstractions to achieve zero coupling. Zero coupling is preserved if relations between abstractions are always in the direction of greater abstraction (stability and reuse). Thus abstraction layers emerge, with each layer significantly more abstract than the one above. It is interesting to observe how these layers seem to emerge typical usage patterns, which in turn give rise to their names: Application layer, Domain abstractions layer, Programming Paradigms layer, and so on.
 
@@ -37,7 +37,7 @@ In ALA "programming paradigms" are used to compose instances of domain abstracti
 
 Programming paradigms are by no means limited to the ones discussed in this chapter. Custom ones can be invented as needed (when they allow better expression of the requirements). We do this with the example at the end of this chapter for scoring games such as Bowling or Tennis. We use a 'ConsistsOf' paradigm which allows us to express that a match consists of sets, a set consists of games, and so on.
 
-== Introduction to execution models
+=== Introduction to execution models
 
 Programming paradigms and execution models are intertwined but not precisely the same thing. Programming paradigms are the meaning of composition. Execution models are how we are going to make that meaning actually work. Essentially, the execution model is where is the CPU is going to go and when?
 
@@ -47,12 +47,12 @@ Other programming paradigms may require an engine or framework. Possible ways th
 
 
 
-== Coding execution models for programming paradigms
+=== Coding execution models for programming paradigms
 
 Here we just show simple code examples of two execution models for the event driven programming paradigm to get an early grounding at the code level. 
 
 
-=== Synchronous events
+==== Synchronous events
 
 
 Here is the interface. 
@@ -158,7 +158,7 @@ The IEvent interface can be compared with the observer pattern (publish/subscrib
 
 
 
-=== Asynchronous events (the event loop)
+==== Asynchronous events (the event loop)
 
 In the above example, we used the word _event_, but implemented it in a specific way (a synchronous method call). The terms _event_ and _event driven_ may have overloaded meanings. To some it may mean asynchronous or it may mean observer pattern (an event is something you can subscribe to), or it may mean both. In ALA the term means neither of these. As a programming paradigm it simply means that we think of programming as reacting to what happens instead of prescribing what will happen next - a reactive rather than prescriptive style.
 
@@ -345,7 +345,7 @@ As usual in ALA, we do not try to decouple anything inside the IEvent.c abstract
 
 
 
-== Execution model properties
+=== Execution model properties
 
 Now that we have a basic idea of what we mean by programming paradigm and execution model at the code level, we next need to discuss some general properties of execution models, such as direct vs indirect, synchronous vs asynchronous, push vs pull, etc. we will refer to them when discussing specific execution models later.
 
@@ -354,14 +354,14 @@ In conventional imperative code, the execution model is inherently restricted by
 In this section we will try to clarify what these design choices are, and the forces on these design choices.
 
 
-=== Sideways vs down vs up communications 
+==== Sideways vs down vs up communications 
 
 In conventional code, we generally try to make all communications go up and down the layers, following the dependencies. So we may not be used to thinking of sideways communications differently from up or down communications. We need to think of them differently in ALA. Let's refer to sideways communications as _wired-communications_, and up/down communications as _abstraction-use-communications_. A common example of abstraction-use communication is when you configure an instance of an abstraction by calling setters. Another example is calling a squareroot function in your math library. A common example of upward communication using abstraction-use-communication is executing a lambda expression that has previously been passed in to an instance of an abstraction during its configuration. Upward calls are always indirect in some way, such as the mentioned lambda expression, passing in an anonymous or named function, observer pattern (publish subscribe), callback, or strategy pattern. We don't use virtual functions in ALA for up calling because we don't need or want to use inheritance. 
 
 In all the following discussions of programming paradigms, we will be talking about _wired-communications_ unless noted otherwise. Note that we use the word _communications_ to cover for both events and data-flow types of programming paradigms. Another word for this is _message_.
 
 
-=== Direct vs indirect
+==== Direct vs indirect
 
 Sideways communications in ALA is always indirect. Function and method calls do not name the called function or method. Receivers do not register for events. Global event names are never used. Communications follows explicit point to point wirings.
 
@@ -382,7 +382,7 @@ Having said that ALA does not use the observer pattern (or any other form of the
 If a dependency were going up from one abstraction layer to a higher one, then of course we invert the dependency. But a dependency from a more abstract abstraction to a more specific one doesn't make sense in the first place and so is unlikely to come about. Inverting dependencies is not something we generally need to do.
 
 
-=== Synchronous vs asynchronous
+==== Synchronous vs asynchronous
 
 Although we already did simple coding examples for synchronous and asynchronous execution models above, the design choice between synchronous and asynchronous needs deeper considerations.
 
@@ -525,7 +525,7 @@ The alternative in conventional code is synchronous calls that block, and so are
 By far the best solution is async/await because it solves the problem using direct programming style. Choose a language that has this essential feature if you can.
 
 
-=== Priorities
+==== Priorities
 
 Asynchronous communications are inherently less deterministic than synchronous. That's why domain abstractions had to not care exactly when one-way communications were executed. Synchronous communications effectively put a system wide lock on everything. Nothing else can happen anywhere until it is executed. Asynchronous allows other things to happen before and during an operation. This brings up the possibility of priorities to explicitly control the order to improve performance.
 
@@ -544,7 +544,7 @@ We might consider global priority levels such as High, Medium, and Low, which wo
 TBD: implement an example priority system, preferably with a stand-alone abstraction in the programming paradigms layer (which would need to be wired to a port on the event-loop abstraction to somehow control the order of the event list.)
 
 
-=== Busy resources
+==== Busy resources
 
 When a resource that takes some time to process is used asynchronously, more than one sender may try to use it at the same time. For example a logging serial output could be used by multiple users at once. If the resource is busy, the communication will need to be queued until it is ready. The reactor pattern can handle this situation. It can check if the receiver is busy before giving it the communication. 
 
@@ -554,7 +554,7 @@ If a simple event loop is used, an intermediary object can be wired in front of 
 
 
 
-=== Push vs pull
+==== Push vs pull
 
 If we are using synchronous function calls or method calls as the execution model, we have a choice between push and pull. In other words, does the sender of an event or data initiate the call, or does the receiver? 
 
@@ -569,7 +569,7 @@ The request/response programming paradigm discussion later also gives examples w
 A final factor in the preference to use push by default is that push ports can be wired for either synchronous or asynchronous execution models without changing the domain abstractions (discussed above in the section on synchronous vs asynchronous). To allow this for pull ports requires writing the pull end to be written for an asynchronous execution model, which can be awkward. This aspect is discussed more fully in the section on the request/response programming paradigm later.
 
 
-==== Wiring incompatible push & pull ports
+===== Wiring incompatible push & pull ports
 
 It is possible to wire together instances of domain abstractions that have incompatible ports with respect to push and pull, provided the communications becomes asynchronous. A send port that uses push can be wired to a receive port that uses pull. And a send port that uses pull can be wired to a receive port that uses push. This can even be done automatically, so that the user story doing the wiring does not need to worry about it.
 
@@ -591,14 +591,14 @@ In summary, I use push style ports for domain abstractions by default. In situat
 
 
 
-=== Fan-in, fan-out wiring
+==== Fan-in, fan-out wiring
 
 In chapter three, we talked about fan-in and fan-out. But that fan-in and fan-out was different from what we will be discussing here. In chapter three it was talking about dependencies going down layers. Here we are talking about wiring.  
 
 An output port of one instance of an abstraction could be wired to many instances, and vice versa. It depends on what makes sense for each particular programming paradigm.
 
 
-==== Fan-out implementation
+===== Fan-out implementation
 
 Some programming paradigms support fan-out out of the box. An example is the UI programming paradigm. Many UI container domain abstractions have a list of child UI elements. The WireTo method looks for a port implemented as a list and can wire from such port multiple times.
 
@@ -612,7 +612,7 @@ Another problem that we can solve in the EventConnector is the problem that a cl
 
 
 
-==== Fan-out ordering 
+===== Fan-out ordering 
 
 Fan-out is valid and common for many programming paradigms, and the order can be significant. Sometimes it is sufficient for the order to be defined as ’down’ in the diagram. The UI fanout works this way to control top to bottom or left to right UI layouts. For events this is not considered explicit enough. Where order matters, we use ”Activity Flow” (exactly analogous to UML activity diagrams) to control ordering. An abstraction called EventConnector used to implement fan-out has a port called ’last’ which allows instances of them to be chained.
 
@@ -621,7 +621,7 @@ Fan-out is valid and common for many programming paradigms, and the order can be
 
 
 
-==== Diamond pattern glitches
+===== Diamond pattern glitches
 
 A related issue is a diamond wiring topology that can potentially cause glitches. When two signals that originated from the same output port take different routes and then arrive at two inputs of the same abstraction, they could be executed at different times. In the time between, the data is potentially invalid. We call this a glitch because it is temporary.  
 
@@ -630,7 +630,7 @@ A solution is to ensure that abstractions with multiple inputs work correctly re
 It is a future topic to have the execution engine automatically detect and control diamond wiring in the topology.
 
 
-=== Circular wiring
+==== Circular wiring
 
 In ALA, it is no problem to have circular wiring from a dependency point of view because wiring doesn't involve dependencies. There are runtime considerations for execution models that allow circular wiring.
 
@@ -646,7 +646,7 @@ Circular wiring can occur in conventional coding architecture as well (as mutual
 
 
 
-== Wiring arbitrary execution models
+=== Wiring arbitrary execution models
 
 To accomplish wiring, the user story code makes a call to the WireTo method, passing in the two object/ports to be wired. The WireTo method by default wires the two objects by assigning the second object to a private field in the first object that has the compatible interface. This default behaviour sets up a synchronous calls using methods in the interface.
 
@@ -659,14 +659,14 @@ The WireTo method in the foundation layer checks its list of registered interfac
 
 
 
-== Execution models of programming paradigms 
+=== Execution models of programming paradigms 
 
 Following is a list of some common programming paradigms and how they would execute. It is not an exhaustive list. There are no doubt many other possibilities waiting to be invented that better allow composing of abstractions for succinct expression of requirements. 
 
 
 
 
-== Request/response
+==== Request/response
 
 In the first part of this chapter we presented some code for one-way synchronous and asynchronous events. In the properties section, we discussed how if the communication is one-way, the ports can be implemented as synchronous, but the wiring between them can be either synchronous or asynchronous.
 
@@ -735,7 +735,7 @@ These techniques allow us to write requesters that can work with either asynchro
 
 
 
-=== Wiring incompatible request/response ports
+===== Wiring incompatible request/response ports
 
 
 Because synchronous and asynchronous have different advantages, the ports of domain abstractions may end up a mixture of synchronous and asynchronous. We may want to use synchronous by default but are forced to use asynchronous when communicating to an instance of an abstraction that is in a different location. Once one asynchronous port is needed, then all the ports connected in the same data flow of the user story tend to need to be asynchronous as well. 
@@ -749,7 +749,7 @@ If the requester is synchronous and the responder is asynchronous, it would be p
 
 
 
-== Event-driven programming paradigm
+==== Event-driven programming paradigm
 
 We now return to the 'Event driven' programming paradigm. At the beginning of this chapter we showed both synchronous and asynchronous code examples of this paradigm, which used an IEvent interface.
 
@@ -758,20 +758,20 @@ We now return to the 'Event driven' programming paradigm. At the beginning of th
 Here we discuss other aspects of the event-driven programming paradigm.
 
 
-=== Events with parameters
+===== Events with parameters
 
 Another section of this chapter discusses the data-flow programming paradigm. Data-flow can be considered event driven, by allowing events to carry a data parameter. However Data-flow has more cases where it will need to use pull rather than push, and it has a variation where a table of data is moved in batches. For this reason they are considered programming paradigms in their own right. 
 
 However within the event-driven programming paradigm, we still have the option to attach a parameter to the events. 
 
 
-=== Event-driven programming
+===== Event-driven programming
 
 Event-driven programming sometimes has a meaning attached to it that is at a higher level than just indirect. Event-driven programming often means _reactive_. This contrasts with the _prescriptive_ or _orchestrated_ nature of the imperative or activity programming paradigms. In event-driven, the system is idle until something happens, and then things react to it, possibly generating more events, completion events, or timeout events. Event driven systems like to use interrupt routines to get events from the outside into the system. The interrupt routine puts the event either directly into the event queue or into a buffer for the system main loop to see. 
 
 In a reactive system, we don't know what will happen next, in either the outside world or what code will execute next. It is less deterministic. Reacting to an event often changes some stored state. This state may change the way we will react to subsequent events. In other words, event-driven often goes hand in hand with state machines. 
 
-=== Factors for asynchronous event processing
+===== Factors for asynchronous event processing
 
 * Event driven is generally not thought of as a request/response programming paradigm. There can be a response, but it is thought of as a completely separate message that needs its own wiring. So we have less reason to use synchronous function calls because there is generally no response associated with an event (in the same wire). We may already have an asynchronous event framework in place, so we always have the option to process events asynchronously. 
 +
@@ -798,7 +798,7 @@ Or he may have a domain abstraction with two ports. An event is sent from the fi
 The order that asynchronous events are processed should be considered non-deterministic. When trying to manage temporal coupling in the system design at the application layer, we recommend using the activity programming paradigm (described below) or another prescriptive paradigm rather than a reactive one. The activity programming paradigm is about explicitly ordering things, even things that take time. It can be used with reactive programming.
 
 
-=== Factors for synchronous event processing
+===== Factors for synchronous event processing
 
 If asynchronous events are the more general and more flexible execution model, why use synchronous at all? 
 
@@ -820,7 +820,7 @@ If asynchronous events are the more general and more flexible execution model, w
 
 
 
-=== Wiring incompatible ports for synchronous and asynchronous
+===== Wiring incompatible ports for synchronous and asynchronous
 
 In the section Programming paradigm properties above, we briefly discussed wiring incompatible ports with respect to synchronous or asynchronous. 
 
@@ -831,7 +831,7 @@ For one-directional events, both sending and receiving ports can use ordinary sy
 This means that when using the event-driven programming paradigm, the decision of wiring for synchronous or asynchronous can be done at the time the user story abstraction is written, not when the domain abstractions are written. This is valuable as it allows us to do the logical user story diagram, and then decide on what locations the instances of the domain abstractions will run, and wire for synchronous or asynchronous accordingly. 
 
 
-=== Event names
+===== Event names
 
 Some conventional event driven systems use global event names for inter-communication between modules. Each receiver names the events it is interested in. They do this by registering to global event or signal names. While this is considered relatively decoupled by its proponents, because senders and receivers don't know directly about each other, only about these global events, it is generally illegal in ALA because most events are not abstract enough to be named and become global, nor to reside in a lower layer. By effectively collaborating on symbol names, abstractions are coupled with each other still. It's a rigid system because instances of abstractions could not be rewired in a different way without changing the abstractions.  
  
@@ -839,7 +839,7 @@ ALA does not generally use global event names. It generally doesn't use event na
 
 It is possible to have an event that is abstract enough to go into the layer below. For example, if many user story abstractions generate or react to the same event, such that the wiring between them would be a many pointed star network all coming to a point, that may be an indication that such an event is really a plug-in point. An example might be a save event. It could be generated from the menu, toolbar or keypress. Many user stories may plug into it save their context. 
 
-== Data-flow
+==== Data-flow
 
 A data-flow model is a model in which wired instances in the program (or connected boxes on a diagram) are a path of data without being a path of execution-flow. The execution flow is like in another dimension relative to the data flow - it may go all over the place.
 
@@ -852,7 +852,7 @@ The network can be circular provided some kind of execution semantic finishes th
 The data-flow paradigm raises the question of type compatibility and type safety. Ideally the types used by the components are either parameterised and specified by the application at each connection or determined through type inference.  
 
 
-=== IDataFlow<T>
+===== IDataFlow<T>
 
 I frequently use data-flow execution models.
 
@@ -876,19 +876,23 @@ Here is the version I use most often.
 TBD
 
 
-It has a number of useful properties.
+Note that domain abstractions may not collaborate on a specific type for T. A pair of domain abstraction may not, for example, share a DTO (data transfer object) class as that would then be an interface specific to one or other of those classes. T must be more abstract and come from a lower layer, so is often a primitive type from the programming language. T may be passed in by the application, which always knows types of data moving through the system. 
 
- 
+Type inferencing is desirable. For example, an instance of a _DataStore<T>_ abstraction could be configured by the application to have some specific fields. Ideally this is the only time the application specifies the fields. The application wires it to a _select_ abstraction that removes one field and then to a _join_ abstraction that adds one field. From there it is wired to a _form_ abstraction that displays the fields. Ideally the form, select and join abstractions do not also have to be configured by the application to know the types of their ports. Instead they are able to infer the type as an anonymous class as it goes from port to port at compile-time.  
 
-=== ITable
+
+===== ITable
 
 This interface moves a whole table of data at once. The table has rows and columns. The columns are determined at runtime by the source. 
+
+Run-time types can also be used. For example, the fields in an instance of a table abstraction may not be fully known at compile-time. This is especially true if the table abstraction provides persistence, or, for example, if the data source is a CSV file with unknown fields. In this case a ITable programming paradigm would transfer type information at run-time as well as the data itself.
+
 
 TBD implemantation examples
 
 
 
-== Activity-flow
+==== Activity-flow
 
 The name Activity-flow comes from the UML activity diagram. Activities that are wired together execute in order. One starts when the previous one finishes. The activity itself may take a long time to complete (without blocking the CPU). Activity flows can split, run concurrently and recombine. 
 
@@ -906,7 +910,7 @@ The domain abstractions may internally use an asynchronous execution model, such
 
 
 
-==== Structured activity flow wiring using text (experimental)
+===== Structured activity flow wiring using text (experimental)
 
 This is a thought experiment at this stage.
 The experiment is to see if we can do structured programming for activity flow.
@@ -966,16 +970,16 @@ This code looks okay, however, as is often the problem with text based represent
 
 
 
-== Direct style
+==== Direct style
 
 
 
 
-=== Work-flow
+==== Work-flow
 
 Persisted Activity-flow. This includes long running activities within a business process such as an insurance claim.
 
-=== IIterator
+==== IIterator
 
 This data-flow interface allows moving a finite number of data values at once. It does so without having to save all the values anywhere in the stream, so has an efficient execution model that moves one data value at a time through the whole network.
 
@@ -985,7 +989,7 @@ IIterator has two variants that handle push and pull execution models. Either th
 
 TBD implementation examples
 
-=== Glitches
+==== Glitches
 
 All systems can have glitches when data flows are pushed in a diamond pattern. The diamond pattern occurs when an output is wired to two or more places, and then the outputs of those places eventually come back together. If they never come together, even both seen by a human, then we generally don't care what order everything is executed in. But when they come together, the first input that arrives with new data will cause processing, and use old data on the other inputs. This unplanned combination of potentially inconsistent data processed together is a glitch. It even happens in electronic circuits.
 
@@ -1047,14 +1051,14 @@ EventBlock -> Mult
 By default multiple IDataFlows wired to a single output are executed in the order that they are wired anyway. On the diagram, they are drawn top to bottom in that order.  This improves the determinism but is a little too implicit for my liking, so that is why I use the order abstraction.
 
 
-== Live data-flow
+==== Live data-flow
 
 As used in the coffee-maker example earlier, this paradigm simulates electronic circuits instead of using the concept of discrete messages. Semantically the inputs have the values of the outputs they are wired to at all times. This type of flow is readily implemented with shared memory variables.
 
 FRP (Functional Reactive Programming) also is effectively a live data-flow execution model.
 
 
-== Synchronous data-flow
+==== Synchronous data-flow
 
 The use of the word synchronous here is different from its use in the discussion of synchronous/asynchronous events above. Here it means a master system clock clocks the data around the system on regular ticks. At each tick, every instance latches its own inputs and then processes them and places the results on their outputs. Data progresses through one operator per tick, so takes more time to get through the system from inputs to outputs. The result is a more deterministic and mathematically analysable system. 
 
@@ -1063,19 +1067,19 @@ The execution timing and the timing of outputs occurs at a predictable tick time
 Glitches that could occur in an asynchronous system (discussed earlier) are eliminated at the level of single clock ticks. A fast glitch could not occur. A glitch would occur when different data paths had different lengths, and would last for at least one tick duration. Controlling glitches is therefore lifted into the normal design space.
 
 
-== UI layout
+==== UI layout
 
 TBD
 
-== UI navigation flow
+==== UI navigation flow
 
 TBD
 
-== Data schema
+==== Data schema
 
 TBD
 
-== Locking resources
+==== Locking resources
 
 
 
@@ -1092,7 +1096,7 @@ The ALAExample project at www.github.com/johnspray74 has an example of this. The
 The arbitrator abstraction could be given the ability to detect deadlocks and even break deadlocks.
 
 
-== State machines
+==== State machines
 
 To get used to how different these programming paradigms can be, let's go now to something completely different - state machines. We wont be going into understanding them at the code level because we want to support hierarchical state machines, and the code for that is a little bit non-trivial, but we do want to get an understanding of how state machines are just another programming paradigm that allows us to wire together instance of abstractions. The meaning of the wiring is different than what it was for the event programming paradigm. 
 
@@ -1120,7 +1124,7 @@ The graphical tool being developed will allow the drawing of hierarchical state 
 How to make hierarchical state machine execute in an optimally efficient way is a non-trivial problem, but I have worked out the templates for what the C code should look like. Generating this code is a topic for another web page.
 
 
-== Imperative
+==== Imperative
 
 Much conventional code is written using the so called _imperative_ programming paradigm. This paradigm has the same execution model of the underlying CPU hardware. Imperative means sequential execution flow of instructions or statements. It prescribes what will happen rather that react to what has happened. Function or method calls go to a named destination, and are synchronous (pass the CPU to the called function for execution, and pass it back to the caller on completion. Most 'high-level' languages seldom rise above this execution model, although some are beginning to, for example with features such as async/await. 
 
@@ -1130,7 +1134,7 @@ Imperative can be structured to comply with ALA constraints, almost. The user st
 
 Some programmers are so used to thinking in terms of the imperative programming paradigm that it can be difficult to think in terms of anything else. A programming paradigm is an abstraction. Learning that abstraction can be a hurdle, even though the benefits may be considerable. Often, we want to know how the underlying code inside a programming paradigm abstraction works, and then we are happy to accept the abstraction and use it for what it is. For this reason we dive straight into some simple code in the next section.
 
-=== Imperative
+===== Imperative
 
 TBD two duplicate sections
 
@@ -1148,7 +1152,7 @@ In terms of the directness of function or method calls, it means that the caller
 
 
 
-== Implementing multiple input ports of the same type 
+==== Implementing multiple input ports of the same type 
 
 C# and other language dont allow an interface to be implemented more than once. It's a valid thing to do, but outside of ALA no one seems to have needed it. In fact the whole concept of ports sould be part of the language. If it were implemented by the C# language, all that would be different is that the implementations would be given names. You could set a reference to the object using this name rather than the interface type. 
 Java sort of allows this to be done if instead of implementing interfaces, you use method references.
@@ -1158,7 +1162,7 @@ To solve this problem in C#, we use the Connector objects to help. Instead of im
 The WireTo method can look for the _B suffix on the interface name and reverse the direction of the wiring.
 
 
-== Multithreading
+==== Multithreading
 
 In the section about request/response, we briefly considered using multithreading to solve the problem when the request/response is implemented as a synchronous function call, but it takes time and the call blocks. 
 
@@ -1172,7 +1176,7 @@ Unless it is required for latency or other performance throughput reasons that c
 
  Note that there is a different programming style of multithreading that doesn't use shared state. In this style, we think of every thread as effectively being on a different processor. Every thread has a single input queue. _All_ communications are asynchronous. Synchronous calls between objects assigned to different threads is not possible, so there is no shared state. The thread's main loop does nothing other than take events from the input queue one at a time, process them, and asynchronously sends events to other such threads. This execution model is a completely different thing. It is called the actor model or producer/consumer. It is safe because there is no shared state and locks are not required. If there is a 'shared' resource, one thread can be assigned to resource. This model does not solve the problem of how to do synchronous request-response calls that block. It is not even the prescriptive programming style that we are trying to achieve with request/response. Every thread is already transformed into a reactive style. Such an execution model is equivalent to a a single threaded system where all calls are asynchronous, but with better performance and scalable performance.
 
-=== State machine vs multithreading concurrency styles
+===== State machine vs multithreading concurrency styles
 
 A bigger problem with callback functions or futures is that if the requester call is inside structured statements such as a loop or if statement, or has been called from another function, all the code right back to main() needs to be rewritten like a state machine. It must keep state variables to remember what would normally be implicit in the program counter state, and manually store any other stack based state that the compiler would normally handle for the execution flow through the program. If the code is a simple function called directly from main, this can be done fairly easily. Each time the function is called, it reads the state, which is usually a function pointer, and dispatches to it. Callbacks or continuations go to their own functions. 
 +
@@ -1199,17 +1203,17 @@ Some people, when confronted with a problem, think "I know, I'll use threads." N
 ====
 
 
-== Agent based programming
+==== Agent based programming
 
 TBD
 
-=== Agents on a single thread
+===== Agents on a single thread
 
 TBD
 
 
 
-== Asynchronous direct style (curiosity only)
+==== Asynchronous direct style (curiosity only)
 
 As a curiosity, an asynchronous event-loop execution model could be set up to, by default, execute everything in the same order as the equivalent synchronous function calling order.
 
@@ -1334,7 +1338,7 @@ Best use a language that supports async/await.
 
 
 
-== Example project - Ten-pin bowling
+=== Example project - Ten-pin bowling
 
 The full source code for the bowling application can be viewed or downloaded from here: https://github.com/johnspray74/GameScoring[https://github.com/johnspray74/GameScoring]
 
@@ -1723,7 +1727,7 @@ namespace GameScoring.DomainAbstractions
 
 
 
-== Example project - Tennis
+=== Example project - Tennis
 
 Now let's modify the bowling application to score tennis. If the bowling game hadn't been implemented using ALA, you probably wouldn't contemplate doing this. But ALA excels for maintainability, and I want to show that off by changing Bowling to Tennis. The Frame and IConsistsOf abstractions look like they could be pretty handy for Tennis. A match consists of sets, which consists of games, which consists of SinglePlays.
 
