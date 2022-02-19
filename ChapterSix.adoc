@@ -620,15 +620,15 @@ ALA makes use of this same property of reusable abstractions. Domain abstraction
 
 ==== Monad syntax
 
-Sometimes in ALA, we will wire together domain abstractions that operate on data flows. Such domain abstractions as SelectMany, Select, Where, and OrderBy are possible. This is in the same problem space that monads also solve. So it is worth comparing the two systems. I am no expert on monads, but here is my current understanding of how ALA wiring and monad binding compare with each other.
+Sometimes in ALA, we will wire together domain abstractions that operate on data flows. Domain abstractions that perform the same function as Select, Where, and OrderBy are possible. This is in the same problem space that monads also solve. So it is worth comparing the two systems. I am not an expert on monads, but here is my current understanding of how ALA wiring and monad binding compare with one another.
 
-When we want to bind a function to a monad such as Nullable<T>, it's contained value can be immediately unwrapped, operated on, and then wrapped in a new monad Nullable<R>. When we want to bind a function to a monad such as IEnumerable<T>, we may not want to pull all the values out immediately. Instead we just want a new IEnumerable<R> that knows how to get values from the first IEnumerable<T> and perform the function on them. When we want to bind a function to a monad such as Task<T>, we can't immediately get its contents because the content wont be there until some time in the future. Instead we want a new Task<R> that knows how to wait for the first task and then apply the function to. In the second two examples, the binding to a monad is like wiring in ALA. The binding code creates a connected set of objects that collectively know how to do their work later. Same in ALA, the wiring code creates a connected set of objects which know how to do the job later. 
+When we want to bind a function to a monad such as Nullable<T>, it's contained value can be immediately unwrapped, operated on, and then wrapped in a new monad Nullable<R>. But when we want to bind a function to a monad such as IEnumerable<T>, we may not want to pull all the values out immediately. Instead we just want a new IEnumerable<R> that when enumerated wil get values from the first IEnumerable<T> and perform the function on them. Similarly, when we want to bind a function to a monad such as Task<T>, we can't immediately get its content because the value wont be there until some time in the future. Instead we want a new Task<R> that waits for the first task and then applies the function. In the second two examples, the binding to a monad is like wiring in ALA. Successive binding creates a connected chain of objects that collectively know how to do the workflow. Same in ALA, the wiring code creates a connected chain of objects which know how to process data through them later. 
 
 We can try to compare the monad pattern's _bind_ with ALA's _WireIn_. 
 
-Let's assume for the ALA case, that the instanceB being wired converts objects from one type to another, the same as a function binded to monad does. So in both cases, we have a source of TAs and we want to convert them to TBs. 
+Let's assume for the ALA case, that the instanceB being wired converts objects from one type to another, the same as a function binded to monad does. So in both cases, we have a source of TAs and we want wire in a function that will convert them to TBs. 
 
-Both bind and WireIn have an object as their first argument. That object is a source for TAs. Both bind and WireIn can be written using the dot operator style:
+Both bind and WireIn have an object as their first argument. That object is the source for TAs. Both bind and WireIn can be written using the dot operator style:
 
 .Monad wiring code
 [source,C#]
@@ -644,12 +644,12 @@ instanceA.WireIn(...)
 ....
 
 
-_bind_ and _WireIn_ are different in their second argument. _bind_ requires a function and WireIn requires an object. The function takes a TA and returns a TB wrapped in a monad. The object has an input port of type TA and an output port of type TB.
+_bind_ and _WireIn_ are different in their second argument. _bind_ requires a function and WireIn requires an object. The function takes a TA and returns an MTB (a TB wrapped in a monad container). The object has an input port of type TA and an output port of type TB.
 
 .Monad wiring code
 [source,C#]
 ....
-monadA.bind((a)=>(<TA,Monad<TB>>)
+monadA.bind((a)=>(func<TA,Monad<TB>>)
 ....
 
 
@@ -662,12 +662,12 @@ instanceA.WireIn(instanceB)
 
 In the monad case, the bind function returns a new monad object. 
 In the ALA case, the WireIn function returns instanceB.
-Therefore, in both cases you can now chain additional operators using fluent style syntax:
+Therefore, in both cases you can now chain additional operators using fluent style:
 
 .Monad wiring code
 [source,C#]
 ....
-monadA.bind(function<TA,Monad<TB>>).bind(...)
+monadA.bind(func<TA,Monad<TB>>).bind(...)
 ....
 
 
@@ -677,41 +677,39 @@ monadA.bind(function<TA,Monad<TB>>).bind(...)
 instanceA.WireIn(instanceB).WireIn(...)
 ....
 
-In the monad version, we often want to specify the function to return a TB instead of a Monad containing a TB. That is what Select is for in C#. Select uses bind but does the wrapping of the TB into a monad for you.
+In the monad version, we often want to specify the function to return a TB instead of a Monad containing a TB. That is what Select is for in C#. Select uses bind under the covers but does the wrapping of the TB into a monad for you:
 
 .Monad wiring code
 [source,C#]
 ....
-monadA.Select(functionB<TA,TB>)
+monadA.Select(func<TA,TB>)
 ....
 
-In the ALA case, we will usually use a prexisting domain abstraction to perform the operation. But to get closer to the same problem that monads solve, lets assume we have no domain abstraction that does what we need, and we really do want to specify the mapping function in the application layer right in amongst the wiring. In other words we want to use a domain abstraction that is configured with a lambda function. In this case I sometimes use a domain abstraction called Lambda which requires a lambda function when it is constructed: 
+In the ALA case, we will usually use a prexisting domain abstraction to perform the operation. For example, we might use the domain abstraction OffsetAndScale. This allows code to be generally be inside domain abstractions layer, and only configuration constants (that come directly from requirements) to be in the application layer. But to get closer to the same problem that monads solve, let's assume we have no domain abstraction that does what we need, and we really do want to specify the mapping function in the application layer right in amongst the wiring. In other words we want a domain abstraction that is configured with a lambda function. In this case we can invent a domain abstraction called Lambda which takes a lambda function when it is constructed: 
 
 .ALA wiring code
 [source,C#]
 ....
-instanceA.WireIn(new Lambda<TA,TB>(functionB<TA,TB>))
+instanceA.WireIn(new Lambda<TA,TB>(funct<TA,TB>))
 ....
 
 
-Just as _Select_ is a more specialized version of bind that changes the type, _Where_ is also more specialized version that removes records from the stream. It requires a predicate function that returns a bool:
+Just as _Select_ is a more specialized version of bind that changes the type, _Where_ is also a more specialized version that removes records from the stream. It requires a predicate function that returns a bool:
 
 .Monad wiring code
 [source,C#]
 ....
-monadA.Where(functionB<TA,bool>)
+monadA.Where(funct<TA,bool>)
 ....
 
 .ALA wiring code
 [source,C#]
 ....
-instanceA.WireIn(new Where<TA>(function<TA,bool>))
+instanceA.WireIn(new Where<TA>(funct<TA,bool>))
 ....
 
 
-You can see that the ALA syntax for solving these particular problems is now slightly more verbose. It requires the use of WireIn and the _new_ keyword.
-
-We could consider using the Monad syntax for all ALA wiring. What would happen if we did that:
+You can see that the ALA syntax for solving this particular problems is now more verbose. It requires the additional use of WireIn and the _new_ keyword. The tradeoff for the extra words is versatility. We could consider using the less verbose Monad syntax for all ALA wiring. What would we lose if we did that:
 
 For example:
 
@@ -722,15 +720,17 @@ For example:
 ....
 
 
-.Monad wiring code
+.consider monad style ALA wiring code
 [source,C#]
 ....
     adc.LowPassFilter(10).OffsetAndScale(0,0.5);
 ....
 
-To accomplish this syntax, we would have to provide lots of additional methods with the same names as the classes. They perform the new operation and then the wiring operation. These methods could be defined directly on the domaina abstractions such as ADC, but that would pollute ADC with knowledge of LowPassFilter. Since there are many ways of wiring things, every abstraction would need methods for every other abstraction to which it could be wired. That would be ridiculous. 
+To accomplish this syntax, we would have to provide methods with the same names as the domain abstractions. These methods would perform the new operation and then the wiring operation.
 
-Instead we would make every domain abstraction implement an _IWireable_ interface. I think this inerface could be empty. Then all the wiring methods would be extension methods on _IWireable_. They would all return an _IWireable_ ready for fluently calling the next wiring method. Now the code for ALA would look like:
+We would briefly consider defining these methods directly on the domain abstractions such as ADC, but that would pollute ADC with knowledge of LowPassFilter. Since there are many ways of wiring things, every abstraction would need methods for every other abstraction to which it could be wired. That would be ridiculous. 
+
+Instead we might make every domain abstraction implement an _IWireable_ interface. I think this inerface would be empty. Then all the wiring methods would be extension methods on _IWireable_. They would all return an _IWireable_ ready for fluently calling the next wiring method. Now the code for ALA would look like:
 
 [source,C#]
 ....
@@ -740,7 +740,7 @@ Instead we would make every domain abstraction implement an _IWireable_ interfac
 which is pretty much the same as the Monad code.
 
 
-The wiring methods would be fairly simple:
+The methods would be fairly simple:
 
 [source,C#]
 ....
@@ -754,17 +754,17 @@ static class LowPassFilterExtensonMethod
 ....
 
 
-Note that IWireable is kind of analogous to IEnumerable in the monad examples we have been looking at. We call it IWireable because domain abstractions can have more than one output port, and we could be wiring any one of them, whereas monads generally only have one output such as IEnumerable.
+Note that IWireable is kind of analogous to IEnumerable in the monad examples we have been looking at. We give it the more abstract name _IWireable_ because domain abstractions can have more than one output port, and we could be wiring any one of them, whereas monads generally only have one output such as IEnumerable.
 
-In ALA we prefer the explicit use of WireIn and new operators. The reasons are as follows.
+In ALA we use the explicit WireIn and new operators for the following reasons.
 
-* In ALA, domain abstractions are written much more frequently than new monads are written. We don't really want the extra overhead of implementing _IWireable_ in every new domain abstraction and adding a corresponding extension method in a separate static class.
+* In ALA, domain abstractions are written much more frequently than new monads are written. They are extremely simple to write. The only difference from plain classes is that you have to know that input ports must use implemented interfaces from the programming paradigms layer, and output ports must be plain private fields of the types of these same interfaces in the programming paradigms layer. We don't really want the extra burden of adding a corresponding extension method in a separate static class, and adding the IWireable interface.
 
 * In ALA we can choose between WireIn and WireTo depending on whether we want to chain instances of abstractions or do fanout wiring.
 
-* We sometimes don't use the new keyword. If the wiring looks like a network rather than a tree, we will store some instances in a local variable, and then wire to them for their other ports. The same thing happens in monad wiring. Its not always a simple chain of operations.
+* Monads tend to be used only for _amplified types_ and for composing functions that use them that have one parameter and one return value. You are composing functions. In ALA you are composing instances of abstractions, which is more general. Also composing monad functions is primarily using a data flow programming paradigm. In ALA different programming paradigms can be used for what it means when composing instances of abstractions, so again it is more general. Also in ALA, you can mix different programming paradigms in the same solution, so that requirements can be fully expressed.
 
-* Monads tend to be used only for _amplified types_ and for composing functions that have one parameter and one return value in chains. Monad functions look like operations on data, but hide the fact they are really just instantiating objects and wiring them together for the operation to occur later. Although confusing at first, it is readable once you are used to it. But imagine if it were used for all programming paradigms. Take for example the UI layout programming paradigm. The code below puts a TextBox and  grid inside a window.
+* Monad functions look like operations on data, but hide the fact they really just instantiate objects and wire them together for the operation to occur later. Although confusing at first, it is readable once you are used to it. But imagine if it were used for all programming paradigms. Take for example the UI layout programming paradigm. The code below puts a TextBox and Grid inside a window.
 
 .ALA wiring code
 [source,C#]
@@ -785,13 +785,13 @@ The equivalent monad style code would be confusing:
 
 
 
-* ALA wiring handles arbitrarily complex objects with multiple input and output ports. Using explict WireTo and WireIn operators directly reflects this mental model. Monads are at first quite difficult to understand because of what happens under the covers. For most people it is quite a learning curve. By using explicit _WireTo_ and _new_, ALA code is fairly obvious.
+* ALA wiring handles arbitrarily complex objects with multiple input and output ports. Using explicit WireTo and WireIn operators directly reflects this mental model. Monads are at first quite difficult to understand because of what happens under the covers. For most people it is quite a learning curve. By using explicit _WireTo_ and _new_, ALA code is fairly obvious.
 
 * Domain abstractions can have multiple ports. WireIn allows us to specify which ports we want to wire when it could be ambiguous.
 
 * Inherent in the requirements of a typical application is really a network of relationships, which we can often represent with a diagram. Explicit WireIn and WireTo operators allow us to more easily see the one-to-one correspondence between the diagram and the code. Also, it is very easy for a diagramming tool to automatically generate wiring code containing .WireTo and new.
 
-
+* Monads based on IEnumerable or IObservable can handle a finite sequence. The IEnumerator interface tells you when it is finished. ALA dataflow interfaces may or may not be written to handle a finite sequences. If they do handle finite sequences, such as for a database query, they are not unwired and rewired every time they are used, They stay permanently wired up, and are reset for each query.
 
  
 ==== Understanding monads
