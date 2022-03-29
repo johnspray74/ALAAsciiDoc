@@ -25,7 +25,7 @@ image::BOSS_Great_Wall.jpg[BOSS_Great_Wall.jpg,900, title="*The large scale stru
 
 John R Spray
 
-Last update: 2022-01-02
+Last update: 2022-03-29
 
 This article is a work in progress. Feedback is welcome. Please send to johnspray274<at>gmail<dot>com
 
@@ -34,7 +34,7 @@ This article is a work in progress. Feedback is welcome. Please send to johnspra
 
 == Synopsis
 
-Intuitively, good quality software would allow you to read and understand any one part of the code without also having to read and understand any other part. I call this zero coupling. We are taught to the meme loose coupling and high cohesion. It is said that a zero coupled system would not do anything. But this is only because we confuse design-time coupling with run-time communications. It is entirely possible for parts of a system to have zero knowledge about one another at design-time and still communicate at run-time. We define the word _coupling_ to mean design-time coupling in this article. That's the coupling that matters. By design-time, we mean any time you are reading, writing or understanding code. 
+Intuitively, good quality software would allow you to read and understand any one part of the code without also having to read and understand any other part. I call this zero coupling. We are taught the meme _loose coupling and high cohesion_. It is said that a zero coupled system would not do anything. But this is only because we confuse design-time coupling with run-time communications. It is entirely possible for parts of a system to have zero knowledge about one another at design-time and still communicate at run-time. We define the word _coupling_ to mean design-time coupling in this article. That's the coupling that matters. By design-time, we mean any time you are reading, writing or understanding code. 
 
 ALA is a set of three architectural constraints to achieve zero coupling:
 
@@ -55,7 +55,9 @@ image::abstracttree.jpg[float="right"]
 
 Abstractions are fundamental to the constraints.
 
-In conventional methods, a system is broken into smaller pieves that we call modules, components or classes. These modules, components or classes tend to implicitly collaborate with one another to form the system. They are like jigsaw pieces. These specific pieces fit together in one specific way to make a specific picture. The system is not explicit, it is just the collaboration of the parts.
+An abstraction is a learnable idea or concept.
+
+In conventional methods, a system is broken into smaller pieces that we call modules, components or classes. These modules, components or classes tend to implicitly collaborate with one another to form the system. They are like jigsaw pieces. These specific pieces fit together in one specific way to make a specific picture. The system is not explicit, it is just the collaboration of the parts.
 
 In contrast, abstractions are like lego pieces. These pieces are general and can be composed in an infinite variety of ways. A specific arrangement is an explict design. It can be varied without changing the abstractions it uses. 
 --
@@ -76,7 +78,7 @@ Inside an abstraction, there are no dependency rules, or any organisational rule
 
 Charles Krueger pointed out that _abstraction_ and _reuse_ are two sides of the same coin. More abstract means more reusable. More abstract also tends to mean more stable because a more abstract idea is drawn from more examples, and is therefore a more ubiquitous more fundamental idea. The abstraction 'squareroot' is very stable despite the fact that new instances of its use occur frequently.
 
-Math functions are good abstractions because they were written without knowledge of who will use them. If we conceive of and write abstractions similarly, without knowledge of the code that will use them, we will also get good abstractions. However, we also need to build useful abstractions. This will require some knowledge of what sorts of things we are wanting to build. We call that the domain, and the abstractions are called domain specific abstractions.
+Math library functions are good abstractions because they were written without knowledge of who will use them. If we conceive of and write abstractions similarly, without knowledge of the code that will use them, we will also get good abstractions. However, we also need to build useful abstractions. This will require some knowledge of what sorts of things we are wanting to build. We call that the domain, and the abstractions are called domain specific abstractions.
 
 
 
@@ -115,6 +117,7 @@ So we make standard deviation and display classes with I/O ports. Instances of t
 A dependency on an abstraction means you need to understand the concept the abstraction represents. We often call it a knowledge dependency. You could not understand the code that calculates standard deviation without first knowing about the concept of squareroot. However, to understand the code that calculates standard deviation does not require knowledge of the concept of a display, so that dependency is illegal.
 
 Going one layer up, to understand the code in the system abstraction requires knowledge of both the concept of standard deviation and the concept of display. It is fine for the system to have dependencies on both so it can compose a standard deviation and a display. 
+
 *Good and bad dependencies*
 
 [.float-group]
@@ -225,13 +228,13 @@ Given this code, it is not difficult for any programmer to write the necessary S
 
 In conventional code, we would likely have broken the system up into two modules, one for the switch and one for the light. The switch might directly call a method in the interface for the light, or vice versa. In ALA you can't do that. The concepts of Switch and Light, already handed to us as abstractions in the words of the requirements, must remain as abstractions. They can't know about or communicate with one another and they can't know about the specific system.
 
-A concept of dataflow is invented to allow _instances_ of Switch and Light to communicate at run-time. Dataflow is an even more abstract abstraction. It resides in the programming paradigms layer. It is a steam of data without end. It is not a specific interface of either Switch or Light. It allows Switches and Lights to be wired arbitrarily to anything using the same Dataflow concept and data type.
+A concept of dataflow is invented to allow _instances_ of Switch and Light to communicate at run-time. Dataflow is an even more abstract abstraction. It resides in the programming paradigms layer. It is a steam of data without end. It is not a specific interface of either Switch or Light. It allows Switches and Lights to be wired arbitrarily to anything using the same dataflow concept and data type.
 
 The _system_ is also an abstraction, albeit a more specific one than Switch and Light. Instances of it can be reused in a building. Its purpose is to know about the system comprising a light and a switch connected together. It knows about Switches,  Lights and Dataflows as abstract concepts but doesn't know anything about their implementation details. 
 
 The system diagram is a direct, formal restatement of the requirements. So the diagram is three things in one: The formal statement of requirements, the high level architecture, and the executable. One source of truth for all three. Conventional software engineering usually has three different documents for these which must be kept synced.  
 
-When the program is this small, it looks like we just created three modules when two would have done. However, by creating an abstraction to represent the system level knowledge, and a dataflow programming paradigm abstraction to allow the lines on the diagram to have a meaning, we make several powerful improvements to the code that are important as the application scales:
+When the program is this small, it looks like we just created four abstractions when two modules would have done. However, by creating an abstraction to represent the system level knowledge, and a dataflow programming paradigm abstraction to allow the lines on the diagram to have a meaning, we make several powerful improvements to the code that are important as the application scales:
 
 . There is now an explicit place that cohesively implements the requirement instead of having the requirement's implementation distributed in an obviscated way inside Switch and Light. What is loose coupling between modules in conventional code becomes cohesive code inside a higher (more specific) abstraction in ALA. Changes to the system are made in this one place.
 
@@ -376,7 +379,7 @@ We just invented some new domain abstractions: AndGate and Sensor, again directl
 
 One of the domain abstraction instances has a configuration of 0.5. This is a threshold for expressing the requirement clause "is dark". 
 
-Notice that this application is easier to write in this way than it would be in conventional C code. This is because the programming paradigm we are using, data-flow, suits the expression of these requirements. Most C code to do even such a simple requirement as this would likely already be messy in the way it handles run-time execution. 
+Notice that this application is easier to write in this way than it would be in conventional C code. This is because the programming paradigm we are using, dataflow, suits the expression of these requirements. Most C code to do even such a simple requirement as this would likely already be messy in the way it handles run-time execution. 
 
 The astute reader will notice that the AndGate can't implement IDataFlow<bool> twice for its two inputs. In later projects, we will show how we work around this language constraint.
 
@@ -431,7 +434,7 @@ new MainWindow()
 
 Here we are introducing some graphical UI, so we invented another programming paradigm for "UI layout". It is used between all the UI elements: MainWindow, Menu, Tickbox, StatusBar, Indicator. Wiring things together using that programming paradigm means things are arranged inside things on the UI.
 
-Notice how ALA is polyglot in programming paradigms. We use UI layout and data-flow in the same diagram. Notice also that we don't separate UI from business logic and data models. These are highly cohesive things from the perspective of user stories. Instead we separate the implementations of the domain abstractions. It is still easy to swap out, for example, the UI implementation. The diagram above could be implemented as a web application or a desktop application by swapping between two sets of UI domain abstraction implementations.  
+Notice how ALA is polyglot in programming paradigms. We use UI layout and dataflow in the same diagram. Notice also that we don't separate UI from business logic and data models. These are highly cohesive things from the perspective of user stories. Instead we separate the implementations of the domain abstractions. It is still easy to swap out, for example, the UI implementation. The diagram above could be implemented as a web application or a desktop application by swapping between two sets of UI domain abstraction implementations.  
 
 Let's do an application to browse for and display a (dynamic content) CSV file on a grid, filtered by a user specified name, and sorted by names. The CSV file has headings that will display in the grid.
 
@@ -771,13 +774,13 @@ Gives the theory of why ALA works from the perspective of complex systems and ho
 
 This web site is a work in progress. ALA is a research in progress. Please don't hesitate to provide feedback to the e-nail address given at the end.
 
-I would like to acknowledge the help of Roopak Sinha at AUT (Auckland University of Technology) in the writing of the paper for ECSA 2018 and  his academic perspective. 
-
-// for web site
+I would like to acknowledge the help of Roopak Sinha at AUT (Auckland University of Technology) for his significant academic contributions and ideas for ALA, and his work in rigorously testing ALA. 
 
 link:Abstraction_Layered_Architecture_Paper_ECSA_2018.pdf[ALA Paper presented at ECSA 2018]
 
-// for pdf
+link:Building_Maintainable_Software_Using_Abstraction_Layering_IEEE_TSE_2022.pdf[ALA Paper published in IEEE Transactions on Software Engineering 2022]
+
+
 
 // https://AbstractionLayeredArchitecture.com/Abstraction_Layered_Architecture_Paper_ECSA_2018.pdf[ALA Paper presented at ECSA 2018]
 

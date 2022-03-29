@@ -89,7 +89,7 @@ There are two situations that commonly cause coupling in conventional code:
 
 . In the above example, if xyz789 is just a source or destination for messages, then abc123 cannot be an abstraction because it cannot be reused without dragging xyz789 with it. abc123, as an abstraction, doesn't care where the data comes from or goes to. To fix this, xyz789 must be passed into abc123 by something else above both of them. This can be passing in a function, passing in an object (dependency injection), or other mechanism such as the WireTo operator that we will use a lot in our ALA example projects.
 +
-A benefit over and above the zero coupling is that the data flow relationship between abc123 and xyz789 used to be hidden inside abc123. In ALA that relationship has to be an explicit line of code (inside another abstraction above) that wires together two instances. There, it will be cohesive with other similar relationships that work together in a collaborative way to make the application. 
+A benefit over and above the zero coupling is that the dataflow relationship between abc123 and xyz789 used to be hidden inside abc123. In ALA that relationship has to be an explicit line of code (inside another abstraction above) that wires together two instances. There, it will be cohesive with other similar relationships that work together in a collaborative way to make the application. 
 +
 Often these collected together wirings form a graph, making diagrams rather than code an even better way to describe the application.
 
@@ -369,11 +369,11 @@ The interface used to connect the instances is called Dataflow. It's important t
 
 | Although there is no dependency, for example from B to C, the fixed arrangement is likely, over time, to make B implicitly collaborate with C (do what C requires), resulting in collaborative coupling. | No implicit coupling can develop over time because there is no fixed relationship between them. B cannot collaborate with C (do what C specifically requires).
 
-| The arrangement between A, B, C, D and E is not obvious in the code. It is buried inside of B, C and D. All must be read to find the application's data flow structure | The arrangement between instances of A, B, C, D and E is explicitly coded in one place. The data-flow between them is cohesive information that belongs in one place.
+| The arrangement between A, B, C, D and E is not obvious in the code. It is buried inside of B, C and D. All must be read to find the application's dataflow structure | The arrangement between instances of A, B, C, D and E is explicitly coded in one place. The dataflow between them is cohesive information that belongs in one place.
 
 | Only A and E can potentially be abstractions. | All of A, B, C, D and E are abstractions.
 
-| Arbitrarily, only the two ends of the data flow chain can be reused independently . | All of A, B, C, D and E are independently reusable.
+| Arbitrarily, only the two ends of the dataflow chain can be reused independently . | All of A, B, C, D and E are independently reusable.
 
 | Difficult to insert another module between, say, B and C. | Easy to insert a new instance of some operator between B and C, etc. 
 
@@ -466,7 +466,7 @@ You need to know all of these things from lower layers:
 
 . Understand what the  domain abstractions, ADC, Avg, Disp, etc do.
 
-. Understand the data flow programming paradigm. When you compose these particular domain abstractions, you are composing a flow of data from left to right.
+. Understand the dataflow programming paradigm. When you compose these particular domain abstractions, you are composing a flow of data from left to right.
 
 . Understand that the WireTo operator, which comes from the Libraries layer, is what you use to do composition. 
 
@@ -500,7 +500,7 @@ Of course application code makes heavy use, in fact is entirely composed of, ins
 
 This is another way of thinking that comes to the same solution. As we know from the previous section, ALA requires you to break up your entire application only by factoring out abstractions. So what does the application that's left in the top layer look like when this is done? Well if anything abstract has been removed, what remains must be details specific only to this application. Essentially these details equate with the requirements.
 
-The application code becomes a formal re-expression of the requirements. There will be some information there that wasn't explicitly stated in the requirements, but they were requirements all the same. For example, it may not have been stated in the requirements that a number displayed on the UI should not change its value too frequently - it should be slow enough for a human to read successive values. A consequence of that requirement is that it should not contain noise that has a frequency higher than the display update rate. So the application will end up with an instance of a re-sampler abstraction and an instance of a filter abstraction wired into its data-flow before the display. The application will specify the re-sampling rate, and the filter bandwidth.
+The application code becomes a formal re-expression of the requirements. There will be some information there that wasn't explicitly stated in the requirements, but they were requirements all the same. For example, it may not have been stated in the requirements that a number displayed on the UI should not change its value too frequently - it should be slow enough for a human to read successive values. A consequence of that requirement is that it should not contain noise that has a frequency higher than the display update rate. So the application will end up with an instance of a re-sampler abstraction and an instance of a filter abstraction wired into its dataflow before the display. The application will specify the re-sampling rate, and the filter bandwidth.
 
 
 // section moved here from chapter 2
@@ -557,7 +557,7 @@ Text becomes troublesome when there are arbitrary connections across the structu
 
 When we need to compose instances of abstractions in an arbitrary network structure, our brains work much better using a diagram. The brain can readily see and follow the lines between the instances of the abstractions. Unlike with text labels, the lines are anonymous, as they should be. Lines don't need encapsulation. To understand all uses of a variable in text, we need an encapsulation scope. To understand all places connected by a line, the brain just sees all the lines instead. Generally lines connect only two points or ports, but sometimes may connect three or four. More than that, and it starts to smell as if a new abstraction may be waiting to be discovered. The spacial positioning of elements is also something the brain readily remembers. So, diagrams can qualitatively do things that text simply cannot.
 
-ALA does not require a diagram per se. It only requires abstraction layering, and it's quite possible for a user story to just consist of a linear sequence of abstracted operations. For example, a sequence of movements by a robot or a "Pipes and Filters" sequence of operations on data. However, ALA is polyglot with respect to programming paradigms because user stories will generally combine multiple programming paradigms: UI, event-flows, data-flows, state machines, data schemas, etc. These aspects of a user story tend to be naturally interrelated (inherent in the requirements), which is what causes the resulting relationships among its instances of abstractions to be a network. Diagrams, then, embrace the bringing together of all these different interrelationships of a user story in one place and view.   
+ALA does not require a diagram per se. It only requires abstraction layering, and it's quite possible for a user story to just consist of a linear sequence of abstracted operations. For example, a sequence of movements by a robot or a "Pipes and Filters" sequence of operations on data. However, ALA is polyglot with respect to programming paradigms because user stories will generally combine multiple programming paradigms: UI, event-flows, dataflows, state machines, data schemas, etc. These aspects of a user story tend to be naturally interrelated (inherent in the requirements), which is what causes the resulting relationships among its instances of abstractions to be a network. Diagrams, then, embrace the bringing together of all these different interrelationships of a user story in one place and view.   
 
 ==== No XML as code
 
@@ -638,7 +638,7 @@ First let's understand what we mean by composition through a few examples:
 
 * In functional programming, we are composing with functions, so the elements are higher level things that you create. But the programming paradigm is still imperative (unless you use monads). The structure is either linear or a tree.
 
-* When programming with monads, we are composing with what they call 'amplified data types'. These are usually low-level elements. But the programming paradigm has changed from imperative to data-flow. The structure is usually linear. (You don't need to understand or use Monads to use ALA. however,    
+* When programming with monads, we are composing with what they call 'amplified data types'. These are usually low-level elements. But the programming paradigm has changed from imperative to dataflow. The structure is usually linear. (You don't need to understand or use Monads to use ALA. however,    
 <<Monads,See my method to understand Monads in Chapter Six>>
 
 * When programming using the UML class diagram, we are composing classes. The programming paradigm is associations. The syntax is graphical. The structure is a network.
@@ -655,7 +655,7 @@ Let's list the different properties present in these types of composition:
 +
 Note that sometimes people think of these higher level elements as more abstract. They are actually less abstract. For example, a class that handles complex numbers is less abstract than the fundamental float type. Complex numbers are a more specific case because its only useful when you need complex numbers in your solution. But when you do need complex numbers, then they are obviously more expressive than using pairs of floats everywhere. This means that you need to compose less abstractions to build your solution.
 
-* The meaning of a composition relationship is mostly fixed in each case. It can be one of Imperative, Data-flow, UI layout etc. 
+* The meaning of a composition relationship is mostly fixed in each case. It can be one of imperative, dataflow, UI layout etc. 
 
 * Linear/Tree/Network: The structure built by the composition relationships can be linear, a tree structure or a general graph or network. 
 
@@ -717,7 +717,7 @@ In software engineering, it is described by a pattern called "Abstract Interacti
 
 ALA has these properties by using domain abstractions with ports, which are instances of programming paradigms. The domain abstractions are the constituent expressions, and the programming paradigms are the rules used to combine them. 
 
-As mentioned earlier, there are other software systems that have composability, usually using the data-flow paradigm, such as RX (Reactive Extensions), or more generally monads. Most composability systems are restricted to a single paradigm. For ALA to have the correct level of expressiveness of all requirements multiple different programming paradigms are needed.
+As mentioned earlier, there are other software systems that have composability, usually using the dataflow paradigm, such as RX (Reactive Extensions), or more generally monads. Most composability systems are restricted to a single paradigm. For ALA to have the correct level of expressiveness of all requirements multiple different programming paradigms are needed.
 
 We can make an analogy with Lego bricks. Some Lego parts have the familiar little stud and tube connectors. Some will support axles and holes connections, either tight or loose. These different ways of connecting Lego parts are analogous to different programming paradigms. Each has a different behaviour at run-time. 
 
@@ -805,7 +805,7 @@ As of this writing, the new ALA version of the application is still a research p
 
 ==== The application's diagram
 
-As we said in this chapter, diagrams can be an important aspect of ALA when the user story naturally contains a network of relationships among its instances of abstractions. In this application this is the case. There are UI relationships between elements of the UI. There are data-flow relationships between UI elements, data processing elements, and data sources. There are event-flows from UI to wizards and between wizards and the SaveFileBrowser. and there are minor data-flows such as a the filepath from the file browser to the csvFileReaderWriter.
+As we said in this chapter, diagrams can be an important aspect of ALA when the user story naturally contains a network of relationships among its instances of abstractions. In this application this is the case. There are UI relationships between elements of the UI. There are dataflow relationships between UI elements, data processing elements, and data sources. There are event-flows from UI to wizards and between wizards and the SaveFileBrowser. and there are minor dataflows such as a the filepath from the file browser to the csvFileReaderWriter.
 
 Here is a sample section from the application diagram that shows all the relationships that implement the user story:
 
@@ -813,7 +813,7 @@ image::DatalinkApplication.xmind.png[DatalinkApplication.xmind.png, title="Xmind
 
 This diagram was drawn using Xmind. It shows a single user story.  There is a UI with a menu item or a tool bar to start the user story. It then displays a browse dialogue to specify the location of the file. When the filepath has been selected, it gets data off a device on a COM port, using a protocol, and writes it to a CSV file. The data is also routed to be shown on a grid on the UI.
 
-The user story diagram makes use of four different programming paradigms (which become four different interface types). Firstly there is the UI structure consisting of the window with its menubar, grid etc arranged inside it. Secondly, there is an event connection for when the menu is clicked which opens the browse dialog. Thirdly a data-flow connection carries the output of the browse dialog, a string containing the selected filepath, to the CSVFileReaderWriter. Another data-flow connection carries characters between the COM port and the SCPProtocol and another carries SCPcommands from the SessionDataSCP. The forth programming paradigm is a table data flow that carries dynamic columns and rows of data from the SessionDataSCP object to the grid object in the UI and to the CSVFileReaderWriter. 
+The user story diagram makes use of four different programming paradigms (which become four different interface types). Firstly there is the UI structure consisting of the window with its menubar, grid etc arranged inside it. Secondly, there is an event connection for when the menu is clicked which opens the browse dialog. Thirdly a dataflow connection carries the output of the browse dialog, a string containing the selected filepath, to the CSVFileReaderWriter. Another dataflow connection carries characters between the COM port and the SCPProtocol and another carries SCPcommands from the SessionDataSCP. The forth programming paradigm is a table dataflow that carries dynamic columns and rows of data from the SessionDataSCP object to the grid object in the UI and to the CSVFileReaderWriter. 
 
 Having drawn the diagram to represent the user story, we need to make the diagram execute. When we started this particular project we had no tool for automatically generating the code from the diagram, but during the project, one of the interns wrote a tool to do this. It parsed the Json output from Xmind and generated C# wiring code equivalent to what we will show below.
 
@@ -933,3 +933,4 @@ As of this writing, a graphical IDE is being developed for these types of ALA ap
 
 
 
+da

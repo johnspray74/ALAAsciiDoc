@@ -278,7 +278,7 @@ I am not an expert at these so called 'Architectural styles'. Any feedback about
 
 ==== Components and connectors
 
-David Garlan and Mary Shaw in their paper titled "An Introduction to Software Architecture" 1994 use components and connectors as a framework for viewing architectural styles. Depending on the style, the connectors can be a procedure call, event broadcast, database query, or pipe (which we call data-flow).
+David Garlan and Mary Shaw in their paper titled "An Introduction to Software Architecture" 1994 use components and connectors as a framework for viewing architectural styles. Depending on the style, the connectors can be a procedure call, event broadcast, database query, or pipe (which we call dataflow).
 
 *Similarities*
 
@@ -358,7 +358,7 @@ TBD
 
 The middle two layers appear to be the same as ALA's. The Presentation (UI) only has run-time dependencies on the Application, and the Domain layer only has run-time dependencies on the Infrastructure (Persistence etc), so these layers are not present in ALA. 
 
-Instead Presentation is done in the same way as the rest of the application, by composing and configuring abstractions in the domain. The meaning of composition for UI elements (typically layout and navigation-flow) is different from the meaning of composition in the use-cases (typically work-flow or data-flow).
+Instead Presentation is done in the same way as the rest of the application, by composing and configuring abstractions in the domain. The meaning of composition for UI elements (typically layout and navigation-flow) is different from the meaning of composition in the use-cases (typically workflow or dataflow).
 
 In ALA, the foundation layer is also done in the same way as the rest of the application, at least a little. Domain abstractions that represent say a persistent table are in the Domain layer. The composition and configuration of them again goes in the Application layer. This time the meaning of composition is, for example, columns for the tables and schema relations.  
 
@@ -447,7 +447,7 @@ In other words, a user story should be able to have private data that is associa
 
 Even if some customer detail needs to be shared with another use case, communicating this via a shared entity is bad. For example, consider a use case in a system that knows about the address that customers enter into the system. It could have an output port called 'address' that can be used to wire it to other use cases. This port will probably have a DTO type that belongs to it. The DTO cannot be shared with other features in the same layer without violating ALA constraints. A feature such as frieghtcost may need an address to calculate freight. Remember it is written separately from the address feature so is not coupled with it.  It cannot know about the address feature. It can't know the DTO of the address. Nor does it need the entire address. So it may be written, for example, to have input ports for country and zip code. Yet another feature is shipping. It needs an address for a shipping label. It may have an input port that takes a string for of address, because it isn't interested in the content of the address, only in faithfully printing it. So these three ports are incompatible. The wiring layer, which knows that it needs to wire these three together also knows how to adapt them, which can be done quite simply by passing in a lambda expression into the WireTo method (analogous to a Select clause in LINQ).
 
-More generally in ALA, such applications are best viewed primarily in terms of data flows rather than abstracted entities. Data flows to/or from the database, for example. It flows to particular use cases, and only the data that is needed by the use case. At any point in the flow, the flow has a type. It is still nice to have a compiler generated, anonymous, fully type checked class at each point in the flow. But nowhere do we want to create an explicit class for sharing a whole entity, or even a part of an entity.
+More generally in ALA, such applications are best viewed primarily in terms of dataflows rather than abstracted entities. Dataflows to/or from the database, for example. It flows to particular use cases, and only the data that is needed by the use case. At any point in the flow, the flow has a type. It is still nice to have a compiler generated, anonymous, fully type checked class at each point in the flow. But nowhere do we want to create an explicit class for sharing a whole entity, or even a part of an entity.
 
 The identity of a customer itself is probably an abstract concept that can be used by all features. We therefore want a shared abstraction for the identity (just knowing about a unique internal or external number or key). 
 
@@ -485,7 +485,7 @@ Otherwise in ALA, you need to use adapters. This can be as simple as a lambda ex
 
 Although this is ALA compliant, in ALA we generally prefer not to use adapters. Instead we use interfaces that are a significantly more abstract that are not owned by the business logic core. These are of course at the abstraction level of programming paradigms. These types of interfaces are heavily reused, allow composability in the wiring, and help tremendously to keep all abstractions from being implicitly coupled.
 
-If a DTO can be avoided by, for example, having two data-flow ports that use primitive types, this will increase the abstraction level, reusability and composability of your abstractions. 
+If a DTO can be avoided by, for example, having two dataflow ports that use primitive types, this will increase the abstraction level, reusability and composability of your abstractions. 
 
 ===== transport DTOs
 
@@ -589,9 +589,9 @@ We have talked about monads a few times because they are an important example of
 
 When you execute a monad structure (generally by calling a function on the last monad you binded), it (usually) terminates. It is only executes again if it is wired up again. An exception is when using hot observables, such as an IO monad. The monad structure stays in existence, and it executes whenever there is input or output. ALA is more similar to this second case. When you start execution of a wired ALA structure, it usually starts running continuously.
 
-Monads are restricted to generic types that have a single type of value. Each monad binding is restricted to stay in this generic type, and only the type of the internal data can change. The functions that are binded must take one parameter and have one return value. Data flows in one direction. 
+Monads are restricted to generic types that have a single type of value. Each monad binding is restricted to stay in this generic type, and only the type of the internal data can change. The functions that are binded must take one parameter and have one return value. Dataflows in one direction. 
 
-ALA wiring is more arbitrary in its meaning. It can be anything depending on the relationships that need to be expressed in the requirements. A single wired connection can carry data as needed in both directions, or the composition may be about something completely different from data-flow.  
+ALA wiring is more arbitrary in its meaning. It can be anything depending on the relationships that need to be expressed in the requirements. A single wired connection can carry data as needed in both directions, or the composition may be about something completely different from dataflow.  
 
 Often when monads are used, the execution is done immediately following the binding. So the deferred nature of the execution is not always obvious.  I found that the separation between composition and execution of monads to be an important aspect to understand when comparing with ALA composition. In ALA all composition takes place at a clear wiring phase time. Then comes run-time. 
 
@@ -620,7 +620,7 @@ ALA makes use of this same property of reusable abstractions. Domain abstraction
 
 ==== Monad syntax
 
-Sometimes in ALA, we will wire together domain abstractions that operate on data flows. Domain abstractions that perform the same function as Select, Where, and OrderBy are possible. This is in the same problem space that monads also solve. So it is worth comparing the two systems. I am not an expert on monads, but here is my current understanding of how ALA wiring and monad binding compare with one another.
+Sometimes in ALA, we will wire together domain abstractions that operate on dataflows. Domain abstractions that perform the same function as Select, Where, and OrderBy are possible. This is in the same problem space that monads also solve. So it is worth comparing the two systems. I am not an expert on monads, but here is my current understanding of how ALA wiring and monad binding compare with one another.
 
 When we want to bind a function to a monad such as Nullable<T>, it's contained value can be immediately unwrapped, operated on, and then wrapped in a new monad Nullable<R>. But when we want to bind a function to a monad such as IEnumerable<T>, we may not want to pull all the values out immediately. Instead we just want a new IEnumerable<R> that when enumerated wil get values from the first IEnumerable<T> and perform the function on them. Similarly, when we want to bind a function to a monad such as Task<T>, we can't immediately get its content because the value wont be there until some time in the future. Instead we want a new Task<R> that waits for the first task and then applies the function. In the second two examples, the binding to a monad is like wiring in ALA. Successive binding creates a connected chain of objects that collectively know how to do the workflow. Same in ALA, the wiring code creates a connected chain of objects which know how to process data through them later. 
 
@@ -762,7 +762,7 @@ In ALA we use the explicit WireIn and new operators for the following reasons.
 
 * In ALA we can choose between WireIn and WireTo depending on whether we want to chain instances of abstractions or do fanout wiring.
 
-* Monads tend to be used only for _amplified types_ and for composing functions that use them that have one parameter and one return value. You are composing functions. In ALA you are composing instances of abstractions, which is more general. Also composing monad functions is primarily using a data flow programming paradigm. In ALA different programming paradigms can be used for what it means when composing instances of abstractions, so again it is more general. Also in ALA, you can mix different programming paradigms in the same solution, so that requirements can be fully expressed.
+* Monads tend to be used only for _amplified types_ and for composing functions that use them that have one parameter and one return value. You are composing functions. In ALA you are composing instances of abstractions, which is more general. Also composing monad functions is primarily using a dataflow programming paradigm. In ALA different programming paradigms can be used for what it means when composing instances of abstractions, so again it is more general. Also in ALA, you can mix different programming paradigms in the same solution, so that requirements can be fully expressed.
 
 * Monad functions look like operations on data, but hide the fact they really just instantiate objects and wire them together for the operation to occur later. Although confusing at first, it is readable once you are used to it. But imagine if it were used for all programming paradigms. Take for example the UI layout programming paradigm. The code below puts a TextBox and Grid inside a window.
 
@@ -1180,7 +1180,7 @@ If you compare this code with the diagram, you can see a pretty direct correspon
 
 Although the diagrams must be turned into text code to actually execute, it is important in ALA to do these architecture design diagrams first. They not only give you the application, they give you the architectural design by giving you the domain abstractions and programming paradigms as well. If you try to design an ALA structure in your head while you write it directly in code, you will get terribly confused and make a mess. Using UML class diagrams will make it even worse. Code at different abstraction levels will end up everywhere, and run-time dependencies will abound. Our programming languages, and the UML Class diagram, are just not designed to support abstraction layered thinking - it is too easy to add bad dependencies (function calls or 'new' keywords) into code in the wrong places.
 
-Note that at run-time, not all data-flows have to go directly between wired up instances of domain abstractions. The data can come up into the application layer code, and then back down. This was the case when we did the functional composition example in Chapter One. In this application we are doing that with the code in the square boxes that get the score from the engine. The important thing is that all the code in the application is specific to the application requirements.  
+Note that at run-time, not all dataflows have to go directly between wired up instances of domain abstractions. The data can come up into the application layer code, and then back down. This was the case when we did the functional composition example in Chapter One. In this application we are doing that with the code in the square boxes that get the score from the engine. The important thing is that all the code in the application is specific to the application requirements.  
 
 
 

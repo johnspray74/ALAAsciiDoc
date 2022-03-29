@@ -366,13 +366,13 @@ That's all there is to know about the three domain abstractions.
 
 We have three programming paradigms
 
--- live-data-flow (works like an electronic circuit)
+-- live dataflow (works like an electronic circuit)
 
 -- events
 
 -- simple state machine
 
-The API for the Programming Paradigms layer is described in the key on the right of the diagram below. It gives you all the knowledge from this layer to be able to read the diagram. So, for example, a solid line is a data-flow; the rounded box is state with the states enumerated inside it.
+The API for the Programming Paradigms layer is described in the key on the right of the diagram below. It gives you all the knowledge from this layer to be able to read the diagram. So, for example, a solid line is a dataflow; the rounded box is state with the states enumerated inside it.
 
 The details of how to turn the diagram into code is explained in a project document, also provided in the Programming Paradigms layer.
 
@@ -429,7 +429,7 @@ The 6 lines of code can be built into a complete program shown below:
  // Coffee Maker domain abstraction
  #include "CoffeeMakerAPI.h"  // original hardware abstraction supplied by hardware engineers
  // Knowledge dependencies :
- // "PolledDataFlowProgrammingParadigm.doc" -- explains how to hand compile a data flow diagram of this type to C code
+ // "PolledDataFlowProgrammingParadigm.doc" -- explains how to hand compile a dataflow diagram of this type to C code
  // Following are 3 Domain abstractions that the application has knowledge dependencies on
  
  

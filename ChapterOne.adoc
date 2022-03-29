@@ -29,7 +29,7 @@ There are many traditional so-called architectural styles, patterns, principles 
 * Principles: SRP, OCP, LSP, ISP, DIP; MVC, MVP, etc 
 * Design Patterns: Layers, Whole-Part, Observer, Strategy, Factory method, Wrapper, Composite, Decorator, Dependency Injection, Callbacks, Chain of Responsibility, etc
 * Expressiveness, Fluency, DDD, Coding guidelines, Comments
-* Programming Paradigms, Imperative, Declarative, Object oriented design, Activity-flow, Work-flow, Data-flow, Function blocks, Synchronous, State machine, GUI layout, Navigation-flow, Data Schema, Functional, Immutable objects, FRP, RX, Monads, AOP, Polyglot-Programming Paradigms
+* Programming Paradigms, Imperative, Declarative, Object oriented design, Activity-flow, Work-flow, Dataflow, Function blocks, Synchronous, State machine, GUI layout, Navigation-flow, Data Schema, Functional, Immutable objects, FRP, RX, Monads, AOP, Polyglot-Programming Paradigms
 * Messaging: Push, Pull, Synchronous, Asynchronous, Shared memory, Signals & Slots
 * Memory management, Heap, Persistence, Databases, ORMs
 * Waterfall, Agile, Use cases, User stories, TDD, BDD, MDSD
@@ -687,9 +687,9 @@ It gets us closer from a composition of abstractions point of view, but all that
 
 
 
-Monads have allowed us to separate execution flow from composition flow. The composition flow is now a pure data-flow paradigm. Data will flow from the ADC to the display, so that is directly represented by the composition. How it executes is now separated out, and we will go into how that works shortly. Let's first understand the 'composition' and why this is so important.
+Monads have allowed us to separate execution flow from composition flow. The composition flow is now a pure dataflow paradigm. Data will flow from the ADC to the display, so that is directly represented by the composition. How it executes is now separated out, and we will go into how that works shortly. Let's first understand the 'composition' and why this is so important.
 
-Even if you don't understand how the monads work, you can see that syntactically the program is now very nice because all it does is compose instances of abstractions, and configure them with constants to be a thermometer. The composition is not declarative - it is 'data-flow', because data-flow suits how to describe the thermometer.
+Even if you don't understand how the monads work, you can see that syntactically the program is now very nice because all it does is compose instances of abstractions, and configure them with constants to be a thermometer. The composition is not declarative - it is _dataflow_, because dataflow suits how to describe the thermometer.
 
 ////
 It suits where a part of a program has all of these characteristics:
@@ -709,7 +709,7 @@ It is common to use multi-threading as the solution to the first four problems i
 
 We are using the word 'composition' here to mean the things we are joining together in adjacent lines of code. It can also mean joining boxes with lines in a diagram. Think of a composition as analogous to the adjacent notes in a music score, which are always played successively. If the lines of code are statements or function calls, we are composing things for successive synchronous execution by the CPU. If the lines of code are data processors, we are composing things for successive processing of data and passing their output to the next data processor. 
 
-Here we are composing for successive processing of data, or data-flow composition. If we are stuck with thinking in terms of imperative execution flow (the only way of thinking in the C language) we will need to try hard to let that go, and realize that in ALA, 'composition' can be any programming paradigm you want.  
+Here we are composing for successive processing of data, or dataflow composition. If we are stuck with thinking in terms of imperative execution flow (the only way of thinking in the C language) we will need to try hard to let that go, and realize that in ALA, 'composition' can be any programming paradigm you want.  
 
 Also notice that the first statement just builds the program. Then the second statement sets it running. This two stage aspect of monads is common in the programming paradigms we will use in ALA. It is because the underlying execution flow is not the same as the flow of the programming paradigm. We first wire it up, and then we tell it to 'execute'.
 
@@ -727,7 +727,7 @@ The functions wire the objects together using a common abstract interface. Commo
 
 
 ////
-The most common programming paradigm we will likely want to use is Data-flow. When we compose domain abstractions together using this paradigm, we mean that at run-time data will pass between adjacently wired instances. There may be waits, thread swaps, or IO along the way. It may take days for the data to flow through. But the flow is directly expressed as adjacent lines of code. A Data-flow implementation used in functional programming is monads. We wont learn further about monads here (many have attempted to explain monads and failed), except to say that this is what the Thermometer example might look like using them. 
+The most common programming paradigm we will likely want to use is dataflow. When we compose domain abstractions together using this paradigm, we mean that at run-time data will pass between adjacently wired instances. There may be waits, thread swaps, or IO along the way. It may take days for the data to flow through. But the flow is directly expressed as adjacent lines of code. A dataflow implementation used in functional programming is monads. We wont learn further about monads here (many have attempted to explain monads and failed), except to say that this is what the Thermometer example might look like using them. 
 ////
 
 Here is the same program as above, but we are using plain objects instead of monads. We use the 'new' keyword ourselves to create the instances of abstractions, and explicitly wire them together using a wiring function. It's a little less succinct than the monad version, but easier to understand, and more versatile when we want multiple ports and different programming paradigms. 
@@ -758,18 +758,18 @@ The WireIn method returns the new object, so it is possible to string WireIns to
 ==== Using multiple programming paradigms:
 
 
-Monads are not versatile enough to handle arbitrary wirings of multiple programming paradigms, which we will want in ALA programs. They usually only give us data-flow. But what if we want to compose the UI? What if we want to compose the flow of navigation around an application? What if we want to compose transitions in a state machine? In ALA, we are able to do all this in the one application, in the same way - using whatever programming paradigms are the best way to express the requirements. 
+Monads are not versatile enough to handle arbitrary wirings of multiple programming paradigms, which we will want in ALA programs. They usually only give us dataflow. But what if we want to compose the UI? What if we want to compose the flow of navigation around an application? What if we want to compose transitions in a state machine? In ALA, we are able to do all this in the one application, in the same way - using whatever programming paradigms are the best way to express the requirements. 
 
-Some instances of abstractions will need to take part in multiple paradigms, such as both UI and data-flow. When we boil down the description of our application to pure composition, our composition will often be a network of relationships. And when you have a network, your composition is best described by a diagram. 
+Some instances of abstractions will need to take part in multiple paradigms, such as both UI and dataflow. When we boil down the description of our application to pure composition, our composition will often be a network of relationships. And when you have a network, your composition is best described by a diagram. 
 
 To illustrate this let's add some UI to our thermometer:
 
 image::ThermometerDiagram.png[ThermometerDiagram.png,500, title="Thermometer application complete with UI"]
 
 
-The diagram has both UI composition and data-flow composition. Once we have this diagram, it is easy to conceive how we might add features. For example, we could add a button into the UI, and wire it to a switcher abstraction that changes between Celcius and Faranheit.
+The diagram has both UI composition and dataflow composition. Once we have this diagram, it is easy to conceive how we might add features. For example, we could add a button into the UI, and wire it to a switcher abstraction that changes between Celcius and Faranheit.
 
-For the UI part of the composition, the lines obviously don't mean data-flow - they mean 'display inside'. So now different lines in our diagram have different meanings. Here is how that diagram is represented as text. 
+For the UI part of the composition, the lines obviously don't mean dataflow - they mean 'display inside'. So now different lines in our diagram have different meanings. Here is how that diagram is represented as text. 
 
 .application.c
 [source,C]

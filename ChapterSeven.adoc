@@ -259,7 +259,7 @@ An argument is sometimes stated along these lines: "There must be at least some 
 
 Think of some instances of dependencies you know of in a system and try to classify them into these three types by asking when the system would fail without it. 
 
-For example, let's say that data flows from an ADC (analog to digital converter) to a display as part of a digital thermometer. At run-time, both must exist. At compile-time both must have the same method signature:
+For example, let's say that dataflows from an ADC (analog to digital converter) to a display as part of a digital thermometer. At run-time, both must exist. At compile-time both must have the same method signature:
 
 [plantuml,file="diagram-01.png"]
 ----
@@ -388,7 +388,7 @@ We now introduce the pattern that both solves the congruence problem just discus
 
 Note: The wiring pattern is not necessarily a part of an ALA architecture. For example, if your whole problem is just an algorithm, and therefore suits a functional programming style, then you can still compose abstractions with function abstractions, provided all function calls are knowledge dependencies, and not say, just passing data or events. 
 
-If you are using monads, especially I/O monads, or RX (reactive extensions), especially with hot observables, you are already using the wiring pattern. The pipes and filter pattern is also an example of the wiring pattern. Labview or Node-Red can use the wiring pattern. There are many other examples of the wiring pattern. Most support a data-flow programming paradigm. Here we generalise the pattern to support any programming paradigm. 
+If you are using monads, especially I/O monads, or RX (reactive extensions), especially with hot observables, you are already using the wiring pattern. The pipes and filter pattern is also an example of the wiring pattern. Labview or Node-Red can use the wiring pattern. There are many other examples of the wiring pattern. Most support a dataflow programming paradigm. Here we generalise the pattern to support any programming paradigm. 
 
 The wiring pattern may be the same as the "Component Pattern" in some literature if used with what is referred to as 'configurable modularity' or 'abstracted interactions'. 
 
@@ -788,11 +788,11 @@ The programming paradigm here is a polar bond. It is more abstract (more ubiquit
  }
 ....
 
-Let's do one more example, this time with a Data-flow programming paradigm. I have found that data-flow is the most useful programming paradigm in practice. It is useful in a a large range of problems. 
+Let's do one more example, this time with a dataflow programming paradigm. I have found that dataflow is the most useful programming paradigm in practice. It is useful in a a large range of problems. 
 
 Let's construct a thermometer. Assume we already have in our domain several useful abstractions: an ADC (Analog Digital Converter) that knows how to read data from the outside world, a Thermistor abstraction that knows how to linearise a thermistor, a Scale abstraction that knows how to offset and scale data, a filter abstraction that knows how to smooth data, and a display abstraction that knows how to display data.
 
-All these domain abstractions will use the Data-flow programming paradigm. Note that none of them know anything about a Thermometer, nor the meaning of the data they process.
+All these domain abstractions will use the dataflow programming paradigm. Note that none of them know anything about a Thermometer, nor the meaning of the data they process.
 
 So we can go ahead and create a Thermometer application just by doing this:
 
@@ -862,15 +862,15 @@ ADC -> Filter -> Thermister -> Scale -> Display
 
 If the domain abstractions are not already implemented, we have got the architecture to the point where we can ask any developer to implement them, provided we first give them knowledge of ALA and of the programming paradigm(s) being used.
 
-But let's look how the data-flow paradigm might work.
+But let's look how the dataflow paradigm might work.
 
-NOTE: If you are familiar with RX (Reactive extensions) with a hot observable source (which is an example of the wiring pattern), this is similar in concept although RX tries to have duality with for-loops iterating through the data. The data-flow paradigm we set up here will just be a stream of data. The IDataFlow interface corresponds to IObserver, and the wireTo method corresponds to the Subscribe method.
+NOTE: If you are familiar with RX (Reactive extensions) with a hot observable source (which is an example of the wiring pattern), this is similar in concept although RX tries to have duality with for-loops iterating through the data. The dataflow paradigm we set up here will just be a stream of data. The IDataFlow interface corresponds to IObserver, and the wireTo method corresponds to the Subscribe method.
 
-NOTE: The ideal would be a language where we don't have to decide if the data-flow will be push or pull, synchronous or asynchronous, buffered or unbuffered or other characteristics of communications. The abstractions would not need to know these things - they would just have logical I/O ports, and the type of communications could be binded in at compile-time as part of the performance configuration of the system.
+NOTE: The ideal would be a language where we don't have to decide if the dataflow will be push or pull, synchronous or asynchronous, buffered or unbuffered or other characteristics of communications. The abstractions would not need to know these things - they would just have logical I/O ports, and the type of communications could be binded in at compile-time as part of the performance configuration of the system.
 
-NOTE: Later we will introduce an asynchronous (event driven) execution model. It is preferable to do the data-flow paradigm interface using that because it allows better performance of other parts of the system without resorting to threads.    
+NOTE: Later we will introduce an asynchronous (event driven) execution model. It is preferable to do the dataflow paradigm interface using that because it allows better performance of other parts of the system without resorting to threads.    
 
-For simplicity, we will just implement a synchronous push system. Again, don't worry about the filter itself. The code is just there to see how the LowPassFilter fits in with the Data-flow programming paradigm, and how simple doing that can be. 
+For simplicity, we will just implement a synchronous push system. Again, don't worry about the filter itself. The code is just there to see how the LowPassFilter fits in with the dataflow programming paradigm, and how simple doing that can be. 
 
  Interface IDataFlow<T>
  {
@@ -878,7 +878,7 @@ For simplicity, we will just implement a synchronous push system. Again, don't w
  }
 
 ....
- /// LowPassFilter is a Data-Flow paradigm decorator to be used in an ALA archtecture.
+ /// LowPassFilter is a DataFlow paradigm decorator to be used in an ALA archtecture.
  /// 1. Decimates the incoming data rate down by the setCutoff configuration
  /// 2. Smooths the data with a single pole filter with cutoff frequency equall to the input frequency divided by the cutoff. T must be a numeric type.
  /// Normal checks and exceptions removed to simplify
@@ -1630,7 +1630,7 @@ The anthropomorphization helps the brain to see them as abstractions. The word '
 
 . An element may know a composition of other elements.
 
-. An element may know where data flows between other elements.
+. An element may know where dataflows between other elements.
 
 . No element should know the source or destination of its inputs and outputs.
 
@@ -1655,7 +1655,7 @@ I took to representing the new designs using box and line drawings representing 
 
 It took two weeks to complete the diagram. I used Xmind because it laid itself out. I found that any drawing package that needed you to stop and do housekeeping such as rearranging the layout got in the way so much that you would lose your flow. Xmind allowed me to just enter in the nodes and it would automatically wire them in as either peers or chains and lay them out. The one disadvantage was that Xmind only does trees, so any cross tree relations had to be done manually, but this was also very quick in Xmind once you were used to it. I just let the cross wiring form arcs across parts of the tree.
 
-Progress was extremely rapid once you had the abstractions and paradigms you needed. And many of them were obvious: softkeys, pages, grids, menus, actions, navigate-action, tables. etc. The programming paradigms would pop into play as needed. After the obvious UI-layout and navigation-flow ones came data-flow and data-flow of table types, events, and schema. The user of this device could set up custom fields, so the schema itself partially came from another  table. At times I would get stuck not knowing how to proceed. The longest of these blocks was half a day. But every time the required abstractions or programming paradigms would firm up, and in the end anything seemed possible.
+Progress was extremely rapid once you had the abstractions and paradigms you needed. And many of them were obvious: softkeys, pages, grids, menus, actions, navigate-action, tables. etc. The programming paradigms would pop into play as needed. After the obvious UI-layout and navigation-flow ones came dataflow and dataflow of table types, events, and schema. The user of this device could set up custom fields, so the schema itself partially came from another  table. At times I would get stuck not knowing how to proceed. The longest of these blocks was half a day. But every time the required abstractions or programming paradigms would firm up, and in the end anything seemed possible.
 
 The diagram itself took shape on the right hand side of the Xmind tree. On the left side I had the invented domain abstractions and paradigm interfaces, with notes to explain them. The right side was mostly just a set of relatively independent features, but there was the odd coupling between them such as UI-navigation lines that were also present in the requirements.
 
