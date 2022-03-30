@@ -11,12 +11,12 @@
 //:stylesheet: asciidoctor-default.css
 //:stylesdir:
 
-[big]*Engineering the large-scale structure of software*
+[big]*Engineering the structure of software*
 
 
 
 
-image::BOSS_Great_Wall.jpg[BOSS_Great_Wall.jpg,900, title="*The large scale structure of the universe - what should it be for software?*"]
+image::BOSS_Great_Wall.jpg[BOSS_Great_Wall.jpg,900, title="*The large scale structure of the universe - what should the structure of software look like?*"]
 
 
 
@@ -25,7 +25,7 @@ image::BOSS_Great_Wall.jpg[BOSS_Great_Wall.jpg,900, title="*The large scale stru
 
 John R Spray
 
-Last update: 2022-03-29
+Last update: 2022-03-30
 
 This article is a work in progress. Feedback is welcome. Please send to johnspray274<at>gmail<dot>com
 
@@ -109,7 +109,7 @@ In ALA a more specific abstraction in a higher layer represents the system. This
 
 We don't particularly like the system abstraction in the higher layer handling the data itself. We prefer the system abstraction's job is just to compose the two peer abstractions - to wire them together.
 
-So we make standard deviation and display classes with I/O ports. Instances of them can then be wired together by the system abstraction. While the standard deviation and display abstractions know nothing about each other, the instances can communicate directly at run-time. As we shall see shortly, the next layer down will provide a abstract interfaces in the form of programming paradigms.
+So we make standard deviation and display classes with I/O ports. Instances of them can then be wired together by the system abstraction. While the standard deviation and display abstractions know nothing about each other, the instances can communicate directly at run-time. As we shall see shortly, the next layer down will provide an abstract interface which we call a programming paradigm.
 
 
 *All dependencies are knowledge dependencies*
@@ -143,7 +143,8 @@ Association relationships in the UML class diagram are bad dependencies, and are
 
 [.float-group]
 --
-image::wiring_mechanism_of_ala.png[wiring_mechanism_of_ala.png, 400, title="*Wiring pattern frequently used in ALA*", float="right"]
+image::Layers.png[Layers.png, 600, title="Abstraction layers", float="right"]
+
 
 Because of the constraint that an abstraction that is depended on must be significantly more abstract, abstractions form layers. This gives the architecture its name: abstraction layered architecture. We give the layers names that reflect the types of abstractions that tend to go in them - _application layer_, _domain abstractions layer_ and _programming paradigms layer_. Each layer becomes a folder and a namespace.
 For large applications, another layer called _features layer_ or _user stories layer_ comes into the picture between the application and domain abstraction layers.
@@ -158,28 +159,50 @@ Once you know the set of abstractions available in lower layers, it is easy to r
 
 [.float-group]
 --
-image::smalltree.jpg[,200,float="right"]
+image::smalltree.jpg[smalltree.jpg,200,float="right"]
 
 The final constraints prevents us from conforming to the first two constraints by simply putting everything into one big abstraction. That's obviously not desirable, so we need this constraint to force us to create abstractions from which we can compose applications. 
 
 Abstractions are internally highly cohesive, which means that all code inside them is inter-related. Internally they are a small ball of mud. If all that inter-related code is to be understood, it needs to be small. 
 
-A rule of thumb is around 200 to 500 lines of code. If the code is in diagram form (which will often be the case for reasons we will explain later), we should limit the size to 200-500 nodes and edges.
+A rule of thumb is around 100 to 500 lines of code. If the code is in diagram form (which will often be the case for reasons we will explain later), we should limit the size to 100-500 nodes and edges.
 --
 
-If an abstraction contains more than 500 lines, it is starting to get over the brain limit for other programmers to understand. If abstractions average less than 200 lines of code, we will have more abstractions than we needed to, and burden ourselves with an unnecessarily high number of them to learn. The sweet spot is somewhere in between.
+If an abstraction contains more than 500 lines, it is starting to get over the brain limit for other programmers to understand. If abstractions average less than 100 lines of code, we will have more abstractions than we needed to, and burden ourselves with an unnecessarily high number of them to learn. The sweet spot is somewhere in between.
 
 
 [big]#*Other emergent patterns*#
 
 [.float-group]
 --
-image::ropespiral.jpg[,200,float="right"]
+image::ropespiral.jpg[ropespiral.jpg,200,float="right"]
 
-ALA emerges many other patterns and properties. Many of them are already known about in software engineering, which is not surprising - such things as DSLs (Domain Specific Languages), Dependency Injection, Composite and Decorator patterns, monad like composition, etc. However, there are often subtle but important differences. For example the observer pattern (publish/subscribe) can be used to achieve calls going up the layers at run-time, but may not be used between abstractions in the same layer. The subscribers's reference to the publisher would be an illegal dependency. A line of code in an abstraction in a higher layer must do the subscribing, which is effectively what the wiring pattern described above is.
+ALA emerges many other patterns and properties. Many of them are already known about in software engineering, which is not surprising - such things as DSLs (Domain Specific Languages), Dependency Injection, Composite and Decorator patterns, monad like composition, etc. However, there are often subtle but important differences. For example the observer pattern (publish/subscribe) can be used to achieve calls going up the layers at run-time, but may not be used between abstractions in the same layer. The subscribers's reference to the publisher would be an illegal dependency. A line of code in an abstraction in a higher layer must do the subscribing, which is effectively what the wiring pattern described below is.
 --
 
 Inheritance is not used in ALA. We only use composition because inheritance breaks abstractions.
+
+[big]#*Wiring pattern*#
+
+
+[.float-group]
+--
+image::WiringPattern.png[WiringPattern.png, 500, title="*Wiring pattern frequently used in ALA*", float="right"]
+
+I use the wiring pattern shown on the right frequently to build ALA applications. 
+
+Abstraction A in the application layer has legal dependencies on abstractions B and C in the domain abstractions layer. B and C have dependencies on D in the programming paradigms layer.
+
+D is a programming paradigm interface. This interface is not owned by B or C. It is its own abstraction representing a compositional idea, such as Dataflow.
+
+B and C have ports of type D. B's port is implemented as a field in the class, and C's port is implemented by implementing D's interface.
+
+A can create an instance of B and an instance of C and wire them together because they have compatible ports. Wiring assigns C causes the instance of C, cast as the interface, to be assigned to the field in B. 
+
+While abstraction B and abstraction C know nothing about each other, the instances of B and C can communicate with each other at run-time.
+--
+
+[big]#*Going forward*#
 
 
 When the idea first occurred that zero coupling could be achieved through the stated constraints, we did not know what it would be like, or even if it was possible, to create a working system. Our experience since then is that zero-coupling has always been possible, but coming up with the abstractions is sometimes obvious and sometimes not so obvious. Also, some (but not all) conventional habits, languages, patterns, and architectural styles will conspire against you to break the fundamental constraints.
@@ -269,8 +292,10 @@ class Switch
     private IDataFlow<bool> output;
     
     // called from internal code (not shown) when it detects a hardware change
-    private void SwitchChange(bool newState) { output.Send(newState); }
-    
+    private void SwitchChange(bool newState)
+    {
+        output.Send(newState);
+    }
 }
 ....
 
@@ -313,7 +338,7 @@ interface IDataFlow<T>
 ....
 
 
-In ALA, we frequently use a *wiring pattern*, as depicted by the diagram in Figure 2, which consists of instantiating domain abstractions and wiring them together by ports that use an even more abstract interface representing a programming paradigm. The wiring pattern is quite ubiquitous, and therefore comes from a foundation layer that resides below the Programming Paradigms layer: 
+In ALA, we frequently use a *wiring pattern*, as depicted by the diagram in Figure 4, which consists of instantiating domain abstractions and wiring them together by ports that use an even more abstract interface representing a programming paradigm. The wiring pattern is quite ubiquitous, and therefore comes from a foundation layer that resides below the Programming Paradigms layer: 
 
 
 *Foundation layer*
@@ -332,7 +357,18 @@ public static object WireTo(this object a, object b)
 }
 ....
 
-Note: You can get the source for an example WireTo extension method from one of the example projects in the chapters below, whose source is on GitHub.
+Note: A basic implementation of WireTo is listed in Chapter Two. You can get the source for a WireTo extension method from one of the Github repositories for the example projects in several following chapters.
+
+Note: ALA does not require the use of reflection. I use reflection because it allows me to use an extension method to get a WireTo operator implemented on all objects. It allows me to make specifying the port name optional. It also allows me to make the port fields in the class private so they do not look like part of the public configuration interface to the layer above.
+
+If you are generating wiring code from the diagram automatically using a tool, and you make the port fields public, you could generate code like the following: 
+
+.Application.cs
+[source,C#]
+....
+new Switch().output = (IDataFlow<double>) new(Light);
+....
+
 
 Now that we know how to express requirements by composition of domain abstractions, let's quickly demonstrate the ease of maintenance of our application:
 

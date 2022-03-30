@@ -245,7 +245,7 @@ The goal of software architecture should be to keep complexity constant.
 
 
 
-=== No Loose Coupling
+=== Zero coupling, not loose Coupling
 
 Here we meet the first meme from our list of software engineering topics that we must throw out. To many, this will seem a surprising one. Yes, I am saying 'loose coupling' is undesirable.
 

@@ -474,7 +474,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <li><a href="#trueexecutable-expression-of-requirements">2.3. Executable expression of requirements</a></li>
 <li><a href="#truediagrams">2.4. Diagrams</a></li>
 <li><a href="#truecomposition-vs-decomposition-methodologies">2.5. Composition vs decomposition methodologies</a></li>
-<li><a href="#truecomponents-based-development">2.6. Components based development</a></li>
+<li><a href="#truecf-component-based-development">2.6. cf Component based development</a></li>
 <li><a href="#truereal-world-analogies">2.7. Real world analogies</a></li>
 <li><a href="#trueexample-project-calculator">2.8. Example project - Calculator</a></li>
 </ul>
@@ -566,7 +566,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <li><a href="#truethe-human-brain">7.1. The human brain</a></li>
 <li><a href="#trueabstraction">7.2. Abstraction</a></li>
 <li><a href="#truecomplexity-2">7.3. Complexity</a></li>
-<li><a href="#trueno-loose-coupling">7.4. No Loose Coupling</a></li>
+<li><a href="#truezero-coupling-not-loose-coupling">7.4. Zero coupling, not loose Coupling</a></li>
 <li><a href="#truewiring-pattern-part-one">7.5. Wiring pattern - Part one</a></li>
 <li><a href="#truewiring-pattern-part-two">7.6. Wiring pattern - part two</a></li>
 <li><a href="#trueexpression-of-requirements">7.7. Expression of requirements</a></li>
@@ -608,19 +608,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p><strong class="big">Engineering the large-scale structure of software</strong></p>
+<p><strong class="big">Engineering the structure of software</strong></p>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="images/BOSS_Great_Wall.jpg" alt="BOSS_Great_Wall.jpg" width="900">
 </div>
-<div class="title">Figure 1. <strong>The large scale structure of the universe - what should it be for software?</strong></div>
+<div class="title">Figure 1. <strong>The large scale structure of the universe - what should the structure of software look like?</strong></div>
 </div>
 <div class="paragraph">
 <p>John R Spray</p>
 </div>
 <div class="paragraph">
-<p>Last update: 2022-03-29</p>
+<p>Last update: 2022-03-30</p>
 </div>
 <div class="paragraph">
 <p>This article is a work in progress. Feedback is welcome. Please send to johnspray274&lt;at&gt;gmail&lt;dot&gt;com</p>
@@ -746,7 +746,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <p>We don&#8217;t particularly like the system abstraction in the higher layer handling the data itself. We prefer the system abstraction&#8217;s job is just to compose the two peer abstractions - to wire them together.</p>
 </div>
 <div class="paragraph">
-<p>So we make standard deviation and display classes with I/O ports. Instances of them can then be wired together by the system abstraction. While the standard deviation and display abstractions know nothing about each other, the instances can communicate directly at run-time. As we shall see shortly, the next layer down will provide a abstract interfaces in the form of programming paradigms.</p>
+<p>So we make standard deviation and display classes with I/O ports. Instances of them can then be wired together by the system abstraction. While the standard deviation and display abstractions know nothing about each other, the instances can communicate directly at run-time. As we shall see shortly, the next layer down will provide an abstract interface which we call a programming paradigm.</p>
 </div>
 <div class="paragraph">
 <p><strong>All dependencies are knowledge dependencies</strong></p>
@@ -797,9 +797,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div class="content">
 <div class="imageblock right">
 <div class="content">
-<img src="images/wiring_mechanism_of_ala.png" alt="wiring_mechanism_of_ala.png" width="400">
+<img src="images/Layers.png" alt="Layers.png" width="600">
 </div>
-<div class="title">Figure 3. <strong>Wiring pattern frequently used in ALA</strong></div>
+<div class="title">Figure 3. Abstraction layers</div>
 </div>
 <div class="paragraph">
 <p>Because of the constraint that an abstraction that is depended on must be significantly more abstract, abstractions form layers. This gives the architecture its name: abstraction layered architecture. We give the layers names that reflect the types of abstractions that tend to go in them - <em>application layer</em>, <em>domain abstractions layer</em> and <em>programming paradigms layer</em>. Each layer becomes a folder and a namespace.
@@ -820,7 +820,7 @@ For large applications, another layer called <em>features layer</em> or <em>user
 <div class="content">
 <div class="imageblock right">
 <div class="content">
-<img src="images/smalltree.jpg" alt="smalltree" width="200">
+<img src="images/smalltree.jpg" alt="smalltree.jpg" width="200">
 </div>
 </div>
 <div class="paragraph">
@@ -830,12 +830,12 @@ For large applications, another layer called <em>features layer</em> or <em>user
 <p>Abstractions are internally highly cohesive, which means that all code inside them is inter-related. Internally they are a small ball of mud. If all that inter-related code is to be understood, it needs to be small.</p>
 </div>
 <div class="paragraph">
-<p>A rule of thumb is around 200 to 500 lines of code. If the code is in diagram form (which will often be the case for reasons we will explain later), we should limit the size to 200-500 nodes and edges.</p>
+<p>A rule of thumb is around 100 to 500 lines of code. If the code is in diagram form (which will often be the case for reasons we will explain later), we should limit the size to 100-500 nodes and edges.</p>
 </div>
 </div>
 </div>
 <div class="paragraph">
-<p>If an abstraction contains more than 500 lines, it is starting to get over the brain limit for other programmers to understand. If abstractions average less than 200 lines of code, we will have more abstractions than we needed to, and burden ourselves with an unnecessarily high number of them to learn. The sweet spot is somewhere in between.</p>
+<p>If an abstraction contains more than 500 lines, it is starting to get over the brain limit for other programmers to understand. If abstractions average less than 100 lines of code, we will have more abstractions than we needed to, and burden ourselves with an unnecessarily high number of them to learn. The sweet spot is somewhere in between.</p>
 </div>
 <div class="paragraph">
 <p><span class="big"><strong>Other emergent patterns</strong></span></p>
@@ -844,16 +844,50 @@ For large applications, another layer called <em>features layer</em> or <em>user
 <div class="content">
 <div class="imageblock right">
 <div class="content">
-<img src="images/ropespiral.jpg" alt="ropespiral" width="200">
+<img src="images/ropespiral.jpg" alt="ropespiral.jpg" width="200">
 </div>
 </div>
 <div class="paragraph">
-<p>ALA emerges many other patterns and properties. Many of them are already known about in software engineering, which is not surprising - such things as DSLs (Domain Specific Languages), Dependency Injection, Composite and Decorator patterns, monad like composition, etc. However, there are often subtle but important differences. For example the observer pattern (publish/subscribe) can be used to achieve calls going up the layers at run-time, but may not be used between abstractions in the same layer. The subscribers&#8217;s reference to the publisher would be an illegal dependency. A line of code in an abstraction in a higher layer must do the subscribing, which is effectively what the wiring pattern described above is.</p>
+<p>ALA emerges many other patterns and properties. Many of them are already known about in software engineering, which is not surprising - such things as DSLs (Domain Specific Languages), Dependency Injection, Composite and Decorator patterns, monad like composition, etc. However, there are often subtle but important differences. For example the observer pattern (publish/subscribe) can be used to achieve calls going up the layers at run-time, but may not be used between abstractions in the same layer. The subscribers&#8217;s reference to the publisher would be an illegal dependency. A line of code in an abstraction in a higher layer must do the subscribing, which is effectively what the wiring pattern described below is.</p>
 </div>
 </div>
 </div>
 <div class="paragraph">
 <p>Inheritance is not used in ALA. We only use composition because inheritance breaks abstractions.</p>
+</div>
+<div class="paragraph">
+<p><span class="big"><strong>Wiring pattern</strong></span></p>
+</div>
+<div class="openblock float-group">
+<div class="content">
+<div class="imageblock right">
+<div class="content">
+<img src="images/WiringPattern.png" alt="WiringPattern.png" width="500">
+</div>
+<div class="title">Figure 4. <strong>Wiring pattern frequently used in ALA</strong></div>
+</div>
+<div class="paragraph">
+<p>I use the wiring pattern shown on the right frequently to build ALA applications.</p>
+</div>
+<div class="paragraph">
+<p>Abstraction A in the application layer has legal dependencies on abstractions B and C in the domain abstractions layer. B and C have dependencies on D in the programming paradigms layer.</p>
+</div>
+<div class="paragraph">
+<p>D is a programming paradigm interface. This interface is not owned by B or C. It is its own abstraction representing a compositional idea, such as Dataflow.</p>
+</div>
+<div class="paragraph">
+<p>B and C have ports of type D. B&#8217;s port is implemented as a field in the class, and C&#8217;s port is implemented by implementing D&#8217;s interface.</p>
+</div>
+<div class="paragraph">
+<p>A can create an instance of B and an instance of C and wire them together because they have compatible ports. Wiring assigns C causes the instance of C, cast as the interface, to be assigned to the field in B.</p>
+</div>
+<div class="paragraph">
+<p>While abstraction B and abstraction C know nothing about each other, the instances of B and C can communicate with each other at run-time.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p><span class="big"><strong>Going forward</strong></span></p>
 </div>
 <div class="paragraph">
 <p>When the idea first occurred that zero coupling could be achieved through the stated constraints, we did not know what it would be like, or even if it was possible, to create a working system. Our experience since then is that zero-coupling has always been possible, but coming up with the abstractions is sometimes obvious and sometimes not so obvious. Also, some (but not all) conventional habits, languages, patterns, and architectural styles will conspire against you to break the fundamental constraints.</p>
@@ -953,8 +987,10 @@ class Switch
     private IDataFlow&lt;bool&gt; output;
 
     // called from internal code (not shown) when it detects a hardware change
-    private void SwitchChange(bool newState) { output.Send(newState); }
-
+    private void SwitchChange(bool newState)
+    {
+        output.Send(newState);
+    }
 }</code></pre>
 </div>
 </div>
@@ -993,7 +1029,7 @@ interface IDataFlow&lt;T&gt;
 </div>
 </div>
 <div class="paragraph">
-<p>In ALA, we frequently use a <strong>wiring pattern</strong>, as depicted by the diagram in Figure 2, which consists of instantiating domain abstractions and wiring them together by ports that use an even more abstract interface representing a programming paradigm. The wiring pattern is quite ubiquitous, and therefore comes from a foundation layer that resides below the Programming Paradigms layer:</p>
+<p>In ALA, we frequently use a <strong>wiring pattern</strong>, as depicted by the diagram in Figure 4, which consists of instantiating domain abstractions and wiring them together by ports that use an even more abstract interface representing a programming paradigm. The wiring pattern is quite ubiquitous, and therefore comes from a foundation layer that resides below the Programming Paradigms layer:</p>
 </div>
 <div class="paragraph">
 <p><strong>Foundation layer</strong></p>
@@ -1011,7 +1047,19 @@ interface IDataFlow&lt;T&gt;
 </div>
 </div>
 <div class="paragraph">
-<p>Note: You can get the source for an example WireTo extension method from one of the example projects in the chapters below, whose source is on GitHub.</p>
+<p>Note: A basic implementation of WireTo is listed in Chapter Two. You can get the source for a WireTo extension method from one of the Github repositories for the example projects in several following chapters.</p>
+</div>
+<div class="paragraph">
+<p>Note: ALA does not require the use of reflection. I use reflection because it allows me to use an extension method to get a WireTo operator implemented on all objects. It allows me to make specifying the port name optional. It also allows me to make the port fields in the class private so they do not look like part of the public configuration interface to the layer above.</p>
+</div>
+<div class="paragraph">
+<p>If you are generating wiring code from the diagram automatically using a tool, and you make the port fields public, you could generate code like the following:</p>
+</div>
+<div class="listingblock">
+<div class="title">Application.cs</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="C#" class="language-C# hljs">new Switch().output = (IDataFlow&lt;double&gt;) new(Light);</code></pre>
+</div>
 </div>
 <div class="paragraph">
 <p>Now that we know how to express requirements by composition of domain abstractions, let&#8217;s quickly demonstrate the ease of maintenance of our application:</p>
@@ -1351,7 +1399,7 @@ Application diagrams do not leave out details from requirements because ultimate
 <div class="content">
 <img src="images/close_up_code.jpg" alt="close_up_code.jpg" width="400">
 </div>
-<div class="title">Figure 4. Code quickly becomes a big ball of mud</div>
+<div class="title">Figure 5. Code quickly becomes a big ball of mud</div>
 </div>
 <div class="paragraph">
 <p>ALA code is readable, not because of style, convention, comments or documentation, but because any one piece of code appears to you as a separate uncoupled little program.</p>
@@ -1433,7 +1481,7 @@ Application diagrams do not leave out details from requirements because ultimate
 <div class="content">
 <img src="images/Cynefin.jpg" alt="Cynefin.jpg" width="800">
 </div>
-<div class="title">Figure 5. Code can quickly get complex</div>
+<div class="title">Figure 6. Code can quickly get complex</div>
 </div>
 <div class="paragraph">
 <p>As the program gets larger, things get a little more complicated, but the young developer&#8217;s brain is still up to the task, not realizing he has already surpassed anyone else&#8217;s ability to read his code. He is still able to get more features working. One day parts of the 'transition'. It becomes somewhere you don&#8217;t want to go. On the Cynfin diagram, it has transitioned from the complicated quadrant to the complex quadrant. And now it is trapped there. It is too complex for refactoring.</p>
@@ -1866,7 +1914,7 @@ Application diagrams do not leave out details from requirements because ultimate
 <div class="content">
 <img src="images/ThermometerDiagram.png" alt="ThermometerDiagram.png" width="500">
 </div>
-<div class="title">Figure 6. Thermometer application complete with UI</div>
+<div class="title">Figure 7. Thermometer application complete with UI</div>
 </div>
 <div class="paragraph">
 <p>The diagram has both UI composition and dataflow composition. Once we have this diagram, it is easy to conceive how we might add features. For example, we could add a button into the UI, and wire it to a switcher abstraction that changes between Celcius and Faranheit.</p>
@@ -1942,7 +1990,7 @@ Application diagrams do not leave out details from requirements because ultimate
 
 namespace DomainAbstractions
 {
-    /// &lt;summary&gt; <i class="conum" data-value="5"></i><b>(5)</b>
+    /// &lt;summary&gt; <i class="conum" data-value="6"></i><b>(6)</b>
     /// ALA Domain abstraction.
     /// Has one DataFlow input port and one DataFlow output port, both type double.
     /// Smooths the incoming data and outputs it at a lower frequency.
@@ -1996,43 +2044,35 @@ namespace DomainAbstractions
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>output port, simple private field of type interface</td>
-</tr>
-</table>
-</div>
+<td>output port, simple private field of type interface
 <div class="paragraph">
-<p>The input port is the IDataFlow&lt;double&gt; interface that is implemented by the class. Dataflow is a programming paradigm which is a steam of data without end. Incoming data arrives via the Push method in this interface. We never know where the data comes from. The output port is the private field named "output". This field will be set pointing at an IDataFlow&lt;double&gt; input of an instance of another abstraction somewhere. We will never know where the data goes to. How the <em>output</em> field gets set is described later.</p>
+<p>The input port is the IDataFlow&lt;double&gt; interface that is implemented by the class. Dataflow is a programming paradigm which is a stream of data without end. Incoming data arrives via the Push method in this interface. We never know where the data comes from. The output port is the private field named "output". This field will be set pointing at an IDataFlow&lt;double&gt; input of an instance of another abstraction somewhere. We never know where the data goes to. How the <em>output</em> field gets set is described later.</p>
 </div>
 <div class="paragraph">
 <p>Because the abstraction uses ports, it has no knowledge of other peer abstractions. If it did, it would not be an abstraction. It is self-understandable at design-time, except for the even more abstract concepts on which it depends. In this case that is DataFlow and the concept of Wiring, which will wire instances of this abstraction to instances of other abstractions with compatible ports. These are described more fully shortly.</p>
-</div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>The public interface is only used by the layer. It is only for creating and configuring instances of the abstraction. The abstraction has two configurations parameters. One is optional. Optional configurations can also be implemented with setters.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>The abstraction keeps some internal state. This goes somewhat contrary to functional programming where we want all state to be passed in. In ALA a good abstraction trumps being stateless. As an abstraction that is naturally stateful, a filter should hide its state internally.</td>
+</div></td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>The implementation of the input interface does the work of the filter. Note that port interfaces are always implemented explicitly. (If implemented implicitly, they would be part of the public API of the class, which we don&#8217;t wan&#8217;t. We only want the port accessed via the interface.)</td>
+<td>The public interface is only used by the layer above. It is only for creating and configuring instances of the abstraction. The abstraction has two configurations parameters. One is optional. Optional configurations can also be implemented with setters.</td>
 </tr>
-</table>
-</div>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>The abstraction keeps some internal state. This goes somewhat contrary to functional programming where we want all state to be passed in. In ALA a good abstraction trumps being stateless. As an abstraction that is naturally stateful, a filter should hide its state internally.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>The implementation of the input interface does the work of the filter. Note that port interfaces are always implemented explicitly. (If implemented implicitly, they would be part of the public API of the class, which we don&#8217;t wan&#8217;t. We only want the port accessed via the interface.)
 <div class="paragraph">
 <p>Internally, abstractions are cohesive (which means sticking together) or highly interconnected code collaborating for a single purpose.</p>
 </div>
 <div class="paragraph">
 <p>In ALA, abstractions are implemented as files. The name of the file is the name of the abstraction. The code that implements an abstraction needs no internal organisation. We do not care about dependencies or any inter-relationships inside an abstraction. In fact the more cohesive everything is the better, as long as it is small. It will often be implemented as a single class or function, but may consist of a small number of items such as classes, functions, interfaces, enums, delegates, etc, as long as the total is small.</p>
-</div>
-<div class="colist arabic">
-<table>
+</div></td>
+</tr>
 <tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>When an abstraction is created, it is critically important to add comments that make it learnable by explaining the concept it provides, its ports, its configurations and an example of its use. In Visual Studio, I copy these comments before the constructor because that allows them to pop up in the IDE when hovering on the constructor name where instances are created with a new keyword.</td>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>When an abstraction is created, it is critically important to add comments that make it learnable by explaining the concept it provides, its ports, its configurations and an example of its use. In Visual Studio, I copy these comments before the constructor because that allows them to pop up in the IDE when hovering on the constructor name where instances are created with a <em>new</em> keyword.</td>
 </tr>
 </table>
 </div>
@@ -2141,7 +2181,7 @@ namespace DomainAbstractions
 <div class="content">
 <img src="images/ALAClassDiagram.drawio.png" alt="ALAClassDiagram.drawio.png" width="90%">
 </div>
-<div class="title">Figure 7. UML class diagrams for ALA have no relation lines.</div>
+<div class="title">Figure 8. UML class diagrams for ALA have no relation lines.</div>
 </div>
 <div class="paragraph">
 <p>The diagram is not useful. We will never use it again. That&#8217;s not to say we won&#8217;t use diagrams. Diagrams can be used in ALA to represent the internals of an abstraction. This is often done in the layer representing the application or a feature or user story. In ALA terms, it shows instances of (lower layer) abstractions wired together. In implementation terms it is a (static) UML object diagram.</p>
@@ -2194,7 +2234,7 @@ namespace DomainAbstractions
 <div class="content">
 <img src="images/Layers.png" alt="Layers.png" width="75%">
 </div>
-<div class="title">Figure 8. Abstraction layers</div>
+<div class="title">Figure 9. Abstraction layers</div>
 </div>
 <div class="paragraph">
 <p>These layers are not fixed by ALA. But we tend to return to these ones in our experience so far. Following is discussion of each layer together with example code to see how everything works.</p>
@@ -2223,12 +2263,12 @@ namespace Application
             private ADCSimulator adc;
 
             adc = new ADCSimulator(channel: 2, period: 1000) { simulatedLevel = 400 }; <i class="conum" data-value="1"></i><b>(1)</b>
-            adc.WireIn(new LowPassFilter(strength: 10)) <i class="conum" data-value="2"></i><b>(2)</b> <i class="conum" data-value="5"></i><b>(5)</b>
+            adc.WireIn(new LowPassFilter(strength: 10)) <i class="conum" data-value="2"></i><b>(2)</b> <i class="conum" data-value="5"></i><b>(5)</b> <i class="conum" data-value="6"></i><b>(6)</b>
                 .WireIn(new OffsetAndScale(offset: -200, scale: 0.2)) <i class="conum" data-value="3"></i><b>(3)</b>
                 .WireIn(new DisplayNumeric&lt;double&gt;(label: "Temperature") { units = "C"} ); <i class="conum" data-value="4"></i><b>(4)</b>
 
             Console.WriteLine("Running application");
-            adc.Run(); <i class="conum" data-value="6"></i><b>(6)</b>
+            adc.Run(); <i class="conum" data-value="7"></i><b>(7)</b>
 
             Console.WriteLine("press any key to stop");
             Console.ReadKey();
@@ -2256,14 +2296,7 @@ namespace Application
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>DisplayNumeric - domain abstraction - has one input port of type IDataFlow&lt;double&gt;. Displays the value on the console with label and optional units.
-<div class="ulist">
-<ul>
-<li>
-<p>Dataflow - programming paradigm - used by the ports of the domain abstractions and allows their instances to push data from one to the next at runtime if they are wired together. For dataflow programming, we default to pushing data through the system (from ADC to display). We use pulling when there is good reason, usually for  performance.</p>
-</li>
-</ul>
-</div></td>
+<td>DisplayNumeric - domain abstraction - has one input port of type IDataFlow&lt;double&gt;. Displays the value on the console with label and optional units.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="5"></i><b>5</b></td>
@@ -2271,7 +2304,11 @@ namespace Application
 </tr>
 <tr>
 <td><i class="conum" data-value="6"></i><b>6</b></td>
-<td>The adc, which is the source of the data that gets pushed through the system, needs to be told to start running (at the configured period).</td>
+<td>These wirings are using the Dataflow programming paradigm. Dataflow is used by the ports of the domain abstractions and allows their instances to push data from one to the next at runtime if they are wired together. For dataflow programming, we default to pushing data through the system (from ADC to display). We use pulling when there is good reason, usually for  performance.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>The adc, which is the source of the data that gets pushed through the system, needs to be told to start running.</td>
 </tr>
 </table>
 </div>
@@ -2341,7 +2378,10 @@ namespace DomainAbstractions
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>The input port is the implemented interface.</td>
+<td>The input port is the implemented interface.
+<div class="paragraph">
+<p>In the application code in the previous section, an instance of LowPassFilter was wired to an instance of OffsetAndScale. When wired, the <em>output</em> field of the LowPassFilter is set to the OffsetAndScale object, cast as the appropriate interface, in this case IDataFlow&lt;double&gt;.</p>
+</div></td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
@@ -2353,14 +2393,7 @@ namespace DomainAbstractions
 </tr>
 <tr>
 <td><i class="conum" data-value="5"></i><b>5</b></td>
-<td>When data is pushed into the input, it is transformed and pushed out of the output port.
-<div class="ulist">
-<ul>
-<li>
-<p>In the application code in the previous section, an instance of LowPassFilter was wired to an instance of OffsetAndScale. When wired, the <em>output</em> field is set to the OffsetAndScale object, cast as the appropriate interface, in this case IDataFlow&lt;double&gt;.</p>
-</li>
-</ul>
-</div></td>
+<td>When data is pushed into the input, it is transformed and pushed out of the output port.</td>
 </tr>
 </table>
 </div>
@@ -2801,8 +2834,8 @@ namespace Features
                 .WireIn(new LowPassFilter(strength: 10, initialState: adcLevel))
                 .WireIn(new OffsetAndScale(offset: -200, scale: 0.2)) // 200 adc counts is 0 C, 300 adc counts is 20 C
                 .WireIn(new DataFlowFanout&lt;double&gt;()) <i class="conum" data-value="3"></i><b>(3)</b>
-                .WireTo(new DisplayNumeric&lt;double&gt;(label: "Temperature") { units = "C"} ) <i class="conum" data-value="4"></i><b>(4)</b>
-                .WireTo(new DataFlowExternalPort&lt;double&gt;((d) =&gt; output?.Push(d))); <i class="conum" data-value="5"></i><b>(5)</b>
+                .WireTo(new DisplayNumeric&lt;double&gt;(label: "Temperature") { units = "C"} ) <i class="conum" data-value="5"></i><b>(5)</b>
+                .WireTo(new DataFlowExternalPort&lt;double&gt;((d) =&gt; output?.Push(d))); <i class="conum" data-value="4"></i><b>(4)</b>
         }
 
 
@@ -2818,29 +2851,25 @@ namespace Features
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>The feature has an output port for temperature</td>
-</tr>
-</table>
-</div>
+<td>The feature has an output port for temperature
 <div class="paragraph">
 <p>The wiring itself is the same as it was in the Thermometer application except that three extra objects are used to make the dataflow wiring work. Their classes come from the Dataflow programming paradigm abstraction. These classes are:</p>
-</div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>ChangeType: allows Dataflow ports of one type to be wired to Dataflow ports of a different type. In this case, the output of ADCSimlator is <em>int</em> and the input of LowPassFilter is <em>double</em>.</td>
+</div></td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>DataFlowFanout: A normal output port can only be wired once. DataFlowFanout allows you to wire to multiple places. In this case we wanted to wire the output of OffsetAndScale to both a DisplayNumeric and an external port.</td>
+<td>ChangeType: allows Dataflow ports of one type to be wired to Dataflow ports of a different type. In this case, the output of ADCSimlator is <em>int</em> and the input of LowPassFilter is <em>double</em>.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>DataFlowExternalPort. We want to wire the output of the DataFlowFanout to the external port <em>output</em>. You might think you could just write .WireTo(output). The reason this doesn&#8217;t work is that when the Temperature constructor runs, the code on the outside is instantiating a Temperature. That same external code would not have wired our <em>output</em> port yet. It&#8217;s value will be null at this time. Therefore we instead wire to a simple class that takes a function as its configuration. For the function we pass in a lambda expression that will push the data via the <em>output</em> port.</td>
+<td>DataFlowFanout: A normal output port can only be wired once. DataFlowFanout allows you to wire to multiple places. In this case we wanted to wire the output of OffsetAndScale to both a DisplayNumeric and an external port.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>DataFlowExternalPort. We want to wire the output of the DataFlowFanout to the external port <em>output</em>. You might think you could just write .WireTo(output). The reason this doesn&#8217;t work is that when the Temperature constructor runs, the code on the outside is instantiating a Temperature. That same external code would not have wired our <em>output</em> port yet. It&#8217;s value will be null at this time. Therefore we instead wire to a simple class that takes a function as its configuration. For the function we pass in a lambda expression that will push the data via the <em>output</em> port.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
 <td>Note that WireTo is used to wire DataFlowFanout to multiple places. WireIn wires things in a chain.</td>
 </tr>
 </table>
@@ -3025,7 +3054,7 @@ namespace DomainAbstractions
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>For soring the last value received on each input. Nullables so that we know when we have had input.</td>
+<td>For storing the last value received on each input. They are nullables so that we know when we have had input.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
@@ -3329,7 +3358,7 @@ namespace DomainAbstractions
 <div class="content">
 <img src="images/Slide8.jpg" alt="Slide8.jpg">
 </div>
-<div class="title">Figure 9. Decomposition into elements and their relations</div>
+<div class="title">Figure 10. Decomposition into elements and their relations</div>
 </div>
 <div class="paragraph">
 <p>The figure shows five conventional modules (or components) and their relations (as interactions). Study almost any piece of software, and this is what you will find (even if it supposedly adheres to the so-called layering pattern).</p>
@@ -3372,7 +3401,7 @@ namespace DomainAbstractions
 <div class="content">
 <img src="images/Slide9.jpg" alt="Slide9.jpg">
 </div>
-<div class="title">Figure 10. Abstraction do not interact</div>
+<div class="title">Figure 11. Abstraction do not interact</div>
 </div>
 <div class="paragraph">
 <p>The word 'modules' has been changed to the word 'abstractions'. All the dependencies are gone. And with them all their problems. You no longer have to worry about dependencies and all their management. The implicit coupling that we talked about earlier is also gone. The 'clumping' structure has become isolated boxes. Loose coupling has become zero coupling.</p>
@@ -3384,7 +3413,7 @@ namespace DomainAbstractions
 <div class="content">
 <img src="images/Slide10.jpg" alt="Slide10.jpg">
 </div>
-<div class="title">Figure 11. Abstractions and composition of their instances</div>
+<div class="title">Figure 12. Abstractions and composition of their instances</div>
 </div>
 <div class="paragraph">
 <p>The code inside the new system abstraction does not involve dependencies <em>between</em> abstractions. It uses dependencies <em>on</em> abstractions. It&#8217;s code that instantiates abstractions and wires them together via their (even more abstract) ports. Since interactions between the instances are implemented without dependencies between the abstractions, circular wiring is fine. In fact we should embrace it, because that is how the system works.</p>
@@ -3416,7 +3445,7 @@ namespace DomainAbstractions
 </div>
 </div>
 <div class="sect2">
-<h3 id="truecomponents-based-development"><a class="anchor" href="#truecomponents-based-development"></a>2.6. Components based development</h3>
+<h3 id="truecf-component-based-development"><a class="anchor" href="#truecf-component-based-development"></a>2.6. cf Component based development</h3>
 <div class="paragraph">
 <p>In this perspective, we compare ALA with components, component based software engineering (component based development), components and connectors and service oriented architecture.</p>
 </div>
@@ -3722,7 +3751,7 @@ namespace Application
 <div class="content">
 <img src="images/Slide15.jpg" alt="Slide15.jpg">
 </div>
-<div class="title">Figure 12. </div>
+<div class="title">Figure 13. </div>
 </div>
 <div class="paragraph">
 <p>The water molecule has a "uses instances of" relationship with the two atoms, and the atoms have a "uses instance of" relationship with the even more abstract polar bond abstraction. Polar bond is an example of an 'abstract interface'.</p>
@@ -3737,7 +3766,7 @@ namespace Application
 <div class="content">
 <img src="images/Slide16.jpg" alt="Slide16.jpg">
 </div>
-<div class="title">Figure 13. </div>
+<div class="title">Figure 14. </div>
 </div>
 <div class="paragraph">
 <p>The domain abstractions are the various Lego pieces, instances of which can be assembled together to make specific creations. Lego pieces themselves have instances of an abstract interface, which is the stud and tube. This is a programming paradigm. There is a second abstract interface, the axle and hole. These programming paradigms have an 'execution model' at run-time. The execution of the stud and tube programming paradigm is to hold structural integrity. The execution of the axle and hole programming paradigm is rotation.</p>
@@ -3754,7 +3783,7 @@ namespace Application
 <div class="content">
 <img src="images/jigsaw.jpg" alt="jigsaw.png" width="75%">
 </div>
-<div class="title">Figure 14. Conventional code is built like a jigsaw puzzle</div>
+<div class="title">Figure 15. Conventional code is built like a jigsaw puzzle</div>
 </div>
 <div class="paragraph">
 <p>The pieces are modules, and the interlocking shapes are the interfaces. The picture is the application or system.</p>
@@ -3779,7 +3808,7 @@ namespace Application
 <div class="content">
 <img src="images/Slide17.jpg" alt="Slide17.jpg">
 </div>
-<div class="title">Figure 15. </div>
+<div class="title">Figure 16. </div>
 </div>
 <div class="paragraph">
 <p>In this domain, we have at least two abstract interfaces as programming paradigms, one for digital logic signals and one for analog signals. Their execution model at run-time is continuous-time voltage levels.</p>
@@ -3794,7 +3823,7 @@ namespace Application
 <div class="content">
 <img src="images/Slide18.jpg" alt="Slide18.jpg">
 </div>
-<div class="title">Figure 16. </div>
+<div class="title">Figure 17. </div>
 </div>
 <div class="paragraph">
 <p>Let&#8217;s go round the circle once. We start with abstract parts such as cog wheels and hands. Instances of these have abstract interfaces as programming paradigms. Their execution models allow them to interact at run-time, such as spinning on axles and meshing teeth. The next step is to instantiate some of these abstractions and configure them. For example, configure the size and number of teeth of the cog wheels. Next comes the composition step, where they are assembled. Finally we have a new abstraction, the clock. Instances of clocks can in turn be used to compose other things such as scheduling things during your day. Because you have now created the abstraction <em>clock</em> you don&#8217;t have to think about cog wheels when thinking about how to meet someone at a certain time.</p>
@@ -3832,7 +3861,7 @@ namespace Application
 <div class="content">
 <img src="images/CalculatorRequirements.png" alt="Calculator3.png" width="900">
 </div>
-<div class="title">Figure 17. Calculator requirements</div>
+<div class="title">Figure 18. Calculator requirements</div>
 </div>
 <div class="paragraph">
 <p>Here is a screenshot of the working calculator as it was two half-days later:</p>
@@ -3841,7 +3870,7 @@ namespace Application
 <div class="content">
 <img src="images/CalculatorScreenshot.png" alt="CalculatorScreenshot.png" width="900">
 </div>
-<div class="title">Figure 18. Calculator screenshot</div>
+<div class="title">Figure 19. Calculator screenshot</div>
 </div>
 <div class="paragraph">
 <p>The first step in the design of the calculator was to express the requirements (UI plus behaviours), inventing any needed abstractions to do so. Here is the actual first sketch I drew:</p>
@@ -3850,7 +3879,7 @@ namespace Application
 <div class="content">
 <img src="images/Calculator2Rows-HandDrawing.png" alt="Calculator2Rows-HandDrawing.png" width="900">
 </div>
-<div class="title">Figure 19. Calculator (2 Rows only shown)</div>
+<div class="title">Figure 20. Calculator (2 Rows only shown)</div>
 </div>
 <div class="paragraph">
 <p>As we shall see, this diagram is practically executable code. The calculator is practically done. We don&#8217;t know if the invented domain abstractions will work yet, but let&#8217;s go through how this calculator works anyway.</p>
@@ -3885,7 +3914,7 @@ namespace Application
 <div class="content">
 <img src="images/CalculatorDomainAbstractionsHandDrawings.png" alt="CalculatorDomainAbstractionsHandDrawings.png" width="300">
 </div>
-<div class="title">Figure 20. Calculator Domain Abstractions</div>
+<div class="title">Figure 21. Calculator Domain Abstractions</div>
 </div>
 <div class="paragraph">
 <p>I see I forgot to draw Concat. I had to write that one. Here is its template as it was in my Xmind templates diagram.</p>
@@ -3894,7 +3923,7 @@ namespace Application
 <div class="content">
 <img src="images/CalculatorStringConcatTemplate.png" alt="CalculatorStringConcatTemplate.png" width="400">
 </div>
-<div class="title">Figure 21. StringConcat template</div>
+<div class="title">Figure 22. StringConcat template</div>
 </div>
 <div class="paragraph">
 <p>The two ports are both drawn on the right hand side unfortunately - a limitation of using Xmind as the drawing tool. Drawing the templates makes the abstractions clearer for their implementation.</p>
@@ -4013,7 +4042,7 @@ namespace DomainAbstractions
 <div class="content">
 <img src="images/CalculatorFormulaTemplate.png" alt="CalculatorFormulaTemplate.png" width="500">
 </div>
-<div class="title">Figure 22. Formula template</div>
+<div class="title">Figure 23. Formula template</div>
 </div>
 <div class="paragraph">
 <p>Once again, one of the input ports is shown on the right when we would prefer it to be on left.</p>
@@ -4232,7 +4261,7 @@ private Horizontal WireRow(StringConcat stringConcat, DataFlowConnector&lt;strin
 <div class="content">
 <img src="images/CalculatorRow-GALADE.png" alt="CalculatorRow-GALADE.png" width="800">
 </div>
-<div class="title">Figure 23. CalculatorRow abstraction internal wiring</div>
+<div class="title">Figure 24. CalculatorRow abstraction internal wiring</div>
 </div>
 <div class="paragraph">
 <p>Before we had that tool, we used Xmind to do diagrams from which we could generated code. This is the approach described in the next section.</p>
@@ -4247,7 +4276,7 @@ private Horizontal WireRow(StringConcat stringConcat, DataFlowConnector&lt;strin
 <div class="content">
 <a class="image" href="images/Calculator2Rows.png"><img src="images/Calculator2Rows.png" alt="Calculator2Rows.png" width="1000"></a>
 </div>
-<div class="title">Figure 24. Calculator drawn in Xmind (two rows version)</div>
+<div class="title">Figure 25. Calculator drawn in Xmind (two rows version)</div>
 </div>
 <div class="paragraph">
 <p>Xmind is not the perfect tool to do this, but it has one huge advantage - it lays itself out. This is so important that it&#8217;s why we use it (until our new tool is ready). We will put up with the disadvantages, and the necessary conventions until then. Those conventions are documented in the wiki section of the project in Github here: <a href="https://github.com/johnspray74/ReactiveCalculator/wiki">https://github.com/johnspray74/ReactiveCalculator/wiki</a></p>
@@ -4265,7 +4294,7 @@ private Horizontal WireRow(StringConcat stringConcat, DataFlowConnector&lt;strin
 <div class="content">
 <img src="images/CalculatorXmindParserTool.png" alt="CalculatorXmindParserTool.png" width="800">
 </div>
-<div class="title">Figure 25. XmindParser tool in use</div>
+<div class="title">Figure 26. XmindParser tool in use</div>
 </div>
 <div class="paragraph">
 <p>The tool can put the generated code into your Application.cs file if you give it special markers like the one below.</p>
@@ -4328,7 +4357,7 @@ private Horizontal WireRow(StringConcat stringConcat, DataFlowConnector&lt;strin
 <div class="content">
 <img src="images/CalculatorNRowsScreenshot.png" alt="CalculatorNRowsScreenshot.png" width="800">
 </div>
-<div class="title">Figure 26. Later version of the calculator to support an unlimited number of rows</div>
+<div class="title">Figure 27. Later version of the calculator to support an unlimited number of rows</div>
 </div>
 <div class="paragraph">
 <p>So it was time to do some maintenance, and solve that problem of the repetition in the diagram at the same time. During this maintenance, none of the existing abstractions changed. Their ports stayed the same. Their internals were improved a little in some cases but nothing significant. Formula was modified internally so that it could handle more than six operand inputs, although any one formula can still only use six of them.</p>
@@ -4343,7 +4372,7 @@ private Horizontal WireRow(StringConcat stringConcat, DataFlowConnector&lt;strin
 <div class="content">
 <img src="images/CalculatorRowTemplate.png" alt="CalculatorRowTemplate.png" width="800">
 </div>
-<div class="title">Figure 27. CalculatorRow abstraction</div>
+<div class="title">Figure 28. CalculatorRow abstraction</div>
 </div>
 <div class="paragraph">
 <p>The implementation of CalculatorRow was done with a diagram using the new Graphical ALA tool which was shown earlier.</p>
@@ -4358,7 +4387,7 @@ private Horizontal WireRow(StringConcat stringConcat, DataFlowConnector&lt;strin
 <div class="content">
 <a class="image" href="images/Calculator2ARows.png"><img src="images/Calculator2ARows.png" alt="Calculator2ARows.png" width="1000"></a>
 </div>
-<div class="title">Figure 28. Calculator drawn in Xmind using the new CalculatorRow requirements abstraction</div>
+<div class="title">Figure 29. Calculator drawn in Xmind using the new CalculatorRow requirements abstraction</div>
 </div>
 <div class="paragraph">
 <p>Because this test calculator has only two rows we can directly compare it with the 2-row calculator above and see how the two rows are now represented by two instances of this new CalculatorRow abstraction. However we are still not there to building a calculator with 10 rows. If we were to instantiate CalculatorRow 10 times, it would need 100 wirings in Xmind to connect all ten results to every CalculatorRow&#8217;s operands input. Having thought the 36 wirings of the 6 row calculator was nuts, there was no way I was going to do 100 of them by hand.</p>
@@ -4376,7 +4405,7 @@ private Horizontal WireRow(StringConcat stringConcat, DataFlowConnector&lt;strin
 <div class="content">
 <img src="images/CalculatorMultipleTemplate.png" alt="CalculatorMultipleTemplate.png" width="500">
 </div>
-<div class="title">Figure 29. CalculatorRow requirements abstraction</div>
+<div class="title">Figure 30. CalculatorRow requirements abstraction</div>
 </div>
 <div class="paragraph">
 <p>Using the new Multiple abstraction, we can now build a 10-row calculator. Here is the new diagram:</p>
@@ -4385,7 +4414,7 @@ private Horizontal WireRow(StringConcat stringConcat, DataFlowConnector&lt;strin
 <div class="content">
 <a class="image" href="images/Calculator10Rows.png"><img src="images/Calculator10Rows.png" alt="Calculator10Rows.png" width="1000"></a>
 </div>
-<div class="title">Figure 30. Calculator drawn in Xmind using the new Multiple domain abstraction to create as many rows as we like</div>
+<div class="title">Figure 31. Calculator drawn in Xmind using the new Multiple domain abstraction to create as many rows as we like</div>
 </div>
 <div class="paragraph">
 <p>You can see inside the instance of Multiple that it is configured to make 10 of whatever is attached to its factory port. The CalculatorRow abstraction is shown next to the CalculatorRowFactory so you can see what it makes. You can see inside Multiple the two methods that Multiple calls when it makes a new instance. These methods are used to wire the CalculatorRow into the rest of the application wiring.</p>
@@ -4406,7 +4435,7 @@ private Horizontal WireRow(StringConcat stringConcat, DataFlowConnector&lt;strin
 <div class="content">
 <img src="images/CalculatorNRows.png" alt="CalculatorNRows.png" width="800">
 </div>
-<div class="title">Figure 31. Later version of the calculator to support an unlimited number of rows</div>
+<div class="title">Figure 32. Later version of the calculator to support an unlimited number of rows</div>
 </div>
 <div class="paragraph">
 <p>I wanted the Button to be at the bottom, so I added another instance of Vertical to act as the wiring point for new row to be attached to the UI. The output of the Button is another programming paradigm interface called an IEvent.</p>
@@ -5501,7 +5530,7 @@ The tool's purpose is to aid creativity in the ALA process of representing a use
 <div class="content">
 <a class="image" href="images/old-datalink/namespaces.png"><img src="images/old-datalink/namespaces.png" alt="namespaces.png"></a>
 </div>
-<div class="title">Figure 32. Legacy application - namespaces</div>
+<div class="title">Figure 33. Legacy application - namespaces</div>
 </div>
 <div class="paragraph">
 <p>This graph is quite large, so if you like you can right click on it, and open it in a new tab in your browser. The red arrows are dependencies in both directions.</p>
@@ -5516,7 +5545,7 @@ The tool's purpose is to aid creativity in the ALA process of representing a use
 <div class="content">
 <a class="image" href="images/old-datalink/classes-in-uiforms-namespace.png"><img src="images/old-datalink/classes-in-uiforms-namespace.png" alt="classes-in-uiforms-namespace.png"></a>
 </div>
-<div class="title">Figure 33. Legacy application - classes in uiforms namespace</div>
+<div class="title">Figure 34. Legacy application - classes in uiforms namespace</div>
 </div>
 <div class="paragraph">
 <p>Here you can see that ndepend is trying to make out the layers. The layers are vertical columns, going from left to right. I have left them vertical even through ALA abstraction layers are usually drawn horizontal because they come out more readable on the page. Again there are many dependencies in both directions drawn in red.</p>
@@ -5528,7 +5557,7 @@ The tool's purpose is to aid creativity in the ALA process of representing a use
 <div class="content">
 <a class="image" href="images/old-datalink/classes-in-datastructure-namespace.png"><img src="images/old-datalink/classes-in-datastructure-namespace.png" alt="classes-in-datastructure-namespace.png"></a>
 </div>
-<div class="title">Figure 34. Legacy application - classes in datastructure namespace</div>
+<div class="title">Figure 35. Legacy application - classes in datastructure namespace</div>
 </div>
 <div class="paragraph">
 <p>Again, Ndepend is trying to make out the layers from left to right.</p>
@@ -5546,7 +5575,7 @@ The tool's purpose is to aid creativity in the ALA process of representing a use
 <div class="content">
 <a class="image" href="images/old-datalink/classes-in-all-namespaces.png"><img src="images/old-datalink/classes-in-all-namespaces.png" alt="classes-in-all-namespaces.png"></a>
 </div>
-<div class="title">Figure 35. Legacy application - all classes in all namespaces</div>
+<div class="title">Figure 36. Legacy application - all classes in all namespaces</div>
 </div>
 <div class="paragraph">
 <p>This graph is very large. Right click on it, and open it in a new tab in your browser, so you can zoom in to see the dependencies in the background. It is truly frightening. Ndepend had no chance to find the dependency layers. There may be vaque onion type layers going outwards from the middle. It makes readily visible why continued maintenance on this application is so difficult. You have to read a lot of code to find even a tiny part of this hidden structure.</p>
@@ -5567,7 +5596,7 @@ The tool's purpose is to aid creativity in the ALA process of representing a use
 <div class="content">
 <a class="image" href="images/new-datalink/classes-in-all-namespaces.png"><img src="images/new-datalink/classes-in-all-namespaces.png" alt="classes-in-all-namespaces.png"></a>
 </div>
-<div class="title">Figure 36. New ALA application - classes in all namespaces</div>
+<div class="title">Figure 37. New ALA application - classes in all namespaces</div>
 </div>
 <div class="paragraph">
 <p>Ndepend has tried to find the three ALA layers which are vertical and go from left to right. Only the Application sits in the top layer. The DomainAbstractions layer contains the next two columns of classes and a few from the next column. And the ProgrammingParadigms layer contains the rest on the right. Actually there were a couple of bad dependencies present when this graph was generated which have since been fixed. (There should be no dependency between Panel and OptionBox, nor between Wizard and WizardItem.) With these removed, the graph would form into the three abstraction layers.</p>
@@ -5582,7 +5611,7 @@ The tool's purpose is to aid creativity in the ALA process of representing a use
 <div class="content">
 <a class="image" href="images/new-datalink/namespaces.png"><img src="images/new-datalink/namespaces.png" alt="namespaces.png"></a>
 </div>
-<div class="title">Figure 37. New ALA application - namespaces</div>
+<div class="title">Figure 38. New ALA application - namespaces</div>
 </div>
 <div class="paragraph">
 <p>Remember in ALA, we do not use decomposition, so namespaces do not represent decomposition of the system. They represent layers. You can clearly see the three layers. The wiring namespace also goes in the programmingparadigms layer.</p>
@@ -5594,7 +5623,7 @@ The tool's purpose is to aid creativity in the ALA process of representing a use
 <div class="content">
 <a class="image" href="images/new-datalink/classes-in-domainabstractions-namespace.png"><img src="images/new-datalink/classes-in-domainabstractions-namespace.png" alt="classes-in-domainabstractions-namespace.png"></a>
 </div>
-<div class="title">Figure 38. New ALA application - classes in DomainAbstractions namespace</div>
+<div class="title">Figure 39. New ALA application - classes in DomainAbstractions namespace</div>
 </div>
 <div class="paragraph">
 <p>Ok here we see the two previously mentioned bad dependencies, and two other dependencies. They are on delegates or enums in the same source file, and so don&#8217;t count as bad dependencies.</p>
@@ -5606,7 +5635,7 @@ The tool's purpose is to aid creativity in the ALA process of representing a use
 <div class="content">
 <a class="image" href="images/new-datalink/classes-in-programmingparadigms-namespace.png"><img src="images/new-datalink/classes-in-programmingparadigms-namespace.png" alt="classes-in-programmingparadigms-namespace.png"></a>
 </div>
-<div class="title">Figure 39. New ALA application - Classes in Programming Paradigms namespace</div>
+<div class="title">Figure 40. New ALA application - Classes in Programming Paradigms namespace</div>
 </div>
 <div class="paragraph">
 <p>Again we see a few dependencies on delegates in the same source file which are ok. There is a couple of connector classes that depend on interfaces in this same layer. I consider them part of the interface from the programming paradigm point of view. They are in the same source file as a cohesive unit.</p>
@@ -5627,7 +5656,7 @@ The tool's purpose is to aid creativity in the ALA process of representing a use
 <div class="content">
 <img src="images/DatalinkApplication.xmind.png" alt="DatalinkApplication.xmind.png">
 </div>
-<div class="title">Figure 40. Xmind being used to design an application</div>
+<div class="title">Figure 41. Xmind being used to design an application</div>
 </div>
 <div class="paragraph">
 <p>This diagram was drawn using Xmind. It shows a single user story.  There is a UI with a menu item or a tool bar to start the user story. It then displays a browse dialogue to specify the location of the file. When the filepath has been selected, it gets data off a device on a COM port, using a protocol, and writes it to a CSV file. The data is also routed to be shown on a grid on the UI.</p>
@@ -5771,7 +5800,7 @@ namespace Application
 <div class="content">
 <img src="images/JacquardLoom.jpg" alt="JacquardLoom.jpg" width="400">
 </div>
-<div class="title">Figure 41. Jacquard loom as a programming paradigm for combining weave pattern rows</div>
+<div class="title">Figure 42. Jacquard loom as a programming paradigm for combining weave pattern rows</div>
 </div>
 <div class="paragraph">
 <p>The layer below the domain abstractions is really interesting in this respect. When we compose or wire two or more instances of domain abstractions together, we need that to have a meaning. Here are some common examples:</p>
@@ -5820,7 +5849,7 @@ namespace Application
 <div class="content">
 <img src="images/TaxonomyProgrammingParadigms.png" alt="TaxonomyProgrammingParadigms.png">
 </div>
-<div class="title">Figure 42. Taxonomy Programming Paradigms - cited from Van Roy</div>
+<div class="title">Figure 43. Taxonomy Programming Paradigms - cited from Van Roy</div>
 </div>
 <div class="admonitionblock tip">
 <table>
@@ -7908,7 +7937,7 @@ namespace ProgrammingParadigms
 <div class="content">
 <img src="images/FSM-generic.png" alt="FSM-generic.png">
 </div>
-<div class="title">Figure 43. State machine execution model</div>
+<div class="title">Figure 44. State machine execution model</div>
 </div>
 <div class="paragraph">
 <p>At first it can be difficult to express the solution to a requirements problem as a state machine, even when the state machine is a suitable way to solve the problem. It takes some getting used to the first time. But it only takes a little bit of practice to begin to master it.</p>
@@ -7925,7 +7954,7 @@ namespace ProgrammingParadigms
 <div class="content">
 <img src="images/BigStateMachine.pdf.jpg" alt="BigStateMachine.pdf.jpg">
 </div>
-<div class="title">Figure 44. My first significant state machine for a real embedded device</div>
+<div class="title">Figure 45. My first significant state machine for a real embedded device</div>
 </div>
 <div class="paragraph">
 <p>Notice that the diagram makes heavy use of hierarchical states (boxes inside boxes). These turn out to be important in most of my state machines.</p>
@@ -8864,7 +8893,7 @@ Perhaps, surprisingly, the architect&#8217;s main job is to focus on the require
 <div class="content">
 <img src="images/Coffee%20Maker%20Domain%20Components.vsd.jpg" alt="Coffee Maker Domain Components.vsd.jpg">
 </div>
-<div class="title">Figure 45. Coffee maker domain abstractions</div>
+<div class="title">Figure 46. Coffee maker domain abstractions</div>
 </div>
 <div class="paragraph">
 <p>Take a moment to look at these three abstractions:</p>
@@ -8912,7 +8941,7 @@ Perhaps, surprisingly, the architect&#8217;s main job is to focus on the require
 <div class="content">
 <img src="images/Coffee%20Maker%20Dataflow%20diagram.vsd.jpg" alt="CoffeeMaker Dataflow diagram">
 </div>
-<div class="title">Figure 46. Coffee maker solution</div>
+<div class="title">Figure 47. Coffee maker solution</div>
 </div>
 <div class="paragraph">
 <p>The diagram to the left is the application itself. Instances of the three domain abstractions, UI, Boiler and Warmer plate are shown as boxes.</p>
@@ -10435,7 +10464,7 @@ private List&lt;List&lt;string&gt;&gt; TranslateFrameScores(List&lt;List&lt;int&
 <div class="content">
 <img src="images/Paintings_from_the_Chauvet_cave.jpg" alt="Paintings_from_the_Chauvet_cave.jpg" width="400">
 </div>
-<div class="title">Figure 47. Paintings in the Chauvet cave</div>
+<div class="title">Figure 48. Paintings in the Chauvet cave</div>
 </div>
 <div class="paragraph">
 <p>Our ancestors could use a word like 'bring your spear' and it had a simple meaning to them only because all the detail and knowledge that went into building a spear was replaced with the abstraction 'spear'. Without the abstraction, the sentence would have had to be more like "bring the object that we made by joining the object we made by applying blows to the hard material we found at the place&#8230;&#8203;, with the long material we cut in the place with the tall&#8230;&#8203;, by tying it with the long grass material using the gooey stuff we found at the&#8230;&#8203;". Even this sentence was only made possible by other abstractions: joining, material, blows, hard, long (twice), cut, tall, tying, gooey, and found. If we expanded all of them until we were only using a few basic concepts like 'object' and 'place', we would have a sentence so long that we could never communicate at all. That&#8217;s what abstractions do, and how our brains make use of them. The word spear, in turn can be used to create a new abstraction, a hunting plan, while all of that other detail remains hidden from that new context.</p>
@@ -10447,7 +10476,7 @@ private List&lt;List&lt;string&gt;&gt; TranslateFrameScores(List&lt;List&lt;int&
 <div class="content">
 <img src="images/neuron.svg" alt="neuron.svg" width="300">
 </div>
-<div class="title">Figure 48. </div>
+<div class="title">Figure 49. </div>
 </div>
 <div class="paragraph">
 <p>As software engineers we do learn and use many abstractions. For example if we want to protect simultaneous access to the resource, our brain should conjure up 'mutex'.</p>
@@ -10567,7 +10596,7 @@ private List&lt;List&lt;string&gt;&gt; TranslateFrameScores(List&lt;List&lt;int&
 <div class="content">
 <img src="images/creativity.jpg" alt="creativity.jpg" width="80%">
 </div>
-<div class="title">Figure 49. The creativity cycle</div>
+<div class="title">Figure 50. The creativity cycle</div>
 </div>
 <div class="paragraph">
 <p>A good abstraction separates the knowledge of different worlds. A clock is a good abstraction. On one side is the world of cog wheels. On the other side is someone trying to be on time in their busy daily schedule. Neither knows anything about the details of the other. SQL is another good abstraction. On one side is the world of fast indexing algorithms. On the other is finding all the orders for a particular customer. Let us consider a domain abstraction - the calculation of loan repayments. On one side is the world of mathematics with the derivation and implementation of a formula. On the other, the code is about a person wanting to know if they can afford to buy a house. If your abstractions don&#8217;t separate knowledge of different worlds like this, then you are probably just factoring common code. Find the abstraction in that common code. Make it hide something complicated that&#8217;s really easy to use and really useful, like a clock.</p>
@@ -10706,7 +10735,7 @@ There should be one port for each peer that can be wired. This is the Interface 
 </div>
 </div>
 <div class="sect2">
-<h3 id="trueno-loose-coupling"><a class="anchor" href="#trueno-loose-coupling"></a>7.4. No Loose Coupling</h3>
+<h3 id="truezero-coupling-not-loose-coupling"><a class="anchor" href="#truezero-coupling-not-loose-coupling"></a>7.4. Zero coupling, not loose Coupling</h3>
 <div class="paragraph">
 <p>Here we meet the first meme from our list of software engineering topics that we must throw out. To many, this will seem a surprising one. Yes, I am saying 'loose coupling' is undesirable.</p>
 </div>
@@ -10950,7 +10979,7 @@ When we use the word 'ubiquitous', it refers to the number of times the abstract
 <div class="content">
 <img src="images/caffeine%20molecule.png" alt="Caffeine molecule.png" width="300">
 </div>
-<div class="title">Figure 50. caffeine - oxygen atoms are red</div>
+<div class="title">Figure 51. caffeine - oxygen atoms are red</div>
 </div>
 <div class="paragraph">
 <p>Abstractions are fragile and get destroyed easily, so we have to take care to protect them. What we needed to do was to put the knowledge about the relationship between oxygen and hydrogen to make water in a new abstraction called Water.</p>
@@ -11071,7 +11100,7 @@ When we use the word 'ubiquitous', it refers to the number of times the abstract
 <div class="content">
 <img src="images/circuit%20diagram.gif" alt="circuit diagram.gif">
 </div>
-<div class="title">Figure 51. In an electronic schematic, the components are abstractions that are composed using two paradigm interfaces - live analog signals and live digital signals</div>
+<div class="title">Figure 52. In an electronic schematic, the components are abstractions that are composed using two paradigm interfaces - live analog signals and live digital signals</div>
 </div>
 <div class="paragraph">
 <p>Returning to a software example, let&#8217;s choose a single simple programming paradigm: activity flow. This programming paradigm is the same as the UML Activity diagram. When we wire A to B and they use this paradigm, it means that B starts after A finishes. If A and B accept and provide this interface respectively, then wiring them together by drawing an arrow will have that meaning, and cause that to happen at run-time.</p>
@@ -11555,7 +11584,7 @@ Later we will introduce an asynchronous (event driven) execution model. It is pr
 <div class="content">
 <img src="images/Layers.png" alt="Layers.png" width="75%">
 </div>
-<div class="title">Figure 52. Four ALA layers</div>
+<div class="title">Figure 53. Four ALA layers</div>
 </div>
 <div class="paragraph">
 <p>ALA uses slightly different names: Application layer, Domain Abstractions layer, Programming Paradigms layer, and Language layer.</p>
@@ -11752,7 +11781,7 @@ Later we will introduce an asynchronous (event driven) execution model. It is pr
 <div class="content">
 <img src="images/Slide11.jpg" alt="Slide11.jpg">
 </div>
-<div class="title">Figure 53. Decomposition Structure</div>
+<div class="title">Figure 54. Decomposition Structure</div>
 </div>
 <div class="paragraph">
 <p>The outer elements correctly only refer to the outer interface of the components - their package or namespace interface, facade, or aggregate root - however you want to think of it. Encapsulation is used at every level of the structure to hide implementation details.</p>
@@ -11767,7 +11796,7 @@ Later we will introduce an asynchronous (event driven) execution model. It is pr
 <div class="content">
 <img src="images/Slide13.jpg" alt="Slide13.jpg">
 </div>
-<div class="title">Figure 54. Tracing a User story</div>
+<div class="title">Figure 55. Tracing a User story</div>
 </div>
 <div class="paragraph">
 <p>The diagram shows both decomposition relationships (boxes inside boxes) and interaction relationships (lines).</p>
@@ -11782,7 +11811,7 @@ Later we will introduce an asynchronous (event driven) execution model. It is pr
 <div class="content">
 <img src="images/Slide14.jpg" alt="Slide14.jpg">
 </div>
-<div class="title">Figure 55. Composition Structure</div>
+<div class="title">Figure 56. Composition Structure</div>
 </div>
 <div class="paragraph">
 <p>Only 'composition' relationships are present. We have shown some of them as lines even though you wouldn&#8217;t normally draw them. For example, the one from <span class="underline">c</span> to C. In practice we wouldn&#8217;t normally draw a diagram like this at all - the abstractions would be just referred to by name. But here we are trying to make a combined diagram of the meta-architecture and the specific architecture. The meta-architecture is the three layers, and the knowledge dependencies that go from the higher layers to the lower layers. The specific architecture consists of the diagrams inside the user stories in the top layer, the specific composition of instances.</p>
@@ -12228,7 +12257,7 @@ Avoid use of symbolic indirection without abstraction
 <div class="content">
 <img src="images/Tru%20Test%20XR5000%20Weigh%20Scale%20Indicator.jpg" alt="Tru Test XR5000 Weigh Scale Indicator.jpg" width="75%">
 </div>
-<div class="title">Figure 56. Livestock weighing indicator</div>
+<div class="title">Figure 57. Livestock weighing indicator</div>
 </div>
 <div class="paragraph">
 <p>The architecture in the original software, was somewhat typically organised into modules and patterns by its developers. Also somewhat typically, it had ended up with a high cost of modifiability - a big ball of mud. After the first release, the first incremental requirement was a 'Treatments' feature, which involved several new tables, new columns in existing tables, new data pages, new settings pages and some new business logic. This feature took a further 3 months to complete (actually 6 calendar months), which seemed out of proportion for the size of the feature. Somehow the Product Owner and managers seemed to have a sort of intuition that if similar things had been done before, such as menus or database tables, those things were already done, and the only new work was in the specific details of the new requirements. Those requirements could be communicated in a relatively short time, say of the order of one hour or one day if you include follow up discussions of abnormal scenarios.  So 6 months did not go down well. ALA, of course, works in exactly this intuitive way that managers hope for. All the things already done are sitting there in the domain abstractions, waiting to be reused, configured and composed into new requirements.</p>
@@ -12260,7 +12289,7 @@ Avoid use of symbolic indirection without abstraction
 <div class="content">
 <a class="image" href="images/All%20Animals%20Screen%20V3.png"><img src="images/All%20Animals%20Screen%20V3.png" alt="All Animals Screen V3.png"></a>
 </div>
-<div class="title">Figure 57. Application diagram for the All Animals View feature</div>
+<div class="title">Figure 58. Application diagram for the All Animals View feature</div>
 </div>
 <div class="paragraph">
 <p>As I did the diagram, I deliberately left out anything to do with the aforementioned Treatments feature, so that I could see how easy it might have been to implement once the domain abstractions for the rest of the requirements had matured. So after the diagram was completed, I added the Treatments feature. This involved adding tables, columns to existing tables, a settings screen, a data screen, and some behaviours.  No further abstractions needed to be invented. The incremental time for the diagram additions was of the order of one hour. Obviously testing would be needed on top of that, and the 'Table' abstraction would need additional work so it could migrate itself, a function it had not needed up until this point. Although somewhat theoretical, the evidence was that we could get at least an order of magnitude improvement in incremental maintenance effort.</p>
@@ -12322,7 +12351,7 @@ Avoid use of symbolic indirection without abstraction
 <div class="content">
 <img src="images/XR5000ScreenShot.jpg" alt="XR5000ScreenShot.jpg" width="75%">
 </div>
-<div class="title">Figure 58. All Animals view in the weighing indicator</div>
+<div class="title">Figure 59. All Animals view in the weighing indicator</div>
 </div>
 <div class="paragraph">
 <p>The student&#8217;s job was to write 12 abstractions out of the 50. These 12 were the ones used by that feature. The initial brief was to make the new code work alongside the old code (as would be needed for an incremental legacy rewrite), but the old code was consuming too much time to integrate with, so this part was abandoned.</p>
@@ -12370,7 +12399,7 @@ Avoid use of symbolic indirection without abstraction
 <div class="content">
 <img src="images/diagram-24.png" alt="diagram 24">
 </div>
-<div class="title">Figure 59. Syntax Diagram showing implementation of statement using recursion</div>
+<div class="title">Figure 60. Syntax Diagram showing implementation of statement using recursion</div>
 </div>
 <div class="paragraph">
 <p>In ALA, we want to preserve the idea of clear layers defining what knowledge is needed to understand what. Resolving this dilemma could get a bit philosophical. Since abstractions are the first class artefacts of the human brain, it may be best to think about how the brain does it. The brain must actually have two abstractions with the same name but at different levels. The first is analogous to a 'forward declaration' in a language to allow a compiler to know about something that will be referred to in a more abstract way before it finds out about it in a more specific way.</p>
@@ -12511,7 +12540,7 @@ Once the code for the single user story is understood, some acceptance tests are
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-03-29 16:24:44 01300
+Last updated 2022-03-30 16:07:06 01300
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/Docco.min.css">

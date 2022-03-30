@@ -29,7 +29,7 @@ using ProgrammingParadigms;
 
 namespace DomainAbstractions
 {
-    /// <summary> <5>
+    /// <summary> <6>
     /// ALA Domain abstraction. 
     /// Has one DataFlow input port and one DataFlow output port, both type double.
     /// Smooths the incoming data and outputs it at a lower frequency.
@@ -76,22 +76,22 @@ The abstraction has two ports:
 <1> Input port, the implemented interface
 
 <2> output port, simple private field of type interface
-
-The input port is the IDataFlow<double> interface that is implemented by the class. Dataflow is a programming paradigm which is a steam of data without end. Incoming data arrives via the Push method in this interface. We never know where the data comes from. The output port is the private field named "output". This field will be set pointing at an IDataFlow<double> input of an instance of another abstraction somewhere. We will never know where the data goes to. How the _output_ field gets set is described later.
-
++
+The input port is the IDataFlow<double> interface that is implemented by the class. Dataflow is a programming paradigm which is a stream of data without end. Incoming data arrives via the Push method in this interface. We never know where the data comes from. The output port is the private field named "output". This field will be set pointing at an IDataFlow<double> input of an instance of another abstraction somewhere. We never know where the data goes to. How the _output_ field gets set is described later.
++
 Because the abstraction uses ports, it has no knowledge of other peer abstractions. If it did, it would not be an abstraction. It is self-understandable at design-time, except for the even more abstract concepts on which it depends. In this case that is DataFlow and the concept of Wiring, which will wire instances of this abstraction to instances of other abstractions with compatible ports. These are described more fully shortly.
 
-<3> The public interface is only used by the layer. It is only for creating and configuring instances of the abstraction. The abstraction has two configurations parameters. One is optional. Optional configurations can also be implemented with setters.
+<3> The public interface is only used by the layer above. It is only for creating and configuring instances of the abstraction. The abstraction has two configurations parameters. One is optional. Optional configurations can also be implemented with setters.
 
 <4> The abstraction keeps some internal state. This goes somewhat contrary to functional programming where we want all state to be passed in. In ALA a good abstraction trumps being stateless. As an abstraction that is naturally stateful, a filter should hide its state internally.  
 
 <5> The implementation of the input interface does the work of the filter. Note that port interfaces are always implemented explicitly. (If implemented implicitly, they would be part of the public API of the class, which we don't wan't. We only want the port accessed via the interface.)
-
++
 Internally, abstractions are cohesive (which means sticking together) or highly interconnected code collaborating for a single purpose.
-
++
 In ALA, abstractions are implemented as files. The name of the file is the name of the abstraction. The code that implements an abstraction needs no internal organisation. We do not care about dependencies or any inter-relationships inside an abstraction. In fact the more cohesive everything is the better, as long as it is small. It will often be implemented as a single class or function, but may consist of a small number of items such as classes, functions, interfaces, enums, delegates, etc, as long as the total is small.
 
-<5> When an abstraction is created, it is critically important to add comments that make it learnable by explaining the concept it provides, its ports, its configurations and an example of its use. In Visual Studio, I copy these comments before the constructor because that allows them to pop up in the IDE when hovering on the constructor name where instances are created with a new keyword.
+<6> When an abstraction is created, it is critically important to add comments that make it learnable by explaining the concept it provides, its ports, its configurations and an example of its use. In Visual Studio, I copy these comments before the constructor because that allows them to pop up in the IDE when hovering on the constructor name where instances are created with a _new_ keyword.
 
 Abstractions are the only mechanism that provides design-time _information hiding_. When David Parnas coined the term _information hiding_ he meant at _design-time_. Unfortunately there is a popular meme that _information hiding_ means _encapsulation_. The same idea of design-time information hiding has other names such as Alistair Cockburn's _protected variations_, and Robert Martin's version of the OCP (open closed principle). 
 
@@ -245,12 +245,12 @@ namespace Application
             private ADCSimulator adc;
 
             adc = new ADCSimulator(channel: 2, period: 1000) { simulatedLevel = 400 }; <1>
-            adc.WireIn(new LowPassFilter(strength: 10)) <2> <5>
+            adc.WireIn(new LowPassFilter(strength: 10)) <2> <5> <6>
                 .WireIn(new OffsetAndScale(offset: -200, scale: 0.2)) <3>
                 .WireIn(new DisplayNumeric<double>(label: "Temperature") { units = "C"} ); <4>
 
             Console.WriteLine("Running application");
-            adc.Run(); <6>
+            adc.Run(); <7>
 
             Console.WriteLine("press any key to stop");
             Console.ReadKey();
@@ -269,11 +269,11 @@ To understand the code, you need to have knowledge of the abstraction concepts o
 
 <4> DisplayNumeric - domain abstraction - has one input port of type IDataFlow<double>. Displays the value on the console with label and optional units.
 
-* Dataflow - programming paradigm - used by the ports of the domain abstractions and allows their instances to push data from one to the next at runtime if they are wired together. For dataflow programming, we default to pushing data through the system (from ADC to display). We use pulling when there is good reason, usually for  performance.
-
 <5> WireIn - foundation abstraction - wires compatible ports of instances of abstractions by setting the private field in the first object that matches the interface implemented by the second object.
 
-<6> The adc, which is the source of the data that gets pushed through the system, needs to be told to start running (at the configured period).
+<6> These wirings are using the Dataflow programming paradigm. Dataflow is used by the ports of the domain abstractions and allows their instances to push data from one to the next at runtime if they are wired together. For dataflow programming, we default to pushing data through the system (from ADC to display). We use pulling when there is good reason, usually for  performance.
+
+<7> The adc, which is the source of the data that gets pushed through the system, needs to be told to start running.
 
 Once you have knowledge of these abstractions, notice that the application code is readabable by itself. It holds all knowledge about thermometers. 
 That knowledge sits at the abstraction level of the requirements. It is highly cohesive - every line works with every other line to make a thermometer. It does none of the work itself - it just assembles and configures the needed worker objects.
@@ -336,14 +336,16 @@ Notes on the code:
 <1> Important to comment what the abstraction concept is.
 
 <2> The input port is the implemented interface.
++
+In the application code in the previous section, an instance of LowPassFilter was wired to an instance of OffsetAndScale. When wired, the _output_ field of the LowPassFilter is set to the OffsetAndScale object, cast as the appropriate interface, in this case IDataFlow<double>.
 
 <3> The output port _output_ is private so that it does not appear as a configuration to the layer above. It is set by WireIn or WireTo using reflection.
+
 
 <4> It has two compulsory configuration parameters.
 
 <5> When data is pushed into the input, it is transformed and pushed out of the output port.
 
-* In the application code in the previous section, an instance of LowPassFilter was wired to an instance of OffsetAndScale. When wired, the _output_ field is set to the OffsetAndScale object, cast as the appropriate interface, in this case IDataFlow<double>.
 
 
 For completeness, here are the other two domain abstractions that we used in the Thermometer application example:
@@ -741,8 +743,8 @@ namespace Features
                 .WireIn(new LowPassFilter(strength: 10, initialState: adcLevel))
                 .WireIn(new OffsetAndScale(offset: -200, scale: 0.2)) // 200 adc counts is 0 C, 300 adc counts is 20 C
                 .WireIn(new DataFlowFanout<double>()) <3> 
-                .WireTo(new DisplayNumeric<double>(label: "Temperature") { units = "C"} ) <4>
-                .WireTo(new DataFlowExternalPort<double>((d) => output?.Push(d))); <5>
+                .WireTo(new DisplayNumeric<double>(label: "Temperature") { units = "C"} ) <5>
+                .WireTo(new DataFlowExternalPort<double>((d) => output?.Push(d))); <4>
         }
 
 
@@ -755,16 +757,16 @@ namespace Features
 ....
 
 <1> The feature has an output port for temperature
-
++
 The wiring itself is the same as it was in the Thermometer application except that three extra objects are used to make the dataflow wiring work. Their classes come from the Dataflow programming paradigm abstraction. These classes are:
 
 <2> ChangeType: allows Dataflow ports of one type to be wired to Dataflow ports of a different type. In this case, the output of ADCSimlator is _int_ and the input of LowPassFilter is _double_.
 
 <3> DataFlowFanout: A normal output port can only be wired once. DataFlowFanout allows you to wire to multiple places. In this case we wanted to wire the output of OffsetAndScale to both a DisplayNumeric and an external port.
 
-<5> DataFlowExternalPort. We want to wire the output of the DataFlowFanout to the external port _output_. You might think you could just write .WireTo(output). The reason this doesn't work is that when the Temperature constructor runs, the code on the outside is instantiating a Temperature. That same external code would not have wired our _output_ port yet. It's value will be null at this time. Therefore we instead wire to a simple class that takes a function as its configuration. For the function we pass in a lambda expression that will push the data via the _output_ port.
+<4> DataFlowExternalPort. We want to wire the output of the DataFlowFanout to the external port _output_. You might think you could just write .WireTo(output). The reason this doesn't work is that when the Temperature constructor runs, the code on the outside is instantiating a Temperature. That same external code would not have wired our _output_ port yet. It's value will be null at this time. Therefore we instead wire to a simple class that takes a function as its configuration. For the function we pass in a lambda expression that will push the data via the _output_ port.
 
-<4> Note that WireTo is used to wire DataFlowFanout to multiple places. WireIn wires things in a chain. 
+<5> Note that WireTo is used to wire DataFlowFanout to multiple places. WireIn wires things in a chain. 
 
 Here is the other feature used by our example application, the Loadcell.
 
@@ -918,7 +920,7 @@ namespace DomainAbstractions
 
 <2> One output port
 
-<3> For soring the last value received on each input. Nullables so that we know when we have had input.
+<3> For storing the last value received on each input. They are nullables so that we know when we have had input.
 
 <4> Implement the first input port
 
@@ -1175,7 +1177,7 @@ It should be about [green]#*inventing abstractions*#.
 ====
 
 
-=== Components based development
+=== cf Component based development
 
 In this perspective, we compare ALA with components, component based software engineering (component based development), components and connectors and service oriented architecture.
 
