@@ -335,165 +335,532 @@ The architect also has a role in helping the developer to design the interface's
 
 This aspect of ALA can also be difficult at times. I have sometimes got stuck for a day or so trying to figure out how the interfaces should work, while still keeping them more abstract than the domain abstractions. The ALA constraints are that these interfaces should work between any two domain abstractions for which it may be meaningful if they are composed together in an application. However, the problem has always been solvable, and once solved, it always seems to have a certain elegance, as if you have created a myriad of possibilities at once. Implementation of the interfaces by the relevant domain abstractions becomes easy. Development then proceeds surprisingly quickly.     
 
-
-=== Example Project - Coffee machine
-
-Robert Martin posed an interesting pedagogical sized embedded system problem about a coffee maker in his book “Agile Software Development: Principles, Patterns and Practices”. The original chapter is called “Heuristics and Coffee”.
-
-In the original chapter, the worked solution to this problem uses decomposition into three modules that collaborate or interact with one another. The ALA solution follows the opposite philosophy. It has three abstractions (which correspond with the three modules), but they do not collaborate or interact with one another. Being abstractions, they don't know anything about each other. As domain abstractions, they also know nothing about the coffee machine. The coffee machine is then constructed (as another abstraction in the top layer) that makes use of the three domain abstractions. 
-
-This example uses different execution models from the 'consistsof' and 'dataflow' ones that we used in previous examples. Here we will use some extremely simple, yet quite interesting electronic-signal-like execution models that have a simple main-loop polling type implementation, just as Robert Martin's original solution also had.
-
-Reading an ALA application requires first knowing the pre-requisite knowledge you need from lower layer abstractions. So before presenting the application, let's first familiarise ourselves with the abstractions we need from the domain layer, and the Programming Paradigms layer.
-
-==== Domain abstractions layer
-
-Here are the three domain abstractions:
-
-image::Coffee%20Maker%20Domain%20Components.vsd.jpg[Coffee Maker Domain Components.vsd.jpg, title="Coffee maker domain abstractions"]
-
-Take a moment to look at these three abstractions:
-
--- The UI has a lamp you can control, and a push button which outputs an event (should have been two separate abstractions).
-
--- There is a WarmerPlate. It tells you whether or not a container is on the warmer plate, and whether or not it is empty. It controls its own heater. 
-
--- There is a  Boiler. It can be turned on or off. It will tell you when it is empty of water. And you can stop water flow instantly with a steam release valve. It will turn its own heater off if it runs out of water, or the valve is opened. 
-
-That's all there is to know about the three domain abstractions.
-
-==== Programming Paradigms layer
-
-We have three programming paradigms
-
--- live dataflow (works like an electronic circuit)
-
--- events
-
--- simple state machine
-
-The API for the Programming Paradigms layer is described in the key on the right of the diagram below. It gives you all the knowledge from this layer to be able to read the diagram. So, for example, a solid line is a dataflow; the rounded box is state with the states enumerated inside it.
-
-The details of how to turn the diagram into code is explained in a project document, also provided in the Programming Paradigms layer.
+---
 
 
-==== Application layer
-
-Now that we have understood the knowledge dependencies in all lower layers, we can read the diagram that resides in the top layer, the application layer:
+=== Example project - Calculator
 
 
 
-image::Coffee%20Maker%20Dataflow%20diagram.vsd.jpg[CoffeeMaker Dataflow diagram, title="Coffee maker solution"]
+This project was originally done in a hurry for an ALA workshop. Apart from being a cool example of the use of ALA, the calculator itself is cool. This calculator is in Github, as a work in progress here: https://github.com/johnspray74/ReactiveCalculator[https://github.com/johnspray74/ReactiveCalculator]
 
-The diagram to the left is the application itself. Instances of the three domain abstractions, UI, Boiler and Warmer plate are shown as boxes.
+The original development for the workshop was done in about a day, so here we tell the story of that development. 
 
-Follow me now as we go through the user stories by looking at the lines on the diagram:
+When I was first asked to do the workshop, I needed to think of a suitable pedagogical sized project. It was suggested to do a calculator. Ok, I thought, if we have the domain abstractions already in place before the workshop, we should be able to write a calculator application (top layer) during the workshop. 
 
-* When the UI push button is pressed, we set the state to Brewing, provided the Boiler has water and the pot is on the Warmerplate. 
+When we think of a calculator application, we usually imagine a user interface that mimics a handheld calculator. It has a one line display and a keypad on the screen. We certainly could have built that calculator (primarily using a state machine programming paradigm). But that problem has already been solved by Miro Samek. Besides, I hate those simulated handheld calculators. I think they are a stupid way to do calculations on a computer. Such a calculator would be cumbersome.
 
-* When the state is brewing, it turns on the boiler, and coffee making starts.
+As an aside, I once loved HP calculators. The first programmable anything I ever owned was an HP65 calculator. I have owned many top end models at one time or another. But as their displays got larger, I became more and more disappointed with how they used that display real-estate. They just used it as a stack. 
 
-* If someone takes the pot off, the valve is opened to momentarily release pressure from the boiling water, which stops the water flow. 
+The calculator I wanted would show the expression you had entered so you can check it. It could show it in algebraic or even textbook form, even though you had entered it as RPN. You could re-edit the expression. You could label your expression result and then you could use the result in another expression. When you changed something, all results would be updated like in Excel. This is what the HP prime should have been.
 
-* When the boiler becomes empty, the state is set to Brewed. When the state is Brewed, the light in the UI is turned on.
+So I drew this sketch of what I wanted a calculator to be: 
 
-* When the coffee pot is replaced empty, the state goes back to the idle state where we began.
+image::CalculatorRequirements.png[Calculator3.png, 900, title="Calculator requirements"]
 
-That's all there is to reading this application. The code for the coffee machine can be read and understood in about one minute. Compare that with reading other solutions to the coffee machine problem.
 
-Note that the paragraph above is pretty much a restatement of the requirements in English. It could have been the requirements. The amount of information in the English form (or the diagram form) is about the same, thus the Domain Abstractions gave us the correct level of expressiveness. Further confirmation of this is if the level of expressiveness allows us to modify it.
+Here is a screenshot of the working calculator as it was two half-days later:
 
-For example, say a requirement was added that a coin device was to enable the machine to be used. The coin device is an abstraction that provides an output when a coin is given, and has a reset input. Looking at the diagram, and being able to reason about its operation so easily, you can see that the coin device's output would intercept the Pushbutton using another instance of an AND gate. And to reset the coin device, you could use the boiler empty output event.
+image::CalculatorScreenshot.png[CalculatorScreenshot.png, 900, title="Calculator screenshot"]
 
-==== Execution
 
-To make it actually execute, we apply the manual procedure documented in “Execution models.doc”. This document is in the Programming Paradigms layer. It will generate these 6 lines of code:
+The first step in the design of the calculator was to express the requirements (UI plus behaviours), inventing any needed abstractions to do so. Here is the actual first sketch I drew: 
 
-    if (userInterface.Button && warmerPlate.PotOnPlate && !boiler.Empty) { state = Brewing; } userInterface.Button = false;
-    boiler.OpenSteamReleaseValve = !warmerPlate.PotOnPlate;
-    boiler.On = state==Brewing;
-    if (boiler.Empty && !prevBoilerEmpty) { state = Brewed; } prevBoilerEmpty = boiler.Empty;
-    if (warmerPlate.PotEmpty && !prevPotEmpty) { state = Idle; } prevPotEmpty = warmerPlate.PotEmpty;
-    userInterface.LightOn = state==Brewed;
- 
+image::Calculator2Rows-HandDrawing.png[Calculator2Rows-HandDrawing.png, 900, title="Calculator (2 Rows only shown)"]
 
-There is a one-to-one correspondence between the lines in the diagram and the lines in the code. 
+As we shall see, this diagram is practically executable code. The calculator is practically done. We don't know if the invented domain abstractions will work yet, but let's go through how this calculator works anyway. 
 
-As you can see, the execution model is a simple one. The 6 lines of code are continually executed in a loop. This execution model is effective and appropriate for this small application.
 
-The 6 lines of code can be built into a complete program shown below:
 
+
+==== How the calculator works
+
+First notice how the entire calculator is there. Every detail for this  particular calculator is represented in the diagram. All those details cohesively describe the calculator. This is an important aspect of ALA designs. All the UI and all the dataflows to make a working calculator are in this one diagram. What is not here is the details we left to the domain abstractions. None of these abstractions is specific to a calculator. They can be used for all sorts of things. Even the Formula abstraction would be useful in any application where a calculation needs to be changed at run-time. For example an insurance application may need configurable calculations.
+
+The left side shows two instances of the abstraction, Horizontal. These arrange their children horizontally in the UI. To the left of those (not shown) is an instance of Vertical, which arranges the two Horizontals vertically. And to the left of that, also not shown, is an instance of MainWindow.   
+
+Each Horizontal has 3 instances of TextBox and one Text. The TextBoxs allow you to enter a string. The abstraction, Text, can only display a string. I see at this point, I hadn't put in the TextBox for the description. 
+
+
+We can ignore the use of labels for a moment and just enter a formula containing constants into the first row TextBox. Let's say we type in "2+1". The string "2+1" goes along the dataflow wire to the StringFormat instance on its port 0. The StringFormat is configured with the format string "({1}=>{0})". StringFormat uses this format string in the same way as an interpolated string in C#. The {0} is substituted with the string coming in on port 0. The {1} is substituted with the string coming in on port 1. Since we have no string on port 1, the output from the StringFormat will be "()=>2+1". This is simply a lambda expression with no parameters. This string is fed into the instance of Formula. Formula is an abstraction that knows how to evaluate a lambda expression. Actually it will accept just a formula string (such as "2+1") as well. We can ignore the other input of Formula for the moment. Formula will evaluate "()=>2+1" and produce the number 3 on its output. This output is a dataflow of type double. This number is fed to an instance of NumberToString, and from there it goes to the instance of Text that knows how to display a string.
+
+Now let's follow the use of labels in the calculator. Let's put the labels "a" and "b" into the TextBoxs for labels on the two rows. "a" and "b" are fed to the Concat instance. Concat's input port can have any number of string dataflows wired into it. In this diagram it has only two. What Concat does is concatenate all its inputs adding a separator. In this case the separator is configured to be a comma. The output of the Concat is "a,b". The concatenated list of labels is fed into port 1 of both StringFormat instances. 
+
+Now let's put the formula "a*3" into the 2nd row of the calculator. The output of the StringFormat for that row will be "(a,b)=>a*3". That lambda expression will be fed to the Formula instance, which will evaluate it, using the value on its first input port for the value of 'a'. The output will appear on the corresponding Text in the 2nd row.
+
+So that's all there is to understanding how the calculator works. At this point it takes a leap of faith that the abstractions can all be made to work, and that the two programming paradigms used, the UI layout and the dataflow, can be made to work. Not withstanding that, all the information required in the design of the calculator is captured.
+
+At this point I drew little drawings of all the invented abstractions. Actually I reused TextBox, Text, Vertical, Horizontal and FormatString from a previous project. And I had already made the UI and dataflow programming paradigm interfaces in previous projects, so I reused them as well.
+
+
+
+
+image::CalculatorDomainAbstractionsHandDrawings.png[CalculatorDomainAbstractionsHandDrawings.png, 300, title="Calculator Domain Abstractions"]
+
+I see I forgot to draw Concat. I had to write that one. Here is its template as it was in my Xmind templates diagram.
+
+image::CalculatorStringConcatTemplate.png[CalculatorStringConcatTemplate.png, 400, title="StringConcat template"]
+
+The two ports are both drawn on the right hand side unfortunately - a limitation of using Xmind as the drawing tool. Drawing the templates makes the abstractions clearer for their implementation.  
+
+==== Implementing the domain abstractions
+
+
+Abstractions are generally trivial to implement because they are zero coupled with anything. They are like tiny stand-alone programs. Here is the full code for StringConcat.
+
+.SringConcat.cs
+[source,C#]
 ....
- #ifndef _COFFEE_MAKER_H_
- #define _COFFEE_MAKER_H_
- // Coffee Maker domain abstraction
- #include "CoffeeMakerAPI.h"  // original hardware abstraction supplied by hardware engineers
- // Knowledge dependencies :
- // "PolledDataFlowProgrammingParadigm.doc" -- explains how to hand compile a dataflow diagram of this type to C code
- // Following are 3 Domain abstractions that the application has knowledge dependencies on
- 
- 
- 
- #include "UserInterface.h"
- #include "Boiler.h"
- #include "WarmerPlate.h"
- 
- 
- 
- class CoffeeMaker
- {
- private:
-    enum {Idle, Brewing, Brewed} state;
-    Boiler boiler;
-    UserInterface userInterface;
-    WarmerPlate warmerPlate;
-    bool prevBoilerEmpty, prevPotEmpty;
-    void _Poll();
- public:
-    CoffeeMaker()
-        : state(Idle), prevBoilerEmpty(boiler.Empty), prevPotEmpty(warmerPlate.PotEmpty)
-    {}
-    void Poll();
- };
- #endif //_COFFEE_MAKER_H_
-....
- 
-....
- // CoffeeMaker.c
- // This is not source code, it is code hand compiled from the CoffeeMaker application diagram
- #include "CoffeeMaker.h"
- 
- void CoffeeMaker::_Poll() <1>
- {
-    if (userInterface.Button && warmerPlate.PotOnPlate && !boiler.Empty) { state = Brewing; } userInterface.Button = false;
-    boiler.OpenSteamReleaseValve = !warmerPlate.PotOnPlate;
-    boiler.On = state==Brewing;
-    if (boiler.Empty && !prevBoilerEmpty) { state = Brewed; } prevBoilerEmpty = boiler.Empty;
-    if (warmerPlate.PotEmpty && !prevPotEmpty) { state = Idle; } prevPotEmpty = warmerPlate.PotEmpty;
-    userInterface.LightOn = state==Brewed;
- }
- 
- 
- 
- void CoffeeMaker::Poll()
- {
-    // get inputs processed
-    userInterface.Poll();
-    boiler.Poll();
-    warmerPlate.Poll();
-    // run application
-    _Poll();
-    // get outputs processed
-    userInterface.Poll();
-    boiler.Poll();
- }
+using ProgrammingParadigms;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace DomainAbstractions
+{
+    /// <summary>
+    /// Outputs the input strings concatenated together
+    /// Whenever an input strings changes, a new output is pushed.
+    /// ---------------------------------------------------------------------------------------------------------
+    /// Ports:
+    /// 1. List<IDataFlowB<string>> inputs: inputs (indefinite number of string inputs)
+    /// 2. IDataFlow<string> output: output
+    /// </summary>
+
+
+
+    public class StringConcat
+    {
+        // Properties ---------------------------------------------------------------
+        public string InstanceName { get; set; } = "Default";
+        public string Separator { private get; set; } = "";
+
+        // Ports ---------------------------------------------------------------
+        private List<IDataFlowB<string>> inputs;
+        private IDataFlow<string> output;
+
+
+        /// <summary>
+        /// Outputs a boolean value of true when all of its inputs are true. Null inputs are treated as false.
+        /// </summary>
+        public StringConcat() { }
+
+        // This function is called immediately after each time the inputs port is wired to something
+        private void inputsPostWiringInitialize()
+        { 
+            inputs.Last().DataChanged += () =>
+            {
+                var result = "";
+                bool first = true;
+                foreach (IDataFlowB<string> input in inputs)
+                {
+                    if (!first) result += Separator;
+                    first = false;
+                    result += input.Data;
+                }
+                output.Data = result;
+            };
+        }
+
+    }
+}
 ....
 
-<1>  The 6 lines of code appear in the "CoffeeMaker::_Poll()" function.
+
+The code in Concat is straightforward if you know C#, except for a few conventions which are to do with the use of ALA (which I was already proficient with):
+
+. We put a property "InstanceName" in every domain abstraction. It's not required, but the reason is because abstractions get reused. So you are likely to end up with multiple instances of an abstraction all over your application. If you name the instances, it makes debugging a lot easier because you can see it in the debugger and know which instance you are in.
+
+. All the IO for the abstraction is in a section called "Ports". Usually an abstraction would have some ports that are private fields of the type of an interface, and some that are an implemented interface. It just so happens that StringConcat has no implemented interface ports.
+
+. The two ports are private, and yet they get wired by the application code to other objects. This may seem a little bit magic. The reason they are private is to indicate they are not for use by anything else. The application will use a method called WireTo() to achieve the wiring. WireTo is an extension method on all objects. It uses reflection to find and assign to these "port" fields.
+
+. Notice that the "inputs" port uses IDataFlowB (not IDataflow). The B on IDataflowB indicates a tricky workaround for a limitation in the C# language. What we would have liked to do is implement IDatFlow. But we would have needed to implement IDataFlow multiple times. You can't do that in C# (although there is no reason why not in theory, and hopefully all languages will have this feature to support the concept of ports one day).
+
+. Notice that the method, inputsPostWiringInitialize, is private and apparently unused. When the WireTo operation wires a port "xyz" it looks for a private method called xyzPostWiringInitialze and invokes it immediately. This gives us the opportunity to set up handlers on any events that may be in the interface. In this case, the IDataFlowB interface has a DataChanged event (that tells us when there is new data on the inputs).    
+
+. It doesn't make sense to use a StringConcat without wiring its output to something. So the line "output.Data = result" will throw an exception if the application has not wired it. Often times, abstractions have ports that are optional to wire, in which case we would use "outputs?.Data = result"
 
 
-If you are using a diagram as we are in this solution, you always change the diagram first when the requirements change. It provides the expressiveness needed to see the application’s requirements represented in a clear, concise and coherent way. There the logic can be ‘reasoned’ with. It is not documentation, it is the source code representation of the requirements, and executable, both important aspects of ALA.
+For reference, here is the IDataFlow interface, which lives in the ProgrammingParadigms folder, and is used by most of the domain abstractions including the StringConcat abstraction:
 
-The next step is to implement the three abstractions. These are straightforward using the same execution model as was used for the application, so are not shown here.
 
-The resulting application passes all of Martin's original acceptance tests plus a number of additional tests of behaviour gleaned from his original text.
+.IDataFlow.cs
+[source,C#]
+....
+namespace ProgrammingParadigms
+{
+    public interface IDataFlow<T>
+    {
+        T Data { get; set; }
+    }
+}
+....
+
+As you can see, this interface is simple, but its importance in giving us a dataflow programming paradigm is huge. It allows objects to be wired together so that data can flow from object to object without the abstractions knowing anything about each other. Note that IDataflow uses a 'push' execution model. This means that the source always initiates the transfer of data on its output (by using 'set'). The IDataFlowB interface is a little more complicated, so we wont go into how it works just now. But it achieves exactly the same purpose of the dataflow programming paradigm, just in a different way that allows more than one input port of the same type. .
+
+
+The other domain abstraction I needed to write for the first time was Formula. Here is the template as used in Xmind: 
+
+
+image::CalculatorFormulaTemplate.png[CalculatorFormulaTemplate.png, 500, title="Formula template"]
+
+
+Once again, one of the input ports is shown on the right when we would prefer it to be on left.
+
+Formula can be configured with an optional C# lambda expression when it is instantiated by the application, for example:
+
+.Application.cs
+[source,C#]
+....
+new Formula() {Lambda = (x,y) => x+y; }
+....
+
+If used in this way, the formula is fixed at design-time. But its real power comes from the fact that it can take a formula as a string at run-time. Formula has an input dataflow port called "formula". 
+
+The Formula abstraction has to parse the formula string and then evaluate it. I used Roslyn to do this in a few lines of code. These lines of code took me a few hours to figure out however: 
+
+.Formula.cs
+[source,C#]
+....
+
+using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Scripting;
+using static System.Math;
+
+namespace DomainAbstractions
+{
+    using LambdaType = Func<double, double, double, double, double, double, double>;
+
+    public class Formula
+    {
+        public LambdaType Lambda { private get; set; }
+
+
+        // Other code omitted from here
+
+
+        private async void Compile(string formula)
+        {
+            var options = ScriptOptions.Default;
+            options = options.AddImports("System.Math");
+            try
+            {
+                Lambda = await CSharpScript.EvaluateAsync<LambdaType>(formula, options);
+            }
+            catch (CompilationErrorException e)
+            {
+                Lambda = null;
+            }
+        }
+    }
+}
+....
+
+As you can see, currently the Formula abstraction can only handle formulas that use a maximum of six parameters. The calculator application can use any number - it's just that any one formula is limited to using only six.
+
+The rest of the code in the Formula abstraction is mostly dealing with this requirement of exactly six parameters used by LambdaType. But that's all internal to the abstraction. An instance of the Formula abstraction can handle any number of operands from zero to many. The Formula abstraction is also tolerant of the string on the formula input port being either just a formula such as "2*(3+1)" (implying it's not using any operand inputs), or a proper lambda expression such as "(x,y,z)=>x*(y+z).
+
+Now that we have our needed domain abstractions, let's return to the application layer, and see if we can get this calculator running.
+
+
+==== Hand wiring the application code from the diagram
+
+First here is the startup code for a wired ALA application. It is very simple:
+
+
+
+.Application.cs
+[source,C#]
+....
+namespace Application
+{
+    public class Application
+    {
+        private MainWindow mainWindow;
+
+        [STAThread]
+        public static void Main()
+        {
+            Application app = new Application();
+            app.mainWindow.Run();
+        }
+
+        private Application()
+        {
+            // mainWindow = WireHelloWorld();
+            mainWindow = Calculator2RowHandWired();
+        }
+    }
+}
+....
+
+
+
+Here is an ALA Hello World application
+
+
+.Application.cs
+[source,C#]
+....
+private MainWindow WireHelloWorld()
+{
+    return new MainWindow().WireTo(new Text("Hello World"));
+}
+....
+
+Ok, now we are ready to hand wire the hand drawn calculator diagram shown above:
+
+
+.Application.cs
+[source,C#]
+....
+private MainWindow Calculator2RowHandWired()
+{
+    // To understand this code, you need the wiring diagram of the two row calculator
+
+    // First instantiate instances of abstractions we need to give names to. The rest can be anonymous.
+    StringConcat stringConcat = new StringConcat() { Separator = "," };
+    DataFlowConnector<string> stringConcatConnector = new DataFlowConnector<string>(); // Connectors are needed when there is fan-out or fan-in in the diagram
+    stringConcat.WireTo(stringConcatConnector, "output");
+    Formula[] formulas = { new Formula(), new Formula() }; // instantiate both the formulas up-front because we need to cross wire them
+
+
+    MainWindow mainWindow = new MainWindow("Calculator")
+        .WireTo(new Vertical()
+            .WireTo(WireRow(stringConcat, stringConcatConnector, formulas[0], formulas))
+            .WireTo(WireRow(stringConcat, stringConcatConnector, formulas[1], formulas))
+            );
+    return mainWindow;
+}
+
+
+private Horizontal WireRow(StringConcat stringConcat, DataFlowConnector<string> stringConcatConnector, Formula formula, Formula[] formulas)
+{
+    // To understand this code, you need the wiring diagram of the two row calculator
+
+    // first instantiate objects we need to give names to.  The rest can be anonymous.
+    Text result = new Text(); 
+
+    // Wire up a calculator row
+    Horizontal row = new Horizontal()
+        .WireTo(new TextBox()
+            .WireTo(new DataFlowConnector<string>()
+                .WireFrom(stringConcat, "inputs")
+            )
+        )
+        .WireTo(new TextBox()
+            .WireTo(new StringFormat<string>("({1})=>{0}")
+                .WireTo(stringConcatConnector, "inputs")
+                .WireTo(formula
+                    .WireTo(new DataFlowConnector<double>()
+                        .WireFrom(formulas[0], "operands")
+                        .WireFrom(formulas[1], "operands")
+                        .WireTo(new NumberToString()
+                            .WireTo(result)
+                        )
+                    )
+                )
+            )
+        )
+        .WireTo(result)
+        .WireTo(new TextBox());
+    return row;
+}
+....
+
+
+Commentary on this wiring code
+
+* The code is written in "fluent style". This is possible because the WireTo extension method returns its 'this' parameter, allowing you to use .WireTo() multiple times on an instance.
+
+* The parts of the diagram that have a tree structure can be wired by using more .WireTos immediately inside the brackets of another WireTo. This is what causes the indented code.
+
+* The previous two points allow much of the wiring to be done without having to think up names for the instances. The instances are anonymous just as they were on the diagram.
+
+* Where the diagram has cross wires that formed a cycle, we need to give instances names so that we can complete all the wiring to them.
+
+* Sometimes the WireTo method is given the port name of the first object. These are used when WireTo may get the wrong port if it were left to use the port types alone. (If an abstraction has multiple ports of the same type, WireTo doesn't know which port to use.)
+
+* Most abstractions have ports that can only be wired to one place, and ports that can only be wired from one place. (The UI abstractions are exceptions, for example, Horizontal can be wired to multiple children.) The hand drawn wiring diagram has several places where the wiring either 'fans out' from a port or 'fans in' to a port. Unfortunately C# does not support the concept of ports, so we improvise to make them work in normal C# code. The way this improvisation works for fan-in and fan-out is to use a connector.
+
+** For fan-out you wire the output port to a new Connector. Then you can wire the connector to multiple places.
+
+** For fan-in, the abstraction, instead of implementing the port, uses a list field of a type like IDataFlowB. The 'B" on the end means the flow of data is reversed from IDataFlow. Now to wire such an inputs port to an output port also requires a connector (a second use for connectors). When wiring an IDataFlowB, you wire from the input to the connector (the opposite way to the direction of dataflow unfortunately). 
+
+* As a convenience, you can use WireFrom. It reverses the two operands being wired compared to WireTo.
+
+
+Handwritten wiring code like the above can be managed for small applications. It is easy to get it wrong though. The code is not readable from the point of view of understanding the application. That's what the diagram is for. So every time you make a change to the requirements, you need to do it on the diagram first, then update the hand-generated code. You are still better off doing this than not using ALA. If not using ALA, the relationships of the cohesive, explicit ALA diagram still exist, but they become obscurred and distributed inside your modules.
+
+But we don't have to hand generate code. At the time of writing a hand written graphical IDE is under development. 
+
+Here is the calculator row part of the diagram, which was successfully used to auto-generate code:
+
+
+image::CalculatorRow-GALADE.png[CalculatorRow-GALADE.png, 800, title="CalculatorRow abstraction internal wiring"]
+
+Before we had that tool, we used Xmind to do diagrams from which we could generated code. This is the approach described in the next section. 
+
+
+
+==== Automatic code generation from the diagram
+
+Here is the diagram of the 2-row calculator as it was originally entered into Xmind. You can click on the image to get a bigger version.
+
+image::Calculator2Rows.png[Calculator2Rows.png, 1000, title="Calculator drawn in Xmind (two rows version)", link=images/Calculator2Rows.png]
+
+
+Xmind is not the perfect tool to do this, but it has one huge advantage - it lays itself out. This is so important that it's why we use it (until our new tool is ready). We will put up with the disadvantages, and the necessary conventions until then. Those conventions are documented in the wiki section of the project in Github here: https://github.com/johnspray74/ReactiveCalculator/wiki[https://github.com/johnspray74/ReactiveCalculator/wiki]
+
+Entering the hand-drawn version of the diagram is a simple matter of copying and pasting the Xmind templates for the abstractions to the right place in the diagram. This connects most of the needed wiring from port to port. Xmind supports tree structured diagrams, so any cross tree wiring was done by using the red lines, which are quick to put in with a shortcut key.
+
+The Xmind version of the diagram is pretty much identical to the hand drawn version. The colored boxes are instances of abstractions. All the other nodes attached around those colored boxes are the ports. The < and > signs in the ports are significant, and tell the automatic code generator which way to wire the instances. The asterisks are also significant, and tell the code generator that many wires can be wired to the one port.
+
+The diagram done, it's time to generate the code. A tool called XmindParser does this. It can be downloaded from the Github project main page. Here is the tool in use to generate a calculator from the diagram.
+
+image::CalculatorXmindParserTool.png[CalculatorXmindParserTool.png, 800, title="XmindParser tool in use"]
+
+The tool can put the generated code into your Application.cs file if you give it special markers like the one below.
+
+
+
+.Application.cs
+[source,C#]
+....
+private void Calculator2Rows()
+{
+    // BEGIN AUTO-GENERATED INSTANTIATIONS FOR Calculator2Rows.xmind
+    // END AUTO-GENERATED INSTANTIATIONS FOR Calculator2Rows.xmind
+
+    // BEGIN AUTO-GENERATED WIRING FOR Calculator2Rows.xmind
+    // END AUTO-GENERATED WIRING FOR Calculator2Rows.xmind
+}
+....
+
+The markers contain the name of the Xmind diagram they get code from. This allows several diagrams to be used for one application.
+
+I usually put the markers inside a function so that all the instantiated objects are private to the function.
+
+Here is the code again with three lines of generated code shown in each section.
+
+
+.Application.cs
+[source,C#]
+....
+private void Calculator2Rows()
+{
+    // BEGIN AUTO-GENERATED INSTANTIATIONS FOR Calculator2Rows.xmind
+    Formula Formula1 = new Formula() { InstanceName = "Formula1" };
+    Formula Formula2 = new Formula() { InstanceName = "Formula2" };
+    Horizontal id_24914ab245484fe1b70af8020ca2e831 = new Horizontal() { InstanceName = "Default" };
+    // END AUTO-GENERATED INSTANTIATIONS FOR Calculator2Rows.xmind
+
+    // BEGIN AUTO-GENERATED WIRING FOR Calculator2Rows.xmind
+    mainWindow.WireTo(id_b02d2caea938499b997b9bfcb80fb0e9, "iuiStructure");
+    id_b02d2caea938499b997b9bfcb80fb0e9.WireTo(id_24914ab245484fe1b70af8020ca2e831, "children"); 
+    Formula1.WireTo(dfc1, "result");
+    // END AUTO-GENERATED WIRING FOR Calculator2Rows.xmind
+
+}
+....
+
+
+Completing the diagram had taken another morning of work. But the calculator was now working and I was ready for the workshop.
+
+I made a diagram with six rows, but it was getting pretty large, and the duplication was pretty clumsy.
+
+
+==== Calculator with 10 rows
+
+The 6-row calculator is powerful compared to any normal calculator, but still wouldn't do jobs like the one shown here which has 11 rows:
+
+image::CalculatorNRowsScreenshot.png[CalculatorNRowsScreenshot.png, 800, title="Later version of the calculator to support an unlimited number of rows"]
+
+So it was time to do some maintenance, and solve that problem of the repetition in the diagram at the same time. During this maintenance, none of the existing abstractions changed. Their ports stayed the same. Their internals were improved a little in some cases but nothing significant. Formula was modified internally so that it could handle more than six operand inputs, although any one formula can still only use six of them.
+
+There were two major changes though. One was to put the repeated wiring for a calculator row inside its own abstraction. This abstraction is called "CalculatorRow". This abstraction is less abstract than the Domain abstractions it uses, but more abstract than the application, which will use it multiple times. Other version of the calculator alos reused it. So it goes into its own layer between the two. This new layer is called "Requirements Abstractions". We don't make new layers lightly, but we had had the experience in a larger project that the diagram got too large. We needed to factor out some of it as 'Feature level abstractions'. These abstractions needed a new layer between the Application layer and the Domain abstractions layer. So I was reasonably happy to make use of this new layer in the calculator to reduce a now quite large diagram.
+
+Here is the Xmind template for the CalculatorRow abstraction showing its ports:
+
+image::CalculatorRowTemplate.png[CalculatorRowTemplate.png, 800, title="CalculatorRow abstraction"]
+
+
+The implementation of CalculatorRow was done with a diagram using the new Graphical ALA tool which was shown earlier.
+
+
+When you implement an abstraction by an internal diagram, there needs to be some extra code to wire from the ports (shown in the template above) to the internal wiring. I found this code quite tricky the first time and it took me a while. But there is a pattern to it. The new tool will be able to automatically generate this code as well, but for now I did it by hand.
+
+I tested the completed CalculatorRow abstraction by making an application that uses it twice:
+
+
+image::Calculator2ARows.png[Calculator2ARows.png, 1000, title="Calculator drawn in Xmind using the new CalculatorRow requirements abstraction", link=images/Calculator2ARows.png]
+
+Because this test calculator has only two rows we can directly compare it with the 2-row calculator above and see how the two rows are now represented by two instances of this new CalculatorRow abstraction. However we are still not there to building a calculator with 10 rows. If we were to instantiate CalculatorRow 10 times, it would need 100 wirings in Xmind to connect all ten results to every CalculatorRow's operands input. Having thought the 36 wirings of the 6 row calculator was nuts, there was no way I was going to do 100 of them by hand.
+
+So the next step was to invent a domain abstraction called 'Multiple'.
+
+What 'Multiple' does is you instantiate it in your application and configure it with the number you want. In this case N:10. Multiple has a port called factory which uses a new interface called IFactory. Then what you do is add a small Factory class inside any abstraction that you want multiple instances of. In this case we want multiple instances of CalculatorRow, so I added a small class to that abstraction called CalculatorRowFactory. CalculatorRowFactory implements IFactory (which resides in the Programming Paradigms layer). Multiple can now create many instances of the abstraction that is wired to it. But these instances now have to be wired into the rest of the wiring in the application diagram as needed. To accomplish that, multiple is configured with two methods. These methods, which are part of the application, know how to wire the new instances into the rest of the wiring.
+
+Here is the Xmind template for Multiple:
+
+image::CalculatorMultipleTemplate.png[CalculatorMultipleTemplate.png, 500, title="CalculatorRow requirements abstraction"]
+
+Using the new Multiple abstraction, we can now build a 10-row calculator. Here is the new diagram: 
+
+image::Calculator10Rows.png[Calculator10Rows.png, 1000, title="Calculator drawn in Xmind using the new Multiple domain abstraction to create as many rows as we like", link=images/Calculator10Rows.png]
+
+You can see inside the instance of Multiple that it is configured to make 10 of whatever is attached to its factory port. The CalculatorRow abstraction is shown next to the CalculatorRowFactory so you can see what it makes. You can see inside Multiple the two methods that Multiple calls when it makes a new instance. These methods are used to wire the CalculatorRow into the rest of the application wiring.
+
+Getting to this point had taken another two Saturday mornings of work. It was mainly spent on thinking out the patterns for how the internal wiring inside CalculatorRow should get wired to CalculatorRows own border ports. Also in the initial attempt I had allowed temporal coupling to creep in between abstractions. It mattered whether the application wiring was done first. And if you let coupling creep in bugs will happen. The temporal coupling was resolved by making CalculatorRow not care whether or not the external wiring is done when it is instantiated.    
+
+==== Calculator with N rows
+
+Wouldn't it be cool if the calculator started with say 4 rows, and had a button for adding additional rows? You will notice that the Multiple abstraction template above has a port called addRow. It takes an IEvent. If it receives an event on that port at run-time, it will create another row and call the lambda wiring functions to get that row wired in.
+
+Here is the calculator with the button added to the UI. This is the calculator from which the screen shot shown above was taken.
+
+image::CalculatorNRows.png[CalculatorNRows.png, 800, title="Later version of the calculator to support an unlimited number of rows"]
+
+I wanted the Button to be at the bottom, so I added another instance of Vertical to act as the wiring point for new row to be attached to the UI. The output of the Button is another programming paradigm interface called an IEvent. 
+
+Here is the source code of IEvent:
+
+.IEvent.cs
+[source,C#]
+....
+namespace ProgrammingParadigms
+{
+    public interface IEvent
+    {
+        void Execute();
+    }
+}
+....
+
+Again, considering that this interface enables a whole programming paradigm, it is extremely simple and abstract, consisting of only a synchronous function call. It allows any objects that can produce events to be wired to any object that can receive an event. In the CalculatorNRows example, it allows a Button to be Wired to a Multiple. When the Button is pressed, Multiple creates a new row.  
+
+There is one major Programming Paradigm that we have not explained yet. It is the one that allows UI instances to be wired together. The meaning of wiring two UI objects together is that one contains the other. Here is the IUI interface that implements this programming paradigm.
+
+.IUI.cs
+[source,C#]
+....
+using System.Windows;
+
+namespace ProgrammingParadigms
+{
+    public interface IUI
+    {
+        UIElement GetWPFElement();
+    }
+}
+....
+
+The interface simply allows a containing UI instance to get the WPF (Windows Presentation Foundation) element from the contained UI instance it is wired to.
+
+Making Multiple able to add rows to the calculator at runtime took yet another Saturday morning. But it was worth it to solve the challenge of learning how to change the wiring at run-time. The wiring diagram now statically describes how it dynamically changes itself.
+
+That concludes the story of the development of the calculator using ALA. The full source code, and all the diagrams for every version along the way are in the Github project at
+https://github.com/johnspray74/ReactiveCalculator[https://github.com/johnspray74/ReactiveCalculator]
+
+

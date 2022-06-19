@@ -3,6 +3,11 @@
 
 == Chapter seven - The philosophy behind ALA
 
+In this chapter we go into some of the deeper whys behind ALA. We did this somewhat in chapter three, but here we get more philosophical. 
+
+This chapter needs a review pass - some of thinking is out of date.
+
+Once again each section of this chapter is a different perspective.
 
 === The human brain
 

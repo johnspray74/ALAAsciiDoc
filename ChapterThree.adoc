@@ -4,6 +4,7 @@
 
 In the previous chapter we described what the structure, the anatomy, of ALA looks like as if we were dissecting a dead body. We see where things are but we don't yet understand why they are there. In this chapter we explain why that structure works. Why does this way of organising code result in software that meets those non-functional requirements we listed in Chapter one?
 
+The organisation of this chapter (and all chapters) is to use different perspectives. We all have different prior knowledge on which we build new knowledge, so we will each have a different best way to understand things. Use the perspective that makes the most sense to you. Because of the use of perspectives, there will often be some repetition of ideas between the major sections. 
 
 
 === A thought experiment
@@ -24,23 +25,23 @@ Imagine you are reading the following function, abc123, and trying to understand
      ....
  }
 
-You don't know what xyz789 is. It may as well be called fubar (fubar stands for messed up beyond all recognition), so you follow the indirection, an inconvenience at the least because you are really just wanting to understand abc123. You have to mentally stack where you were in abc123, including everything you understand about it so far. 
+You don't know what abc123 nor xyz789 do. They may as well be called fubar (fubar stands for \******ed up beyond all recognition), so you follow the indirection, an inconvenience at the least because you are really just wanting to understand abc123. You have to mentally stack where you were in the code of abc123, including everything you understand about it so far. 
 
-You begin reading the code at xyz789. It only has about 20 lines but it is complicated. You need to use the code in abc123 to try to unravel what need xyz789 might be proiding to it. A comment mentions that it uses a CORDIC algorithm and gives a reference. But before following that indirection as well, you note that both abc123 and xyz789 have the following properties:
+You begin reading the code in xyz789. It only has about 20 lines but it is complicated. You need to use the code in abc123 to try to unravel what xyz789 might be providing to it. A comment mentions that it uses a CORDIC algorithm and gives a reference. But before following that indirection as well, you note that both abc123 and xyz789 have the following properties:
 
-* modules
-* apparently loosly coupled 
+* they are modules
+* apparently loosely coupled 
 * have a simple interface
-* encapsulated
+* use encapsulation of internals
 * use no external variables
 * have no side effects
 * hide information
 * probably separate two concerns
-* is small
-* follows coding guidelines
+* are small
+* follow coding guidelines
 * have comments
 
-Despite having all these great properties that we are all taught, still we are forced to read both functions to understand the code in either of them. They are effectively fully coupled - understanding any of the code involves understanding all of the code.  
+Despite having all these great properties, still we are forced to read both functions to understand the code in either of them. They are effectively fully coupled - understanding any of the code involves understanding all of the code.  
 
 Now we make a small change: 
 
@@ -57,20 +58,19 @@ Now we make a small change:
      // complicated code
  }
 
-Suddenly understandability is absolutely transformed. All we did was make the two functions abstrations.
+Suddenly understandability is absolutely transformed. All we did was make the two functions abstractions. Now we don't have to read the complicated code inside xyz123 at all. The code inside each of the two functions goes from highly mutually coupled to zero coupled. 
 
-All those other attributes that we listed above seemingly made no difference. The quality attribute that really mattered was abstraction. The others are still good to have, but they are insufficient. The abstraction property is the only one that our brains are designed for. The quality of abstraction is subjective. Software engineers must invent good quality abstractions. No compiler or tool can yet check that quality, although, as Robert Martin points out, the number of reuses of an abstraction can be used as a indicator.
+All those other attributes that we listed above seemingly made no difference. The quality attribute that really mattered was abstraction. The others are still good to have, but they are completely insufficient. The abstraction property is _the_ one that our brains have evolved to use.
 
+The quality of abstraction is subjective. Software engineers must invent good quality abstractions. No compiler or tool can yet check that quality.
 
-The code inside each of the two functions goes from fully coupled to zero coupled. 
-
-* In the downward direction, coupling goes to zero because the standard deviation function need only know the concept of the squareroot abstraction, not the code inside the squareroot abstraction.
+* In the downward direction, coupling goes to zero because the standard deviation function need only know the concept of the squareroot abstraction.
 
 * In the upward direction, coupling goes to zero because squareroot is more abstract and therefore can't know anything about the more specific Standard deviation abstraction that happens to use it. 
 
 There are other benefits too:
 
-* Abstraction and stability go hand in hand. The Sqrt abstraction is as stable as the concept of squareroot. That's a concept that's been stable for thosands of years. All dependencies in an ALA program go in the direction of the more stable.  
+* Abstraction and stability go hand in hand. The Sqrt abstraction is as stable as the concept of squareroot. That's a concept that's been stable for thousands of years. All dependencies in an ALA program go in the direction of the more stable.  
 
 * Abstraction and reuse go hand in hand (as pointed out by Krueger). The more abstract an abstraction is the more reusable. Code reuse in ALA programs increases markedly.  
 
@@ -78,42 +78,41 @@ The complicated code inside SQRT no longer matters. It is completely isolated by
 
 
 
-With this new understanding, we will now define the word dependency to be compile-time relationships, and coupling to be the design-time or understanding-time relationships. One is what the compiler sees, the other is what our brain sees. 
+With this new understanding, we will now define the word dependency to be compile-time relationships, and coupling to be the design-time. One is what the compiler sees, the other is what our brain sees. 
 
-Using these definitions, you can have coupling without dependencies (sometimes called implicit coupling). The reverse is also true - it is possible to have dependencies without coupling. ALA makes use of this by simply making a constraint all dependencies must be on abstractions. When you do that, every artefact (abstraction) in the program is zero-coupled with every other. 
+Using these definitions, you can have coupling without dependencies (sometimes called implicit coupling). The reverse is also true - it is possible to have dependencies without coupling. ALA makes use of this by simply making a constraint that all dependencies must be on abstractions. When you do that, every artefact (abstraction) in the program is zero-coupled with every other. 
 
-Doing this isn't always easy because unfortunately there are many established architectural methods, patterns and styles that break this constraint. On the other hand, applying this constrain emerges some patterns that we will immediately recognise. DSLs and dependency injection are two examples. We will also emerge some less well known ones that are none-the-less not novel. There already exists an "abstract interactions" pattern, for example.
+Doing this isn't always easy because unfortunately there are many established architectural methods, patterns and styles that break this constraint. On the other hand, applying this constrain emerges some patterns that we will immediately recognise. DSLs and dependency injection are two examples. We will also emerge some less well known ones that are none-the-less not novel. There already exists an "abstract interactions" pattern, for example, which uses interfaces that are more abstract than the modules using it.
 
 
 There are two situations that commonly cause coupling in conventional code:
 
-. In the above example, if xyz789 is just a source or destination for messages, then abc123 cannot be an abstraction because it cannot be reused without dragging xyz789 with it. abc123, as an abstraction, doesn't care where the data comes from or goes to. To fix this, xyz789 must be passed into abc123 by something else above both of them. This can be passing in a function, passing in an object (dependency injection), or other mechanism such as the WireTo operator that we will use a lot in our ALA example projects.
+. In the above example, imagine that def456 is just a source or destination for messages (in the same abstraction layer as abc123) such as a display. Then abc123 cannot be an abstraction because it cannot be reused without dragging def456 with it. If abc123 is an abstraction, it cannot know (or care) where the data comes from or goes to. To fix this, def456 must be passed into abc123 by something else above both of them. In other words, they must be composed. This can be passing in a function, passing in an object (dependency injection), or other mechanism such as function composition, monad composition, or the WireTo operator that we will use a lot in our ALA example projects.
 +
-A benefit over and above the zero coupling is that the dataflow relationship between abc123 and xyz789 used to be hidden inside abc123. In ALA that relationship has to be an explicit line of code (inside another abstraction above) that wires together two instances. There, it will be cohesive with other similar relationships that work together in a collaborative way to make the application. 
+In conventional code, if abc123 calls directly def456, then the connection relationship between abc123 and def456 is hidden inside abc123. In ALA that relationship has to be an explicit line of code (inside another abstraction) in the layer above that composes the two instances. There, it will be cohesive with other similar relationships that work together in a collaborative way to make the application. 
 +
 Often these collected together wirings form a graph, making diagrams rather than code an even better way to describe the application.
 
-. If xyz789 provides a part of the implementation of abc123 such that it is specific to abc123, then xyz789 is more specific than abc123. Sometimes such a function or class is called a helper or submodule. This is because abc123 could be reused many times, whereas xyz789 could only ever be used once (only by abc123). xyz789 needs to be more abstract than abc123 or it will be coupled to it.
+. In conventional code, if xyz789 provides a part of the implementation of abc123, it will be more specific than abc123. Sometimes such a function or class is called a helper or submodule because xyz789 could only ever be used by abc123. In ALA xyz789 needs to be significantly more abstract than abc123 or it will be highly coupled to it. If xyz789 is put inside abc123 the complexity inside abc123 is still that of both of abc123 and xyz789 together.
 +
-This is contrary to what we are taught. We are taught to "divide and conquer" or to separate out the responsibilities in abc123. If we do this arbitrarily, we will end up with specific pieces (such as UI and business logic) which are highly coupled with each other, and with the specific application. We need to work hard to separate only by finding abstractions - potentially reusable artefacts. Then we configure instances of those abstractions for each specific use by passing the application specific details into them.  
+This is contrary to what we are taught. We are taught to "divide and conquer" or to separate out the responsibilities. If we do this arbitrarily, we will end up with specific pieces (such as UI and business logic) which are highly coupled with each other, and with the specific application. We need to work hard to separate only by finding abstractions - potentially reusable artefacts. Then we configure instances of those abstractions for each specific use by passing the application specific details into them.  
 
-In summary, ALA's starting premise is a constraint. The constraint is that you can only use one type of dependency - a dependency on an abstraction that is more abstract. This results in zero coupling throughout the abstractions of the entire program. 
-
-The rest of this chapter expands on the points we mentioned briefly in this first section. 
+In summary, ALA's starting premise is a constraint. The constraint is that you can only use one type of dependency - a dependency on an abstraction that is significantly more abstract than the one using it. This results in zero coupling throughout the abstractions of the entire program. 
 
 
+=== Abstractions
 
-
-=== Abstraction as design-time encapsulation
+==== Design-time encapsulation
 
 [IMPORTANT]
 ====
 [green]#*Abstractions*# are the human brain's version of [green]#*encapsulation*#.
 ====
 
-The maintainability quality attribute is often thought of in terms of ripple effects of change. I don't think that is quite the right way to look at it. I have often had to make changes across a number of modules in poorly written code. The changes themselves just don't take that long. The problem I see is the time you have to spend understanding enough of the system to know where to make a change, even if it is one line of code. To make that small change with confidence that it wont break anything can take a long ime. The problem is coupling. Even if the change is one line of code (which it often is), you may have had to understand a lot of code to figure that out. You have to understand all the code that is potentially coupled to that one line of code, which is essentially the complexity.
+The maintainability quality attribute is often thought of in terms of ripple effects of change. I don't think that is quite the right way to look at it. I have often had to make changes across a number of modules in poorly written code. The changes themselves just don't take that long. The problem I see is the time you have to spend understanding enough of the system to know where to make a change, even if it ends up being just one line of code in one place. To make that small change with confidence that it wont break anything can take a long time understanding the collaboration between modules. You may have had to understand a lot of code to figure that out. You have to understand all the code that is potentially coupled to that one line of code, which is essentially the complexity.
 
-Unlike modules or encapsulation, abstractions contain and hide complexity at design-time. They give boundaries to how far you have to read code to understand it.
+Unlike encapsulation which works at compile-time, abstractions hide complexity at design-time. They give boundaries to how far you have to read code to understand it.
+
 
 
 ==== Abstractions and Instances
@@ -123,36 +122,36 @@ Unlike modules or encapsulation, abstractions contain and hide complexity at des
 [green]#*Software architecture*# should contain [green]#*two concepts*# for its [green]#*elements*#  equivalent to [green]#*abstractions*# and [green]#*instances*#.
 ====
 
-ALA makes abstraction and instances fundamental. 
+If you are going to have abstraction, it makes sense that you would have instances. 
+An instance is nothing more than the use of an abstraction by referring to its name. If your abstraction is a pure function, then an instance is just using the function, or getting a reference to it.
 
-Abstractions are separate, zero coupled, design-time elements. Abstractions, therefore, cannot exchange data themselves. The concept of instances must be added. An instances is nothing more than the use of an abstraction by referring to its name. 
+If your abstraction is a class, and if that class contains data, then you need to instantiate the class so that each instance has its own data. Object oriented languages of course already have these two concepts as classes and objects. 
 
-Object oriented programming has these two concepts as classes and objects. Functional programming has the two concepts in terms of the function definition and the function invocation. But many discussions on software architecture seem to combine them into one term, such as modules, components or layers. They may implicitly contain the separate concepts, as components may, but not having them explicit will inevitably lead to confusion. 
+Many discussions on software architecture seem to combine them into one term, such as modules or components. These terms may implicitly contain the separate concepts of abstractions and instances, or they may be intended to only one instance. Not having explicit terms, like class and object, will inevitably lead to confusion. In ALA the terms we use are abstractions and instances.
 
-The problem is that when we become vague about the difference, we will create dependencies between the abstractions, such as to get or put data, that should just be using two instances in a line of code somewhere. Adding dependencies between abstractions destroy them as abstractions. Composing two Instances of abstractions does not. If we don't have two separate and clear terms for abstractions and instances, we will end up with no abstractions.
+The problem is that when we become vague about the difference between abstraction and instance, we will then create dependencies between abstractions, such as to get or put data. If you create dependencies between peer abstractions, they are no longer abstractions. Instead you need to wire the instances. If we don't have two separate and clear terms for abstractions and instances, we will end up with no abstractions. Many architectural styles appear to have this problem.
 
-Nearly all architectural styles have this problem. For example, in layering, we put 'modules' into layers and then create unnecessary dependencies to move data between them. No, put abstractions into one layer. Then compose instances of them inside a new abstraction in the layer above.  
-
-Another common example of the problem is the UML, which already has the separate concepts of objects and classes. But we tend to ignore objects and create associations between classes instead. The most important idea that OOP brought us was the idea of classes and objects. It has been ruined by the UML class diagram. Instead of associations between classes, instantiate objects and wire them together. Do that completely inside another class in the layer above. 
+A common example of the problem is the UML, which already has the separate concepts of classes and objects. The UML class diagram encourages us to create associations between classes, destroying them as abstractions. The most important potential idea that OOP brought us was the idea of classes as reusable abstractions, and objects as their instances. It never happened in part because of the UML class diagram, and the very harmful habit of putting dependencies between abstractions instead of wiring instances. 
 
 ****
-The quality of an abstraction's _concept_ or _idea_ is important. It is the existence of the concept that allows the brain to learn it and not have to know how it's implemented each time it comes across it. It is the stability of the idea of the abstraction that blocks coupling. ALA requires effort to conceive good abstractions, especially for the first application in a new domain.
+The quality of an abstraction's _concept_ or _idea_ is important. It is the existence of the concept that allows the brain to learn it and not have to know how it's implemented each time it comes across it. It is the concept of the abstraction that blocks coupling. ALA sometimes requires effort over several days to conceive good abstractions, especially for the first application in a new domain.
 ****
+
 
 
 === Zero coupling and higher cohesion
 
-ALA has zero coupling between the code inside (or the code that implements) all abstractions. This is the case both horizontally between peers in the same layer, and vertically up or down the layers. 
+==== Zero coupling
 
-In software design we are only interested in design-time coupling. This means that to understand one piece of code, how much do we need to understand other pieces of code? This is the coupling that matters. We will use the word coupling to refer to design-time coupling. 
+ALA has mutual zero coupling between the code inside (or the code that implements) all abstractions. This is the case both horizontally between peers in the same layer, and vertically up or down the layers. 
+
+In software design we are only interested in design-time coupling. This means that to understand one piece of code, how much do we need to understand other pieces of code? This is the coupling that matters. We will use the word coupling to refer to design-time coupling. A lot of esign-time coupling is what I call _collaboration coupling_. Interfaces may hide some details, but they don't stop collaboration. When modules have a fixed arrangement with each other, they are highly likely to be collaborating, and this collaboration will tend to increase during maintenance.  
 
 
 ****
-Wikipedia defines coupling as "the degree of interdependence between software modules". It doesn't really distinguish between design-time, compile-time or run-time coupling, and the given formula for coupling seems to reflect compile-time. We prefer to think of coupling as a design-time property. The use of abstractions instead of modules changes the way we should think about coupling. 
+Wikipedia defines coupling as "the degree of interdependence between software modules". It doesn't really distinguish between design-time, compile-time or run-time coupling, and the given formula for coupling seems to reflect compile-time. I prefer to think of coupling as a design-time property. The use of abstractions instead of modules changes the way we should think about coupling. 
 
-Consider the principle of compositionality. As stated in Wikipedia, "In semantics, mathematical logic and related disciplines, the principle of compositionality is the principle that the meaning of a complex expression is determined by the meanings of its constituent expressions and the rules used to combine them."
-
-In ALA we use abstractions as the 'constituent expressions', and we have the objective that all code conforms to the principle of compositionality. We then define coupling as anything that compromises this principle.
+Consider the principle of compositionality. As stated in Wikipedia, "In semantics, mathematical logic and related disciplines, the principle of compositionality is the principle that the meaning of a complex expression is determined by the meanings of its constituent expressions and the rules used to combine them." In ALA we use domain abstractions as the 'constituent expressions', and programming paradigms as the 'rules used to combine them'. We have the objective that all code conforms to the principle of compositionality. We can then define coupling as anything that compromises this principle.
 ****
 
 [TIP]
@@ -160,11 +159,11 @@ In ALA we use abstractions as the 'constituent expressions', and we have the obj
 [green]#*To understand any one part of the code should involve understanding only that one part of the code, and the abstractions it uses.*#
 ====
 
-Unfortunately there is a meme in the software engineering industry that there must be some coupling between 'modules'. The argument goes that if the system is to do anything it must have some coupling between its parts in order to do anything. We therefore hear of "loose coupling" as being the ideal. Using the definition of coupling given above, this is completely incorrect. Because of this meme, in conventional code  we are settling for design-time coupling to achieve connections between different parts of a system. This is not necessary. Part of the problem is that the same word is being used for both design-time coupling and _connections_ or _wiring_. 
+Unfortunately there is a meme in the software engineering industry that there must be some coupling between 'modules'. The argument goes that if the system is to do anything it must have some coupling between its parts. We therefore hear of "loose coupling" as being the ideal. Using the definition of coupling given above, this is completely incorrect. Because of this meme, in conventional code we have developed a habit of using dependencies to implement communications. We settling for design-time coupling to achieve communication connections between different parts of a system. This is not necessary. Part of the problem is that the same word, _coupling_, is being used for both design-time coupling and _connections_ or _wiring_ used for communications. 
 
-In our A & B example above, the code inside B knows nothing of A. The code inside A, while it knows about the concept of the abstraction B, knows nothing about the code that is inside B (or implements B). So we already know how to do zero-coupling. ALA is basically a constraint to always have zero coupling.
+In our A & B example above, the code inside B knows nothing of A. The code inside A, while it knows about the concept of the abstraction B, knows nothing about the code that is inside B. So it's not like we don't know how to do zero-coupling. ALA is basically a constraint to force us to _always_ do zero coupling.
 
-For example, in conventional code, if function Switch calls function Light, the code inside Switch is coupled with Light. If the light's abstraction level is about the same as that of the Switch, then the abstraction of Switch is destroyed. When you use it you have to know the internal code brings in a Light. To understand the _system_ (a Switch connected to a light), you have to go inside the Switch:
+For example, in conventional code, if function Switch calls function Light, the code inside Switch is coupled with Light. If the light's abstraction level is about the same as that of the Switch, then the abstraction of Switch is destroyed. When you reuse it you have to know the internal code brings in a Light. To understand the _system_ (a Switch connected to a light), you have to go inside the Switch:
 
 
 [plantuml,file="switch-light-bad.png"]
@@ -221,55 +220,196 @@ A similar argument applies if Switch and Light are classes. In conventional code
 
 ALA _never_ uses coupling for connections or wiring between parts of a system. A larger system typically consists of many  connections. These connection are typically cohesive, and belong in one place. In conventional code they tend to be distributed and buried inside the modules. A smell is that you are doing 'all files' searches to unravel them   
 
+
+==== Cohesion
+
+
 [TIP]
 ====
 "[red]#*Collaboration*# becomes [green]#*cohesion*#".
 ====
 
-In ALA, collaboration between modules becomes cohesion. A call from one module to another becomes two cohesive calls in adjacent lines of code. A method call on a peer's classes interface is first transformed to two abstract interface ports. Then a line of creates the two parts and wires them. This line is cohesive with other such wirings needed for that requirement.  
+In ALA, collaboration between modules becomes cohesion inside a new abstraction. A call from one module to another becomes a line of code. Calloboration between a group of modules for a single purpose, such as a user story, becomes several cohesive lines of code.
 
-Cohesion also increases in a different way. An abstraction is closely aligned with the single responsibility principle. We can think of abstration as a single concept principle. Using abstractions increases the cohesion of the code that implements the abstraction.
+Cohesion also increases in a different way. An abstraction is closely aligned with the single responsibility principle. We can think of abstraction as a single concept principle. Using abstractions increases the cohesion of the code that implements the abstraction.
 
+ALA provides no structure for the internals of an abstraction because the code is cohesive. The internals of an abstraction could be described as a small ball of mud, which is why they should be small. There is no such thing as a sub-abstraction. Instead the code is composed of instances of abstractions from lower layers. So layers replace hierarchical encapsulation. 
+Zero coupling and high cohesion limits ripple effects of change, whether in higher layers or lower ones. A ripple stops at an abstraction concept because of the inherent stability of the concept itself.
 
-Zero coupling and high cohesion limits ripplle effects of change, whether in higher layers or lower ones. A ripple generally stops at an abstraction concept because of the inherent stability of the concept. What does happen though is that the abstraction can be improved. They are hard to get right in the up-front design. Often you can generalize an abstraction further by adding a configuration that has a default behaviour, so it doesn't affect other uses of the abstraction (convention over configuration).
+What does happen though is that abstractions can be improved as abstractions. Often you can generalize an abstraction to make it more reusable by adding a configuration that has a default behaviour, so it doesn't affect other uses of the abstraction (convention over configuration).
 
-In our experience, the most common type of change that still affects multiple abstractions are changes to conventions. Conventions in the ways abstractions are commented, and their code laid out are effectively abstractions in themselves that live in the bottom layer. So when they change, it makes sense that all abstractions that depend on them change. These types of changes may require a lot of editing, but don't require simultaneous understanding of multiple modules, which is where the real problem with coupling lies. 
+In our experience, the most common type of change that still affects multiple abstractions are changes to conventions. Conventions in the ways abstractions are commented, and their code laid out are effectively abstractions in themselves that live in the bottom layer. So when they change, it makes sense that all abstractions that depend on them change. These conventions will mature in time. Besides, while these types of changes may require a lot of editing, they don't require simultaneous understanding of multiple modules, which is where the real problem with coupling lies. 
+
 
 
 
 
 === Good versus bad dependencies
 
-We can distinguish two types of dependencies. One is run-time dependencies. These are dependencies in the code that are there because one module will need another module to be present at run-time for the system to work. The other is design-time dependencies. These are dependencies on the knowledge you must have to even understand a given piece of code. I will often refer to this type as a "knowledge dependency" or "use of an abstraction". It is also sometimes called "semantic coupling".
+For the purposes of this book, a dependency is when some code symbolically refers to a class, interface or function or other artefact in a separate piece of code. This covers everything from dependencies on classes, interfaces, modules or components, to dependencies on libraries or packages. 
 
- 
-[WARNING]
-====
-[red]#*Run-time dependencies are bad*#.
-====
+A dependency can be on something inside a class or interface, usually a method or property. Even if using an object reference, there is still a dependency if there is a reference to something named inside the class or interface. 
+
+We can distinguish between good and bad dependencies. Good dependencies are  design-time dependencies. These are dependencies on the knowledge you must have to even understand a given piece of code. I will often refer to this type as a "knowledge dependency" or "use of an abstraction". It is also sometimes called "semantic coupling". This type of dependency effectively adds to the language you use to write code. Here is a diagram shwoing a good dependency.
+
+
+[plantuml,file="GoodDependency1.png"]
+----
+@startdot
+digraph foo {
+size="2.0!"
+graph [rankdir=TB]
+subgraph cluster_1 
+{
+label="Abstract"
+labeljust=l
+style=rounded 
+A [shape = "circle", width=0.1, fixedsize=true, style=invis]
+#[ style = invis ];
+}
+B [label="MoreAbstract"; shape = rect; style=rounded ]
+A -> B [dir="both", arrowhead="open", arrowtail="tee", color=green, label=""]
+}
+@enddot
+----
+
+
+
+A bad dependency is one that is there to facilitate run-time communications between two modules or components. Here is a diagram representation.
+
+
+
+[plantuml,file="BadDependency1.png"]
+----
+@startdot
+digraph foo {
+size="2.0!"
+graph [rankdir=LR]
+subgraph cluster_1 
+{
+label="Peer1"
+labeljust=l
+style=rounded 
+A [shape = "circle", width=0.1, fixedsize=true, style=invis]
+#[ style = invis ];
+}
+B [label="Peer2"; shape = rect; style=rounded ]
+A -> B [dir="both", arrowhead="open", arrowtail="tee", color=red, label=""]
+}
+@enddot
+----
+
+
+
+Another type of bad dependency is when a module uses a submodule that is a specific part of it. An example is a 'helper' class. The submodule is often thought of as being logically contained inside its parent module.
+
+
+[plantuml,file="BadDependency2.png"]
+----
+@startdot
+digraph foo {
+size="2.0!"
+graph [rankdir=LR]
+subgraph cluster_1 
+{
+label="Module"
+labeljust=l
+style=rounded 
+A [shape = "circle", width=0.1, fixedsize=true, style=invis]
+#[ style = invis ];
+B [label="Submodule"; shape = rect; style=rounded ]
+}
+A -> B [dir="both", arrowhead="open", arrowtail="tee", color=red, label=""]
+}
+@enddot
+----
+
+
 [TIP]
 ====
-[green]#*Design-time knowledge dependencies on abstractions are good*#.
+[green]#*Dependencies on more abstract abstractions are good*#.
+====
+[WARNING]
+====
+[red]#*Dependencies for communciations between peers are bad, as are dependencies on submodules*#.
 ====
 
-A simple example of a run-time dependency is a module that calculates the average rainfall then calls a display module to display the result. The Display module needs to be present at run-time. But to understand the code that calculates the average rainfall requires no knowledge about displays, nor even where the result will be sent. The dependency is only there to make the system work at run-time.
+A simple example of a communication dependency is a module that calculates the average then calls a display module to display the result. To understand the code that calculates the average requires no knowledge about displays, nor even where the result will be sent. So it is a bad dependency.
 
-A simple example of a design-time knowledge dependency is some code that calculates the rainfall using an averaging filter. It uses an abstraction that takes a data stream as input and outputs a running average. To understand the rainfall code needs knowledge of averaging filter. This is a design-time, or knowledge dependency. Any application needing to reduce data to an average could use the same abstraction. 
 
-We find both types of dependencies in conventional code. A typical modular program is full of bad run-time dependencies. But whether a knowledge dependency or a run-time dependency, they all just look like a function call or a 'new' keyword, or a method call on a peer class's interface. We are not taught how to distinguish between them. They are all just called dependencies. We lump them together when we talk about dependency management, loose coupling, layering, fan-in, fan-out, circular dependencies or dependency inversion. Dependency graphing tools cannot distinguish between them because dependencies depend on understanding some abstraction. 
 
-These two different types of dependencies are not just good and bad. They are really good and really bad. So it's doubly important that we learn to tell the difference. What's more it's entirely possible to build a system using only good dependencies. 
+[plantuml,file="BadDependency3.png"]
+----
+@startdot
+digraph foo {
+size="2.0!"
+graph [rankdir=LR]
+subgraph cluster_1 
+{
+label="Average"
+labeljust=l
+style=rounded 
+A [shape = "circle", width=0.1, fixedsize=true, style=invis]
+#[ style = invis ];
+}
+B [label="Display"; shape = rect; style=rounded ]
+A -> B [dir="both", arrowhead="open", arrowtail="tee", color=red, label=""]
+}
+@enddot
+----
+
+The intention of the fixed arrangment between Average and Display was to measure rainfall. To do that, an instance of an Average module needs to be connected to an instance of Display module at run-time, but you don't need a dependency to achieve that.
+
+[plantuml,file="GoodDependency2.png"]
+----
+@startdot
+digraph foo {
+size="2.0!"
+graph [rankdir=TB]
+subgraph cluster_1 
+{
+label="Rainfall"
+labeljust=l
+style=rounded 
+A [shape = "circle", width=0.1, fixedsize=true, style=invis]
+#[ style = invis ];
+}
+B [label="Average"; shape = rect; style=rounded ]
+C [label="Display"; shape = rect; style=rounded ]
+A -> B [dir="both", arrowhead="open", arrowtail="tee", color=green, label=""]
+A -> C [dir="both", arrowhead="open", arrowtail="tee", color=green, label=""]
+}
+@enddot
+----
+
+
+
+
+A simple example of knowledge dependencies occurs in an abstraction that measures rainfall. To understand the rainfall code, you must understand the concepts of average and of display. The rainfall abstraction can use the abstractions for averaging and displaying. 
+
+
+
+We typically find both good and bad dependencies in conventional code. A typical modular program is full of bad dependencies. But whether a knowledge dependency or a communication dependency, they all look syntactically the same - a function call or a 'new' keyword, etc. We are not gnerally taught how to distinguish between them. We lump them together when we talk about dependency management, loose coupling, layering, fan-in, fan-out, circular dependencies or dependency inversion. Dependency graphing tools cannot distinguish between them because identiying good dependencies would require understanding abstraction levels. 
+
+Good and bad dependencies are not just good and bad. They are really good and really bad.
+
+A knowledge dependency is good because it's only a dependency on an abstract concept, on something stable and learnable. We want more of them, because then we are reusing our abstractions. Then the more dependencies you have on such an abstraction, the more abstract it is. 
+
+So it's doubly important that we are able to tell good dependencies from bad. 
+
+It's entirely possible to build a system using only good dependencies. 
 
 [TIP]
 ====
 [green]#*In ALA we eliminate ALL bad dependencies*#.
 ====
 
-A knowledge dependency is good because it's only dependent on an abstract concept. Good abstractions are easy to learn. The more dependencies you have on such an abstraction, the more abstract it is, the more reuse you are getting, and the easier it is to learn.
 
-Bad dependencies destroy abstractions. They cause explicit and implicit coupling. They obscure the structure of the application by distributing that structure throughout its modules. When we remove all bad dependencies we express what they did in normal cohesive code inside a more specific abstraction above, that composes instances of the abstractions .
+Bad dependencies destroy abstractions. They cause explicit and implicit coupling. They obscure the structure of the application by distributing that structure throughout its modules.
 
-Consider the diagram below. It the modular way to write a reanfall meter. An ADC reading is averaged, converted, accumulated, and displayed. One of modules has bad dependencies which it uses to make function calls to pull the data in and push it out. 
+When we remove all bad dependencies, they become normal lines of code, cohesive with one another, inside a more specific abstraction in a higher layer. Each line of code composes instances of the abstractions which would otherwise have had the bad dependency.
+
+Consider the diagram below. It's the conventional modular way to write a rainfall meter. An ADC reading is averaged, converted, accumulated, and displayed. The middle three modules have bad dependencies which they use to make function calls to pull data in and push data out. 
 
 [plantuml,file="dependency-diagram.png"]
 ----
@@ -288,9 +428,9 @@ key:   <---(Depends On)
 @endditaa
 ----
 
-There are four bad run-time dependencies.
+There are four bad dependencies, two from Conv and one each from Avg and Accu.
 
-Now consider this diagram.
+Now consider this diagram, which uses only good dependencies.
 
 
 [plantuml,file="dependency-diagram-1.png"]
@@ -322,7 +462,9 @@ Programming Paradigms
 @endditaa
 ----
 
-There are five good knowledge dependencies (the top layer uses five abstractions in the second layer), but no bad run-time dependencies because the abstractions have no relations with one another. Connections between the instances are completely inside another abstraction as cohesive code that knows about a rain meter.
+There are five good dependencies from the Application to the five Abstractions. There are also five good dependencies from the Abstraction on Dataflow. We never draw arrows on a diagram for good dependencies. Instead we just refer to the abstractions by name.
+
+Connections between the instances of teh abstractions are completely described inside the Application. There it is cohesive code that knows about how to build a rain meter.
 
 The code in the application abstraction could look something like this if using functions (although you would likely use some temporary variables in practice):
 
@@ -341,13 +483,15 @@ It might look something like this if using classes:
 
 How this code is done is not what's important. How syntactically succinct this code is is not important. What's important is where it is. We want the code that cohesively and fully expresses a rain meter to be in one place.  
 
-The lower-case letters used in the top layer of the diagram represent instances of the respective abstractions. (In UML they would be underlined.) You never draw arrows for knowledge dependencies - you only ever refer to abstractions by name. (Just as you would never draw an arrow to a box representing the squareroot function - you would just use Sqrt by its name.)
+The lower-case letters used in the top layer of the diagram represent instances of the respective abstractions. (In UML they would be underlined.) 
 
-In common programming languages, the run-time dependencies in the first diagram and the knowledge dependencies in the second diagram could both be syntactically written in the same form, either new A() or just a function call, A(). The only difference is in where those new keywords or function calls are, and in the case of classes, using an abstract interface instead of each class having its own specific interface. This difference means the difference between good dependencies and bad dependencies. It has a huge effect on the quality of the architecture as it gets larger.
+You never draw arrows for knowledge dependencies - you only ever refer to abstractions by name. (Just as you would never draw an arrow to a box representing the squareroot function - you would just use Sqrt by its name.)
 
-The application abstraction can move the data between the instances of ADC, Avg, etc itself, as we did in the first code example, however strictly speaking that pollutes it with details of how to move data that actually belongs in the programming paradigms layer. We much prefer the application code just does the composing - just specifies who connects to whom, but is not involved with how it works. That's why in most of the examples, we compose with classes that have ports rather than functions. In the second code example, the dataflow programming paradigm would be implemented with an execution model that know how to actually move data. The application only knows that it is composing a flow of data.
+In common programming languages, the communication dependencies in the first diagram and the knowledge dependencies in the second diagram could both be syntactically written in the same form, either new A() or just a function call, A(). The only difference is in where those new keywords or function calls are.
 
-The interface used to connect the instances is called Dataflow. It's important that this interface is abstract. It is two layers down. It is not an interface specific to any one of the domain abstractions, ADC, Avg, etc.. This is the abstract interactions pattern. Many other domain abstractions can either implement it or accept it, or both.
+The application abstraction can move the data between the instances of ADC, Avg, etc itself, as we did in the first code example, however strictly speaking that pollutes it with details of how to move data that actually belongs in the programming paradigms layer. We much prefer the application code just does the composing - just specifies who connects to whom, but is not involved with how data actually flows. That's why in most of the examples, we compose with classes that have ports rather than functions. In the second code example, the dataflow programming paradigm would be implemented with an execution model that knows how to actually move data. The application only knows that it is composing a flow of data.
+
+The interface used to connect the instances is called Dataflow. It's important that this interface is abstract. It is two layers down. It is not an interface specific to any one of the domain abstractions, ADC, Avg, etc. This is the abstract interactions pattern. Other domain abstractions can either implement it or accept it, or both.
 
 
 ==== Comparison of good versus bad dependencies.
@@ -393,13 +537,13 @@ During code creation, run-time dependencies are easily introduced, and never see
 
 ==== Free lunch?
 
-When you are comparing the left and right sides of the table above, you may be wondering, where did the free lunch come from? Where did the runtime dependencies go? Is this some kind of magic? Or how can the program work without them? Or haven't I just moved them somewhere else? No there are no tricks. The answer is that we have been taught to do programming in a very bad way. The knowledge that ADC will talk to Avg, etc at run-time is there, but it is now contained within an abstraction, not a dependency between modules. If you really want to find a disadvantage, then it is the need for the abstractions. It only works as well as the quality of the abstractions. Effectively we have replaced the need for dependency management with the need to create good abstractions. Creating good abstractions is a skill that does take time to get used to.
+When you are comparing the left and right sides of the table above, you may be wondering, where did the free lunch come from? Where did the runtime dependencies go? Is this some kind of magic? Or how can the program work without them? Or haven't I just moved them somewhere else? No there are no tricks. The answer is that we have been taught to do programming in a very bad way. The knowledge that ADC will talk to Avg, etc at run-time is there, but it is now contained within an abstraction, not a dependency between modules. If you really want to find a disadvantage, then it is the need for the abstractions. It only works as well as the quality of the abstractions. Effectively we have traded the need for dependency management, and all the complexity that bad dependencies cause, with the need to create good abstractions. Creating good abstractions is a skill that does take time to get used to.
 
 Just to recap the only dependencies we have used are good design-time or knowledge dependencies: 
 
 . The application should and must 'know' at design-time what domain abstractions it needs to compose to make a rain meter application.
 
-. The domain abstractions should and must know at design-time what programming paradigm it needs - the abstract interfaces to use for their input and output ports. 
+. The domain abstractions should and must know at design-time what programming paradigm they need - the abstract interfaces to use for their input and output ports. 
 
 
 ==== Stable dependencies principle
@@ -449,7 +593,7 @@ That concludes our discussion on why the ALA structure works from the point of v
 
 
 
-=== Knowledge dependencies are on all layers below
+==== Knowledge dependencies are on all layers below
 
 Sometimes layers are used incorrectly as partitions or really just modules. We would be better off to just tip all such layering models on their side.  Because of this mistake, there is a meme that we should only have dependencies on the immediate layer below. For ALA layers this is incorrect.
 
@@ -488,17 +632,27 @@ In conventional software development, we typically break a user story (or featur
 
 In ALA we want to find a way to express the user story with about the same level of expressiveness as when the user story was explained in English by the product owner. The language he used would have contained domain specific terms to enable him to explain it concisely. The same thing ought to be possible in the code. Anything that does not come directly from the requirements and starts to look like implementation detail is separated out. It comes out into abstractions. These abstractions typically contain knowledge of how user stories in general are implemented - how things can be displayed, how things can be saved, how data can be processed.
 
-It turns out that abstractions that know how to implement useful things for expressing user stories are not only reusable for different user stories, but can be reusable for other applications. In other words, they are domain level abstractions. A typical user story might be composed of several of them, some to implement the user story's UI, some to implement the user story's business, and some to implement the user story's saving of data. A user story instantiates the abstractions, configures them with the specific knowledge from the requirement, and then wires them together.
+Many times, abstractions that know how to implement useful things for expressing user stories are not only reusable for user stories, but can be reusable for other applications. In other words, they are domain level abstractions. A typical user story might be composed of several of them, some to implement the user story's UI, some to implement the user story's business, and some to implement the user story's saving of data. A user story instantiates the abstractions, configures them with the specific knowledge from the requirement, and then wires them together.
 
 Most maintenance is probably changing, adding or fixing user stories or features. When those features are described entirely in one place instead of distributed through a lot of modules, you have a direct understanding of how the user story is represented by code, and therefore of how to change it or fix it.
 
 Of course application code makes heavy use, in fact is entirely composed of, instances of domain abstractions. When fixing a bug, it quickly becomes clear if the application code itself doesn't represent the requirements as intended, or one of the abstractions is not doing its job properly. Again the maintenance is easy.
 
+==== The meaning of composition
+
+Expressing user stories as a composition of domain abstractions, as discussed in the previous section, is all well and good, but it doesn't work without defining what composion means. That's where programming paradigm abstractions come in.
+
+For example, many applications have displayed values or outputs that need to be updated 'live'. In conventional code, we often write imperative code to implement this live behaviour. The code repeatedly gets data from its source(s), does some manipulation on that data, and updates the output. This kind of code uses lots of bad dependencies. we really should have a programming paradigm for it. In ALA you think of it as a dataflow. Wiring together domain abstractions represents data flowing automatically. This programming paradigm is not new, of course, it appears in Unix's pipes and filters, functional programming, binding GUI display elements to a data source, LINQ, Reactive Extensions, Labview, function blocks, ladder logic, and countless other programming systems. Dataflows are often used on distributed systems because implementation over literal wires is naturally a dataflow. But the paradigm is just as applicable inside monolithic systems. What ALA does is make it easy and natural to implement dataflow yourself every time it is the best way to express requirements. We should never be writing imperative code when dataflow is what best expresses what we want to do. ALA makes it easy wire a linear chain of data manipulations. But it also makes it easy to wire up an arbitrary network of dataflows. 
+
+The same idea applies to the event-driven programming paradigm. It is common these days for GUI elements such as buttons, menu items, etc to have event-driven output ports. But then we often just wire them to imperative methods with a dependency. In ALA you create input ports as well. For example all popup window abstractions such as file browsers, wizards, settings, navigable pages, etc have input ports. The main window has a close input port. Long running tasks that need to be told when to start have an input port. Then you can use the event-driven programming paradigm for composing instances of these types of domain abstractions. 
+
+Another programming paradigm is building the UI. Building the UI by composing abstractions is common using conventional libraries these days. The meaning of composition is containing one UI element inside another. The composed UI structure is a tree. For example XAML does this using XML. I do not like the use of XML for this. What ALA brings is doing all composition in a consistent way. Wiring for the UI is done in the same way as the composition wiring for dataflow, or event-driven, or any other programming paradigm you care to use. That way a user story is fully and cohesively expressed inside its own abstraction.
+
 
 // sections moved here from chapter 2
 ==== Requirements are what's left when you factor out all implementation details
 
-This is another way of thinking that comes to the same solution. As we know from the previous section, ALA requires you to break up your entire application only by factoring out abstractions. So what does the application that's left in the top layer look like when this is done? Well if anything abstract has been removed, what remains must be details specific only to this application. Essentially these details equate with the requirements.
+This is another way of thinking that comes to the same solution. As we know from the previous section, ALA requires you build your entire application factoring out all pieces of computing work into domain abstractions and programming paradigm abstractions. So what does the application that's left in the top layer look like? Well if everything abstract has been factored out, what remains must be details specific only to this application. Essentially these details equate with the requirements.
 
 The application code becomes a formal re-expression of the requirements. There will be some information there that wasn't explicitly stated in the requirements, but they were requirements all the same. For example, it may not have been stated in the requirements that a number displayed on the UI should not change its value too frequently - it should be slow enough for a human to read successive values. A consequence of that requirement is that it should not contain noise that has a frequency higher than the display update rate. So the application will end up with an instance of a re-sampler abstraction and an instance of a filter abstraction wired into its dataflow before the display. The application will specify the re-sampling rate, and the filter bandwidth.
 
@@ -517,8 +671,7 @@ Seen as a DSL, in ALA you wire together plain old objects or functions while con
 
 === Diagrams vs text
 
-The fundamental rules of ALA don't prescribe the use of diagrams. But diagrams often emerge.
-So why do we often use a diagram instead of text in the application (top) layer of an ALA application?
+The fundamental rules of ALA don't prescribe the use of diagrams. But diagrams often emerge. So why do we often use a diagram instead of text in the application (top) layer of an ALA application?
 
 It's because in any non-trivial program, there is structure inherent in the requirements that forms a graph. If you have UI that graph is a tree - still representable with indented text. But the UI must have connections. (These particular connections are often called bindings.) They need connections with data. They need connections with event handlers. These connections must be done symbolically if using text. The connections go further. There are connections to business logic and to some form of persistent data model, and from there to real databases or files. There are arbitrary connections for navigating around different pats of the UI. If text, most of these connections must be done symbolically. On the way, they may need to connect arbitrarily with things that process, reduce, or combine. There may be states involved, with arbitrary transitions needed between those states. There may be activities that have to happen in a prescribed time sequence, which by itself is representable as a linear instructions in text. But there are often loops or alternative routes through the sequence, which is representable as indented text. But then there is always some connection between the activities and some data or the outside world. If text, these connections must generally be done symbolically. 
 
@@ -541,42 +694,48 @@ Now you can choose to go ahead and represent that graph in text in one place, us
 ==== Diagrams and text are not equivalent
 
 
-Diagrams and text are sometimes thought of as equivalent - and it's a matter of personal preference which you use. I do not agree with this. From the point of view of how our brain's work best, they are different, and each is powerful at its own job.
+Diagrams and text are sometimes thought of as equivalent, as if they have a duality like waves and particles in physics. It is said to be a matter of personal preference which you use, and since graphical tools are hard to produce, why not use text? I do not agree with this. From the point of view of how our brain's work best, they are very different, and each is powerful at its own job.
 
-Consider an electronics engineer who uses a schematic diagram. Ask him to design a circuit using text and he will think you a simpleton. Electronics naturally has a network structure that is best viewed and reasoned about as a diagram. If you turn a diagram into a textual list of nodes and connections, the brain can no longer work with it directly. It is constantly interrupted to search for symbolic references when it should be free to just reason about the design. 
+Consider an electronics engineer who uses a schematic diagram. Ask him to design a circuit using text and he will just laugh at you. Electronics naturally has a network structure that is best viewed and reasoned about as a diagram. If you turn a diagram into a textual list of nodes and connections, the brain can no longer work with it directly. It is constantly interrupted to search for symbolic references when it should be free to just reason about the design. 
 
-Most software naturally has an arbitrary network structure. Think about whenever you are working with legacy code - how often to you need to do "all files searches" or "find all references". And even those are foiled by indirections. Try designing or reasoning about a state machine without using a diagram.
+Most software naturally has an arbitrary network structure. Think about whenever you are working with legacy code - how often to you need to do "all files searches" or "find all references". And even those are foiled by indirections. Try designing or reasoning about a non-trivial state machine without using a diagram.
 
 Text can readily be used to compose elements in a linear chain or sequence. It is excellent for telling stories. White space is the normal connector between the elements. Sometimes periods or other symbols are used instead. Text can also handle shallow tree structures, simply by using indenting. Compilers may use brackets, usually () or {}. Interestingly, the brackets work for the compiler, but not for the brain. The brain doesn't see them, it just sees the indenting. So I personally don't agree that Python's significant indenting is a mistake as many do. 
 
 When the tree gets deep, the indenting is too deep for our brains to follow. So text is only suitable for linear structures and shallow trees. Structured programming and XAML are examples of tree structured code represented successfully in text.
 
-Text becomes troublesome when there are arbitrary connections across the structure forming a mesh. It must be done with matching names, labels or identifiers. Most imperative programs are actually not a tree structure because of the variables. They must be done with labels. Local variables in a small scope are not too much of a problem. It only requires an editor that highlights all of them. For large scopes we end up spending too much time finding and trying to remember the connections, resorting to many all-files searches. It is a cumbersome way to try to reason about what is usually a simple structure when viewed as a diagram. 
+Text becomes troublesome when there are arbitrary connections across the structure forming a graph. It must be done with matching names, labels or identifiers. Most imperative programs are actually not a tree structure because of the variables. They must be done with labels. Local variables in a small scope are not a problem. It only requires an editor that highlights all of them. For large scopes we end up spending too much time finding and trying to remember the connections, resorting to many all-files searches. It is a cumbersome way to try to reason about what is usually a reasonably simple structure when viewed as a diagram. 
 
-(When we talk about labels, we are talking about labels that are used for connecting two or more points. These labels are not abstractions. References to the names of abstractions are absolutely fine, and we don't draw lines for them even if we are using a diagram. We just use a box with the abstraction name inside it.)
+(When we talk about labels, we are talking about labels that are used for connecting two or more points. These labels are not abstractions. References to the names of abstractions are absolutely fine, and we don't draw lines for them even if we are using a diagram. We always just use abstractions by their name.)
 
-When we need to compose instances of abstractions in an arbitrary network structure, our brains work much better using a diagram. The brain can readily see and follow the lines between the instances of the abstractions. Unlike with text labels, the lines are anonymous, as they should be. Lines don't need encapsulation. To understand all uses of a variable in text, we need an encapsulation scope. To understand all places connected by a line, the brain just sees all the lines instead. Generally lines connect only two points or ports, but sometimes may connect three or four. More than that, and it starts to smell as if a new abstraction may be waiting to be discovered. The spacial positioning of elements is also something the brain readily remembers. So, diagrams can qualitatively do things that text simply cannot.
+When we need to compose instances of abstractions in an arbitrary network structure, our brains work much better using a diagram. The brain can readily see and follow the lines between the instances of the abstractions. Unlike with text labels, the lines are anonymous, as they should be. When symbolic connections are used, the symbols themselves need an encapsulation scope. Lines don't need encapsulation. They quietly connect two point without any other code seeing a symbol.
 
-ALA does not require a diagram per se. It only requires abstraction layering, and it's quite possible for a user story to just consist of a linear sequence of abstracted operations. For example, a sequence of movements by a robot or a "Pipes and Filters" sequence of operations on data. However, ALA is polyglot with respect to programming paradigms because user stories will generally combine multiple programming paradigms: UI, event-flows, dataflows, state machines, data schemas, etc. These aspects of a user story tend to be naturally interrelated (inherent in the requirements), which is what causes the resulting relationships among its instances of abstractions to be a network. Diagrams, then, embrace the bringing together of all these different interrelationships of a user story in one place and view.   
+Generally lines connect only two points or ports, but sometimes may connect three or more. To understand all places connected by a symbolic connection requires an all files search. To understand all places connected by lines, the brain just follows the lines instead.  The spacial positioning of elements is also something the brain readily remembers. So, diagrams can qualitatively do things that text simply cannot.
+
+If lines connect a high number of ports, it starts to smell as if a new abstraction may be waiting to be discovered.
+
+ALA does not require a diagram per se. It only requires abstraction layering, and it's quite possible for a user story to just consist of a linear sequence of abstracted operations. For example, a sequence of movements by a robot or a "Pipes and Filters" sequence of operations on data. However, ALA is a polyglot programming paradigm because user stories will generally combine multiple programming paradigms: UI, event-flows, dataflows, state machines, data schemas, etc. These aspects of a user story tend to be naturally interrelated (inherent in the requirements), which is what causes the resulting relationships among its instances of abstractions to be a graph. Diagrams, then, embrace the bringing together of all these different interrelationships of a user story in one cohesive place.   
 
 ==== No XML as code
 
-If dependency injection is used to implement the wiring, I prefer not to use XML to specify the application. Firstly XML is not very readable. Secondly it only handles tree structures well, not networks, and it becomes more unreadable if the tree is deep. If you must use text for specifying wiring, use normal code. You are still better off with this code in one place than having it distributed inside your modules. But if a network structure is inherent in the requirements, there is really no substitute for the readability of diagrams. 
+If dependency injection is used to implement the wiring, I prefer not to use XML to specify the application. Firstly XML is not very readable. Secondly it only handles tree structures well, not networks, and it becomes more unreadable if the tree is deep. If you must use text for specifying wiring, use normal code. Represent the diagram as a tree as much as possible, and use indenting to represnet that tree. Any nodes that need cross connections should be saved in local variables. The cross connections can then be wired using the variables. You will see this done in many of the examples.
 
-
+You are still better off with this code in one place than having it distributed inside your modules. But if a graph structure is inherent in the requirements, there is really no substitute for the readability of diagrams. In time there will be good tool support for ALA applications.
 
 
 ==== Diagramming tools
 
-The ALA design process (which is describing your requirements and inventing the needed abstractions as you go) is an intense diagram generating activity, especially the first time in a new domain. It requires all your focus. I have found that hand drawing the diagram on paper is not good. The diagram quickly gets into a messy state which requires redrawing, and that interrupts your flow. I have found that a diagramming tool that constantly needs you to control the layout, such as Visio, is also not good.   
+The ALA design process (which is describing your requirements and inventing the needed abstractions as you go) is an intense intellectual activity, especially the first time in a new domain. As well as expressing your user stories, you are inventing abstractions. You are inventing a set of domain abstractions and programming paradigms that will allow you to express all user stories with a finite number of them. It requires all your focus. I have found that hand drawing the diagram on paper is not good. The diagram quickly gets into a mess which requires redrawing, and that interrupts your design flow. I have found that a diagramming tool that constantly needs you to control the layout, such as Visio, is also not good.   
 
 So until there is a better tool, I have been using Xmind because as a mind-mapping tool, it is designed to not get in your way as you are creating. It lays itself out as a tree structure, and then allows cross connections on the tree to be added using a key short-cut at the source and a mouse click at the destination node. It has its limitations, however I use some simple conventions to get around these. For example, I use '<' and '>' to represent input and output ports.
 
 Furthermore, the tree structure allows easy hand translation of the diagram into indented, fluent style code. 
 
-More recently we use a simple tool that takes Xmind files and generates the code automatically.
+While Xmind allows you to be creative in the beginning (I couldn't imagine doing without it), it is far from ideal once the abstractions have matured, and you are just churning out user stories.
 
-And even more recently, we have in progress a purpose built graphical IDE for ALA.
+We use a simple tool that takes Xmind files and generates the code automatically.
+
+And even more recently, we have in progress a purpose built graphical IDE for ALA. But it is not complete.
 
 See the end of this chapter for an example project using Xmind.
 
@@ -610,6 +769,8 @@ In my experience, a low overhead drawing tool is essential during the iteration 
 
 === Composition, not decomposition
 
+In this perspective, we look at ALA as the antithesis of the prevalent decomposition methodolgy.
+
 The conventional technique for tackling system complexity is "divide and conquer".
 
 Consider this phrase, which has been used as the definition of software architecture:
@@ -619,8 +780,7 @@ Consider this phrase, which has been used as the definition of software architec
 "[red]#*decomposition*# of a system into [red]#*elements*# and [red]#*_their_*# [red]#*relations*#".
 ====
 
-Notice the word 'their', which I have italicised to emphasis that the relations are inferred to be between the decomposed elements. It suggests that the decomosed elements know something about each other, that they collaborate to create the whole.  
-
+Notice the word 'their', which I have italicised to emphasis that the relations are inferred to be between the decomposed elements. It suggests that the decomposed elements know something about each other, that they collaborate to create the whole.  
 In ALA we think about building the system in a completely different way. Here is how to reword the meme for ALA:
 
 [TIP]
@@ -638,12 +798,11 @@ First let's understand what we mean by composition through a few examples:
 
 * In functional programming, we are composing with functions, so the elements are higher level things that you create. But the programming paradigm is still imperative (unless you use monads). The structure is either linear or a tree.
 
-* When programming with monads, we are composing with what they call 'amplified data types'. These are usually low-level elements. But the programming paradigm has changed from imperative to dataflow. The structure is usually linear. (You don't need to understand or use Monads to use ALA. however,    
-<<Monads,See my method to understand Monads in Chapter Six>>
+* When programming with monads, we are composing functions. The programming paradigm has changed from imperative to dataflow. The structure is usually linear, but sometimes it is a reverse tree (two dataflows can be combined). (ALA is compared with monads in detail later in this chapter.)
 
-* When programming using the UML class diagram, we are composing classes. The programming paradigm is associations. The syntax is graphical. The structure is a network.
+* When programming using the UML class diagram, we are composing with classes directly (not objects). The programming paradigms are associations and inheritance.
 
-* When programming using the UML activity diagram, we are composing activities to be done in a set order. The structure is a network, because you can branch, recombine and loop back arbitrarily. Activity diagrams are not imperative (like the old style flow diagrams). The CPU is not necessarily dedicated to each activity being done. Activities may take an arbitrarily long time without the system blocking. 
+* When programming using the UML activity diagram, we are composing activities to be done in a set order. The structure is a graph, because you can branch, recombine and loop back arbitrarily. Activity diagrams are not imperative (like the old style flow diagrams). The CPU is not necessarily dedicated to each activity being done. Activities may take an arbitrarily long time without the system blocking. 
 
 * When programming with XAML, we are composing UI elements. The programming paradigm is UI layout (what goes inside what and in what order). The structure is a tree.
 
@@ -651,23 +810,23 @@ First let's understand what we mean by composition through a few examples:
 
 Let's list the different properties present in these types of composition:
 
-* Low-level or high-level - Sometimes we are composing fine-grained general elements and we need a lot of them. Sometimes we are composing 'higher level' more specific elements, and we need a few of them.
+* Low-level or high-level - Sometimes we are composing fine-grained general elements and we need a lot of them. Sometimes we are composing 'higher level' more specific elements, and we need relatively few of them.
 +
 Note that sometimes people think of these higher level elements as more abstract. They are actually less abstract. For example, a class that handles complex numbers is less abstract than the fundamental float type. Complex numbers are a more specific case because its only useful when you need complex numbers in your solution. But when you do need complex numbers, then they are obviously more expressive than using pairs of floats everywhere. This means that you need to compose less abstractions to build your solution.
 
-* The meaning of a composition relationship is mostly fixed in each case. It can be one of imperative, dataflow, UI layout etc. 
+* There is only one meaning of a composition relationship in each case. It can be one of imperative, dataflow, UI layout etc. 
 
 * Linear/Tree/Network: The structure built by the composition relationships can be linear, a tree structure or a general graph or network. 
 
-* Syntax: The syntax for the composition of two joined elements can be using spaces, dots or lines on a diagram. We can use various types of bracketing or indenting for the text form of tree structures.
+* Syntax: The syntax for the composition of two joined elements can be using spaces, dots, or lines on a diagram. We can use various types of bracketing or indenting for the text form of tree structures.
 
-In ALA, we are setting up to do composition of user stories. We want the composition to have the following properties:
+In ALA, we are setting up to use composition to create user stories or features. We want the composition to have the following properties:
 
-* Composing course grained expressive elements by letting them be specialized to your domain.
+* Composing more course grained expressive elements by letting them be specialized to your domain.
 * Allow use of many programming paradigms (meaning of composition)
-* Allows linear, tree or network structures.
-* Allow new programming paradigms with new meaning if that's the best way to express typical requirements.
-* Uses the same syntax for all composition relationships.
+* Allow linear, tree or graph structures.
+* Allow the programmer to add new programming paradigms with new meaning if that's the best way to express typical requirements.
+* Uses the same syntax for all the different composition relationships.
 
 ALA can therefore be thought of as a 'generalised compose from abstractions' methodology. 
 
@@ -675,116 +834,369 @@ ALA can therefore be thought of as a 'generalised compose from abstractions' met
 
 === No Data coupling
 
-In conventional programming, data coupling is considered unavoidable.
+The term _data coupling_ here doesn't mean that one module communicates data with another.  It means that the two modules agree on the meaning of that data.
 
-The word coupling here is used for both the fact that one module communicates data with another and the fact that the modules must agree on the meaning of that data.
+The actual communication of data at run-time is not a problem. The sharing of knowledge on how to interpret that data is. 
 
-The actual communication of data at run-time is not a problem. The sharing of the knowledge on how to interpret that data is. In ALA we only refer to the later as coupling (remember coupling occurs at design-time). ALA eliminates this coupling.
+In conventional programming, data coupling is considered unavoidable. There is a misconception meme that two modules have to share the knowledge of the meaning of data if they are to communicate at run-time. Even if you have an understanding of ALA, you will still be trapped by this misconception unless you know about it. This will cause you to write modules in the conventional way and they will have coupling.
 
-There is a misconception meme that two modules have to share the knowledge of the meaning of data if they communicate at run-time. Even if you have a basic understanding of ALA, you may be still trapped by this misconception. This will cause you to write modules in the conventional way and they will have coupling.
+The misconception is especially rife if the two modules run in different locations. It seems a self-evident truth that the two modules must share some kind of language if they are to communicate, just as people do. 
 
-To overcome this misconception, we will use a specific example. Let's say there is a temperature sensor on a Mars rover. The temperature is to be displayed at a ground station on Earth.
+Let's use an example. There is a temperature sensor on a Mars rover. The temperature is to be displayed at a ground station on Earth.
 
-In conventional programming, to implement this user story, one module resides in the Mars rover and one module resides in the ground station. These two modules must agree on the meaning of data. For example, it is an integer number of tenths of degrees C (Celsius). 
+In conventional programming, to implement this user story, one module resides in the Mars rover and one module resides in the ground station. These two modules must agree on the meaning of data. For example, it is an integer number of tenths of degrees C (Celsius).
 
-Obviously a lot of other system parts are involved in transporting the data from the sensor module to the display module. These are referred to as middleware. It is common to _containerise_ the data so that none of the middleware needs to know what the data is. But the two end points must have shared knowledge.
+Obviously a lot of other system parts are involved in transporting the data from the sensor module to the display module. These are referred to as middleware. It is common to _containerise_ the data so that none of the middleware needs to know its meaning. But the two end points at least seemingly must have shared knowledge.
 
-How does ALA avoid this shared knowledge. The anwser is that in ALA, you use a single module (application layer abstraction) to implement the user story. 
+In ALA, the _meaning_ of the communication is completely contained inside another abstraction. That abstraction is the only one that knows about the user story, so it's the only one that needs to know the meaning of the data going from Mars to Earth. 
 
-This single abstraction contains all the knowledge of this user story. What this single abstraction does is instantiate an abstract display, instantiate an abstract ADC converter, and logically wire them together. Since we want to display the temperature in tenths of degrees, we will also wire in an instance of a convert abstraction and configure it to convert raw ADC readings to tenths of degrees.
+Here is the user story implementation.
 
-Then, also inside the user story abstraction, we annotate the three instances with their physical locations. An abstraction that knows about the concept of _physical view_ has already been configured to know about the two physical locations for this application. The physical view engine takes care of deploying the instances of abstractions for the user story to the correct locations, and it takes care of actually connecting both ends through the middleware.  
+[source,C#]
+....
+class AmbientTempertureUserStory {
+    new TemperatureSensor()
+        .WireIn(new OffsetAndScale(4.3, 712))
+        .WireIn(new Display("#.#"))
+}    
+....
 
-That's how you do it in ALA. There is no data coupling involved.
+The meaning of the temperature data does not need to be known outside of this small abstraction. It does not need to be known by the sensor itself, or the display, or anything in-between. The meaning only needs to be known by the engineer who wants the sensor on the rover and wants to see what it says on the display, and so wites the above code.
 
-This technique fails when the module at one end already exists in a 3rd party system with an API. The 3rd party is not using ALA. Now there must be coupling. The coupling manifests as a design-time communication from one party to the other, probably in the form of a specification.
+Now if he were to change the units of temperature were to change, only this user story abstraction would change. Just change the OffsetAndScale configuration, and change the way the display is formatted.
 
-In this situation it is still possible to mitigate the effects of coupling somewhat. Let's say the display end has been written by the 3rd party, but is written in such a way that it accepts _self describing data_ according to a standard. Without changing the display end, the user story can be implemented from scratch by sending to the display the self describing data. The display then knows how how to receive the label and display format (which can be sent once) as well as the numeric data. The display knows how to create a space for displaying the data. This is how browsers work. 
+It doesn't even matter if software needs to interpret the data. For example, let's add an alarm that goes off at 50 C: 
 
-If the situation is the other way around, if a 3rd party is providing the installed sensors and the API for it, then we can't avoid the coupling. We must know about the API at design-time. It is common for example, for a 3rd party to provide a sensor and publish the data on an MQTT server. Say we are then writing an application to use this data, not only display it, but interpret the data as well. We have no choice but to be coupled with knowledge provided by the 3rd party about the MQTT topic that we need to subscribe to.
+[source,C#]
+....
+    new TempertureSensor()  // unit is celcius
+        .WireIn(new OffsetAndScale(4.3, 712))
+        .WireTo(new Display("#.#"))
+        .WireTo(new Alarm(500));
+....
 
-But, if the 3rd party is selling you sensors that you install yourself and selling you the MQTT communication infrastructure, then you could be provided with a more abstract 'configuration API' from the 3rd party. You would then write a domain abstraction that knows about that configuration API. Then, whenever you want to do a new user story, you can use an instance of that 'device configuration' abstraction. You can fully configure the MQTT topic itself, and its data format, then subscribe to it and process it. Everything specific to the user story is now cohesively contained inside a single abstraction once again. 
+The interpretation of the data is still contained inside the user story abstraction. Everything about that temperature is here as cohesive code. 
+
+==== deployment
+
+The user story code spans physical locations. So how do those instances of abstractions get deployed?
+
+Inside the user story abstraction, we can annotate the three instances with their physical locations. An abstraction that knows about the concept of _physical view_ would already have been configured to know about the three physical locations. The physical view engine takes care of deploying the instances of abstractions for the user story to the correct locations, configuring them, and it takes care of actually connecting both ends through middleware. It also knows how to take care of version compatibility, and updating versions at different times at different locations. 
+
+
+
+==== modules written by different parties
+
+What happens if one end of the user story is written by a team that has no communication with the team who does the user story. They just provide an API. In this case the team responsible for the user story itself will write an adapter for the API that also knows about the common programming paradigm abstraction. We can still have a separate abstraction to repesent the whole user story, and keep the data coupling contained in the adapter.
+
+The idea of no data coupling of course relies on the common programming paradigm. It relies on the teams who write the domain abstractions (or the adapters) all using that programming paradigm. And it relies on having a spearate team responsible for the user story, and all teams agreeing to use ALA and the common programming paradigm.  
+
+But there is an organisational problem in the form of Conway's law.
+
+ Conway's law: Any organisation that designs a system will produce a design whose structure is a copy of the organisation's communication structure. 
+
+It is unlikely that there would be a dedicated team in an organisation to write all the code for a specific user story if the user story spans different locations, or code written at different times. These are likely to fall to entirely different departments who both expect the two parts of the system to communicate between an agreed API and contract. In this siutaion there cannot be a separate abstraction for the user story, because there is no department for it. 
+
+So there will be collaboration in the code at each end in the form of data coupling. There will need to be be contracts. The contracts will describe all the implicit coupling. The contract will be a second source of truth, which must be kept updated.
+
+In this situation it is still possible to mitigate the effects of coupling somewhat. Let's say the display end has been written by the 3rd party, but is written in such a way that it accepts _self describing data_ according to a standard. Effectively this is just making it more abstract. Without changing the display end, the user story can be implemented from scratch by sending to the display the self describing data. The display then knows how how to receive the label and display format (which can be sent once) as well as the numeric data. The display knows how to create a space for displaying the data. This is how browsers work. 
+
+It is common, for example, for a 3rd party to provide a sensor and publish the data on an MQTT server as self describing data. Say the other team is writing an application to use this data, not only display it, but interpret the data as well. They will subscribe to the topic. They will write code that is coupled with design knowledge provided by the 3rd party about the MQTT topic.
+
+However, if the 3rd party is selling you abstract sensors that you install yourself and selling you the MQTT communication infrastructure, then you could be provided with a more abstract 'configuration API' from the 3rd party. You would then write a domain abstraction that knows about that configuration API. Whenever you want to do a new user story, you can use an instance of that 'device configuration' abstraction. You can fully configure the MQTT topic, and its data format, then subscribe to it and process it. Everything specific to the user story is now cohesively contained inside a single abstraction once again. 
+
+==== 3rd party library abstractions
+
+All the above applies when teams are supplying peer modules for a system. The modules have a similar level of abstraction. If the 3rd party is providing something more abstract like a library, we can choose to be directly dependent on it, if it is abstract enough to be considered part of the language we want to write user stories in. The canonical example is a relational database with the abstraction being SQL. 
+
+The common problem here is that if the abstraction comes from a 3rd party, we are making ourselves dependent not only on the abstraction, which is ok, but on the provisioning of the implementation. This may be okay when we choose to depend on, for example, the windows or MacOS operating system, but is dubious for a database. (Actually its not ok for Windows either, but being able to swap out windows is considered too hard). So it's become good practice to allow swapping out of the database. And since SQL is not quite as abstract as it should be between vendors, it means we don't want to be dependent on SQL either. 
+
+Clean architecture suggests to do this by using interfaces specific to the user stories, and then writing adapters for every interface to SQL.
+
+In ALA, you probably already have a 'tabular dataflow' type of programming paradigm. All abstractions that deal with tabular data already use ports of that type.
+
+It is a matter of writing one adapter that is configured with the schema. The adapter then generates the appropriate SQL queries.
+
+TBD provide code example of a lazy tabular programming paradigm, something like:
+
+[source,C#]
+....
+    interface ITabularDataflow : IQueryable<dynamic>
+    {
+    }
+....
+
+We can write a Query domain abstraction that takes a linq query as a parameter. This one abstraction allows us to use LINQ's From, Select, SelectMany, Sort, Where, Join etc. The query abstraction is then has ports to make it wirable into a user story using ALA. Since Linq is already compliant with ALA from the point of view of composing data manipulation abstractions, there is no reason not to use it directly in this way.
+
+TBD Write a query abstraction that takes a LINQ query as a parameter and has ITabularDataflow<T> ports. Shouldn't be too hard so full code can go here.
+
+TBD Write an abstract adapter for SQL Lite database with a special port that is used directly by the Query abstraction. 
+
+
+
 
 === Composability and Compositionality
 
-We have used the word _compose_ a lot so far in describing ALA. Now we look at the property of  _composability_ which enables us to compose. Composability means the ability to create an infinite variety of applications by combining instances of a finite number of domain abstractions.
+We have used the word _compose_ a lot so far in describing ALA. The term _Composability_ means the ability to create an infinite variety of things by composing instances of a finite number of things.
 
-This is a very important property of ALA. Composability uses the Principle of Compositionality which states: In mathematics, semantics, and philosophy of language, the principle of compositionality is the principle that the meaning of a complex expression is determined by the meanings of its constituent expressions and the rules used to combine them. 
+Composability is a very important property for dealing with complexity. The Principle of Compositionality states: In mathematics, semantics, and philosophy of language, the principle of compositionality is the principle that the meaning of a complex expression is determined by the meanings of its constituent expressions and the rules used to combine them.
+
+Brian Beckman, who does the best explanation of monads I have found in "Don't fear the monad" says that composability is _the_ way to deal with complexity.
 
 Jules Hedges says of this property "I claim that compositionality is extremely delicate, and that it is so powerful that it is worth going to extreme lengths to achieve it." 
 
 In software engineering, it is described by a pattern called "Abstract Interactions" or "Configurable Modularity" by Raoul de Campo and Nate Edwards - the ability to reuse independent components by changing their interconnections but not their internals. It is said that this characterises all successful reuse systems. 
 
-ALA has these properties by using domain abstractions with ports, which are instances of programming paradigms. The domain abstractions are the constituent expressions, and the programming paradigms are the rules used to combine them. 
+ALA has these properties by using domain abstractions with ports. The ports are instances of programming paradigms. The domain abstractions are the constituent expressions, and the programming paradigms are the rules used to combine them. 
 
-As mentioned earlier, there are other software systems that have composability, usually using the dataflow paradigm, such as RX (Reactive Extensions), or more generally monads. Most composability systems are restricted to a single paradigm. For ALA to have the correct level of expressiveness of all requirements multiple different programming paradigms are needed.
-
-We can make an analogy with Lego bricks. Some Lego parts have the familiar little stud and tube connectors. Some will support axles and holes connections, either tight or loose. These different ways of connecting Lego parts are analogous to different programming paradigms. Each has a different behaviour at run-time. 
+There are other software systems that have composability, usually using the dataflow programming paradigm, such as RX (Reactive Extensions), or more generally monads. Most composability systems are restricted to a single paradigm. In ALA, to achieve the correct level of expressiveness of requirements, multiple different programming paradigms are needed.
 
 
-=== Some real dependency graphs
 
-Our example project for this chapter is a real legacy application (that was maintained for approximately 10 years) that we decided to re-write using ALA. Normally, for reasons I won't go into here, I would never re-write an application. Maintenance had become difficult with this legacy code, and we wanted to run a research experiment to see if a rewrite using ALA could be successful. It would also give us a good basis for comparative metrics of the two code bases.
 
-The original application has around 30 KLOC. Rather than look at any of the details of the application itself, we present here dependency graphs generated by Ndepend for the old legacy application and new ALA application.
+
+=== ALA compared with Object oriented programmingp
+
+Lets start with Brian Will's explanation of why object oriented programming is crap from his Youtube channel:
+
+https://www.youtube.com/watch?v=QM1iUe6IofM[https://www.youtube.com/watch?v=QM1iUe6IofM]
+
+I am in agreement with Brian in that trying to associate _all_ code with data causes inappropriate fragmentation of the code, encourages a model of collaborating agents, and creates a dependency hell. 
+
+The idea of encapsulation is only partially realized because objects reach into each other's data indirectly. 
+
+Also the UML class diagram encourages relationships directly between classes, which should be uncoupled abstractions. It encourages mutable data. And it encourages a horrendous model of agents interacting with each others data in a multithreaded environment. To solve this, Brian advocates a return to procedural programming and provides several examples which demonstrate that procedural programming is better.
+
+Although ALA uses objects, it is not object oriented. You don't try to model everything with objects and you can't create associations between classes. It uses objects as a language feature, not a design philosophy. Objects are used in ALA for the following four reasons. 
+
+. Objects store references to other objects to which they are wired. A form of dependency injection is used to receive the references to the other objects. 
+
+. Domain abstractions, being reusable entities, often need configuring. The object stores its own configuration data passed in the constructor or via setters.
+
+. Some abstractions need state to work internally. For example an abstraction that implements a low pass filter for a dataflow needs to keep some kind of historical value or values. It is inherent in the nature of the abstraction that it has state.
+
+. There is usually some state data that doesn't belong with any code. In ALA we will often create a special domain abstraction called 'state' that acts as a source or destination for dataflows.
+
+
+==== Dependency injection
+
+The dependency injection pattern was introduced as an attempt to clean up the dependency mess created by OOP. It came too late to make the famous GOF patterns book. The authors wish they had included it instead of singleton. But dependency injection alone does not solve OOPs problems.
+
+Previously we mentioned the use of dependency injection in ALA by using the wiring pattern to wire up instances of abstractions by their ports. The way this dependency injection is done is quite different to container based dependency injection. 
+
+Container based dependency injection works by matching interface types. The interfaces are implemented by one class, and required by another. The matching of this interface type is the implicit wiring of the two classes. There is no place where you can see the wiring explicitly. This is really bad. It is very difficult to trace the flow of a user story through the classes.
+
+Now a class may be substitutable with another class that implements or provides the same interfaces. That's why there is a container. You instantiate an object of the class you want to wire in, and put it into the container. But this is a far cry from general composability.
+
+In ALA interfaces do not belong to one or other of the classes being wired. They are more abstract and represent a compositional concept which we call a programming paradigm. When a domain abstraction uses one of these abstract interfaces, either implementing it or using it, we call it a port. The abstraction has no implicit fixed arrangement with other abstractions. A separate abstraction in a higher layer is needed to specify how instances of these abstractions with ports should be composed.
+
+Note that ALA is extremely polymorphic. That's because from the point of view inside an abstraction with ports, you do not know where that port will be wired to. Despite the use of polymorphism for wiring up everything, there is none of the usual disadvantage of indirection. In fact it is way easier to trace through a proram or system. From inside an abstraction, the abstraction doesn't need or want to know where it is wired. It's completely self-readable up to the port. And if you are trying to trace a dataflow through the program or system, well that's explicit and all in one place for any given user story.
+
+Chapter six also has a section on comparing ALA with dependency injection, and covers XML configured dependency injection.
+
+
+=== From procedural programming to ALA
+
+Let's get back to procedural programming that Brain Will advocates instead of object oriented programming. How would ALA relate to procedural programming?
+
+Starting from pure procedural programming and applying ALA, we can see in the progression of the following five points that we use of objects as a programming language feature in ALA, but not object oriented programming per se:
+
+. To begin with, you can apply ALA directly to procedural programming style. Abstractions are implemented a group of procedures. You must structure the code so that you only call procedures in an abstraction that is significantly more abstract. You will have user story abstractions in the top layer, and domain abstractions in a second layer. Procedures that directly code a given user story are put together to form a user story abstraction. Procedures that are cohesive in the domain layer, such as configure/read/write sets are also grouped together as abstractions. Such abstractions could be implemented as a code source file or a static class.
+
+. Once you have abstractions, you can of course reuse them. Abstractions often need configuring. Configuring requires storing some data. We can put the configuration data inside the abstraction, and provide constructor parameters or setters. Since the abstraction now contains some data, the abstraction needs to be implemented as a class so that it can be instantiated with each instance having it own configuration. 
+. In procedural programming, the user story will frequently call one procedure, get some data returned by that procedure and then pass it straight to another. This handling of data is not really something the abstraction should need to do. It should just compose procedures. But if we make the abstractions classes, then we can wire the instances so that at run-time data flows directly from one instane to another. Now we have two reasons to use classes.
+
+. In procedural programming, you will tend to have some state variables, which are like globals. We wont call them globals because we wouldn't access them directly from any procedures. We would instead always pass them into the procedures as required. This would create extra parameters for our procedures. Some procedures will need extra parameters even though they don't know what the data is. They are just passing it through to other procedures they call. All this extra passing around is a real pain. Some of the data may really belong with a given abstraction, so the pain seems to make no sense. Moving the data outside the abstraction and always passing it in It is breaking the abstraction. For example, say the abstraction is a running average. It needs to keep an internal state of the last n data points.
+
+For these cases we will put the data back inside the abstraction. We can do this either for user story abstractions, or with domain abstractions. For domain abstractions, once again we will then need to implement the abstractions with classes so that each instance of the abstraction has its own state data. For user story abstractions, there is probably one instance per application, so the class could be static.
+
+. Lastly, there may still be state data that does not belong to a specific abstraction. This will be sitting around in a top layer looking like a global. In object oriented programming, this is the type of data we would stuff into a class anyway, and then have almost pointless accessor methods. The other classes then have harmful dependencies on these data classes which obfuscate the data flows through the system. 
++
+In ALA, what we do is create a state domain abstraction. This abstraction has dataflow input and output ports. Instances of the abstraction are a source/destination of data. We can create instances of it for each item of state data needed by the application. The application wires these instances into the dataflows of the appropriate user stories. 
++
+If the type system is dynamic, the state abstraction can hold any complex data structure, and the user stories it is wired to can use the data in a dynamic way.
+Only the application layer knows the actual structure of the data at design-time.
++
+If the type system is static, and we want to group data together in a single instance of a state abstraction, The application layer can use an explicit or implicit struct type. If explicit, the state abstraction will be a generic, and the struct type is passed to it at compile-time. User stories that are wired to the state instance will also have the struct type passed to them. The other way to do static typing is to use an anonymous struct when the generic state class is created, and then the user stories that are wired to it use type inferencing, if your language supports this. 
++
+Through the five steps above, we have transformed procedural code back into ALA code. We have used objects, but we did not use object oriented design. The resulting ALA version has these properties:
+
+* Control of execution becomes the responsibility of programming paradigms.
+
+* Passing data becomes the responsibility of dataflow types of programming paradigms.
+
+* Storing state data becomes a domain abstraction whose purpose is to store state data. It will act as a data source/destination for dataflows.
+
+* Despite the fact that we use objects, the ALA constraints avoid most of the problems of conventional object oriented programming. For example, both the configuration data, and the wiring data stored in an instance is immutable. Only instances of abstractions that contain state data are mutable and it this is clear from very nature of the abstraction. 
+
+
+////
+==== Immutable state
+
+In the previous section in point 5, we talked about a state abstraction.
+
+The state abstraction should be immutable. At first this does not seem to make sense. What use is state that is immutable? This is the big idea behind the proramming language Clojure. Think of the state domain abstraction as being a time series of all its previous states. When the output dataflow port is used to get the state, it returns a reference to the data (or boxed data if it's a simple type). The data at that reference will now never change. It is a snapshot in time, and all subsequent processing of that state data by the user story can be done taking its time. User stories can take time, for example when waiting for external inputs. Other user stories can run at the same time. So we can have concurrency even in a singe threaded application. These other user stories can change the state in the same instance of the state abstraction, without affecting the first user story that has not completed yet.
+
+When the input port of the state abstraction is used to change the state, it, in effect, copies the state and then stores the reference as the new latest state. For performance reasons, the implementation should not actually copy large amounts of data - it should use the same idea of optimized immutable data containers that clojure uses. The parts of a data container that are changed are copied, and the new container refers to the older containers for the rest of the data.    
++
+It is an advantage of having a state abstraction that you can implement immutability once and then reuse it for all wired state that your application needs.
+////
+
+
+=== ALA Compared with functional programming
+
+The difference between ALA and functional programming is that ALA composes objects whereas functional programming composes functions. ALA is both more flexible, and easier to understand. 
+
+ALA could be applied to functional programming. The fundamental constraints require that the functions be good abstractions, that functions would only call or use functions that are significantly more abstract than themselves, and that functions are relatively small.
+
+==== Monads
+
+In practice, composition of functions evolves into composition using monads. 
+
+Monads are explained and compared with ALA in detail in chapter six. Here we just present a summary.
+
+ALA and monads are both composition patterns using layers. The main difference is that ALA composes instances of classes whereas monads are for composing functions.
+
+ALA is a three layer pattern. Monads are of themselves a two layer pattern, corresponding with the application and programming paradigm layers of ALA. Expressions that compose functions using Bind are in the top layer. The Monad Type or Interface<T> and the Bind function are in the programming paradigms layer. They are highly reusable and are often provided as a library.
+
+In the monad world, it is common to add many functions that do more specific jobs than the basic Bind function, such as Filter, Map, Select and Aggregate. These functions use Bind, or do the equivalent of Bind themselves. This set of functions are roughly equivalent to the domain abstractions layer. So it could be said that monads are an example of the ALA layering pattern.  
+
+ALA is generally easier to understand and more versatile than monads.
+
+ALA is easier to understand because it uses plain objects and therefore doesn't hide so much under the covers in the form of closures. Monads usually involve a number of closure objects and delegate objects wired together in a large structure.
+
+In ALA, what would be closures for monads, become pain objects which you instantiate yourself with WireIn(new Something()). The only new thing you have to learn about ALA objects is that they must use ports for their I/O. You are not allowed make a class directly have an association with another class. You must make a port. That is just dependency injection. The only difference between ALA dependency injection and more conventional dependency injection is that ALA wiring must be explicitly specified in a cohesive user story abstraction in the application layer. And teh WireTo function uses reflection to implement dependency injection instead of constructor injection or setter injection. That's pretty much it to understanding the mechanics of ALA over conventional objects.  
+
+ALA is more versatile, again because it uses plain objects with ports. The monad Bind function, because it is a function, essentially has only two ports, an input port and an output port. Both ports are of the same type, e.g. IEnumerable. Some more specific functions can have a second input port, e.g. Merge will merge two streams. ALA domain abstractions can have an arbitrary number of ports, and they can be using arbitrarily different programming paradigms.
+
+All monads are essentially a dataflow programming paradigm, (as far eas I know) since they compose functions that take data and return data, whereas ALA supports general programming paradigms under a consistent system of wiring. 
+
+So ALA domain abstractions are a bit like Integrated circuits in electronics (many pins, with different functions), and monads are more like resistors and capacitors (two pins, analog only). 
+
+For the particular problems that monads suit, the monad syntax is more concise.
+
+[source,C#]
+....
+source.Filter(x=>x>=0).Select(x=>x+1)
+....
+
+versus
+
+[source,C#]
+....
+source.WireIn(new Filter(x=>x>=0)).WireIn(new Select(x=>x+1)
+....
+
+If this code is generated from a diagram, it doesn't matter.
+
+If monads are already available in a system, you can have the best of both worlds by using them both together. For example, if you have a library of IEnumerable, or IObservable based monads already, it wouldn't make sense to rewrite every function in teh library such as Select as wirable domain abstractions. Instead, what you can do is create a single domain abstraction that can be configured with monad code. For example, we can write a domain abstraction called EnumerableQuery that can be configured with any LINQ IEnumerable query:
+
+
+[source,C#]
+....
+static void Application()
+{
+    var proxySource = new EnumerableProxySource<int>();
+    var query = proxySource.SelectMany(x => new[] { x * 10 + 1, x * 10 + 2, x * 10 + 3 }).Select(x => x + 1);
+
+    // Now create an ALA program using the domain abstraction, Query
+    var program = (EnumerableToConsoleOutput<int>)
+    new List<int> { 0 }
+    .WireInR(new EnumerableQuery<int, int>(proxySource, query))
+    .WireInR(new EnumerableQuery<int, int>(proxySource, query))
+    .WireInR(new EnumerableQuery<int, int>(proxySource, query))
+    .WireInR(new EnumerableToConsoleOutput<int>());
+
+    program.Run();
+}
+....
+
+The code first creates a LINQ query consisting of a SelectMany and a Select. 
+
+EnumerableProxySource is a small class inside the EnumerableQuery abstraction that acts as an IEnumerable on which we can start a LINQ query. When EnumerableProxySource is passed into EnumerableQuery, the EnumerableQuery configures it with a source Enumerator via a setter. So when the EnumerableProxySource's GetEnumerator is called later, it will return an actual Enumerator.
+
+We create a LINQ query once and use it three times (which you wouldn't normally do, I'm just using the same one three times to save having more code for different ones). I wanted to demonstrate wiring three EnumerableQuerys together just for fun.
+
+The second half of the code is conventional ALA user story code that instantiates three instances of EnumerableQuery. The input of the first one is wired from a very simple source consisting of an IEnumerable that returns one value which is a zero. The last one is wired to a EnumerableToConsole domain abstraction, which does was you might expect - when told to run, it loops through the IEnumerable at its input and outputs all the values to the console. Here is the output of the program:
+
+image::Console output result-01.png[Console output result-01.png, title="Output of demo code using EnumerableQuery domain abstraction", link=Console output result-01.png]
+
+One unusual thing you may notice about this ALA program is the use of WireInR instead of WireIn that we would normally use to chain wire things. A.WireInR(new B()) actually wires from B to A. You use it like you would WireIn, in the same direction as the dataflow, but it actually wires in the opposite direction. This is because the IEnumerable, the programming paradigm interface being used, goes in the opposite direction as the dataflow. The B object has a filed of type IEnumerable and the A object implements IEnumerable. So the wiring must go in teh reverse direction of the dataflow. WireInR is implemented simple as WireInR(A,B) {WireIn(B,A);}  
+
+Further discussion about the domain abstraction EnumerableQuery and a full comparison with monad can be found in chapter six.
+
+The code above can be found in a working demo program on Github in the IEnumerableMonad repository here: https://github.com/johnspray74[https://github.com/johnspray74]
+
+
+
+
+=== Dependency graphs ALA vs conventional code
+
+Our example for this chapter compares dependency graphs for a legacy application and one with the same functionality written in ALA.
+
+The legacy application had been maintained for approximately 20 years, so as might be expected, maintenance had become difficult. In fact there were certain new requirements we could not do because of the prohibitive effort. Normally I wouldn't ever re-write an application. But I wanted to run a research experiment to see how ALA would work on it. I had intern students available, and it would give us an opportunity to compare metrics of the two code bases.
+
+The original application has around 70 KLOC. Rather than look at any of the details of the application itself, we present here dependency graphs generated by Ndepend for the legacy application and the new ALA application.
 
 ==== Legacy application dependency graphs
 
-One of the core tenets of ALA (as discussed in Section 3.2) is "Composition using layers" instead of "Decomposition using encapsulation". Unfortunately Ndepend is designed with the assumption that the application should be built using the latter approach. It likes to present a decomposition structure, starting with assemblies (packages) at the outermost level, then namespaces, and then classes. I'm not sure why it considers namespaces a viable encapsulation mechanism because they don't provide encapsulation. Anyway, here is the namespace dependency graph for the main assembly of the legacy version of the application, as it comes out of ndepend.
+One of the core tenets of ALA (as discussed in an earlier section) is "Composition using layers" instead of "Hierarchical decomposition using encapsulation". Unfortunately Ndepend is designed with the assumption that the application should be built using the latter approach. It likes to present a decomposition structure, starting with assemblies (packages) at the outermost level, then namespaces, and then classes. I'm not sure why it considers namespaces a viable encapsulation mechanism because they don't provide encapsulation. 
+
+
+////
+Anyway, here is the namespace dependency graph for the main assembly of the legacy version of the application, as it comes out of Ndepend.
 
 image::old-datalink/namespaces.png[namespaces.png, title="Legacy application - namespaces", link=images/old-datalink/namespaces.png]
 
 This graph is quite large, so if you like you can right click on it, and open it in a new tab in your browser. The red arrows are dependencies in both directions.
 
-Each box represents a namespace. The thickness of the arrows is proportional to the number fo dependencies. The size of the boxes is proportional to the number of lines of code in the namespace.
+Each box represents a namespace. The thickness of the arrows is proportional to the number fo dependencies between pairs of namespaces. The size of the boxes is proportional to the number of lines of code in the namespace.
 
 If we drill down into the largest namespace, UIForms, we see the class relationships between classes inside that namespace:
 
 
 image::old-datalink/classes-in-uiforms-namespace.png[classes-in-uiforms-namespace.png, title="Legacy application - classes in uiforms namespace", link=images/old-datalink/classes-in-uiforms-namespace.png]
 
-Here you can see that ndepend is trying to make out the layers. The layers are vertical columns, going from left to right. I have left them vertical even through ALA abstraction layers are usually drawn horizontal because they come out more readable on the page. Again there are many dependencies in both directions drawn in red.
+Here you can see that Ndepend is trying to make out the layers. The layers are vertical columns, going from left to right. I have left them vertical even through ALA abstraction layers are usually drawn horizontal because they come out more readable on the page. Again there are many dependencies in both directions drawn in red.
 
 Here are the classes inside the DataStructure namespace:
 
 image::old-datalink/classes-in-datastructure-namespace.png[classes-in-datastructure-namespace.png, title="Legacy application - classes in datastructure namespace", link=images/old-datalink/classes-in-datastructure-namespace.png]
 
-Again, Ndepend is trying to make out the layers from left to right.
-
 There is one class called Device which actually looks like it might be a good abstraction.
+////
 
+Namespaces provide no useful decomposition structure. They do not make abstractions in themselves, nor do they implement a facade pattern or an aggregate root type of pattern with even logical encapsulation. Any classes inside each namespace can have unconstrained direct relationships with any classes in any other namespace.
 
-As mentioned, namespaces provide no useful decomposition structure. They do not make abstractions in themselves, nor do they implement a facade pattern or an aggregate root type of pattern with even logical encapsulation. Any classes inside each namespace can have unconstrained relationships with any classes in any other namespace.
-
-So Ndepend is giving us a false picture here, because it is omitting all dependencies that go in or out of the namespaces. To really get an idea of what the big ball of mud looks like, I configured Ndepend to use a query that gives me all the classes in all the namespaces. Here finally is what this application truly looks like: 
+So Ndepend out of the box gives us a false picture, because it omits all dependencies that go in or out of namespaces. To really get an idea of what the class dependency graph looks like, I configured Ndepend to use a query that gives me all the classes in all the namespaces. Here is what the legacy application truly looks like: 
 
 image::old-datalink/classes-in-all-namespaces.png[classes-in-all-namespaces.png, title="Legacy application - all classes in all namespaces",link=images/old-datalink/classes-in-all-namespaces.png]
 
-This graph is very large. Right click on it, and open it in a new tab in your browser, so you can zoom in to see the dependencies in the background. It is truly frightening. Ndepend had no chance to find the dependency layers. There may be vaque onion type layers going outwards from the middle. It makes readily visible why continued maintenance on this application is so difficult. You have to read a lot of code to find even a tiny part of this hidden structure.
+This graph is very large. Right click on it, and open it in a new tab in your browser, so you can zoom in to see the dependencies in the background. It is truly frightening. Ndepend had no chance to find the dependency layers. There may be vague onion type layers going outwards from the middle. It makes readily visible why continued maintenance on this application is so difficult. You have to read a lot of code to find even a tiny part of this hidden structure.
 
-The developer who maintains the application tells me this is a fair projection of the complexity that he has to deal with.
+The developer who maintains the application tells me this is a fair reflection of the complexity that he has to deal with.
 
-To be fair, some of the dependencies in this diagram are 'good' dependencies (as described in Section 3.1 on good and bad dependencies). For example, the box near south-east called ScpProtocolManager has a lot of dependencies coming into it, which means it is possibly used a lot and therefore is a potential good abstraction. Ndepend does not know about the concept of good and bad dependencies, but if it did I would have it just display the bad ones.   
+To be fair, some of the dependencies in this diagram are 'good' dependencies (as described in an earlier section on good and bad dependencies). For example, the box near south-east called ScpProtocolManager has a lot of dependencies coming into it, which means it is possibly used a lot and therefore is potentially good abstraction. Ndepend does not know about the concept of good and bad dependencies, but if it did I would have it just display the bad ones.   
 
 
 ==== New ALA application dependency graphs
 
-Here is the equivalent Ndepend generated class dependency graph for the new ALA version of the application.
+Here is the equivalent Ndepend generated class dependency graph for the new ALA version of the application. This graph has the classes from all namespaces.
+
 
 image::new-datalink/classes-in-all-namespaces.png[classes-in-all-namespaces.png, title="New ALA application - classes in all namespaces", link=images/new-datalink/classes-in-all-namespaces.png]
 
-Ndepend has tried to find the three ALA layers which are vertical and go from left to right. Only the Application sits in the top layer. The DomainAbstractions layer contains the next two columns of classes and a few from the next column. And the ProgrammingParadigms layer contains the rest on the right. Actually there were a couple of bad dependencies present when this graph was generated which have since been fixed. (There should be no dependency between Panel and OptionBox, nor between Wizard and WizardItem.) With these removed, the graph would form into the three abstraction layers. 
+You can see the three ALA layers which are vertical and go from left to right. Only the Application sits in the top layer. The DomainAbstractions layer contains the next two columns of classes and a few from the next column. And the ProgrammingParadigms layer contains the rest on the right. Actually there were a couple of bad dependencies present when this graph was generated which have since been fixed. (There should be no dependency between Panel and OptionBox, nor between Wizard and WizardItem.) With these removed, the graph would form into the three abstraction layers. 
 
-The newly rewritten application is a work in progress at this point. However, as features are added, this is all the dependencies you will ever see. The Application already uses most of the domain abstractions we will ever need, and the domain abstractions already use the programming paradigm interfaces they need. There are a few DomainAbstractions to be added, but this is essentially what the  class dependency graph will look like.  
+The newly rewritten application is a work in progress at this point. However, as features are added, this is all the dependencies you will ever see. The Application already uses most of the domain abstractions we will ever need, and the domain abstractions already use the programming paradigm interfaces they need. There are a few DomainAbstractions to be added, but this is essentially what the class dependency graph will stay looking like.  
 
-
-This graph has the classes from all namespaces. But just for interest, here is ndpend's namespace dependency graph.
+////
+But just for interest, here is Ndepend's namespace dependency graph.
 
 
 image::new-datalink/namespaces.png[namespaces.png, title="New ALA application - namespaces", link=images/new-datalink/namespaces.png]
 
-Remember in ALA, we do not use decomposition, so namespaces do not represent decomposition of the system. They represent layers. You can clearly see the three layers. The wiring namespace also goes in the programmingparadigms layer.
-
+Remember in ALA namespaces are layers. The dependencies are correct for the layers. 
 
 Let's drill inside the domain abstraction namespace to see the interdependencies within that layer. We expect to see no dependencies:
 
@@ -800,7 +1212,9 @@ image::new-datalink/classes-in-programmingparadigms-namespace.png[classes-in-pro
 
 Again we see a few dependencies on delegates in the same source file which are ok. There is a couple of connector classes that depend on interfaces in this same layer. I consider them part of the interface from the programming paradigm point of view. They are in the same source file as a cohesive unit.
 
-As of this writing, the new ALA version of the application is still a research project, but so far everything has gone smoothly with two weeks spent doing the description of the requirements as a diagram, and three months so far spent writing the domain abstractions. So far there are no issues getting it to actually execute. It is expected that we will actually commercialize the project soon and replace the old application.
+////
+
+As of this writing, the new ALA version of the application is still a research project, but so far everything has gone smoothly with two weeks spent doing the description of the requirements as a diagram, and 18 months so far spent writing the domain abstractions. So far there are no issues getting it to actually execute. It is expected that we will actually commercialize the project soon and replace the old application.
 
 
 ==== The application's diagram
@@ -933,4 +1347,3 @@ As of this writing, a graphical IDE is being developed for these types of ALA ap
 
 
 
-da
