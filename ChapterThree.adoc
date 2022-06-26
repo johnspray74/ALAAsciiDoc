@@ -1055,41 +1055,45 @@ In practice, composition of functions evolves into composition using monads.
 
 Monads are explained and compared with ALA in detail in chapter six. Here we just present a summary.
 
-ALA and monads are both composition patterns using layers. The main difference is that ALA composes instances of classes whereas monads are for composing functions.
+ALA and monads are both composition patterns using layers. The main difference is that ALA composes instances of classes whereas monads compose functions.
 
-ALA is a three layer pattern. Monads are of themselves a two layer pattern, corresponding with the application and programming paradigm layers of ALA. Expressions that compose functions using Bind are in the top layer. The Monad Type or Interface<T> and the Bind function are in the programming paradigms layer. They are highly reusable and are often provided as a library.
+ALA is a three layer pattern. Monads themselves are a two layer pattern. The two layers correspond with the application and programming paradigm layers of ALA. Expressions that compose functions are in the application layer. The Bind function is in the programming paradigms layer, as is the the Monad Type or Interface<T>. They are highly reusable and are often provided as a library.
 
-In the monad world, it is common to add many functions that do more specific jobs than the basic Bind function, such as Filter, Map, Select and Aggregate. These functions use Bind, or do the equivalent of Bind themselves. This set of functions are roughly equivalent to the domain abstractions layer. So it could be said that monads are an example of the ALA layering pattern.  
+In the monad world, it is common to add many functions that do more specific jobs than the basic Bind function, such as Filter, Map, Select and Aggregate. These functions use Bind, or do the equivalent of Bind themselves. This set of functions are roughly equivalent to the domain abstractions layer. So monads in practice also have three layers corresponding to ALA's three layers. It could be said that monads are an example of the ALA layering pattern.
 
-ALA is generally easier to understand and more versatile than monads.
+ALA using objects is generally easier to understand and more versatile than monads.
 
-ALA is easier to understand because it uses plain objects and therefore doesn't hide so much under the covers in the form of closures. Monads usually involve a number of closure objects and delegate objects wired together in a large structure.
+Some monad implementations evaluate an expression immediately as the Bind function runs. Others are implemented as a deferred or lazy form. For a deferred monad, the Bind function builds a structure of objects which can be told to run later. The deferred form can work using either pull or push. All compares closely with the deferred/push version of monads.
 
-In ALA, what would be closures for monads, become pain objects which you instantiate yourself with WireIn(new Something()). The only new thing you have to learn about ALA objects is that they must use ports for their I/O. You are not allowed make a class directly have an association with another class. You must make a port. That is just dependency injection. The only difference between ALA dependency injection and more conventional dependency injection is that ALA wiring must be explicitly specified in a cohesive user story abstraction in the application layer. And teh WireTo function uses reflection to implement dependency injection instead of constructor injection or setter injection. That's pretty much it to understanding the mechanics of ALA over conventional objects.  
+The deferred versions of monads are difficult to understand in terms of equivalent imperative code because they use objects and closures under the covers. Thi also makes them very difficult to debug. You can't really see the under cover code. ALA is easier to understand because it uses plain objects and doesn't hide them. 
 
-ALA is more versatile, again because it uses plain objects with ports. The monad Bind function, because it is a function, essentially has only two ports, an input port and an output port. Both ports are of the same type, e.g. IEnumerable. Some more specific functions can have a second input port, e.g. Merge will merge two streams. ALA domain abstractions can have an arbitrary number of ports, and they can be using arbitrarily different programming paradigms.
+In ALA, you instantiate the objects yourself using code such as: .WireIn(new Something()). The only new thing you have to learn about ALA objects is that they must use ports for their I/O. You are not allowed to make a class directly have an association with another peer class. You must make a port and wire it from a higher layer. That is just dependency injection. The only difference between ALA dependency injection and more conventional dependency injection is that ALA wiring must be explicitly specified in a cohesive user story abstraction in the application layer. Another difference about ALA dependency injection is that I like to use reflection and implement a single WireTo function for wiring all types of ports. That way I don't need constructor injection or setter injection in every single domain abstraction class. That's pretty much it to understanding the mechanics of ALA over conventional objects.
+
+ALA is more versatile, again because it uses plain objects with ports. The monad Bind function, because it is a function, essentially has only two ports, an input port and an output port. Both ports are of the same type, e.g. IEnumerable. Some more specific functions can have a second input port, e.g. Merge will merge two streams. However, ALA domain abstractions can have an arbitrary number of ports, and they can be using arbitrarily different programming paradigms.
 
 All monads are essentially a dataflow programming paradigm, (as far eas I know) since they compose functions that take data and return data, whereas ALA supports general programming paradigms under a consistent system of wiring. 
 
-So ALA domain abstractions are a bit like Integrated circuits in electronics (many pins, with different functions), and monads are more like resistors and capacitors (two pins, analog only). 
+So ALA domain abstractions are a bit like Integrated circuits in electronics (many pins, with different types of signals), and monads are more like resistors and capacitors (two pins, analog signals only). 
 
-For the particular problems that monads suit, the monad syntax is more concise.
+For the particular problems that monads suit, the monad syntax is more concise than ALA:
 
 [source,C#]
 ....
-source.Filter(x=>x>=0).Select(x=>x+1)
+source.Filter(x => x>0).Select(x => x+1)
 ....
 
 versus
 
 [source,C#]
 ....
-source.WireIn(new Filter(x=>x>=0)).WireIn(new Select(x=>x+1)
+source.WireIn(new Filter(x => x>=0)).WireIn(new Select(x => x+1)
 ....
 
 If this code is generated from a diagram, it doesn't matter.
 
-If monads are already available in a system, you can have the best of both worlds by using them both together. For example, if you have a library of IEnumerable, or IObservable based monads already, it wouldn't make sense to rewrite every function in teh library such as Select as wirable domain abstractions. Instead, what you can do is create a single domain abstraction that can be configured with monad code. For example, we can write a domain abstraction called EnumerableQuery that can be configured with any LINQ IEnumerable query:
+If monads are already available in a system, you can have the best of both worlds by using monads and ALA together. For example, if you have a library of IEnumerable, or IObservable based monads already, it wouldn't make sense to rewrite every function in the library such as Select or Filter as domain abstractions. Instead, what you can do is create a single domain abstraction that can be configured with a monadic expression or query. For example, we can write a domain abstraction called EnumerableQuery that can be configured with any LINQ IEnumerable query:
+
+Here is a program using such a domain abstraction. We chain up three of them all with the same LINQ query.
 
 
 [source,C#]
@@ -1099,7 +1103,7 @@ static void Application()
     var proxySource = new EnumerableProxySource<int>();
     var query = proxySource.SelectMany(x => new[] { x * 10 + 1, x * 10 + 2, x * 10 + 3 }).Select(x => x + 1);
 
-    // Now create an ALA program using the domain abstraction, Query
+    // Now create an ALA program using the domain abstraction, EnumerableQuery
     var program = (EnumerableToConsoleOutput<int>)
     new List<int> { 0 }
     .WireInR(new EnumerableQuery<int, int>(proxySource, query))
@@ -1111,19 +1115,23 @@ static void Application()
 }
 ....
 
+This code is composing using both LINQ and ALA.
+
 The code first creates a LINQ query consisting of a SelectMany and a Select. 
 
-EnumerableProxySource is a small class inside the EnumerableQuery abstraction that acts as an IEnumerable on which we can start a LINQ query. When EnumerableProxySource is passed into EnumerableQuery, the EnumerableQuery configures it with a source Enumerator via a setter. So when the EnumerableProxySource's GetEnumerator is called later, it will return an actual Enumerator.
+EnumerableProxySource is a small class inside the EnumerableQuery abstraction that acts as an IEnumerable on which we can start a LINQ query. When EnumerableProxySource is passed into EnumerableQuery, the EnumerableQuery gives it a source Enumerator via a setter. So when the EnumerableProxySource's IEnumerable interface is called later, GetEnumerator it will return that Enumerator.
 
-We create a LINQ query once and use it three times (which you wouldn't normally do, I'm just using the same one three times to save having more code for different ones). I wanted to demonstrate wiring three EnumerableQuerys together just for fun.
+We create a LINQ query once and use it three times (which you wouldn't normally do, I'm just using the same one three times to show that these things can be Wired in a chain).
 
-The second half of the code is conventional ALA user story code that instantiates three instances of EnumerableQuery. The input of the first one is wired from a very simple source consisting of an IEnumerable that returns one value which is a zero. The last one is wired to a EnumerableToConsole domain abstraction, which does was you might expect - when told to run, it loops through the IEnumerable at its input and outputs all the values to the console. Here is the output of the program:
+The second half of the code is conventional ALA user story code that instantiates three instances of EnumerableQuery. The input of the first one is wired from a very simple source consisting of an IEnumerable that returns one value which is a zero. The last one is wired to an EnumerableToConsole domain abstraction, which does was you might expect - when told to run, it loops through the IEnumerable at its input and outputs all the values to the console. Here is the output of the program:
 
 image::Console output result-01.png[Console output result-01.png, title="Output of demo code using EnumerableQuery domain abstraction", link=Console output result-01.png]
 
-One unusual thing you may notice about this ALA program is the use of WireInR instead of WireIn that we would normally use to chain wire things. A.WireInR(new B()) actually wires from B to A. You use it like you would WireIn, in the same direction as the dataflow, but it actually wires in the opposite direction. This is because the IEnumerable, the programming paradigm interface being used, goes in the opposite direction as the dataflow. The B object has a filed of type IEnumerable and the A object implements IEnumerable. So the wiring must go in teh reverse direction of the dataflow. WireInR is implemented simple as WireInR(A,B) {WireIn(B,A);}  
+The output shows the generation of 3 digit numbers as it wnet through the three expansion stages given by the LINQ expression.
 
-Further discussion about the domain abstraction EnumerableQuery and a full comparison with monad can be found in chapter six.
+One unusual thing you may notice about this ALA program is the use of WireInR instead of WireIn that we would normally use to wire things in a chain. A.WireInR(new B()) actually wires in the reverse direction from normal, that is from B to A. You use it like you would use WireIn, in the same direction as the dataflow, but it actually wires in the opposite direction. This is because the IEnumerable, the programming paradigm interface being used, being a pull based interface, goes in the opposite direction as the dataflow. The A object implements IEnumerable as a data output port and the B object has a field of type IEnumerable, which is a data input port. So the wiring must go in the reverse direction of the dataflow. WireInR is implemented simply as WireInR(this object A, object B) {WireIn(B, A);}  
+
+An explanation of monads for imperative object oriented programmers is in chapter six, along with a full comparison of ALA with monads. The EnumerableQuery class is listed there.
 
 The code above can be found in a working demo program on Github in the IEnumerableMonad repository here: https://github.com/johnspray74[https://github.com/johnspray74]
 
