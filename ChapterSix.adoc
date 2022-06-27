@@ -147,7 +147,7 @@ Note that in the imperative world we would say we are really passing in two poin
 
 The Compose function returns a structure made up of delegates and closure objects:
 
-image::ComposeClosure.drawio.png[]
+image::ComposeClosure.drawio.png[title="Object diagram of the structure returned by the deferred version of the Compose function"]
 
 The closure object has two fields, which are delegates to the source and the functions. A delegate is a pointer to an object together with a method in that object. A closure is an object made from a compiler generated class with a single method and one or more fields which were copied from the local scope when the closure was created.
 
@@ -171,7 +171,7 @@ int result = composedFunction();
 
 Deferred function composition generally returns a large object structure containing delegate objects and closure objects. Here is what the object structure for the composition above looks like:
 
-image::ThreeComposedFunctionsClosureDiagram.drawio.png[]
+image::ThreeComposedFunctionsClosureDiagram.drawio.png[title=Object diagram of expression composing three functions using deferred Compose function]
 
 We will generally want a deferred version of a Compose function because then you have the option of using it immediately as if it wasn't deferred, or running it at a later time. Even if you run it immediately, the way a deferred composed function runs can be more efficient with use of memory. 
 
@@ -307,7 +307,7 @@ Application layer code
 int result = 42.Bind(x => x+1).Bind(x = x*10+1).Bind(x => x==0 ? -1 : 1/x);
 ....
 
-It's exactly the same as what we had before except that we are using Bind instead of Compose. Bind will contain the extra logic to handle -1. The other difference is that the composed functions are now allowed to return -1, which we have done for the third one.
+It's almost the same as what we had before except that we are using Bind instead of Compose. Bind will contain the extra logic to handle -1. The other difference is that the composed functions are now allowed to return -1, which we have done for the third one.
 
 
 Here is the Bind function:
@@ -330,29 +330,23 @@ You can see that if any function in the chain returns -1, the rest of teh functi
 
 ===== Immediate monad: IMaybe
 
-The MinusOne is not used outside the C world, and has limited use with only positive integers. The more general solution is the IMaybe<T> monad:
+Minus one to represent a no value is not used outside the C world, and has limited use with only positive integers. The general solution is the IMaybe<T> monad:
+
+The IMaybe version is similar to the -1 version. However Bind in this case requires an IMaybe and returns an IMaybe, and the functions that we compose together also return an IMaybe:
 
 Application layer code
 [source,C#]
 ....
-// composition of functions that return IMaybe<T>
-
-IMaybe<int> result = 42.ToMaybe<int>().Bind(function1).Bind(function2).Bind(function3);
+IMaybe<double> combinedFunctions = 42.ToMaybe()
+.Bind(x => new MaybeSomething<int>(x+1))
+.Bind(x => new MaybeSomething<int>(x*10+1))
+.Bind(x => x==0 ? new MaybeNothing<double>() : new MaybeSomething<double>((double)1/x) );
 ....
-
-The Maybe version is similar to the -1 version. However Bind in this case requires an IMaybe and returns an IMaybe. 
-
-IMaybe has two getters, one called HasValue() that returns a bool to find out if a value is there, and the other called Value to get the value out. You would normally use HasValue first and only if it is true use Value. HasValue is analogous to the MoveNext method in the IEnumerator interface, which you also have to call first.
 
 We need to convert 42 to a Maybe so that Bind can be used on it. That's the reason for the ToMaybe extension method.
 
-I have gone back to composing functon1, function2 and function3 to keep the code simpler. The lambda expressions need to return an IMaybe.
+IMaybe has two getters, one called HasValue() that returns a bool to find out if a value is there, and the other called Value to get the value out. 
 
-The Bind function uses its input IMaybe<T> to see if there is a value present or not. If there is nothing it doesn't even call the function. It just returns a new IMaybe<U> implemented by a nothing object. If there is a value, it gets the value and passes it to the function, then Bind returns the IMaybe returned by the function.
-
-In the following code, we could use Nullable, but let's create our own monad from scratch.
-
-Monad layer code
 [source,C#]
 ....
 public interface IMaybe<T>
@@ -360,6 +354,16 @@ public interface IMaybe<T>
     bool HasValue { get; }
     T Value { get; }
 }
+....
+
+You would normally use HasValue first and only if it is true use Value. HasValue is analogous to the MoveNext method in the IEnumerator interface, which you also have to call first before retreiving a value.
+
+The Bind function uses its input IMaybe<T> to see if there is a value present or not. If there is nothing it doesn't even call the function. It just returns a new IMaybe<U> implemented by a nothing object. If there is a value, it gets the value and passes it to the function, then Bind returns the IMaybe returned by the function.
+
+
+Monad layer code
+[source,C#]
+....
 
 
 public static class MaybeMonadExtensionMethods
@@ -408,6 +412,16 @@ Application layer code
 // monad composition of functions that return a List
 
 List<int> result = new List<int>(){42}.Bind(function1).Bind(function2).Bind(function3);
+....
+
+The functions each return a list. Here is the same application code with lambda expressions:
+
+[source,C#]
+....
+var result = new List<int> { 0 }  
+.Bind(x => new List<int> { x * 10 + 1, x * 10 + 2, x * 10 + 3 })
+.Bind(x => new List<int> { x * 10 + 1, x * 10 + 2, x * 10 + 3 })
+.Bind(x => new List<int> { x * 10 + 1, x * 10 + 2, x * 10 + 3 });
 ....
 
 This is the list example. In this case Bind will receive a list as its input. It will feed all the values one by one to the function. Each call of the function will return a new list. Bind will append all the lists together and return the combined list.
@@ -478,11 +492,12 @@ For the deferred version, we use Func<int> instead of an int as the monad type o
 // deferred monad composition of functions that might return -1
 
 Func<int> CombinedFunction = 
-    42.ToMinusOne().Bind(function1).Bind(function2).Bind(function3);
+    42.Bind(x => x+1).Bind(x = x*10+1).Bind(x => x==0 ? -1 : 1/x);
 }
 ....
 
-The Bind implementation doesn't call the function, it returns another function will do that later: 
+
+The Bind implementation doesn't call the function, it returns another function that will do that later: 
 
 Pull version
 [source,C#]
@@ -510,50 +525,60 @@ namespace Monad.MinusOne
 
 The lambda functions are turned into closure objects by the compiler. The returned structure looks like the diagram below.
 
-image::MinusOneDeferredPullMonadDiagram.drawio.png[]
+image::MinusOneDeferredPullMonadDiagram.drawio.png[title=Object diagram of expression using deferred/pull version of MinusOne monad"]
 
 This structure is exactly the same as the one we showed above for the Compose function. The only difference is that for the three closures that are created by the Bind function, the closure method contains the common code, that is it checks it received -1 from the source before calling the function.
 
 This is the pull version of the deferred monad implementation. We got a little lucky because it used pulling - we were able to use Func<int> is the interface that Bind takes and returns instead of using an actual interface with a function in it.  
 
+
+
+
 ===== Deferred monad MinusOne (push)
 
-We can also do a push version. For the push version we don't have the luck we had in the pull version. Bind requires a real interface. We also need a second interface. The interface that Bind takes and returns must be implemented by a source. But we can't push via such an interface (unless we use C# events). So we have a second interface that is implemented by the destination. The first interfaces function is to facilitate wiring of the second interface in the opposite direction. 
-
-We can't have interfaces on a closure object - a closure can have only one method referenced by a delegate. Therefore we must use an explicit class that implements both interfaces. The interface that Bind uses is called IMinusOneObservable and the interface that is used to push data is called IMinusOneObserver. And yes these two interfaces are analogous to the IObservable and IObserver interfaces in reactive extensions.
-
-Here is the application code that composes the three functons. The return type is IMinusOneObservable:
+We can also do a push version. Here is the application code that composes the three functions. The return type is IMinusOneObservable:
 
 [source,C#]
 ....
 // deferred monad composition of functions that might return -1
 
 IMinusOneObservable<int> CombinedFunction = 
-    42.ToMinusOne().Bind(function1).Bind(function2).Bind(function3);
+    42.ToMinusOne().Bind(x => x+1).Bind(x = x*10+1).Bind(x => x==0 ? -1 : 1/x);
 }
 ....
 
 
-Here is the code for the MinusOne monad, deferred/push version:
+For the push version we don't have the luck we had in the pull version that allowed us to implement it with closures. This time we can't use integer as the type on which the Bind extension method is defined. That's because we need to do pushing. To do the pushing we need an interface that is wired in the same direction as the dataflow (although we could have chosen to use C# events instead). Here is that interface. You can see it has a push method.
+
+[source,C#]
+....
+public interface IMinusOneObserver
+{
+    void Push(int value);
+}
+....
+
+Since this interface is wired in teh same directon as the dataflow, destinations implement the interface and source will have a field of the type of this interface.
+
+Bind can't be defined on this interface because its the wrong way around for Bind. The interface that Bind takes and returns must be implemented by a source. So what we do is have another interface just for Bind to use:
+
+[source,C#]
+....
+public interface IMinusOneObservable
+{
+    void Subscribe(IMinusOneObserver observer);
+}
+....
+
+All this interface does is give Bind a way to wire up the other interface. And yes these two interfaces are exactly analogous to the IObservable and IObserver interfaces in reactive extensions.
+
+We can't have an interface on a closure object (a closure object can have only one method referenced by a delegate). We actually got lucky with the pull version of the MinusOne monad in being able to use a closure. For the push version of the monad, and all the deferred monads we will do from now on, we must use an explicit class to implement  interfaces. So with that in mind, here is the code for the MinusOne monad, deferred/push version:
 
 Push version
 [source,C#]
 ....
 namespace Monad.MinusOne
 {
-    public interface IMinusOneObservable
-    {
-        void Subscribe(IMinusOneObserver observer);
-    }
-
-    public interface IMinusOneObserver
-    {
-        void Push(int value);
-    }
-
-
-
-
     public static class ExtensionMethods
     {
         public static IMinusOneObservable ToMinusOneMonad(this int value)
@@ -631,7 +656,7 @@ The last thing to note is the usual method we need to get the 42 into the monad 
 
 Here is the object diagram of the resulting structure:
 
-image::MinusOneDeferredPushMonadDiagram.drawio.png[]
+image::MinusOneDeferredPushMonadDiagram.drawio.png[title=Object diagram of expression using deferred/push version of MinusOne monad]
 
 You can see that the three delegate-closure pairs we had in the pull version are replaced with an object of class MinusOne. The three objects are wired together in the direction of the data flow using the IMinusOneObserver interface. The IMinusOneObservable was only used by the Bind function to effect the wiring. It is unused when the structure runs. The IMinusOneObservable interface at the end can be used to wire to an output object that implement IMinusOneObserver.
 
@@ -649,41 +674,25 @@ Let's do an example of a deferred pull monad that uses a real interface<T> by im
 
 Here is application code that uses the Bind function for the deferred/pull implementation of the maybe monad.
 
+
 [source,C#]
 ....
-// composition of functions that return IMaybe
-
-IMaybe<int> combinedFunctions = 
-    42.ToMaybe().Bind(function1).Bind(function2).Bind(function3);
+IMaybe<double> combinedFunctions = 42.ToMaybe()
+.Bind(x => new MaybeSomething<int>(x+1))
+.Bind(x => new MaybeSomething<int>(x*10+1))
+.Bind(x => x==0 ? new MaybeNothing<double>() : new MaybeSomething<double>((double)1/x) );
 ....
-
 
 First we define the IMaybe interface, which is the same as for the immediate version above. The MaybeNothing and MaybeSomething classes are also the same as before.
 
-The Bind function is different as it must build a structure that can be run later. It needs a class that implements IMaybe, which will do all the work at runtime.
-
 
 [source,C#]
 ....
-namespace Monad.MaybeDeferredPull
-{
     public interface IMaybe<T>
     {
         bool HasValue { get; }
         T Value { get; }
     }
-
-
-
-
-    public class MaybeNothing<T> : IMaybe<T>
-    {
-        bool IMaybe<T>.HasValue { get => false; }
-        T IMaybe<T>.Value { get { throw new Exception("No value"); } }
-    }
-
-
-
 
     public class MaybeSomething<T> : IMaybe<T>
     {
@@ -697,7 +706,20 @@ namespace Monad.MaybeDeferredPull
 
 
 
+    public class MaybeNothing<T> : IMaybe<T>
+    {
+        bool IMaybe<T>.HasValue { get => false; }
+        T IMaybe<T>.Value { get { throw new Exception("No value"); } }
+    }
+....
 
+
+The Bind function is different as it must build a structure that can be run later. It needs a class that implements IMaybe, which will do all the work at runtime.
+
+[source,C#]
+....
+namespace Monad.MaybeDeferredPull
+{
     public static class ExtensionMethods
     {
         public static IMaybe<T> ToMaybe<T>(this T value)
@@ -710,7 +732,6 @@ namespace Monad.MaybeDeferredPull
             return new Maybe<T, U>(source, function);
         }
     }
-
 
 
 
@@ -760,10 +781,10 @@ namespace Monad.MaybeDeferredPull
 
 
 
-Bind creates objects of the class Maybe and chains them using the IMaybe interface.
+Bind creates objects of the class Maybe and chains them using the IMaybe interface. This diagram shows the resulting structure from our little bit of application code:
 
 
-image::MaybeDeferredPullMonadDiagram.drawio.png[]
+image::MaybeDeferredPullMonadDiagram.drawio.png[title=Object diagram of expression using deferred/pull version of IMaybe monad]
 
 Because this is a pull implementation of the monad, the references go in the opposite direction of the dataflow - from destination to source or from right to left. When you want to run the combined function, you pull the value from the right end. 
 
@@ -771,7 +792,7 @@ Because this is a pull implementation of the monad, the references go in the opp
 
 ===== Deferred monad IMaybe (push)
 
-Now the push version of the deferred IMaybe monad. Here is the applicaation layer code, which in this case returns a IMaybeObservable.
+Now the push version of the deferred IMaybe monad. Here is the application layer code, which in this case returns a IMaybeObservable.
 
 [source,C#]
 ....
@@ -781,8 +802,9 @@ IMaybeObservable<int> combinedFunctions =
     42.ToMaybe().Bind(function1).Bind(function2).Bind(function3);
 ....
 
+I've purposely left the lambda expressions out for now. Well get back to them in a minute.
 
-As with the deferred push version of the MinusOne monad, we need two interfaces, IMaybeObservabe<T> for Bind to take and return, and IMaybeObserver for doing the actual pushing of data.
+As with the deferred push version of the MinusOne monad, we need two interfaces, IMaybeObservabe<T> which Bind takes and returns, and IMaybeObserver for doing the actual pushing of data.
 
 Here are the two interfaces:
 
@@ -804,13 +826,23 @@ Here are the two interfaces:
     }
 ....
 
-All IMaybeObservable does is facilitate the wiring of the IMaybeObserver in the opposite direction.
+The Bind functon uses the IMaybeObservable to wire the IMaybeObserver in the oposite direction, the direction of the data flow.
 
-Now we come to the question of what type the functions that you compose should retur.n. For the MinusOne deferred/monad, the functions just returned an integer so that was simple. Conventionally, the functions for the IMaybe monad would return IMaybeObservable, the same interface that Bind takes and returns. So the functions would have the form form: Func<T, IMaybeObservable<U>>. But that would make the functions themselves a little overly complicated. They would have to create an object implementing the IMaybeObservable interface. That interface then has a Subscribe method which you call and pass an IMaybeObserver. Then the object can finally return its value by pushing it via the IMaybeObserver.
+Now we consider the type that the functions that you compose should return. Normally with monads, this is the same interface that Bind takes and returns. So that would be IMaybeObservable. IMaybeObservable will certainly work, but the functions will be a little complicated. They will have the form: Func<T, IMaybeObservable<U>>. They would have to create an object implementing the IMaybeObservable interface to return. That interface then has a Subscribe method called on it, which gives the object an IMaybeObserver. Then the object can finally push out its result by pushing it via the IMaybeObserver.
 
-It would be much simpler for the functions if we just passed the IMaybeObserver to it when we call it. So the functions would have the form Action<T, IMaybeObserver<U>>. Now the function doesn't need to create an object to return. Instead it can just directly push the result out via the interface. This kind of makes sense because it's a push monad. 
+It would be just so much simpler if the functions were passed the IMaybeObserver when we call them. If we did that, the functions would have the form Action<T, IMaybeObserver<U>>. Now when the functions run, they don't need to create an object to return. Instead they just directly push the result out via the IMaybeObserver<U>> interface they already have. This kind of makes sense because it's a push monad. 
 
-So remember when reading the monad implementation below, the functions that are passed into the Bind fucntion are Actions of the form Action<T, IMaybeObserver<U>>.
+Here is the application layer code with lambad expressions:
+
+[source,C#]
+....
+IMaybeObservable<double> combinedFunctions = 42.ToMaybe()
+.Bind((x,ob) => ob.Value(x+1))
+.Bind((x,ob) => ob.Value(x*10+1))
+.Bind((x,ob) => { if (x==0) ob.NoValue(); else ob.Value((double)1/x); } );
+....
+
+So remember when reading the monad implementation below, the functions that you compose in the application layer take a T and a IMaybeObserver<U> and don't return a value.
 
 
 [source,C#]
@@ -819,12 +851,12 @@ namespace Monad.MaybeDeferredPush
 {
     public static class ExtensionMethods
     {
-        public static IMaybeObservabe<T> ToMaybe<T>(this T value)
+        public static IMaybeObservable<T> ToMaybe<T>(this T value)
         {
-            return new ToMaybe<T>(value);
+            return new MaybeStart<T>(value);
         }
 
-        public static IMaybeObservabe<U> Bind<T, U>(this IMaybeObservabe<T> source, Action<T, IMaybeObserver<U>> action)
+        public static IMaybeObservable<U> Bind<T, U>(this IMaybeObservabe<T> source, Action<T, IMaybeObserver<U>> action)
         {
             var maybe = new Maybe<T, U>(action);
             source.Subscribe(maybe);
@@ -836,7 +868,7 @@ namespace Monad.MaybeDeferredPush
 
 
 
-    class Maybe<T, U> : IMaybeObserver<T>, IMaybeObservabe<U>
+    class Maybe<T, U> : IMaybeObserver<T>, IMaybeObservable<U>
     {
         private Action<T, IMaybeObserver<U>> action;
 
@@ -845,7 +877,7 @@ namespace Monad.MaybeDeferredPush
 
         private List<IMaybeObserver<U>> subscribers = new List<IMaybeObserver<U>>();
 
-        void IMaybeObservabe<U>.Subscribe(IMaybeObserver<U> observer)
+        void IMaybeObservable<U>.Subscribe(IMaybeObserver<U> observer)
         {
             subscribers.Add(observer);
         }
@@ -861,14 +893,14 @@ namespace Monad.MaybeDeferredPush
 
         void IMaybeObserver<T>.Value(T value)
         {
-            action(value, new ActionReceiver<T, U>(this));
+            action(value, new ActionObserver<T, U>(this));
         }
 
 
-        private class ActionReceiver<T, U> : IMaybeObserver<U>
+        private class ActionObserver<T, U> : IMaybeObserver<U>
         {
             private Maybe<T, U> outer;
-            public ActionReceiver(Maybe<T, U> outer) { this.outer = outer; }
+            public ActionObserver(Maybe<T, U> outer) { this.outer = outer; }
 
             void IMaybeObserver<U>.NoValue()
             {
@@ -891,7 +923,7 @@ namespace Monad.MaybeDeferredPush
 
 
 
-    class ToMaybe<T> : IMaybeObservabe<T>
+    class MaybeStart<T> : IMaybeObservable<T>
     {
         private T value;
         public ToMaybe(T value) { this.value = value; }
@@ -913,11 +945,19 @@ namespace Monad.MaybeDeferredPush
 ....
 
 
-The Bind function just creates an object of the Maybe class to do all the work at runtime. It also subscribes that object to the source, which wires it in.
+As you can see, the Bind function just creates an object of the Maybe class to do all the work at runtime.
 
-At runtime, the Maybe class will need to call the action, and it needs an object that implements IMaybeObserver to pass to the action so the action can push its result out. That's the purpose of the nested class ActionReceiver. 
+You will notice a class called ActionObserver inside the Maybe class. At runtime, the Maybe class will need to call the action, and it needs an object that implements IMaybeObserver to pass to that action. That's what ActionObsserver is for. 
 
-The only other things we haven't seen before is to support multiple subscribers. It is normal for push monads to support fan out,in other words many observers can be listening to the data that is pushed out.
+The only other new thing is to support multiple subscribers. It is normal for push monads to support fan out, in other words many observers can be listening to the same data that is pushed.
+
+Here is an object diagram of the complete expression.
+
+image::MaybeDeferredPushMonadDiagram.drawio.png[title=Object diagram of expression using deferred/push version of IMaybe monad]
+
+You can see that the references between the objects, which use IMaybeIobserver, go in the same direction as the dataflow. IMaybeObservable is only used for wiring the structure up.
+The structure starts executing when the Run method in the MaybeStart object on the left is called. The application needs to keep a reference to this object so it can start the program. 
+
 
 So far we have seen deferred pull and deferred push implementations of the MinusOne and Maybe monads. Let's do a couple more examples of deferred monads to get used to the pattern:
 
