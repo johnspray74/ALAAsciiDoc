@@ -1045,35 +1045,87 @@ It is an advantage of having a state abstraction that you can implement immutabi
 
 === ALA Compared with functional programming
 
-The difference between ALA and functional programming is that ALA composes objects whereas functional programming composes functions. ALA is both more flexible, and easier to understand. 
+The difference between ALA and functional programming is that ALA composes objects whereas functional programming composes functions. In this section we explain why ALA is both more flexible, and easier to understand. 
 
-ALA could be applied to functional programming. The fundamental constraints require that the functions be good abstractions, that functions would only call or use functions that are significantly more abstract than themselves, and that functions are relatively small.
+In this section we assume familiarity with monads. There is an explanation of what monads are in chapter six. Most explanations of monads on the internet are quite mathematical or abstract, and in my view inadequate, so are difficult to understand. The explanation in chapter six takes a different approach. It looks at monads as a simple refactoring of equivalent imperative code. It is therefore accessible to anyone with an understanding of imperative code and objects.   It is quite long, but that is because it uses code examples of imperative code and the equivalent monad code.
 
-==== Monads
+ALA could be applied to functional programming. The fundamental constraints would require that the functions be good abstractions, that functions would only call or use functions that are significantly more abstract than themselves.
 
-In practice, composition of functions evolves into composition using monads. 
+Functional programming encourages what I would call computational abstractions by not allowing side effects. However, in doing so, it also compromises 'would-be abstractions' that would otherwise be coherent with their data. Data tends to need to be passed into these computational only abstractions, creating a lot of unnecessary coupling. This coupling manifests as a disconnect between code and the global data they will operate on. Functions with no interest in the become involved because they end up having to pass the data though.
 
-Monads are explained and compared with ALA in detail in chapter six. Here we just present a summary.
+Object oriented programming tends to have the opposite, but equally bad, problem where data has to be associated with some code. Then code elsewhere ends up 'reaching in' via class associations to get or manipulate that data. This also creates unnecessary coupling as well as issues with multithreading. 
 
-ALA and monads are both composition patterns using layers. The main difference is that ALA composes instances of classes whereas monads compose functions.
+Both monads and ALA are both in a way solutions to these problems.
 
-ALA is a three layer pattern. Monads themselves are a two layer pattern. The two layers correspond with the application and programming paradigm layers of ALA. Expressions that compose functions are in the application layer. The Bind function is in the programming paradigms layer, as is the the Monad Type or Interface<T>. They are highly reusable and are often provided as a library.
 
-In the monad world, it is common to add many functions that do more specific jobs than the basic Bind function, such as Filter, Map, Select and Aggregate. These functions use Bind, or do the equivalent of Bind themselves. This set of functions are roughly equivalent to the domain abstractions layer. So monads in practice also have three layers corresponding to ALA's three layers. It could be said that monads are an example of the ALA layering pattern.
 
-ALA using objects is generally easier to understand and more versatile than monads.
+==== ALA compared with monads
 
-Some monad implementations evaluate an expression immediately as the Bind function runs. Others are implemented as a deferred or lazy form. For a deferred monad, the Bind function builds a structure of objects which can be told to run later. The deferred form can work using either pull or push. All compares closely with the deferred/push version of monads.
 
-The deferred versions of monads are difficult to understand in terms of equivalent imperative code because they use objects and closures under the covers. Thi also makes them very difficult to debug. You can't really see the under cover code. ALA is easier to understand because it uses plain objects and doesn't hide them. 
+Monads fix functional programming by adding objects. The Bind function will create, and wire together either closure objects or explicit class objects. These objects are wired together just like in ALA. On the other hand ALA comes from the opposite direction and fixes object oriented programming by removing all the coupling or bad dependencies. The dependencies are turned into pure functional code. The two approaches move toward each other, but do not completely meet in the middle. In the application layer of ALA you compose objects, but in the application layer of a monads you compose functions. Both use pure functional code to do the composing. In both cases the executable code in the wired up structure is not pure functional code, but it is composed of reusable and well tested objects. ALA is the more general solution, and is easier to understand.
 
-In ALA, you instantiate the objects yourself using code such as: .WireIn(new Something()). The only new thing you have to learn about ALA objects is that they must use ports for their I/O. You are not allowed to make a class directly have an association with another peer class. You must make a port and wire it from a higher layer. That is just dependency injection. The only difference between ALA dependency injection and more conventional dependency injection is that ALA wiring must be explicitly specified in a cohesive user story abstraction in the application layer. Another difference about ALA dependency injection is that I like to use reflection and implement a single WireTo function for wiring all types of ports. That way I don't need constructor injection or setter injection in every single domain abstraction class. That's pretty much it to understanding the mechanics of ALA over conventional objects.
+If you are not familiar with monads, there is a full explanation in chapter six. Monads are notoriously difficult to understand, and I am yet to find an explanation on the internet that is not either highly abstracted or inadequate. The approach taken in chapter six is to show how monads are a simple refactoring pattern of ordinary imperative object oriented code, so anyone with an understanding of imperative objected oriented code can understand it.
 
-ALA is more versatile, again because it uses plain objects with ports. The monad Bind function, because it is a function, essentially has only two ports, an input port and an output port. Both ports are of the same type, e.g. IEnumerable. Some more specific functions can have a second input port, e.g. Merge will merge two streams. However, ALA domain abstractions can have an arbitrary number of ports, and they can be using arbitrarily different programming paradigms.
+The rest of this section assumes an understanding of monads. 
 
-All monads are essentially a dataflow programming paradigm, (as far eas I know) since they compose functions that take data and return data, whereas ALA supports general programming paradigms under a consistent system of wiring. 
+===== Monads as a layering pattern
 
-So ALA domain abstractions are a bit like Integrated circuits in electronics (many pins, with different types of signals), and monads are more like resistors and capacitors (two pins, analog signals only). 
+ALA and monads are both composition patterns using layers. The main difference is that ALA composes instances of classes whereas monads compose functions. That is, the developer writing code to implement user stories in the application layer is thinking either in terms of composing functions if using monads, or composing instances of abstractions if using ALA.
+
+ALA is a three layer pattern. Monads by themselves are a two layer pattern, but many extra functions such as Select, Where, Sort and Aggregate are typically added that effectively constitute a domain abstraction layer, although a little more abstract than the average ALA domain abstraction. The two layers of monads correspond with the application and programming paradigm layers of ALA. Code that composes functions with dot operators is in the application layer. The Bind function is in the programming paradigms layer, as is the the monad yype or Interface<T>. The Bind function and the Interface<T> are highly reusable and are often provided as a library. So monads in practice also have three layers corresponding to ALA's three layers. It could be said that monads are a special case of the ALA layering pattern.
+
+===== Monads can be immediate or deferred
+
+Monad implementations can evaluate an expression immediately as the Bind function runs. Others are implemented as a deferred or lazy form. For a deferred monad, the Bind function builds a structure of objects which can be asked to run later. The deferred form can work using either pull or push. It is the deferred/push form of monads that most closely compares with ALA. 
+
+The deferred versions of monads are difficult to understand in terms of equivalent imperative code because they use objects and closures under the covers. This also makes them difficult to debug. There can be a surprising number of objects or closures created and wired together, and you can't really see any of this code. Examples of these structures are shown in Chapter six.
+
+ALA is easier to understand because it uses plain objects, and because as the application developer, you instantiate and wire up these plain objects yourself. The typical way you do that is with code like .WireIn(new Something()). The only difference between ALA objects and objected oriented programming is that the objects must use ports for their I/O. You are not allowed to make a class have an association with another peer class. You must make a port and then wire the instantiated objects together. But that is nothing more than dependency injection. The only difference between ALA dependency injection and more conventional dependency injection is that ALA wiring must be explicitly specified in a cohesive user story abstraction in the application layer. Another difference about ALA dependency injection is that I like to use reflection and implement a single WireTo function for wiring all types of ports. That way I don't need constructor injection or setter injection in every single domain abstraction class. That's pretty much all there is to understanding the mechanics of ALA objects.
+
+ALA is more versatile because it uses plain objects with ports. The monad Bind function essentially has only two ports, an input port and an output port. Both ports are of the same type, e.g. IEnumerable. The more specific functions that come with monads can have a second input port, e.g. Merge will merge two streams. They can have more ports as well, just by adding more parameters. However such ports can be awkward to use as they must all be passed in at once. ALA domain abstraction objects have an arbitrary number of ports. If you keep a reference to the object, you can wire them in separate steps. These ports can be either 'inward facing' or 'outward facing' depending on whether they implement the interface or accept the interface. These interfaces can support arbitrarily different programming paradigms.
+
+Monads, because they compose functions, are essentially a dataflow programming paradigm. You string functions together so that the output of one is fed to the input of the next. ALA supports any programming paradigms that you can implement with an interface.  
+
+To use an analogy with electronics, ALA domain abstractions are more like Integrated circuits (many pins, with different types of signals), and monads are more like resistors and capacitors (two pins, analogue signals only).
+
+
+==== Why deferred/push monads?
+
+We mentioned that deferred/push monads are closest to ALA. Deferred/push monads have two very useful properties.
+
+The first property comes from being deferred. Often people write a query using monads, and then immediately run the query. The deferred nature of the monads is not really utilized because the query is used immediately and only once each time it is constructed. Now imagine constructing the query once, and then keeping it to be reused every time the program needs to run it. At first that doesn't seem to be an advantage. But what it does is allows us to put the code that builds the query in a completely different place from the code that runs the query. Now with these two codes in different places, we can imagine building not just the query but the entire user story in that place. As well as the query, we can build the UI, the schema and database tables, and the business logic. All this code is cohesive to the user story. Once that 'program' is built, it can be set running.
+
+The difference that this reorganisation of the code makes is massive. What we have described is essentially what ALA is all about. The code that describes the user story, including the query, is now cohesive. The code that that executes at runtime is in a set of domain abstractions, whose instances are wired together by that user story code. The two are now separated. 
+
+Monads can be used to reorganise code in this way but you need the ideas of ALA to do it.
+
+Now building a query from deferred monads once, and then reusing it many times as the program runs means that the monads must be designed to be used more than once. The monads based on IEnumerable are fine in this respect. It has a Reset method that can be used to re-run the query. However monads based on the IObservable interface are not designed to be able to run more than once. Once that OnCompleted method is called, the object structure refuses to run ever again. It has to be reconstructed by re-running the Binds, which will re-run the Subscribe method calls. I think this design in reactive extension is rather silly. You can have so called 'hot' observables, but that just means they never call OnCompleted.
+
+So when I wire IObservables to build a user story, I don't use the OnCompleted or OnError methods in the IObserver interface. This means that I have to add a different method to signal the end of a set of data.
+
+The second advantage of deferred/push monads (that is reactive extensions) is the fact that they use push. In ALA we design dataflow or event progarmming paradigms to use push by default, and only use pull if there is some good reason to use pull.
+
+The difference is that push can be either synchronous or asynchronous, whereas pull can only be synchronous (unless you use future objects.)
+
+
+////
+This method I make a push method, so it initiates from the source. I will often add an additional method that runs at the start of a data transfer as well. This method is to carry information such as header information. To accommodate this additional function, I don't use IObserver as the interface for the port. IObserver becomes something within the interface for the port. 
+
+Sometimes I will add an additional method going in the opposite direction to the dataflow which is used by the destination to request that the data transfer starts. In an IObservable interface, the Subscribe method has two functions. Firstly it is used to wire up the IObserver interface in the opposite direction. Well in ALA, that is done by WireIn which wires IObserver interfaces, so we don't need the IObservable interface. However the other function of Subscribe is to request a data transfer. Sometimes we do want the destination end to request the data, even when the source is going to push it through. So in this case I will add a method to the interface to request a data transfer. 
+
+You may think it would be better to use IEnumerable instead, but there is an advantage to using IObservable even when the destination needs to request the data. And that is that the IObserver interface can execute asynchronously. Since the domain abstractions themselves do not always know when they will be used in situations that need asynchronous communications, it is a great advantage to use push style programming paradigms which can do either synchronous or asynchronous, especially when there may be a lot of data to be transferred. It allows the data to be sent in batches. (IEnumerable can be made to work asynchronously as well, but it a lot more complicated as it involves futures.) 
+
+The method used by the destination to request a data transfer goes in the opposite direction from the interface that actually carries the data. We could implement it as a C# event in that interface. This would mean that we have one interface, and it is wired in the direction of the dataflow. When using this 'request' programming paradigm, it seems more natural to wire in the direction of the request rather than in the direction of the dataflow. Therefore, I use a second interface, which is analogous to the IObservable interface. This new interface has the request method, and is the one we use for wiring. The first time a request is made, the method send the requesting object, which allows the source object to wire the interface that goes in teh opposite direction. 
+
+In ALA, because we can create programming paradigms and design the interface for them, it is easy to implement all the aforementioned extra methods and the interface.
+////
+
+TBD example of a programming paradigm that is pure push, and is based on IObserver. Test what happens when there is an exception. Add methods for OnCompleted and OnError that don't use the ones in the IObservable, so that the program can continue to run.
+
+TBD example of a programming paradigm that allows the destination to request the transfer, but the transfer is still a push from the source. The WireIn works in the direction of teh request.
+
+
+==== Using monads in an ALA application
 
 For the particular problems that monads suit, the monad syntax is more concise than ALA:
 
@@ -1089,11 +1141,76 @@ versus
 source.WireIn(new Filter(x => x>=0)).WireIn(new Select(x => x+1)
 ....
 
-If this code is generated from a diagram, it doesn't matter.
+If this code is generated from a diagram, it doesn't make any difference, but if you are hand writing the wiring code, the ALA syntax is definitely longer. That is is the cost of the extra versatility of composing objects rather than functions.
 
-If monads are already available in a system, you can have the best of both worlds by using monads and ALA together. For example, if you have a library of IEnumerable, or IObservable based monads already, it wouldn't make sense to rewrite every function in the library such as Select or Filter as domain abstractions. Instead, what you can do is create a single domain abstraction that can be configured with a monadic expression or query. For example, we can write a domain abstraction called EnumerableQuery that can be configured with any LINQ IEnumerable query:
+If monads are already available in a system, you can have the best of both worlds by using monads and ALA together. If you already have a library for the IEnumerable or IObservable based monad, it would make no sense to rewrite every function in the library such as Select or Filter as a domain abstraction. Instead, there are ways you can use the monads library directly within an ALA application. This makes sense, because ALA provides the means to compose an entire user story, whereas monads only provide the means to compose the dataflow parts.
 
-Here is a program using such a domain abstraction. We chain up three of them all with the same LINQ query.
+There are two ways we can use monads in ALA.
+
+==== Domain abstractions with IObservable ports 
+
+The first way to use monads with ALA is to use the monad interface, such as IObservable, for the ports on domain abstractions. For example, we could have a domain abstraction for a UI grid, and another domain abstraction for a CSV file reader. The grid has a IObservable input port and the CSVFileReader has an output IObservabe port. We may want to do some filtering and selecting inbetween, and use monads that alreay exist in the reactive extension library for that.
+
+[source,C#]
+....
+class CSVType {int x, int y, int z}
+
+
+var sourceCSV = new CSVFileReader<CSVType>("filename");
+var destinationGrid = 
+sourceCSV.Filter(value => value.x>=0)).Select(value => new {value.y, value.z).WireIn(new Grid<???>());
+....
+
+
+The CSVType class specifies the type of the values that will be read from the CSV file at compile time. The type is changed by the Select function. Type inference generates the new type at its output IObservable. We need to feed that type to the Grid but we can't use type inference when instantiating an object. So what we can do is add an extension method to the Grid abstraction called ToGrid.
+
+[source,C#]
+....
+public Grid<T> ToGrid<T>(this IObservable<T> source) 
+{
+    return source.WireIn(new Grid<T>()); 
+}
+....
+
+The type T is determined by the compiler from the first parameter, source. 
+So now we can have type inference go right through to the Grid like this, and still be able to wire the grid to the other things as need to make the user story. 
+
+[source,C#]
+....
+class CSVType {int x, int y, int z}
+
+
+var sourceCSV = new CSVFileReader<CSVType>("filename");
+var destinationGrid = 
+sourceCSV.Filter(value => value.x>=0)).Select(value => new {value.y, value.z).ToGrid();
+
+mainWindow.WireTo(destinationGrid);
+....
+
+
+We can now have this program run continuously.
+
+Data transfers are triggered from the grid end by using the Subscribe method in the IObservable interface. The monads down the chain will also Subscribe until the source is reached will then push the data back, possibly asynchronousy
+
+If we want the trigger data transfers from the source end, we effectively wire the IObserver interfaces permanently. The Oncompleted and OnError methods in the interface are not used.
+
+
+which is more likely, we would need a parallel port to carry the equivalent of an OnCompleted signal, which for the CSVFileReader would signal the end of the file.
+
+
+
+
+TBD test the effect of OnComplated and OnError on running teh program a second time.
+
+TBD example using a dynamic class.
+
+
+==== Domain abstraction that is configured with monads  
+
+
+What you can do is create a single domain abstraction that can be configured with a monadic expression or query. For example, we can write a domain abstraction called EnumerableQuery that can be configured with any LINQ IEnumerable query. The abstraction can have input and output dataflow ports that are not IEnumerable or IObservable. 
+
+Here is a program using such a domain abstraction. The domain abstraction uses IEnumerable as the programming paradigm for its ports. We chain up three of them all with the same LINQ query.
 
 
 [source,C#]
@@ -1103,8 +1220,8 @@ static void Application()
     var proxySource = new EnumerableProxySource<int>();
     var query = proxySource.SelectMany(x => new[] { x * 10 + 1, x * 10 + 2, x * 10 + 3 }).Select(x => x + 1);
 
-    // Now create an ALA program using the domain abstraction, EnumerableQuery
-    var program = (EnumerableToConsoleOutput<int>)
+    // Now create an ALA program using a domain abstraction called EnumerableQuery
+    var program = (EnumerableToConsoleOutput<int>) // cast
     new List<int> { 0 }
     .WireInR(new EnumerableQuery<int, int>(proxySource, query))
     .WireInR(new EnumerableQuery<int, int>(proxySource, query))
@@ -1119,19 +1236,19 @@ This code is composing using both LINQ and ALA.
 
 The code first creates a LINQ query consisting of a SelectMany and a Select. 
 
-EnumerableProxySource is a small class inside the EnumerableQuery abstraction that acts as an IEnumerable on which we can start a LINQ query. When EnumerableProxySource is passed into EnumerableQuery, the EnumerableQuery gives it a source Enumerator via a setter. So when the EnumerableProxySource's IEnumerable interface is called later, GetEnumerator it will return that Enumerator.
+EnumerableProxySource is a small class inside the EnumerableQuery abstraction that acts as an IEnumerable on which we can start a LINQ query. When EnumerableProxySource is passed into EnumerableQuery, the EnumerableQuery gives it a source Enumerator via a setter. So when the EnumerableProxySource's IEnumerable interface is called later, GetEnumerator will return that Enumerator.
 
 We create a LINQ query once and use it three times (which you wouldn't normally do, I'm just using the same one three times to show that these things can be Wired in a chain).
 
 The second half of the code is conventional ALA user story code that instantiates three instances of EnumerableQuery. The input of the first one is wired from a very simple source consisting of an IEnumerable that returns one value which is a zero. The last one is wired to an EnumerableToConsole domain abstraction, which does was you might expect - when told to run, it loops through the IEnumerable at its input and outputs all the values to the console. Here is the output of the program:
 
-image::Console output result-01.png[Console output result-01.png, title="Output of demo code using EnumerableQuery domain abstraction", link=Console output result-01.png]
+image::ConsoleOutputListMonad.png[ConsoleOutputListMonad.png, title="Output of demo code using EnumerableQuery domain abstraction", link=Console output result-01.png]
 
 The output shows the generation of 3 digit numbers as it wnet through the three expansion stages given by the LINQ expression.
 
 One unusual thing you may notice about this ALA program is the use of WireInR instead of WireIn that we would normally use to wire things in a chain. A.WireInR(new B()) actually wires in the reverse direction from normal, that is from B to A. You use it like you would use WireIn, in the same direction as the dataflow, but it actually wires in the opposite direction. This is because the IEnumerable, the programming paradigm interface being used, being a pull based interface, goes in the opposite direction as the dataflow. The A object implements IEnumerable as a data output port and the B object has a field of type IEnumerable, which is a data input port. So the wiring must go in the reverse direction of the dataflow. WireInR is implemented simply as WireInR(this object A, object B) {WireIn(B, A);}  
 
-An explanation of monads for imperative object oriented programmers is in chapter six, along with a full comparison of ALA with monads. The EnumerableQuery class is listed there.
+As mentioned earlier, an explanation of monads for imperative object oriented programmers is in chapter six, along with a full comparison of ALA with monads. The EnumerableQuery class is listed there.
 
 The code above can be found in a working demo program on Github in the IEnumerableMonad repository here: https://github.com/johnspray74[https://github.com/johnspray74]
 
