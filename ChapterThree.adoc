@@ -1147,9 +1147,9 @@ If monads are already available in a system, you can have the best of both world
 
 There are two ways we can use monads in ALA.
 
-==== Domain abstractions with IObservable ports 
+==== Domain abstractions with IEnumerable or IObservable ports 
 
-The first way to use monads with ALA is to use the monad interface, such as IObservable, for the ports on domain abstractions. For example, we could have a domain abstraction for a UI grid, and another domain abstraction for a CSV file reader. The grid has a IObservable input port and the CSVFileReader has an output IObservabe port. We may want to do some filtering and selecting inbetween, and use monads that alreay exist in the reactive extension library for that.
+The first way to use monads with ALA is to use the monad interface, such as IObservable, for the ports on domain abstractions. For example, we could have a domain abstraction for a UI grid, and another domain abstraction for a CSV file reader. The grid has a IObservable input port and the CSVFileReader has an IObservabe output port. We may want to do some filtering and selecting inbetween using monad functions that alreay exist in the reactive extension library.
 
 [source,C#]
 ....
