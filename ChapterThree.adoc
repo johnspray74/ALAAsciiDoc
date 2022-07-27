@@ -143,23 +143,34 @@ The quality of an abstraction's _concept_ or _idea_ is important. It is the exis
 
 ==== Zero coupling
 
+****
+Larry Constantine, who coined the expression "loose coupling and high cohesion" wrote: "The key question is: How much of one module must be known in order to understand another module?". That is the essence of the most useful way to think about coupling in software.
+****
+
 ALA has mutual zero coupling between the code inside (or the code that implements) all abstractions. This is the case both horizontally between peers in the same layer, and vertically up or down the layers. 
 
-In software design we are only interested in design-time coupling. This means that to understand one piece of code, how much do we need to understand other pieces of code? This is the coupling that matters. We will use the word coupling to refer to design-time coupling. A lot of esign-time coupling is what I call _collaboration coupling_. Interfaces may hide some details, but they don't stop collaboration. When modules have a fixed arrangement with each other, they are highly likely to be collaborating, and this collaboration will tend to increase during maintenance.  
+In software design we are only interested in design-time coupling. This means that to understand one piece of code, how much do we need to know about other pieces of code? It is about knowledge, which is about design-time. This is the coupling that matters. We will use the word coupling to refer to design-time coupling. 
 
+Here is a typical definition of Loose coupling from the internet: "*Loose coupling* refers to minimal dependencies between modules, accomplished through strict, narrow, stable interfaces at the boundaries." 
 
-****
-Wikipedia defines coupling as "the degree of interdependence between software modules". It doesn't really distinguish between design-time, compile-time or run-time coupling, and the given formula for coupling seems to reflect compile-time. I prefer to think of coupling as a design-time property. The use of abstractions instead of modules changes the way we should think about coupling. 
+This definition of loose coupling differs from ALAs in two respects.
+
+Firstly, we are not minimizing dependencies. We are elliminating bad dependencies and maximizing good dependencies.
+
+Secondly, it's not just about using interfaces. A lot of design-time coupling is what I call _collaboration coupling_. An interfaces between two modules that have a fixed arrangement with each other may hide some details, but it doesn't stop fundamental collaboration between the two modules. When modules have a fixed arrangement with each other, they are highly likely to be collaborating, and this collaboration will tend to increase during maintenance.  
+
+Larry Constantine's key question about coupling (quoted above) is what is important. His reasoning came from identifying how to reduce complexity, the time taken to understand software, and reducing the incidence of bugs. Some definitions of coupling are in terms of the ripple effects of change. This is part of it, but even if a change ends up being made in one place, the time taken to understand all the collaborating code can be severe.
+
+Wikipedia defines coupling as "the degree of interdependence between software modules". It doesn't really distinguish between design-time, compile-time or run-time coupling, and the given formula for coupling seems to reflect compile-time. I prefer to think of coupling as a design-time property. It is about knowledge of internals of a module. The use of abstractions instead of modules allows us to achieve zero coupling.
 
 Consider the principle of compositionality. As stated in Wikipedia, "In semantics, mathematical logic and related disciplines, the principle of compositionality is the principle that the meaning of a complex expression is determined by the meanings of its constituent expressions and the rules used to combine them." In ALA we use domain abstractions as the 'constituent expressions', and programming paradigms as the 'rules used to combine them'. We have the objective that all code conforms to the principle of compositionality. We can then define coupling as anything that compromises this principle.
-****
 
 [TIP]
 ====
 [green]#*To understand any one part of the code should involve understanding only that one part of the code, and the abstractions it uses.*#
 ====
 
-Unfortunately there is a meme in the software engineering industry that there must be some coupling between 'modules'. The argument goes that if the system is to do anything it must have some coupling between its parts. We therefore hear of "loose coupling" as being the ideal. Using the definition of coupling given above, this is completely incorrect. Because of this meme, in conventional code we have developed a habit of using dependencies to implement communications. We settling for design-time coupling to achieve communication connections between different parts of a system. This is not necessary. Part of the problem is that the same word, _coupling_, is being used for both design-time coupling and _connections_ or _wiring_ used for communications. 
+Unfortunately there is a meme in the software engineering industry that there must be some coupling between 'modules'. The argument goes that if the system is to do anything it must have some coupling between its parts. We therefore hear of "loose coupling" as being the ideal. Using the definition of coupling given above, this is completely incorrect. Because of this meme, in conventional code we have developed a habit of using dependencies to implement communications. We are settling for design-time coupling to achieve run-time communication connections between different parts of a system. This is not necessary. Part of the problem is that the same word, _coupling_, is being used for both design-time coupling and _connections_ or _wiring_ used for communications. 
 
 In our A & B example above, the code inside B knows nothing of A. The code inside A, while it knows about the concept of the abstraction B, knows nothing about the code that is inside B. So it's not like we don't know how to do zero-coupling. ALA is basically a constraint to force us to _always_ do zero coupling.
 

@@ -36,7 +36,7 @@ There are many traditional architectural styles, patterns, principles and paradi
 * Interfaces, Polymorphism, Encapsulation, Contracts, Interface Intent
 * Execution models, Event-Driven, Multithreaded, Mainloop, Data-driven, Concurrency, Reactor pattern, Race condition, Deadlock, Priority Inversion, Reactive 
 * Principles: SRP, OCP, LSP, ISP, DIP; MVC, MVP, etc 
-* Design Patterns: Layers, Whole-Part, Observer, Strategy, Factory method, Wrapper, Composite, Decorator, Dependency Injection, Callbacks, Chain of Responsibility, etc
+* Design Patterns: GOF patterns, GRASP patterns, Layers, Whole-Part, Observer, Strategy, Factory method, Wrapper, Composite, Decorator, Dependency Injection, Callbacks, Chain of Responsibility, etc
 * Expressiveness, Fluency, DDD, Coding guidelines, Comments
 * Programming Paradigms, Imperative, Declarative, Object oriented design, Activity-flow, Work-flow, Dataflow, Function blocks, Synchronous, State machine, GUI layout, Navigation-flow, Data Schema, Functional, Immutable objects, FRP, RX, Monads, AOP, Polyglot-Programming Paradigms
 * Messaging: Push, Pull, Synchronous, Asynchronous, Shared memory, Signals & Slots
