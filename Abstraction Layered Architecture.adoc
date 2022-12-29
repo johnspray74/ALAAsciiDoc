@@ -11,12 +11,12 @@
 //:stylesheet: asciidoctor-default.css
 //:stylesdir:
 
-[big]*The rght way to organise code*
+[big]*How to organise code in the large scale*
 
 
 
 
-image::BOSS_Great_Wall.jpg[BOSS_Great_Wall.jpg,900, title="*The large scale structure of the universe - what should the structure of code look like?*"]
+image::BOSS_Great_Wall.jpg[BOSS_Great_Wall.jpg,900, title="*The large scale structure of the universe - what should the large scale structure of code look like?*"]
 
 
 
@@ -59,14 +59,15 @@ An abstraction is a learnable idea or concept. Once learned it becomes part of y
 
 In conventional methods, a system is broken into smaller pieces that we call modules, components or classes. These modules, components or classes tend to have a fixed arrangement with one-another (although an individual piece may be substitutable). This fixed arrangement leads to implicit collaboration with one another to form the system. They are like jigsaw pieces. Specific pieces fit together in a specific way to make a specific picture. The system is not explicit, it is just the collaboration of all the individual parts.
 
-In contrast, abstractions are like lego pieces. These pieces are general and can be composed in an infinite variety of ways. A specific arrangement is an explicit artifact in itself. It can be varied without changing the abstractions it uses. 
+In contrast, abstractions are like lego pieces. These pieces are general and can be composed in an infinite variety of ways. A specific arrangement is an explicit artefact in itself. It can be varied without changing the abstractions it uses. 
 --
 
 Abstractions have no knowledge of one another, nor the system that uses them.
 
-****
+[TIP]
+====
 All implicit collaboration between modules in conventional architecture becomes explicit code inside a new abstraction in a higher layer in ALA.
-****
+====
 
 This first constraint means that the ALA equivalent of a _module_ is an _abstraction_. The distinction is crucial. Modules that are not good abstractions only provide encapsulation. The term _encapsulation_ means hiding details at compile-time, but not necessarily at design-time. Abstractions are what our brains use, so only abstractions hide details at design-time. 
 
@@ -95,7 +96,7 @@ For this to work, the abstraction being used must be significantly more abstract
 
 [.float-group]
 --
-image::collaboration.jpg[float="right",title="Collaboration between abstractions is illegal"]
+image::collaboration.jpg[collaboration.jpg, float="right",title="Collaboration between abstractions is illegal"]
 
 
 Seemingly, communication is needed between peer abstractions to make a system work. However, in ALA, a dependency from one abstraction on the interface of another is illegal. For example, if the code implementing standard deviation were to, say, output the result directly to a peer module like a display, it would destroy the standard deviation abstraction. Even if the dependency is on the interface of the _display_ abstraction, the code in standard deviation would still be coupled to a concept that is not more abstract. Standard deviation would no longer be easily learnable as a concept and it would no longer be reusable without dragging display with it.
@@ -212,7 +213,7 @@ Inheritance is not used in ALA. We only use composition because inheritance brea
 
 [.float-group]
 --
-image::WiringPattern.png[WiringPattern.png, 500, title="*Wiring pattern frequently used in ALA*", float="right"]
+image::WiringPattern.png[WiringPattern.png, 500, title="*Wiring pattern frequently used in ALA*", float="right", link=images/WiringPattern.png]
 
 I use the wiring pattern shown on the right frequently to build ALA applications. 
 
@@ -836,9 +837,9 @@ This online book is a work in progress. ALA is a research in progress. Please do
 
 I would like to acknowledge the help of Roopak Sinha at AUT (Auckland University of Technology) for his significant academic contributions and ideas for ALA, and the contributions of many students who have implemented ALA projects, and helped refine the ALA methodology. 
 
-link:Abstraction_Layered_Architecture_Paper_ECSA_2018.pdf[ALA Paper presented at ECSA 2018]
+link:linkedDocumants/Abstraction_Layered_Architecture_Paper_ECSA_2018.pdf[ALA Paper presented at ECSA 2018]
 
-link:Building_Maintainable_Software_Using_Abstraction_Layering_IEEE_TSE_2022.pdf[ALA Paper published in IEEE Transactions on Software Engineering 2022]
+link:linkedDocuments/Building_Maintainable_Software_Using_Abstraction_Layering_IEEE_TSE_2022.pdf[ALA Paper published in IEEE Transactions on Software Engineering 2022]
 
 
 

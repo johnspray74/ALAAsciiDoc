@@ -17,9 +17,9 @@ In this chapter we look at each of these good and bad patterns or styles in deta
 
 In chapter 3, we did a brief comparison of ALA and monads in which we assumed prior familiarity with monads. In this section we assume no familiarity with monads. So we start by explaining what monads are. I promise this will be the easiest explanation of monads you will find on the internet. I'll be using the approach that monads are a refactoring pattern. We'll first do some imperative code, and then do the equivalent refactored code. We will do the refactoring in several stages. We will point out the multiple advantages of the refactored code along the way. At the last stage the refactored code qualifies under as a monad.
 
-____
+****
 Often abstract concepts in programming can be explained in terms of how they are syntactical sugar for a longer, imperative form of the code. For example, lambda expressions can be explained as syntactical sugar for passing in a named function. This is hard to do for monads, especially 'deferred' monads, because there is code generated under the hood. So most explanations of monads do not attempt to explain them in terms of equivalent imperative code. They go for an abstract or mathematical explanation instead. This makes these explanations very difficult to understand, especially for developers who are not so much mathematicians, but do understand imperative object oriented code just fine. I am going to show that code generated behind the scenes as well.
-____
+****
 
 Monads are motivated by three problems in functional programming:
 
@@ -172,7 +172,7 @@ The _() =>_ syntax is a lambda expression for a function that takes no parameter
 
 What the Compose function returns is actually an object structure made up of delegates and closure objects created by the compiler:
 
-image::ComposeClosure.drawio.png[title="Object diagram of the structure returned by the deferred version of the Compose function"]
+image::ComposeClosure.drawio.png[ComposeClosure.drawio.png, title="Object diagram of the structure returned by the deferred version of the Compose function",link=images/ComposeClosure.drawio.png]
 
 Note that in the imperative world we would say we are really passing in two pointers to functions, and returning a pointer to a function, but in the functional world this is said to be just composing functions. 
 
@@ -199,7 +199,7 @@ Note that we used another extension method called ToFunc to get a function that 
 
 Deferred function composition generally returns a surprisingly large object structure containing delegate objects and closure objects. Here is what the object structure for the composedFunction above looks like:
 
-image::ThreeComposedFunctionsClosureDiagram.drawio.png[title=Object diagram of expression composing three functions using deferred Compose function]
+image::ThreeComposedFunctionsClosureDiagram.drawio.png[ThreeComposedFunctionsClosureDiagram.drawio.png, title=Object diagram of expression composing three functions using deferred Compose function,link=images/ThreeComposedFunctionsClosureDiagram.drawio.png]
 
 We will generally go for a deferred version of a Compose function because then you have the option of using it immediately, or using it to build a larger program to be executed later. Deferred execution is our fifth advantage of using a compose function. Even if you run it immediately, the way a deferred composed function runs can be more efficient with use of memory. 
 
@@ -503,7 +503,7 @@ var result = new List<int> { 0 }
 
 In this case Bind will receive a list as its input. It will feed all the values one by one to the function. Each call of the function will return a new list. Bind will then join all the lists together and return the combined list. Because we compose three functions, and each returns a list of three items, the result list at the end will contain 27 items. The output is:
 
-image::ConsoleOutputListMonad.png[ConsoleOutputListMonad.png, title="Output of three Bind functions in a row"]
+image::ConsoleOutputListMonad.png[ConsoleOutputListMonad.png, title="Output of three Bind functions in a row", link=images/ConsoleOutputListMonad.png]
 
 
 Here is the Bind function for the List monad:
@@ -635,7 +635,7 @@ namespace Monad.MinusOne
 
 The lambda functions are turned into closure objects by the compiler. The returned object structure looks like the diagram below.
 
-image::MinusOneDeferredPullMonadDiagram.drawio.png[title=Object diagram of expression using deferred/pull version of MinusOne monad"]
+image::MinusOneDeferredPullMonadDiagram.drawio.png[MinusOneDeferredPullMonadDiagram.drawio.png, title=Object diagram of expression using deferred/pull version of MinusOne monad, link=images/MinusOneDeferredPullMonadDiagram.drawio.png"]
 
 This structure is exactly the same as the one we showed above for the Compose function. The only difference is that for the three closures that are created by the Bind function, the closure method contains the common code, that is it checks for  -1 from the source before calling the next function.
 
@@ -782,7 +782,7 @@ namespace Monad.MinusOne
 
 Here is the object diagram of the resulting structure:
 
-image::MinusOneDeferredPushMonadDiagram.drawio.png[title=Object diagram of expression using deferred/push version of MinusOne monad]
+image::MinusOneDeferredPushMonadDiagram.drawio.png[MinusOneDeferredPushMonadDiagram.drawio.png, title=Object diagram of expression using deferred/push version of MinusOne monad, link=images/MinusOneDeferredPushMonadDiagram.drawio.png]
 
 You can see that the three delegate-closure pairs we had in the pull version are replaced with an object of class MinusOne. The three objects are wired together in the direction of the data flow (left to right) using the IMinusOneObserver interface. The IMinusOneObservable was only used by the Bind function to effect the wiring of IMinusOneObserver. It is unused when the structure runs. The IMinusOneObservable interface at the end can be used to wire to an output object that implements IMinusOneObserver.
 
@@ -912,7 +912,7 @@ The code that runs later in the Maybe class is the HasValue and Value getters. T
 Bind creates objects of the class Maybe and chains them together. This diagram shows the resulting structure from our little bit of application code:
 
 
-image::MaybeDeferredPullMonadDiagram.drawio.png[title=Object diagram of expression using deferred/pull version of IMaybe monad]
+image::MaybeDeferredPullMonadDiagram.drawio.png[MaybeDeferredPullMonadDiagram.drawio.png, title=Object diagram of expression using deferred/pull version of IMaybe monad, link=images/MaybeDeferredPullMonadDiagram.drawio.png]
 
 Because this is a pull implementation of the monad, the references go in the opposite direction of the dataflow - from destination to source or from right to left. When you want to run the combined function, you pull the value from the right end. 
 
@@ -1086,7 +1086,7 @@ namespace Monad.MaybeDeferredPush
 
 Here is an object diagram of the complete expression.
 
-image::MaybeDeferredPushMonadDiagram.drawio.png[title=Object diagram of expression using deferred/push version of IMaybe monad]
+image::MaybeDeferredPushMonadDiagram.drawio.png[MaybeDeferredPushMonadDiagram.drawio.png, title=Object diagram of expression using deferred/push version of IMaybe monad, link=images/MaybeDeferredPushMonadDiagram.drawio.png]
 
 You can see that the references between the objects, which use IMaybeObserver, go in the same direction as the dataflow. IMaybeObservable is only used for wiring the structure up.
 
@@ -1275,7 +1275,7 @@ The two fields, sourceEnumerator, and functionEnumerator are the state. The firs
 
 The object diagram for the program again shows three objects wired in a chain from right to left:
 
-image::IEnumerableDeferredPullMonadDiagram.drawio.png[title=IEnumerable Deferred Pull Monad Object Diagram]
+image::IEnumerableDeferredPullMonadDiagram.drawio.png[IEnumerableDeferredPullMonadDiagram.drawio.png, title=IEnumerable Deferred Pull Monad Object Diagram, link=images/IEnumerableDeferredPullMonadDiagram.drawio.png]
 
 
 Bind just wires the IEnumerable interface. The IEnumerable GetEnumerator method then effectively wires the IEnumerator interface (in the same direction). So you might wonder if the IEnumerable interface could be considered redundant. We not just make Bind wire up the IEnumerator interfaces and dispensed with IEnumerable altogether? That would work, but I guess the reason IEnumerable exists is because IEnumerator is already implemented by many underlying library collections. When writing a new class that will support foreach, we need only provide a GetEnumerator method that simply returns the underlying collection instead of implementing the whole IEnumerator interface. However in our class above, this didn't help because we had to implement the whole IEnumerator interface because we were recombining multiple collections.
@@ -1778,7 +1778,7 @@ As you can see, while Bind always takes an interface and returns the same interf
 Here is a diagram of the general monad pattern.
 
 
-image::MonadPattern.png[title=The monad pattern]
+image::MonadPattern.png[MonadPattern.png, title=The monad pattern, link=images/MonadPattern.png]
 
 
 As you can see, monads are a 2-layer pattern. The two layers correspond roughly with ALA's application and programming paradigms layers. The code that uses Bind to compose functions, and the lambda functions themselves are in the application layer. The Bind function and the Interface<T> are in the programming paradigms layer. Often monads come with a set of more specialized functions such as Sort, Filter or Sum. These would go in the equivalent of the domain abstractions layer. These functions either use Bind, or do the equivalent logic as Bind themselves.
@@ -2372,7 +2372,7 @@ static void Application()
 
 Here is the output of the program:
 
-image::ConsoleOutputListMonad.png[ConsoleOutputListMonad.png, title="Output of demo code using EnumerableQuery domain abstraction", link=Console output result-01.png]
+image::ConsoleOutputListMonad.png[ConsoleOutputListMonad.png, title="Output of demo code using EnumerableQuery domain abstraction", link=images/ConsoleOutputListMonad.png]
 
 The initial value of zero expands to 27 numbers because of the SelectMany in each of the LINQ expressions.
 

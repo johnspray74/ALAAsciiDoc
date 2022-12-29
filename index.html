@@ -613,13 +613,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p><strong class="big">The rght way to organise code</strong></p>
+<p><strong class="big">How to organise code in the large scale</strong></p>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="images/BOSS_Great_Wall.jpg" alt="BOSS_Great_Wall.jpg" width="900">
 </div>
-<div class="title">Figure 1. <strong>The large scale structure of the universe - what should the structure of code look like?</strong></div>
+<div class="title">Figure 1. <strong>The large scale structure of the universe - what should the large scale structure of code look like?</strong></div>
 </div>
 <div class="paragraph">
 <p>John R Spray</p>
@@ -678,19 +678,26 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <p>In conventional methods, a system is broken into smaller pieces that we call modules, components or classes. These modules, components or classes tend to have a fixed arrangement with one-another (although an individual piece may be substitutable). This fixed arrangement leads to implicit collaboration with one another to form the system. They are like jigsaw pieces. Specific pieces fit together in a specific way to make a specific picture. The system is not explicit, it is just the collaboration of all the individual parts.</p>
 </div>
 <div class="paragraph">
-<p>In contrast, abstractions are like lego pieces. These pieces are general and can be composed in an infinite variety of ways. A specific arrangement is an explicit artifact in itself. It can be varied without changing the abstractions it uses.</p>
+<p>In contrast, abstractions are like lego pieces. These pieces are general and can be composed in an infinite variety of ways. A specific arrangement is an explicit artefact in itself. It can be varied without changing the abstractions it uses.</p>
 </div>
 </div>
 </div>
 <div class="paragraph">
 <p>Abstractions have no knowledge of one another, nor the system that uses them.</p>
 </div>
-<div class="sidebarblock">
-<div class="content">
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
 <div class="paragraph">
 <p>All implicit collaboration between modules in conventional architecture becomes explicit code inside a new abstraction in a higher layer in ALA.</p>
 </div>
-</div>
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>This first constraint means that the ALA equivalent of a <em>module</em> is an <em>abstraction</em>. The distinction is crucial. Modules that are not good abstractions only provide encapsulation. The term <em>encapsulation</em> means hiding details at compile-time, but not necessarily at design-time. Abstractions are what our brains use, so only abstractions hide details at design-time.</p>
@@ -729,7 +736,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div class="content">
 <div class="imageblock right">
 <div class="content">
-<img src="images/collaboration.jpg" alt="collaboration">
+<img src="images/collaboration.jpg" alt="collaboration.jpg">
 </div>
 <div class="title">Figure 2. Collaboration between abstractions is illegal</div>
 </div>
@@ -899,7 +906,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div class="content">
 <div class="imageblock right">
 <div class="content">
-<img src="images/WiringPattern.png" alt="WiringPattern.png" width="500">
+<a class="image" href="images/WiringPattern.png"><img src="images/WiringPattern.png" alt="WiringPattern.png" width="500"></a>
 </div>
 <div class="title">Figure 4. <strong>Wiring pattern frequently used in ALA</strong></div>
 </div>
@@ -1553,7 +1560,7 @@ interface IPullTable : IEnumerable&lt;List&lt;string&gt;&lt;T&gt;&gt;
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/Cynefin.jpg" alt="Cynefin.jpg" width="800">
+<a class="image" href="images/Cynefin.jpg"><img src="images/Cynefin.jpg" alt="Cynefin.jpg" width="800"></a>
 </div>
 <div class="title">Figure 7. Code can quickly follow the Cynefin quadrants into the complex</div>
 </div>
@@ -2274,7 +2281,7 @@ namespace DomainAbstractions
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/ALAClassDiagram.drawio.png" alt="ALAClassDiagram.drawio.png" width="90%">
+<a class="image" href="ALAClassDiagram.drawio.png"><img src="images/ALAClassDiagram.drawio.png" alt="ALAClassDiagram.drawio.png" width="90%"></a>
 </div>
 <div class="title">Figure 9. UML class diagrams for ALA have no relation lines.</div>
 </div>
@@ -3567,7 +3574,7 @@ When diagrams become large, they need two tools. One tool allows you to draw the
 <p>The UML component diagram uses lollipops to represent the ports. At first this seems great because it looks like you should then be able to wire them up in arbitrary ways. But, at the port level, all the example component diagrams I have seen use interfaces that are specific to one or other of the connected components. In other words the components have a fixed arrangement with each other. This in turn encourages them to collaborate and have implicit coupling with each other. It is the jigsaw analogy.</p>
 </div>
 <div class="paragraph">
-<p>In ALA, you must have compositonality. This means the abstractions have no fixed arrangment. You have the capability to compose instances of abstractions in an infinite variety of ways. It is the lego analogy.</p>
+<p>In ALA, you must have compositonality. This means the abstractions have no fixed arrangement. You have the capability to compose instances of abstractions in an infinite variety of ways. It is the lego analogy.</p>
 </div>
 <div class="paragraph">
 <p>Component architecture does have one thing - the ability to sunstitute one component for another with the same interfaces.</p>
@@ -3966,7 +3973,7 @@ namespace Application
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/Coffee%20Maker%20Domain%20Components.vsd.jpg" alt="Coffee Maker Domain Components.vsd.jpg">
+<a class="image" href="images/Coffee%20Maker%20Domain%20Components.vsd.jpg"><img src="images/Coffee%20Maker%20Domain%20Components.vsd.jpg" alt="Coffee Maker Domain Components.vsd.jpg"></a>
 </div>
 <div class="title">Figure 19. Coffee maker domain abstractions</div>
 </div>
@@ -4014,7 +4021,7 @@ namespace Application
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/Coffee%20Maker%20Dataflow%20diagram.vsd.jpg" alt="CoffeeMaker Dataflow diagram">
+<a class="image" href="images/Coffee%20Maker%20Dataflow%20diagram.vsd.jpg"><img src="images/Coffee%20Maker%20Dataflow%20diagram.vsd.jpg" alt="CoffeeMaker Dataflow diagram"></a>
 </div>
 <div class="title">Figure 20. Coffee maker solution</div>
 </div>
@@ -5899,7 +5906,7 @@ This is true even if we are using abstractions. That&#8217;s because multi-threa
 </div>
 <div class="imageblock text-center">
 <div class="content">
-<img src="images/DatalinkApplication.xmind.png" alt="DatalinkApplication.xmind.png">
+<a class="image" href="images/DatalinkApplication.xmind.png"><img src="images/DatalinkApplication.xmind.png" alt="DatalinkApplication.xmind.png"></a>
 </div>
 <div class="title">Figure 23. Xmind being used to design an application</div>
 </div>
@@ -6089,7 +6096,7 @@ namespace Application
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/TaxonomyProgrammingParadigms.png" alt="TaxonomyProgrammingParadigms.png">
+<a class="image" href="images/TaxonomyProgrammingParadigms.png"><img src="images/TaxonomyProgrammingParadigms.png" alt="TaxonomyProgrammingParadigms.png"></a>
 </div>
 <div class="title">Figure 25. Taxonomy Programming Paradigms - cited from Van Roy</div>
 </div>
@@ -8194,7 +8201,7 @@ namespace ProgrammingParadigms
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/BigStateMachine.pdf.jpg" alt="BigStateMachine.pdf.jpg">
+<a class="image" href="images/BigStateMachine.pdf.jpg"><img src="images/BigStateMachine.pdf.jpg" alt="BigStateMachine.pdf.jpg"></a>
 </div>
 <div class="title">Figure 27. My first significant state machine for a real embedded device</div>
 </div>
@@ -9138,7 +9145,7 @@ Perhaps, surprisingly, the architect&#8217;s main job is to focus on the require
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/CalculatorRequirements.png" alt="Calculator3.png" width="900">
+<a class="image" href="images/CalculatorRequirements.png"><img src="images/CalculatorRequirements.png" alt="Calculator3.png" width="900"></a>
 </div>
 <div class="title">Figure 28. Calculator requirements</div>
 </div>
@@ -9147,7 +9154,7 @@ Perhaps, surprisingly, the architect&#8217;s main job is to focus on the require
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/CalculatorScreenshot.png" alt="CalculatorScreenshot.png" width="900">
+<a class="image" href="images/CalculatorScreenshot.png"><img src="images/CalculatorScreenshot.png" alt="CalculatorScreenshot.png" width="900"></a>
 </div>
 <div class="title">Figure 29. Calculator screenshot</div>
 </div>
@@ -9156,7 +9163,7 @@ Perhaps, surprisingly, the architect&#8217;s main job is to focus on the require
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/Calculator2Rows-HandDrawing.png" alt="Calculator2Rows-HandDrawing.png" width="900">
+<a class="image" href="images/Calculator2Rows-HandDrawing.png"><img src="images/Calculator2Rows-HandDrawing.png" alt="Calculator2Rows-HandDrawing.png" width="900"></a>
 </div>
 <div class="title">Figure 30. Calculator (2 Rows only shown)</div>
 </div>
@@ -9191,7 +9198,7 @@ Perhaps, surprisingly, the architect&#8217;s main job is to focus on the require
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/CalculatorDomainAbstractionsHandDrawings.png" alt="CalculatorDomainAbstractionsHandDrawings.png" width="300">
+<a class="image" href="images/CalculatorDomainAbstractionsHandDrawings.png"><img src="images/CalculatorDomainAbstractionsHandDrawings.png" alt="CalculatorDomainAbstractionsHandDrawings.png" width="300"></a>
 </div>
 <div class="title">Figure 31. Calculator Domain Abstractions</div>
 </div>
@@ -9538,7 +9545,7 @@ private Horizontal WireRow(StringConcat stringConcat, DataFlowConnector&lt;strin
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/CalculatorRow-GALADE.png" alt="CalculatorRow-GALADE.png" width="800">
+<a class="image" href="images/CalculatorRow-GALADE.png"><img src="images/CalculatorRow-GALADE.png" alt="CalculatorRow-GALADE.png" width="800"></a>
 </div>
 <div class="title">Figure 34. CalculatorRow abstraction internal wiring</div>
 </div>
@@ -9571,7 +9578,7 @@ private Horizontal WireRow(StringConcat stringConcat, DataFlowConnector&lt;strin
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/CalculatorXmindParserTool.png" alt="CalculatorXmindParserTool.png" width="800">
+<a class="image" href="images/CalculatorXmindParserTool.png"><img src="images/CalculatorXmindParserTool.png" alt="CalculatorXmindParserTool.png" width="800"></a>
 </div>
 <div class="title">Figure 36. XmindParser tool in use</div>
 </div>
@@ -9634,7 +9641,7 @@ private Horizontal WireRow(StringConcat stringConcat, DataFlowConnector&lt;strin
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/CalculatorNRowsScreenshot.png" alt="CalculatorNRowsScreenshot.png" width="800">
+<a class="image" href="images/CalculatorNRowsScreenshot.png"><img src="images/CalculatorNRowsScreenshot.png" alt="CalculatorNRowsScreenshot.png" width="800"></a>
 </div>
 <div class="title">Figure 37. Later version of the calculator to support an unlimited number of rows</div>
 </div>
@@ -9649,7 +9656,7 @@ private Horizontal WireRow(StringConcat stringConcat, DataFlowConnector&lt;strin
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/CalculatorRowTemplate.png" alt="CalculatorRowTemplate.png" width="800">
+<a class="image" href="images/CalculatorRowTemplate.png"><img src="images/CalculatorRowTemplate.png" alt="CalculatorRowTemplate.png" width="800"></a>
 </div>
 <div class="title">Figure 38. CalculatorRow abstraction</div>
 </div>
@@ -9712,7 +9719,7 @@ private Horizontal WireRow(StringConcat stringConcat, DataFlowConnector&lt;strin
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/CalculatorNRows.png" alt="CalculatorNRows.png" width="800">
+<a class="image" href="images/CalculatorNRows.png"><img src="images/CalculatorNRows.png" alt="CalculatorNRows.png" width="800"></a>
 </div>
 <div class="title">Figure 42. Later version of the calculator to support an unlimited number of rows</div>
 </div>
@@ -9791,12 +9798,12 @@ namespace ProgrammingParadigms
 <div class="paragraph">
 <p>In chapter 3, we did a brief comparison of ALA and monads in which we assumed prior familiarity with monads. In this section we assume no familiarity with monads. So we start by explaining what monads are. I promise this will be the easiest explanation of monads you will find on the internet. I&#8217;ll be using the approach that monads are a refactoring pattern. We&#8217;ll first do some imperative code, and then do the equivalent refactored code. We will do the refactoring in several stages. We will point out the multiple advantages of the refactored code along the way. At the last stage the refactored code qualifies under as a monad.</p>
 </div>
-<div class="quoteblock">
-<blockquote>
+<div class="sidebarblock">
+<div class="content">
 <div class="paragraph">
 <p>Often abstract concepts in programming can be explained in terms of how they are syntactical sugar for a longer, imperative form of the code. For example, lambda expressions can be explained as syntactical sugar for passing in a named function. This is hard to do for monads, especially 'deferred' monads, because there is code generated under the hood. So most explanations of monads do not attempt to explain them in terms of equivalent imperative code. They go for an abstract or mathematical explanation instead. This makes these explanations very difficult to understand, especially for developers who are not so much mathematicians, but do understand imperative object oriented code just fine. I am going to show that code generated behind the scenes as well.</p>
 </div>
-</blockquote>
+</div>
 </div>
 <div class="paragraph">
 <p>Monads are motivated by three problems in functional programming:</p>
@@ -9988,7 +9995,7 @@ int result = function3(r2);</code></pre>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/ComposeClosure.drawio.png" alt="ComposeClosure.drawio">
+<a class="image" href="images/ComposeClosure.drawio.png"><img src="images/ComposeClosure.drawio.png" alt="ComposeClosure.drawio.png"></a>
 </div>
 <div class="title">Figure 43. Object diagram of the structure returned by the deferred version of the Compose function</div>
 </div>
@@ -10025,7 +10032,7 @@ int result = function3(r2);</code></pre>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/ThreeComposedFunctionsClosureDiagram.drawio.png" alt="ThreeComposedFunctionsClosureDiagram.drawio">
+<a class="image" href="images/ThreeComposedFunctionsClosureDiagram.drawio.png"><img src="images/ThreeComposedFunctionsClosureDiagram.drawio.png" alt="ThreeComposedFunctionsClosureDiagram.drawio.png"></a>
 </div>
 <div class="title">Figure 44. Object diagram of expression composing three functions using deferred Compose function</div>
 </div>
@@ -10373,12 +10380,13 @@ public class Something&lt;T&gt; : IMaybe&lt;T&gt;
 </div>
 </div>
 <div class="paragraph">
-<p>In this case Bind will receive a list as its input. It will feed all the values one by one to the function. Each call of the function will return a new list. Bind will then join all the lists together and return the combined list. Because we compose three functions, and each returns a list of three items, the reslt list at the end will contain 27 items. The output is:</p>
+<p>In this case Bind will receive a list as its input. It will feed all the values one by one to the function. Each call of the function will return a new list. Bind will then join all the lists together and return the combined list. Because we compose three functions, and each returns a list of three items, the result list at the end will contain 27 items. The output is:</p>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/ConsoleOutputListMonad.png" alt="ConsoleOutputListMonad">
+<a class="image" href="images/ConsoleOutputListMonad.png"><img src="images/ConsoleOutputListMonad.png" alt="ConsoleOutputListMonad.png"></a>
 </div>
+<div class="title">Figure 45. Output of three Bind functions in a row</div>
 </div>
 <div class="paragraph">
 <p>Here is the Bind function for the List monad:</p>
@@ -10523,9 +10531,9 @@ result.Item0, result.Item1                   // tuple</code></pre>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/MinusOneDeferredPullMonadDiagram.drawio.png" alt="MinusOneDeferredPullMonadDiagram.drawio">
+<a class="image" href="images/MinusOneDeferredPullMonadDiagram.drawio.png""><img src="images/MinusOneDeferredPullMonadDiagram.drawio.png" alt="MinusOneDeferredPullMonadDiagram.drawio.png"></a>
 </div>
-<div class="title">Figure 45. Object diagram of expression using deferred/pull version of MinusOne monad"</div>
+<div class="title">Figure 46. Object diagram of expression using deferred/pull version of MinusOne monad</div>
 </div>
 <div class="paragraph">
 <p>This structure is exactly the same as the one we showed above for the Compose function. The only difference is that for the three closures that are created by the Bind function, the closure method contains the common code, that is it checks for  -1 from the source before calling the next function.</p>
@@ -10701,9 +10709,9 @@ IMinusOneObservable&lt;int&gt; result = 42.ToMinusOne()
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/MinusOneDeferredPushMonadDiagram.drawio.png" alt="MinusOneDeferredPushMonadDiagram.drawio">
+<a class="image" href="images/MinusOneDeferredPushMonadDiagram.drawio.png"><img src="images/MinusOneDeferredPushMonadDiagram.drawio.png" alt="MinusOneDeferredPushMonadDiagram.drawio.png"></a>
 </div>
-<div class="title">Figure 46. Object diagram of expression using deferred/push version of MinusOne monad</div>
+<div class="title">Figure 47. Object diagram of expression using deferred/push version of MinusOne monad</div>
 </div>
 <div class="paragraph">
 <p>You can see that the three delegate-closure pairs we had in the pull version are replaced with an object of class MinusOne. The three objects are wired together in the direction of the data flow (left to right) using the IMinusOneObserver interface. The IMinusOneObservable was only used by the Bind function to effect the wiring of IMinusOneObserver. It is unused when the structure runs. The IMinusOneObservable interface at the end can be used to wire to an output object that implements IMinusOneObserver.</p>
@@ -10842,9 +10850,9 @@ IMinusOneObservable&lt;int&gt; result = 42.ToMinusOne()
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/MaybeDeferredPullMonadDiagram.drawio.png" alt="MaybeDeferredPullMonadDiagram.drawio">
+<a class="image" href="images/MaybeDeferredPullMonadDiagram.drawio.png"><img src="images/MaybeDeferredPullMonadDiagram.drawio.png" alt="MaybeDeferredPullMonadDiagram.drawio.png"></a>
 </div>
-<div class="title">Figure 47. Object diagram of expression using deferred/pull version of IMaybe monad</div>
+<div class="title">Figure 48. Object diagram of expression using deferred/pull version of IMaybe monad</div>
 </div>
 <div class="paragraph">
 <p>Because this is a pull implementation of the monad, the references go in the opposite direction of the dataflow - from destination to source or from right to left. When you want to run the combined function, you pull the value from the right end.</p>
@@ -11039,9 +11047,9 @@ IMinusOneObservable&lt;int&gt; result = 42.ToMinusOne()
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/MaybeDeferredPushMonadDiagram.drawio.png" alt="MaybeDeferredPushMonadDiagram.drawio">
+<a class="image" href="images/MaybeDeferredPushMonadDiagram.drawio.png"><img src="images/MaybeDeferredPushMonadDiagram.drawio.png" alt="MaybeDeferredPushMonadDiagram.drawio.png"></a>
 </div>
-<div class="title">Figure 48. Object diagram of expression using deferred/push version of IMaybe monad</div>
+<div class="title">Figure 49. Object diagram of expression using deferred/push version of IMaybe monad</div>
 </div>
 <div class="paragraph">
 <p>You can see that the references between the objects, which use IMaybeObserver, go in the same direction as the dataflow. IMaybeObservable is only used for wiring the structure up.</p>
@@ -11254,9 +11262,9 @@ IMinusOneObservable&lt;int&gt; result = 42.ToMinusOne()
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/IEnumerableDeferredPullMonadDiagram.drawio.png" alt="IEnumerableDeferredPullMonadDiagram.drawio">
+<a class="image" href="images/IEnumerableDeferredPullMonadDiagram.drawio.png"><img src="images/IEnumerableDeferredPullMonadDiagram.drawio.png" alt="IEnumerableDeferredPullMonadDiagram.drawio.png"></a>
 </div>
-<div class="title">Figure 49. IEnumerable Deferred Pull Monad Object Diagram</div>
+<div class="title">Figure 50. IEnumerable Deferred Pull Monad Object Diagram</div>
 </div>
 <div class="paragraph">
 <p>Bind just wires the IEnumerable interface. The IEnumerable GetEnumerator method then effectively wires the IEnumerator interface (in the same direction). So you might wonder if the IEnumerable interface could be considered redundant. We not just make Bind wire up the IEnumerator interfaces and dispensed with IEnumerable altogether? That would work, but I guess the reason IEnumerable exists is because IEnumerator is already implemented by many underlying library collections. When writing a new class that will support foreach, we need only provide a GetEnumerator method that simply returns the underlying collection instead of implementing the whole IEnumerator interface. However in our class above, this didn&#8217;t help because we had to implement the whole IEnumerator interface because we were recombining multiple collections.</p>
@@ -11822,9 +11830,9 @@ Interface&lt;W&gt; I4 = I3.Bind(func&lt;V, Interface&lt;W&gt;&gt;);</code></pre>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/MonadPattern.png" alt="MonadPattern">
+<a class="image" href="images/MonadPattern.png"><img src="images/MonadPattern.png" alt="MonadPattern.png"></a>
 </div>
-<div class="title">Figure 50. The monad pattern</div>
+<div class="title">Figure 51. The monad pattern</div>
 </div>
 <div class="paragraph">
 <p>As you can see, monads are a 2-layer pattern. The two layers correspond roughly with ALA&#8217;s application and programming paradigms layers. The code that uses Bind to compose functions, and the lambda functions themselves are in the application layer. The Bind function and the Interface&lt;T&gt; are in the programming paradigms layer. Often monads come with a set of more specialized functions such as Sort, Filter or Sum. These would go in the equivalent of the domain abstractions layer. These functions either use Bind, or do the equivalent logic as Bind themselves.</p>
@@ -12440,9 +12448,9 @@ Interface&lt;W&gt; I4 = I3.Bind(func&lt;V, Interface&lt;W&gt;&gt;);</code></pre>
 </div>
 <div class="imageblock">
 <div class="content">
-<a class="image" href="Console output result-01.png"><img src="images/ConsoleOutputListMonad.png" alt="ConsoleOutputListMonad.png"></a>
+<a class="image" href="images/ConsoleOutputListMonad.png"><img src="images/ConsoleOutputListMonad.png" alt="ConsoleOutputListMonad.png"></a>
 </div>
-<div class="title">Figure 51. Output of demo code using EnumerableQuery domain abstraction</div>
+<div class="title">Figure 52. Output of demo code using EnumerableQuery domain abstraction</div>
 </div>
 <div class="paragraph">
 <p>The initial value of zero expands to 27 numbers because of the SelectMany in each of the LINQ expressions.</p>
@@ -13857,7 +13865,7 @@ private List&lt;List&lt;string&gt;&gt; TranslateFrameScores(List&lt;List&lt;int&
 <div class="content">
 <img src="images/Paintings_from_the_Chauvet_cave.jpg" alt="Paintings_from_the_Chauvet_cave.jpg" width="400">
 </div>
-<div class="title">Figure 52. Paintings in the Chauvet cave</div>
+<div class="title">Figure 53. Paintings in the Chauvet cave</div>
 </div>
 <div class="paragraph">
 <p>Our ancestors could use a word like 'bring your spear' and it had a simple meaning to them only because all the detail and knowledge that went into building a spear was replaced with the abstraction 'spear'. Without the abstraction, the sentence would have had to be more like "bring the object that we made by joining the object we made by applying blows to the hard material we found at the place&#8230;&#8203;, with the long material we cut in the place with the tall&#8230;&#8203;, by tying it with the long grass material using the gooey stuff we found at the&#8230;&#8203;". Even this sentence was only made possible by other abstractions: joining, material, blows, hard, long (twice), cut, tall, tying, gooey, and found. If we expanded all of them until we were only using a few basic concepts like 'object' and 'place', we would have a sentence so long that we could never communicate at all. That&#8217;s what abstractions do, and how our brains make use of them. The word spear, in turn can be used to create a new abstraction, a hunting plan, while all of that other detail remains hidden from that new context.</p>
@@ -13869,7 +13877,7 @@ private List&lt;List&lt;string&gt;&gt; TranslateFrameScores(List&lt;List&lt;int&
 <div class="content">
 <img src="images/neuron.svg" alt="neuron.svg" width="300">
 </div>
-<div class="title">Figure 53. </div>
+<div class="title">Figure 54. </div>
 </div>
 <div class="paragraph">
 <p>As software engineers we do learn and use many abstractions. For example if we want to protect simultaneous access to the resource, our brain should conjure up 'mutex'.</p>
@@ -13989,7 +13997,7 @@ private List&lt;List&lt;string&gt;&gt; TranslateFrameScores(List&lt;List&lt;int&
 <div class="content">
 <img src="images/creativity.jpg" alt="creativity.jpg" width="80%">
 </div>
-<div class="title">Figure 54. The creativity cycle</div>
+<div class="title">Figure 55. The creativity cycle</div>
 </div>
 <div class="paragraph">
 <p>A good abstraction separates the knowledge of different worlds. A clock is a good abstraction. On one side is the world of cog wheels. On the other side is someone trying to be on time in their busy daily schedule. Neither knows anything about the details of the other. SQL is another good abstraction. On one side is the world of fast indexing algorithms. On the other is finding all the orders for a particular customer. Let us consider a domain abstraction - the calculation of loan repayments. On one side is the world of mathematics with the derivation and implementation of a formula. On the other, the code is about a person wanting to know if they can afford to buy a house. If your abstractions don&#8217;t separate knowledge of different worlds like this, then you are probably just factoring common code. Find the abstraction in that common code. Make it hide something complicated that&#8217;s really easy to use and really useful, like a clock.</p>
@@ -14372,7 +14380,7 @@ When we use the word 'ubiquitous', it refers to the number of times the abstract
 <div class="content">
 <img src="images/caffeine%20molecule.png" alt="Caffeine molecule.png" width="300">
 </div>
-<div class="title">Figure 55. caffeine - oxygen atoms are red</div>
+<div class="title">Figure 56. caffeine - oxygen atoms are red</div>
 </div>
 <div class="paragraph">
 <p>Abstractions are fragile and get destroyed easily, so we have to take care to protect them. What we needed to do was to put the knowledge about the relationship between oxygen and hydrogen to make water in a new abstraction called Water.</p>
@@ -14493,7 +14501,7 @@ When we use the word 'ubiquitous', it refers to the number of times the abstract
 <div class="content">
 <img src="images/circuit%20diagram.gif" alt="circuit diagram.gif">
 </div>
-<div class="title">Figure 56. In an electronic schematic, the components are abstractions that are composed using two paradigm interfaces - live analog signals and live digital signals</div>
+<div class="title">Figure 57. In an electronic schematic, the components are abstractions that are composed using two paradigm interfaces - live analog signals and live digital signals</div>
 </div>
 <div class="paragraph">
 <p>Returning to a software example, let&#8217;s choose a single simple programming paradigm: activity flow. This programming paradigm is the same as the UML Activity diagram. When we wire A to B and they use this paradigm, it means that B starts after A finishes. If A and B accept and provide this interface respectively, then wiring them together by drawing an arrow will have that meaning, and cause that to happen at run-time.</p>
@@ -14977,7 +14985,7 @@ Later we will introduce an asynchronous (event driven) execution model. It is pr
 <div class="content">
 <img src="images/Layers.png" alt="Layers.png" width="75%">
 </div>
-<div class="title">Figure 57. Four ALA layers</div>
+<div class="title">Figure 58. Four ALA layers</div>
 </div>
 <div class="paragraph">
 <p>ALA uses slightly different names: Application layer, Domain Abstractions layer, Programming Paradigms layer, and Language layer.</p>
@@ -15174,7 +15182,7 @@ Later we will introduce an asynchronous (event driven) execution model. It is pr
 <div class="content">
 <img src="images/Slide11.jpg" alt="Slide11.jpg">
 </div>
-<div class="title">Figure 58. Decomposition Structure</div>
+<div class="title">Figure 59. Decomposition Structure</div>
 </div>
 <div class="paragraph">
 <p>The outer elements correctly only refer to the outer interface of the components - their package or namespace interface, facade, or aggregate root - however you want to think of it. Encapsulation is used at every level of the structure to hide implementation details.</p>
@@ -15189,7 +15197,7 @@ Later we will introduce an asynchronous (event driven) execution model. It is pr
 <div class="content">
 <img src="images/Slide13.jpg" alt="Slide13.jpg">
 </div>
-<div class="title">Figure 59. Tracing a User story</div>
+<div class="title">Figure 60. Tracing a User story</div>
 </div>
 <div class="paragraph">
 <p>The diagram shows both decomposition relationships (boxes inside boxes) and interaction relationships (lines).</p>
@@ -15204,7 +15212,7 @@ Later we will introduce an asynchronous (event driven) execution model. It is pr
 <div class="content">
 <img src="images/Slide14.jpg" alt="Slide14.jpg">
 </div>
-<div class="title">Figure 60. Composition Structure</div>
+<div class="title">Figure 61. Composition Structure</div>
 </div>
 <div class="paragraph">
 <p>Only 'composition' relationships are present. We have shown some of them as lines even though you wouldn&#8217;t normally draw them. For example, the one from <span class="underline">c</span> to C. In practice we wouldn&#8217;t normally draw a diagram like this at all - the abstractions would be just referred to by name. But here we are trying to make a combined diagram of the meta-architecture and the specific architecture. The meta-architecture is the three layers, and the knowledge dependencies that go from the higher layers to the lower layers. The specific architecture consists of the diagrams inside the user stories in the top layer, the specific composition of instances.</p>
@@ -15650,7 +15658,7 @@ Avoid use of symbolic indirection without abstraction
 <div class="content">
 <img src="images/Tru%20Test%20XR5000%20Weigh%20Scale%20Indicator.jpg" alt="Tru Test XR5000 Weigh Scale Indicator.jpg" width="75%">
 </div>
-<div class="title">Figure 61. Livestock weighing indicator</div>
+<div class="title">Figure 62. Livestock weighing indicator</div>
 </div>
 <div class="paragraph">
 <p>The architecture in the original software, was somewhat typically organised into modules and patterns by its developers. Also somewhat typically, it had ended up with a high cost of modifiability - a big ball of mud. After the first release, the first incremental requirement was a 'Treatments' feature, which involved several new tables, new columns in existing tables, new data pages, new settings pages and some new business logic. This feature took a further 3 months to complete (actually 6 calendar months), which seemed out of proportion for the size of the feature. Somehow the Product Owner and managers seemed to have a sort of intuition that if similar things had been done before, such as menus or database tables, those things were already done, and the only new work was in the specific details of the new requirements. Those requirements could be communicated in a relatively short time, say of the order of one hour or one day if you include follow up discussions of abnormal scenarios.  So 6 months did not go down well. ALA, of course, works in exactly this intuitive way that managers hope for. All the things already done are sitting there in the domain abstractions, waiting to be reused, configured and composed into new requirements.</p>
@@ -15682,7 +15690,7 @@ Avoid use of symbolic indirection without abstraction
 <div class="content">
 <a class="image" href="images/All%20Animals%20Screen%20V3.png"><img src="images/All%20Animals%20Screen%20V3.png" alt="All Animals Screen V3.png"></a>
 </div>
-<div class="title">Figure 62. Application diagram for the All Animals View feature</div>
+<div class="title">Figure 63. Application diagram for the All Animals View feature</div>
 </div>
 <div class="paragraph">
 <p>As I did the diagram, I deliberately left out anything to do with the aforementioned Treatments feature, so that I could see how easy it might have been to implement once the domain abstractions for the rest of the requirements had matured. So after the diagram was completed, I added the Treatments feature. This involved adding tables, columns to existing tables, a settings screen, a data screen, and some behaviours.  No further abstractions needed to be invented. The incremental time for the diagram additions was of the order of one hour. Obviously testing would be needed on top of that, and the 'Table' abstraction would need additional work so it could migrate itself, a function it had not needed up until this point. Although somewhat theoretical, the evidence was that we could get at least an order of magnitude improvement in incremental maintenance effort.</p>
@@ -15744,7 +15752,7 @@ Avoid use of symbolic indirection without abstraction
 <div class="content">
 <img src="images/XR5000ScreenShot.jpg" alt="XR5000ScreenShot.jpg" width="75%">
 </div>
-<div class="title">Figure 63. All Animals view in the weighing indicator</div>
+<div class="title">Figure 64. All Animals view in the weighing indicator</div>
 </div>
 <div class="paragraph">
 <p>The student&#8217;s job was to write 12 abstractions out of the 50. These 12 were the ones used by that feature. The initial brief was to make the new code work alongside the old code (as would be needed for an incremental legacy rewrite), but the old code was consuming too much time to integrate with, so this part was abandoned.</p>
@@ -15792,7 +15800,7 @@ Avoid use of symbolic indirection without abstraction
 <div class="content">
 <img src="images/diagram-24.png" alt="diagram 24">
 </div>
-<div class="title">Figure 64. Syntax Diagram showing implementation of statement using recursion</div>
+<div class="title">Figure 65. Syntax Diagram showing implementation of statement using recursion</div>
 </div>
 <div class="paragraph">
 <p>In ALA, we want to preserve the idea of clear layers defining what knowledge is needed to understand what. Resolving this dilemma could get a bit philosophical. Since abstractions are the first class artefacts of the human brain, it may be best to think about how the brain does it. The brain must actually have two abstractions with the same name but at different levels. The first is analogous to a 'forward declaration' in a language to allow a compiler to know about something that will be referred to in a more abstract way before it finds out about it in a more specific way.</p>
@@ -15933,7 +15941,7 @@ Once the code for the single user story is understood, some acceptance tests are
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-12-29 12:07:03 01300
+Last updated 2022-12-29 17:06:12 01300
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/Docco.min.css">

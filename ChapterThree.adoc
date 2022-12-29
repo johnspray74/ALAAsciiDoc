@@ -1383,7 +1383,7 @@ As we said in this chapter, diagrams can be an important aspect of ALA when the 
 
 Here is a sample section from the application diagram that shows all the relationships that implement the user story:
 
-image::DatalinkApplication.xmind.png[DatalinkApplication.xmind.png, title="Xmind being used to design an application", align="center"]
+image::DatalinkApplication.xmind.png[DatalinkApplication.xmind.png, title="Xmind being used to design an application", align="center", link=images/DatalinkApplication.xmind.png]
 
 This diagram was drawn using Xmind. It shows a single user story.  There is a UI with a menu item or a tool bar to start the user story. It then displays a browse dialogue to specify the location of the file. When the filepath has been selected, it gets data off a device on a COM port, using a protocol, and writes it to a CSV file. The data is also routed to be shown on a grid on the UI.
 

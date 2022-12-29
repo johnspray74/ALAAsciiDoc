@@ -356,17 +356,17 @@ The calculator I wanted would show the expression you had entered so you can che
 
 So I drew this sketch of what I wanted a calculator to be: 
 
-image::CalculatorRequirements.png[Calculator3.png, 900, title="Calculator requirements"]
+image::CalculatorRequirements.png[Calculator3.png, 900, title="Calculator requirements", link=images/CalculatorRequirements.png]
 
 
 Here is a screenshot of the working calculator as it was two half-days later:
 
-image::CalculatorScreenshot.png[CalculatorScreenshot.png, 900, title="Calculator screenshot"]
+image::CalculatorScreenshot.png[CalculatorScreenshot.png, 900, title="Calculator screenshot", link=images/CalculatorScreenshot.png]
 
 
 The first step in the design of the calculator was to express the requirements (UI plus behaviours), inventing any needed abstractions to do so. Here is the actual first sketch I drew: 
 
-image::Calculator2Rows-HandDrawing.png[Calculator2Rows-HandDrawing.png, 900, title="Calculator (2 Rows only shown)"]
+image::Calculator2Rows-HandDrawing.png[Calculator2Rows-HandDrawing.png, 900, title="Calculator (2 Rows only shown)", link=images/Calculator2Rows-HandDrawing.png]
 
 As we shall see, this diagram is practically executable code. The calculator is practically done. We don't know if the invented domain abstractions will work yet, but let's go through how this calculator works anyway. 
 
@@ -395,7 +395,7 @@ At this point I drew little drawings of all the invented abstractions. Actually 
 
 
 
-image::CalculatorDomainAbstractionsHandDrawings.png[CalculatorDomainAbstractionsHandDrawings.png, 300, title="Calculator Domain Abstractions"]
+image::CalculatorDomainAbstractionsHandDrawings.png[CalculatorDomainAbstractionsHandDrawings.png, 300, title="Calculator Domain Abstractions", link=images/CalculatorDomainAbstractionsHandDrawings.png]
 
 I see I forgot to draw Concat. I had to write that one. Here is its template as it was in my Xmind templates diagram.
 
@@ -698,7 +698,7 @@ But we don't have to hand generate code. At the time of writing a hand written g
 Here is the calculator row part of the diagram, which was successfully used to auto-generate code:
 
 
-image::CalculatorRow-GALADE.png[CalculatorRow-GALADE.png, 800, title="CalculatorRow abstraction internal wiring"]
+image::CalculatorRow-GALADE.png[CalculatorRow-GALADE.png, 800, title="CalculatorRow abstraction internal wiring", link=images/CalculatorRow-GALADE.png]
 
 Before we had that tool, we used Xmind to do diagrams from which we could generated code. This is the approach described in the next section. 
 
@@ -719,7 +719,7 @@ The Xmind version of the diagram is pretty much identical to the hand drawn vers
 
 The diagram done, it's time to generate the code. A tool called XmindParser does this. It can be downloaded from the Github project main page. Here is the tool in use to generate a calculator from the diagram.
 
-image::CalculatorXmindParserTool.png[CalculatorXmindParserTool.png, 800, title="XmindParser tool in use"]
+image::CalculatorXmindParserTool.png[CalculatorXmindParserTool.png, 800, title="XmindParser tool in use", link=images/CalculatorXmindParserTool.png]
 
 The tool can put the generated code into your Application.cs file if you give it special markers like the one below.
 
@@ -775,7 +775,7 @@ I made a diagram with six rows, but it was getting pretty large, and the duplica
 
 The 6-row calculator is powerful compared to any normal calculator, but still wouldn't do jobs like the one shown here which has 11 rows:
 
-image::CalculatorNRowsScreenshot.png[CalculatorNRowsScreenshot.png, 800, title="Later version of the calculator to support an unlimited number of rows"]
+image::CalculatorNRowsScreenshot.png[CalculatorNRowsScreenshot.png, 800, title="Later version of the calculator to support an unlimited number of rows", link=images/CalculatorNRowsScreenshot.png]
 
 So it was time to do some maintenance, and solve that problem of the repetition in the diagram at the same time. During this maintenance, none of the existing abstractions changed. Their ports stayed the same. Their internals were improved a little in some cases but nothing significant. Formula was modified internally so that it could handle more than six operand inputs, although any one formula can still only use six of them.
 
@@ -783,7 +783,7 @@ There were two major changes though. One was to put the repeated wiring for a ca
 
 Here is the Xmind template for the CalculatorRow abstraction showing its ports:
 
-image::CalculatorRowTemplate.png[CalculatorRowTemplate.png, 800, title="CalculatorRow abstraction"]
+image::CalculatorRowTemplate.png[CalculatorRowTemplate.png, 800, title="CalculatorRow abstraction", link=images/CalculatorRowTemplate.png]
 
 
 The implementation of CalculatorRow was done with a diagram using the new Graphical ALA tool which was shown earlier.
@@ -820,7 +820,7 @@ Wouldn't it be cool if the calculator started with say 4 rows, and had a button 
 
 Here is the calculator with the button added to the UI. This is the calculator from which the screen shot shown above was taken.
 
-image::CalculatorNRows.png[CalculatorNRows.png, 800, title="Later version of the calculator to support an unlimited number of rows"]
+image::CalculatorNRows.png[CalculatorNRows.png, 800, title="Later version of the calculator to support an unlimited number of rows", link=images/CalculatorNRows.png]
 
 I wanted the Button to be at the bottom, so I added another instance of Vertical to act as the wiring point for new row to be attached to the UI. The output of the Button is another programming paradigm interface called an IEvent. 
 

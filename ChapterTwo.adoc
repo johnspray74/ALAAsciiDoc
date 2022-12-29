@@ -200,7 +200,7 @@ Class diagrams are evil. They have done more damage to software architecture tha
 
 If a UML class diagram were drawn of an ALA application, there would be no lines at all, just boxes in space arranged in layers. This makes sense, because classes are used to implement abstractions, and abstractions have zero coupling with one another. 
 
-image::ALAClassDiagram.drawio.png[ALAClassDiagram.drawio.png, title="UML class diagrams for ALA have no relation lines.", width=90%]
+image::ALAClassDiagram.drawio.png[ALAClassDiagram.drawio.png, title="UML class diagrams for ALA have no relation lines.", width=90%, link=ALAClassDiagram.drawio.png]
 
 The diagram is not useful. We will never use it again. That's not to say we won't use diagrams. Diagrams can be used in ALA to represent the internals of an abstraction. This is often done in the layer representing the application or a feature or user story. In ALA terms, it shows instances of (lower layer) abstractions wired together. In implementation terms it is a (static) UML object diagram.
 
@@ -1215,7 +1215,7 @@ That's the intentions. In practice, all the component diagrams I have seen fall 
 
 The UML component diagram uses lollipops to represent the ports. At first this seems great because it looks like you should then be able to wire them up in arbitrary ways. But, at the port level, all the example component diagrams I have seen use interfaces that are specific to one or other of the connected components. In other words the components have a fixed arrangement with each other. This in turn encourages them to collaborate and have implicit coupling with each other. It is the jigsaw analogy. 
 
-In ALA, you must have compositonality. This means the abstractions have no fixed arrangment. You have the capability to compose instances of abstractions in an infinite variety of ways. It is the lego analogy.
+In ALA, you must have compositonality. This means the abstractions have no fixed arrangement. You have the capability to compose instances of abstractions in an infinite variety of ways. It is the lego analogy.
 
 Component architecture does have one thing - the ability to sunstitute one component for another with the same interfaces. 
 
@@ -1560,7 +1560,7 @@ Reading an ALA application requires first knowing the pre-requisite knowledge yo
 
 Here are the three domain abstractions:
 
-image::Coffee%20Maker%20Domain%20Components.vsd.jpg[Coffee Maker Domain Components.vsd.jpg, title="Coffee maker domain abstractions"]
+image::Coffee%20Maker%20Domain%20Components.vsd.jpg[Coffee Maker Domain Components.vsd.jpg, title="Coffee maker domain abstractions", link=images/Coffee%20Maker%20Domain%20Components.vsd.jpg]
 
 Take a moment to look at these three abstractions:
 
@@ -1593,7 +1593,7 @@ Now that we have understood the knowledge dependencies in all lower layers, we c
 
 
 
-image::Coffee%20Maker%20Dataflow%20diagram.vsd.jpg[CoffeeMaker Dataflow diagram, title="Coffee maker solution"]
+image::Coffee%20Maker%20Dataflow%20diagram.vsd.jpg[CoffeeMaker Dataflow diagram, title="Coffee maker solution", link=images/Coffee%20Maker%20Dataflow%20diagram.vsd.jpg]
 
 The diagram to the left is the application itself. Instances of the three domain abstractions, UI, Boiler and Warmer plate are shown as boxes.
 

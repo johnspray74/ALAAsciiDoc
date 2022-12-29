@@ -294,7 +294,7 @@ ALA completely eliminates this problem and this conflict. The structure is expli
 
 Typical bright young engineers come out of university knowing C++ or Java (or other C*, low-level, imperative, language that mimics the silicon), and are confident that, because the language is Turing-complete, if they string together enough statements, they can accomplish anything. At first they can. There hardly seems a need for a software architect to be involved. And besides, we are told that a design can emerge through incremental refactoring.
 
-image::Cynefin.jpg[Cynefin.jpg,800, title="Code can quickly follow the Cynefin quadrants into the complex"]
+image::Cynefin.jpg[Cynefin.jpg,800, title="Code can quickly follow the Cynefin quadrants into the complex",link=images/Cynefin.jpg]
 
 As the program gets larger, things get a little more complicated, but the young developer's brain is still up to the task, not realizing he has already surpassed anyone else's ability to read his code. He is still able to get more features working. One day parts of the 'transition'. It becomes somewhere you don't want to go. On the Cynfin diagram, it has transitioned from the complicated quadrant to the complex quadrant. And now it is trapped there. It is too complex for refactoring.  
 

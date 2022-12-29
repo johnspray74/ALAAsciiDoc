@@ -28,7 +28,7 @@ The programming paradigms layer may also contain other abstractions useful for b
 
 Here is Peter Van Roy's taxonomy of programming paradigms which gives us an idea of what the term "programming paradigm" means in general. Peter Von Roy is an advocate for multiple programming paradigms in a computer language, which is why the language Oz appears all over the diagram. In ALA we invent and implement our own programming paradigms, without relying on them being built into the underlying programming language. 
 
-image::TaxonomyProgrammingParadigms.png[TaxonomyProgrammingParadigms.png, title="Taxonomy Programming Paradigms - cited from Van Roy"]
+image::TaxonomyProgrammingParadigms.png[TaxonomyProgrammingParadigms.png, title="Taxonomy Programming Paradigms - cited from Van Roy", link=images/TaxonomyProgrammingParadigms.png]
 
 [TIP]
 ====
@@ -1833,7 +1833,7 @@ I once had to express a set of user stories that involved different things that 
 
 Here is the diagram.
 
-image::BigStateMachine.pdf.jpg[BigStateMachine.pdf.jpg, title="My first significant state machine for a real embedded device"]
+image::BigStateMachine.pdf.jpg[BigStateMachine.pdf.jpg, title="My first significant state machine for a real embedded device", link=images/BigStateMachine.pdf.jpg]
 
 Notice that the diagram makes heavy use of hierarchical states (boxes inside boxes). These turn out to be important in most of my state machines.
 
