@@ -34,11 +34,11 @@ This online book is a work in progress. Feedback is welcome. Please send to john
 
 == Synopsis
 
-Intuitively, good quality software would allow you to read and understand any one part of the code without also having to read and understand any other part. I call this _zero coupling_. We are taught the meme _loose coupling and high cohesion_. Unfortunately, this implies that zero coupling is not achievable. It is said that a zero coupled system would not do anything. But this is only because we confuse design-time coupling with run-time communications. It is entirely possible for parts of a system to have zero knowledge about one another at design-time and still communicate at run-time. We define the word _coupling_ to mean design-time coupling throughout this book. That's the coupling that matters. By _design-time_, we mean any time you are reading, writing or understanding code in one module, how much to you have to know about code inside other modules. Modules in conventional code tend to have a lot of coupling in the form of collaboration. ALA converts that collaborative coupling into cohesion contained in a new module.
+Intuitively, good quality software would allow you to read and understand any one part of the code without also having to read and understand any other part. I call this _zero coupling_. We are taught the meme _loose coupling and high cohesion_. Unfortunately, this implies that zero coupling is not achievable. It is said that a zero coupled system would not do anything. But this is only because we confuse design-time coupling with run-time communications. It is entirely possible for parts of a system to have zero knowledge about one another at design-time and still communicate at run-time. We define the word _coupling_ to mean design-time coupling throughout this book. That's the coupling that matters. By _design-time_, we mean that any time you are reading, writing or understanding code in one module, how much to you have to know about code inside other modules? Modules in conventional code tend to have a lot of coupling in the form of collaboration. ALA converts that collaborative coupling into cohesion contained in a new module.
 
 ALA is a set of three architectural constraints:
 
-* The only unit of code is an abstraction.
+* The only unit of code is an _abstraction_.
 
 * The only relationship allowed is a dependency on an abstraction that is significantly more abstract.
 
@@ -59,7 +59,7 @@ An abstraction is a learnable idea or concept. Once learned it becomes part of y
 
 In conventional methods, a system is broken into smaller pieces that we call modules, components or classes. These modules, components or classes tend to have a fixed arrangement with one-another (although an individual piece may be substitutable). This fixed arrangement leads to implicit collaboration with one another to form the system. They are like jigsaw pieces. Specific pieces fit together in a specific way to make a specific picture. The system is not explicit, it is just the collaboration of all the individual parts.
 
-In contrast, abstractions are like lego pieces. These pieces are general and can be composed in an infinite variety of ways. A specific arrangement is an explicit artefact in itself. It can be varied without changing the abstractions it uses. 
+In contrast, abstractions are like lego pieces. These pieces are general and can be composed in an infinite variety of ways. A specific arrangement is an explicit artefact in itself. The parts in a specific arrangment are not collaborating. What makes the system is the particular compositon of them. It can be varied without changing the abstractions it uses. 
 --
 
 Abstractions have no knowledge of one another, nor the system that uses them.
@@ -104,7 +104,7 @@ Seemingly, communication is needed between peer abstractions to make a system wo
 Furthermore, over time, the fixed arrangement between the standard deviation function and the display function is likely to lead the display function to provide specifically what the standard deviation function needs. So both functions would now just be specific parts of a specific system. They would be collaborating.
 --
 
-In ALA a more specific abstraction in a higher layer represents the system. This abstraction calls the standard deviation function and then calls the display function, or arranges for this to happen in some way.
+In ALA, there must be a more specific abstraction in a higher layer to represent the system consisting of an instance of a standard deviation abstraction connected to an instance of a display abstraction. This higher layer abstraction calls the standard deviation function and then calls the display function, or arranges for this to happen in some way. The higher layer abstraction can be thought of as representing the user story.
 
 *Using objects instead of functions*
 
@@ -114,7 +114,7 @@ In functional programming we can compose functions and have the data automatical
 
 ALA essentially brings the benefits of functional monad programming to the world of plain old objects. Many compuations are best expressed using objects rather than functions. Because they are plain old explicit classes, they are also easier to understand than monads, and easier to write, which is essential if they are to be at the abstraction level of the domain.
 
-These plain old objects have multiple ports, which can each use different programming paradigms, not just data flow.  For example, we can make _standard deviation_ and _display_ classes with I/O ports. Instances of them can then be wired together by the _application_ abstraction in a higher layer. The display object can then be further wired into the UI. 
+These plain old objects have multiple ports, which can each use different programming paradigms, not just data flow.  For example, we can make _standard deviation_ and _display_ classes with I/O ports. Instances of them can then be wired together by the _user story_ abstraction in a higher layer. The display object can then be further wired into the UI. 
 
 While the standard deviation and display abstractions know nothing about each other, the instances can communicate directly at run-time. To facilitate this run-time communication, the next layer down will provide an abstract interface which we call a programming paradigm.
 
@@ -139,7 +139,7 @@ Conventional code contains both good and bad dependencies.
 
 Good dependencies are ones on abstractions such as math library classes. There will typically be many bad dependencies. These bad dependencies are usually put there for different parts of a program to inter-communicate. They are also used to break a program up into smaller but more specific pieces. Bad dependencies make the dependency diagram look like the one on the right. My partner says these look like two ferris wheels engaged in a mating act. Even if there are no cyclic dependences, there are still typically many bad dependencies. 
 
-In ALA, both types of bad dependencies are illegal. Normally in conventional code we don't distinguish between good and bad dependencies. We consider them all to be necessary if the system is to work. But it turns out that systems can be built using only good dependencies.
+In ALA, bad dependencies are illegal. Normally in conventional code we don't distinguish between good and bad dependencies. We consider them all to be necessary if the system is to work. But it turns out that systems can be built using only good dependencies.
 
 Good dependencies are not just good - they are really good. We want as many of them as possible, because then we are reusing our abstractions. Bad dependencies are not just bad - they are really bad. They cause a growing tangled network of complexity.
 --
@@ -148,7 +148,7 @@ Since bad dependencies are illegal in ALA, how do parts of the system communicat
 
 If you think about it, circular dependencies come about because there is circular communications. When you stop representing communications with dependencies, and start representing them with wiring code, circular wiring makes perfect sense. When you use only knowledge dependencies, the whole dependency problem just goes away.
 
-Association relationships in the UML class diagram are bad dependencies, and are illegal in ALA. The only legal UML class relationship is composition (filled diamond arrow), and then _only_ if the class being used is more abstract. Now when you use such an abstraction you refer to it by name, not use an arrow on a diagram. You wouldn't draw a line on a diagram to a library function such as squareroot - you just use squarerrot by name as if its part of your language. So if you draw a UML class diagram of an ALA application, you will just get disconnected boxes sitting in space. They will be arranged in layers as described below, but there will be no lines at all. The UML class diagram is not only not useful in ALA, it is the cause of much unnecessary complexity in conventional code. UML class diagrams are evil.
+Association relationships in the UML class diagram are bad dependencies, and are illegal in ALA. The only legal UML class relationship is composition (filled diamond arrow), and then _only_ if the class being used is more abstract. Now when you use such an abstraction you refer to it by name, not use an arrow on a diagram. You wouldn't draw a line on a diagram to a library function such as squareroot - you just use squareroot by name as if its part of your language. Similarly, you wouldn't draw composition relationships on a UML diagram of an ALA application. So if you draw a UML class diagram of an ALA application, you will just get disconnected boxes sitting in space. They will be arranged in layers as described below, but there will be no lines at all. The UML class diagram is not useful in ALA. In fact the UML class diagram, by encouraging relationships between would-be peer abstractions, has probably caused more damage to software than any other software engineering meme. UML class diagrams are evil.
 
 *Metrics*
 
@@ -176,7 +176,7 @@ For large applications, another layer called _features layer_ or _user stories l
 
 There is no 'hierarchical' structure in ALA. In other words, abstractions cannot be contained within abstractions. There is no analog of a sub-module or sub-component - no such thing as a sub-abstraction. _Abstraction layers_ replace _hierarchical containment_. This is because lower layer abstractions must be public for reuse, not hidden inside an encapsulation hierarchy. 
 
-Once you know the set of concepts of the abstractions available in lower layers, it is easy to read and understand code in higher layers that use instances of them. Reading a line of code that uses an abstraction by name is like reading any other line of code. A good abstraction is when we don't need to follow the indirection and go and read the code that implements the abstraction. For example, when we see a use of squareroot, if our brain has already learned he concept of squareroot once, we can just stay in the context of the code that is using the squareroot. Squareroot is just part of the language. ALA is about achieving that level of readability for every single dependency in the entire application. 
+Once you know the set of concepts of the abstractions available in lower layers, it is easy to read and understand code in higher layers that use instances of them. Reading a line of code that uses an abstraction by name is like reading any other line of code. A good abstraction is when we don't need to follow the indirection and go and read the code that implements the abstraction. For example, when we see a use of squareroot, if our brain has already learned the concept of squareroot once, we can just stay in the context of the code that is using the squareroot. Squareroot is just part of the language. ALA is about achieving that level of readability for every single dependency in the entire application. 
 
 
 [big]#*All abstractions must be small*#
@@ -187,14 +187,12 @@ image::smalltree.jpg[smalltree.jpg,200,float="right"]
 
 The final constraints prevents us from conforming to the first two constraints by simply putting everything into one big abstraction. That's obviously not desirable, so we need this constraint to force us to create abstractions from which we can compose applications. 
 
-The application layer is where code will accumulate as more user stories or features are added. Eventually it will be necessary to insert a new layer for this type of abstraction.
-
 Abstractions are internally highly cohesive, which means that all code inside them is inter-related. Internally they are a small ball of mud. If that highly interrelated code is to be understood, it needs to be small. 
 
 A rule of thumb is around 100 to 500 lines of code. If the code is in diagram form (which will often be the case for reasons we will explain later), we should limit the size to 100-500 nodes plus edges.
 --
 
-If an abstraction contains more than 500 lines, it is starting to get over the brain limit for other programmers to understand. If abstractions average less than 100 lines of code, we might have more abstractions than we needed to, and burden ourselves with an unnecessarily high number of them to learn. The sweet spot, which relates to the size of our brains, is somewhere in between.
+If an abstraction contains more than 500 lines, it is starting to get over the brain limit for other programmers to understand. If abstractions average less than 100 lines of code, we might have more abstractions than we need to, and burden ourselves with an unnecessarily high number of them to learn. The sweet spot, which relates to the size of our brains, is somewhere in between.
 
 
 [big]#*Other emergent patterns*#
@@ -225,7 +223,7 @@ B and C have ports of type D. B's port is implemented as a field in the class of
 
 A can create an instance of B and an instance of C and wire them together because they have compatible ports. Wiring causes the instance of C, cast as the interface, to be assigned to the field in B. 
 
-While abstraction B and abstraction C know nothing about each other, the instances of B and C can communicate with each other at run-time via teh interface D.
+While abstraction B and abstraction C know nothing about each other, the instances of B and C can communicate with each other at run-time because they both know about the interface D.
 --
 
 [big]#*Going forward*#
@@ -266,6 +264,8 @@ The diagram above is not documentation. Nor is it a high-level architectural vie
 
 *Application layer*
 
+Here is the diagram converted to text form:
+
 .System.cs
 [source,C#]
 ....
@@ -273,7 +273,7 @@ var system = new Switch().WireTo(new Light());
 system.Run();
 ....
 
-Given this code, it is not difficult for any programmer to write the necessary Switch and Light domain abstractions as classes, together with a dataflow programming paradigm abstraction as an interface to make that code execute.
+Given this code, it is not difficult for any programmer to write the necessary Switch and Light domain abstractions as classes, together with a dataflow programming paradigm abstraction as an interface to make that code execute. We will do that in a moment.
 
 In conventional code, we would likely have broken the system up into two modules, one for the switch and one for the light. The switch might directly call a method in the interface for the light, or vice versa. In ALA you can't do that. The concepts of Switch and Light, already handed to us as abstractions in the words of the requirements, must remain as abstractions. At design-time, they can't know about one another and they can't know about the specific system. As abstractions they can't communiate with one another. But at run-time, instances of them, after having been wired together, _can_ communicate with one another.
 
@@ -295,11 +295,11 @@ When the program is this small, it looks like we just created four abstractions 
 
 . Switch and light do not need a shared understanding for the interpretation of data (a shared language). We think that shared languages are necessary because people need a shared language to communicate. So we tend to create modules that work in the same way. These are sometimes referred to as contracts. If Switch and Light were modules, they would need to agree on something like _true_ means _on_ and _false_ means _off_. In ALA, this type of coupling is also gone. The knowledge about interpretation of data is wholly contained inside the user story abstraction in the higher layer. This may seem trivial in this simple case, but it becomes enormously significant in larger programs and distributed programs.
 
-. If the instances of Switch and Light are deployed to different physical locations, the Switch-Light system is still a single cohesive abstraction describing that system. Normally programs are decomposed first into modules across physical locations, but in ALA you always compose first by user stories, regardless of the physical deployment of its instantiated constituents. This will also be highly significant as the system scales up in size.
+. If the instances of Switch and Light are deployed to different physical locations, the Switch-Light system is still a single cohesive abstraction describing that system. Normally programs are decomposed first into modules across physical locations, but in ALA you always compose first by user stories, regardless of the physical deployment of its instantiated domain abstractions. This will also be highly significant as the system scales up in size.
 
-. Switch and Light are testable with unit tests.
+. Switch and Light are easily testable with unit tests.
 
-. Testing the system abstraction is exactly acceptance testing. In ALA, you always test with dependencies in place, but you mock the ports. Just as you would not mock out a dependency such as squareroot, you do not mock any dependencies in ALA, because all dependencies are knowledge dependencies. Testing the system abstraction means testing that the switch and Light system works.
+. Testing the system abstraction is exactly _acceptance testing_. In ALA, you always test with dependencies in place, but you mock the ports. Just as you would not mock out a dependency such as squareroot, you do not mock any dependencies in ALA, because all dependencies are knowledge dependencies. Testing the system abstraction means testing that the switch and Light system works.
 
 . The writing of the Switch and Light abstractions can be handed off to different individuals or teams because, as abstractions, they know nothing about each other, and they know nothing about the System. In fact abstractions will be better quality if the teams do _not_ collaborate with each other so that the abstractions themselves do not collaborate. (Corollary of Conway's law.)
 
@@ -391,12 +391,12 @@ Note: A basic implementation of WireTo is listed in Chapter Two. You can get the
 
 Note: ALA does not require the use of reflection. I like to use reflection because it allows me to use an extension method to get a WireTo operator implemented for all domain abstractions. It allows me to make specifying the port name optional. It also allows me to make the port fields in the class private so they do not look like part of the public configuration interface to the layer above.
 
-If you are generating wiring code from the diagram automatically using a tool, and you make the port fields public, you could generate code like the following: 
+Instead of using a WireTo function, and if you are generating wiring code from the diagram automatically using a tool, and you make the port fields public, you could generate wiring code like the following: 
 
 .Application.cs
 [source,C#]
 ....
-new Switch().output = (IDataFlow<double>) new Light();
+new Switch().output = (IDataFlow<bool>) new Light();
 ....
 
 
@@ -424,6 +424,8 @@ Sensor -> AndGate -> Indicator
 @enddot
 ----
 
+Here is the diagram converted to text form:
+
 
 .Application.cs
 [source,C#]
@@ -447,7 +449,7 @@ One of the domain abstraction instances has a configuration of 0.5. This is a th
 
 Notice that this application is easier to write in this way than it would be in conventional C code. This is because the programming paradigm we are using, dataflow, suits the expression of these requirements. Most C code to do even such a simple requirement as this would likely already be messy in the way it handles run-time execution. 
 
-The astute reader will notice that the AndGate can't implement IDataFlow<bool> twice for its two inputs. In later projects, we will show how we work around this language constraint.
+The astute reader will notice that the AndGate can't implement IDataFlow<bool> twice for its two inputs. In later projects, we will show how we work around this unnecessary language constraint.
 
 You may also notice that the fanout from the output of the AndGate to both the Light and the Indicator won't work. We show how this implementation problem is solved in later projects as well.
 
@@ -478,6 +480,9 @@ MainWindow -> StatusLine -> Indicator
 @enddot
 ----
 
+Here is the diagram converted to text form:
+
+
 .Application.cs
 [source,C#]
 ....
@@ -500,11 +505,9 @@ new MainWindow()
 
 Here we are introducing some graphical UI, so we invented another programming paradigm for "UI layout". It is used between all the UI elements: MainWindow, Menu, Tickbox, StatusBar, Indicator. Wiring things together using that programming paradigm means things are arranged inside things on the UI.
 
-Notice how ALA is a polyglot programming paradigm. We use two programming paradigms, UI layout and dataflow, in the same diagram. Notice also that we don't separate UI from business logic and data models. These are highly cohesive things from the perspective of user stories. Instead we separate the implementations of the domain abstractions. It is still easy to swap out, for example, the UI implementation. The diagram above could be implemented as a web application or a desktop application by swapping between two sets of UI domain abstraction implementations.  
+Notice how ALA is a polyglot programming paradigm. We use two programming paradigms, UI layout and dataflow, in the same diagram. Notice also that we don't separate UI from business logic and data models as we do in conventional architectural laering patterns. These are highly cohesive things from the perspective of user stories. Instead we separate the implementations of the domain abstractions. It is still easy to swap out, for example, the UI implementation. The diagram above could be implemented as a web application or a desktop application by swapping between two sets of UI domain abstraction implementations.  
 
 Let's do an application to browse for and display a (dynamic content) CSV file on a grid, filtered by a user specified name, and sorted by names. The CSV file has headings that will display in the grid.
-
-Actually if you already have monads in your programming library for things like sorting and filtering (such as LINQ or reactive extensions), you could just create a domain abstraction called _query_ and put all the code for the query passed into it as its configuration.
 
 [plantuml,file="diagram-csv-to-grid.png"]
 ----
@@ -527,10 +530,12 @@ MainWindow -> Grid
 @enddot
 ----
 
-The wiring between the CSVReadWriter, Filter, Sort and Grid uses a new programming paradigm that allows dynamic row and columns of data to flow.  The Grid abstraction is able to pull rows of data.
-
 The wiring between the MeniItem and the OpenFileBrowser uses an Event-driven programming paradigm.
 
+The wiring between the CSVReadWriter, Filter, Sort and Grid uses a programming paradigm that allows dynamic row and columns of data to flow.  The Grid abstraction is able to pull rows of data as needed.
+
+
+Here is the diagram converted to text form:
 
 .Application.cs
 [source,C#]
@@ -555,10 +560,11 @@ new MainWindow()
     .Run();
 ....
 
+ Note: if you already have monads in your programming library for things like sorting and filtering (such as LINQ or reactive extensions), then instead of creating new domain abstractons for Filter and Sort, you could just create a domain abstraction called _query_ and use LINQ or reacitve extensions code to configure the query instance.
 
-Note: WireTo() returns its first operand (this). WireIn() is the same as WireTo() except that it returns its second operand. These operators support the fluent coding style being used in this hand compiled code so that we do't have to think of names for every instance of an abstraction.
+ Note: WireTo() returns its first operand (this). WireIn() is the same as WireTo() except that it returns its second operand. These operators support the fluent coding style being used in this hand compiled code so that we do't have to think of names for every instance of an abstraction.
 
-The methodology we have been following is that you write the application code (diagram) first (or part of it), just focusing on expressing the requirements. This causes you to invent domain abstractions and programming paradigms. Then you come up with an execution model that will make the programming paradigms execute. For example, the two interfaces listed below might be what you would come up with for Event and PullTable. 
+The methodology we have been following is that you write the application code (diagram) first (or part of it), just focusing on expressing the requirements. This causes you to invent domain abstractions and programming paradigms. Then you come up with an execution model that will make the programming paradigms execute. For example, the two interfaces listed below might be what you would come up with for the Event and PullTable programming paradigms: 
 
 .Event.cs
 [source,C#]
@@ -583,15 +589,17 @@ interface IPullTable : IEnumerable<List<string><T>>
 ....
 
 
-This interface is designed to handle dynamic data (types unknown at compiletime). Both Filter and Sort will also have both input and output ports of type  IPullTable. The List in the IEnumerable represents one row of the table.
+This interface handles dynamic data (types unknown at compile-time) by crudely using strings. In a later project we will show a more sophisticated IPullTable interface that uses static typing for fields known at compile-time and an ExpandoObject for dynamic fields. We will also do a push version.
 
-Don't worry, we won't be creating new programming paradigm abstractions at this rate for long. In fact we already have most of the ones we will use in all our example projects.
+Both Filter and Sort will have both input and output ports of type IPullTable. The List in the IEnumerable represents one row of the table.
+
+Don't worry, we won't be creating new programming paradigm abstractions at this rate for long. In fact we already have most of the ones we will use in all our example projects in this book.
 
 Notice how in the above examples, we have used software engineering patterns we already know about, just in a different way. There is DSL (Domain Specific Language), Dependency Injection (which is what the WireTo operator does), Event driven programming, XAML-like UI layout (without the XML), RX (Reactive programming), monad-like wiring up, and the fluent style. 
 
-Notice how the application diagram in each case is both a direct representation of the requirements and executable. Application diagrams do not leave out details from requirements because ultimately they are a complete expression of them. Instead, they leave out details of implementation.
+Notice how the application diagram in each case is both a direct representation of the requirements and the executable. It is executable because unlike conventional higher level or architecture diagrams, ALA application diagrams do not leave out details from the requirements because. They are a complete expression of them. Instead, they leave out all details of implementation, which are taken care of by the domain and programming paradigm abstractions.
 
-To the extent that the requirements are cohesive, so the code that expresses them should be. For example, we do not try to separate the specific UI, I/O, business logic, persistent data etc into different modules because they are highly cohesive for a given requirement. Most other architectural patterns, such as MVC, do separate in this way, which creates coupling. Instead we reduce the problem in a different way - through the use of domain abstractions which provide reusable aspects of implementation. All knowledge and details from the requirements end up in the application layer, but that's all that goes there. 
+To the extent that requirements are cohesive, so the code that expresses them should be. For example, we do not try to separate the specific UI, I/O, business logic, persistent data etc into different modules because they are highly cohesive for a given requirement. Most other architectural patterns, such as MVC, do separate in this way, which creates coupling. Instead we reduce the problem in a different way - through the use of domain abstractions which provide reusable aspects of implementation. All knowledge and details from the requirements end up in the application layer, but that's all that goes there. 
 
 Note: A graph-like structure is showing up in these small applications because each requirement in itself contains a graph of relationships. ALA embraces this and makes it explicit, which is why the requirements are best expressed as diagrams. In conventional code, the graph structure is still there, but it is typically obfuscated as many intermodule relationships, making it hard to see. Worse still, the natural cycles in the graph of relationships in the requirements, would cause circular dependencies amoung the modules. Conventionally, some of these dependencies are broken by using pulling data half the time rather than pushing, or worse still, using indirections such as the observer pattern. These removals of dependencies don't make the relationships themselves go away, they just make them harder to see.
 
