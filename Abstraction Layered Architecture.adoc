@@ -114,9 +114,9 @@ In ALA we wont be restricting ourselves to pure functions. We will use classes a
 
 Another example of the need for a class rather than a function might be our display abstraction. A display probably needs some configuration, for example to tell it how many decimal places to display. That kind of configuration is usually set once when the abstraction is instantiated, so the state should be stored inside the display abstraction. 
 
-ALA is actually highly object oriented. But it's object oriented in a more disciplined way than conventional object orientation. That's because peer classes may not have associations, period. In other words, an object's communication with another object at run-time may not be implemented by one class having knowledge of another at design-time. Not even on an interface of a peer class or even an interface for a set of replaceable peer classes.
+ALA is actually highly object oriented. But it's object oriented in a more disciplined way than conventional object orientation. That's because peer classes may not have associations, period. In other words, an object's communication with another object at run-time may not be implemented by one class having knowledge of another at design-time. Not even on an interface of a peer class.
 
-There must be a more specific abstraction in a higher layer that instantiates two classes and arranges for them to communicate. This is more than dependency injection. Dependency injection, where one class knows about the interface belonging to another peer class is illegal in ALA. 
+There must be a more specific abstraction in a higher layer that instantiates two classes and arranges for them to communicate. This is more than dependency injection. Dependency injection, where one class knows about the interface belonging to another peer class, or a set of substitutable peer classes, is illegal in ALA. 
 
 Now we could have the more specific abstraction in the higher layer handle the communication itself by simply calling methods on each of the classes. For the example above, the user story abstraction in the higher layer could call a standard deviation method to get the result, and then call a display method to display it. But that would mean the user story abstraction would be handling the data itself, and driving the execution model. We don't particularly like that. We prefer the user story abstraction's job is just to _compose_ the instances of the two peer abstractions, in a declarative style.
 
@@ -228,7 +228,7 @@ Inheritance is not used in ALA. We only use composition because inheritance brea
 --
 image::WiringPattern.png[WiringPattern.png, 500, title="*Wiring pattern frequently used in ALA*", float="right", link=images/WiringPattern.png]
 
-I use the wiring pattern shown above frequently to build ALA applications. 
+I use the wiring pattern shown on the right frequently to build ALA applications. 
 
 Abstraction A in the application layer has legal dependencies on abstractions B and C in the domain abstractions layer. B and C have dependencies on D in the programming paradigms layer.
 

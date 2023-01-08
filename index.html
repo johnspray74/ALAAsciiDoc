@@ -762,10 +762,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <p>Another example of the need for a class rather than a function might be our display abstraction. A display probably needs some configuration, for example to tell it how many decimal places to display. That kind of configuration is usually set once when the abstraction is instantiated, so the state should be stored inside the display abstraction.</p>
 </div>
 <div class="paragraph">
-<p>ALA is actually highly object oriented. But it&#8217;s object oriented in a more disciplined way than conventional object orientation. That&#8217;s because peer classes may not have associations, period. In other words, an object&#8217;s communication with another object at run-time may not be implemented by one class having knowledge of another at design-time. Not even on an interface of a peer class or even an interface for a set of replaceable peer classes.</p>
+<p>ALA is actually highly object oriented. But it&#8217;s object oriented in a more disciplined way than conventional object orientation. That&#8217;s because peer classes may not have associations, period. In other words, an object&#8217;s communication with another object at run-time may not be implemented by one class having knowledge of another at design-time. Not even on an interface of a peer class.</p>
 </div>
 <div class="paragraph">
-<p>There must be a more specific abstraction in a higher layer that instantiates two classes and arranges for them to communicate. This is more than dependency injection. Dependency injection, where one class knows about the interface belonging to another peer class is illegal in ALA.</p>
+<p>There must be a more specific abstraction in a higher layer that instantiates two classes and arranges for them to communicate. This is more than dependency injection. Dependency injection, where one class knows about the interface belonging to another peer class, or a set of substitutable peer classes, is illegal in ALA.</p>
 </div>
 <div class="paragraph">
 <p>Now we could have the more specific abstraction in the higher layer handle the communication itself by simply calling methods on each of the classes. For the example above, the user story abstraction in the higher layer could call a standard deviation method to get the result, and then call a display method to display it. But that would mean the user story abstraction would be handling the data itself, and driving the execution model. We don&#8217;t particularly like that. We prefer the user story abstraction&#8217;s job is just to <em>compose</em> the instances of the two peer abstractions, in a declarative style.</p>
@@ -928,7 +928,7 @@ So now, while the standard deviation and display <em>abstractions</em> know noth
 <div class="title">Figure 4. <strong>Wiring pattern frequently used in ALA</strong></div>
 </div>
 <div class="paragraph">
-<p>I use the wiring pattern shown above frequently to build ALA applications.</p>
+<p>I use the wiring pattern shown on the right frequently to build ALA applications.</p>
 </div>
 <div class="paragraph">
 <p>Abstraction A in the application layer has legal dependencies on abstractions B and C in the domain abstractions layer. B and C have dependencies on D in the programming paradigms layer.</p>
@@ -15980,7 +15980,7 @@ Once the code for the single user story is understood, some acceptance tests are
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2023-01-09 10:26:46 01300
+Last updated 2023-01-09 10:48:13 01300
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/Docco.min.css">
