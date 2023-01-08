@@ -110,13 +110,15 @@ In ALA, there must be a more specific abstraction in a higher layer to represent
 
 *Classes with ports*
 
-In ALA we wont be restricting ourselves to pure functions. We will use classes as well. That's because in ALA, when we need state, we consider abstraction to be more important than referential transparency (invariant behaviour over time.) Essentially we are using zero design-time coupling through use of abstractions as the tool to get analysability instead of removing time. Sometimes separating state from functions breaks other wise good abstractions. An example would be if our standard deviation abstraction receives a stream of data and produces a running standard deviation result. In ALA, such an abstraction has it's state (SumX, SumXX and N) stored with it, not passed into it. In other words, if state together with some methods makes a good abstraction, then we don't break it. 
+In ALA we wont be restricting ourselves to pure functions. We will use classes as well. That's because in ALA, when we need state, we consider abstraction to be more important than referential transparency (invariant behaviour over time.) Essentially we are using zero design-time coupling through use of abstractions as the tool to get analysability instead of removing time. Sometimes separating state from functions breaks otherwise good abstractions. An example would be if our standard deviation abstraction receives a stream of data and produces a running standard deviation result. In ALA, such an abstraction has it's state (SumX, SumXX and N) stored with it, not passed into it. In other words, if state together with some methods makes a good abstraction, then we don't break it. 
 
-ALA is actually highly object oriented. But its object oriented in a more disciplined way than conventional object orientation. That's because peer classes may not have associations, period. In other words, an object's communication with another object at run-time may not be implemented by one class having knowledge of another at design-time. Not even on an interface of a peer class or even an interface for a set of replaceable peer classes.
+Another example of the need for a class rather than a function might be our display abstraction. A display probably needs some configuration, for example to tell it how many decimal places to display. That kind of configuration is usually set once when the abstraction is instantiated, so the state should be stored inside the display abstraction. 
+
+ALA is actually highly object oriented. But it's object oriented in a more disciplined way than conventional object orientation. That's because peer classes may not have associations, period. In other words, an object's communication with another object at run-time may not be implemented by one class having knowledge of another at design-time. Not even on an interface of a peer class or even an interface for a set of replaceable peer classes.
 
 There must be a more specific abstraction in a higher layer that instantiates two classes and arranges for them to communicate. This is more than dependency injection. Dependency injection, where one class knows about the interface belonging to another peer class is illegal in ALA. 
 
-Now we could have the more specific abstraction in the higher layer handle the communication itself by simply calling methods on each of the classes. For the example we used above, the user story abstraction in the higher layer could call a standard deviation method to get the result, and then call a display method to display it. But that would mean the user story abstraction would be handling the data itself, and driving the execution model. We don't particularly like that. We prefer the user story abstraction's job is just to _compose_ the instances of the two peer abstractions, in a declarative style.
+Now we could have the more specific abstraction in the higher layer handle the communication itself by simply calling methods on each of the classes. For the example above, the user story abstraction in the higher layer could call a standard deviation method to get the result, and then call a display method to display it. But that would mean the user story abstraction would be handling the data itself, and driving the execution model. We don't particularly like that. We prefer the user story abstraction's job is just to _compose_ the instances of the two peer abstractions, in a declarative style.
 
 To do this, we build the classes with _ports_. We then simply wire the instances together by their ports.  For example, we could make a _standard deviation_ class with an output Dataflow port and a _display_ class with an input Dataflow port. Instances of them can then be wired together by the _user story_ abstraction in a higher layer.
 
@@ -286,13 +288,13 @@ In conventional code, we would likely have broken the system up into two modules
 
 The abstract concept of dataflow is invented to allow _instances_ of Switch and Light and many other things to communicate at run-time. Dataflow is an even more abstract abstraction. It resides in the programming paradigms layer. It is a stream of data without end. It is not a specific interface of either Switch or Light. It allows Switches and Lights to be wired arbitrarily to anything using the same dataflow concept.
 
-The _system_ is also an abstraction, albeit a more specific one than Switch or Light. Multiple instances of it could be used in a building. Its purpose is to know about the system comprising a light and a switch connected together. It knows about Switch,  Light and Dataflow as abstract concepts but doesn't know anything about their implementation details. 
+The Switch-Light _system_ is also an abstraction, albeit a more specific one than Switch or Light. Multiple instances of it could be used in a building. Its purpose is to know about the system comprising a light and a switch connected together. It knows about Switch,  Light and Dataflow as abstract concepts but doesn't know anything about their implementation details. 
 
 The system diagram is a direct, formal restatement of the requirements. So the diagram is three things in one: The formal statement of requirements, the high level architecture, and the executable. One source of truth for all three. Conventional software engineering usually has three different documents for these, which then must be kept synced.  
 
 When the program is this small, it looks like we just created four abstractions when two modules would have done. However, by creating an application layer abstraction to represent the system level knowledge, and a programming paradigm layer abstraction to represent the concept of Dataflow, we make several powerful improvements to the code that are important as the application scales up in size:
 
-. There is now an explicit place that cohesively implements the requirement instead of having the requirement's implementation distributed in an obviscated way inside Switch and Light. What is loose coupling between modules in conventional code becomes cohesive code completely contained inside a higher (more specific) abstraction in ALA. Changes to the _system_ are made in this one place.
+. There is now an explicit place that cohesively implements the requirement instead of having the requirement's implementation distributed in an obviscated way inside Switch and Light. What is loose coupling between modules in conventional code becomes cohesive code completely contained inside a higher (more specific) abstraction in ALA. Changes to the requirements are made in this one place.
 
 . The code inside all the abstractions: System, Switch, Light and Dataflow are zero-coupled with one another. Every abstraction's internal code is readable in isolation. 
 
@@ -302,7 +304,7 @@ When the program is this small, it looks like we just created four abstractions 
 
 . Switch and light do not need a shared understanding for the interpretation of data (a shared language). We think that shared languages are necessary because people need a shared language to communicate. So we tend to create modules that work in the same way. These are sometimes referred to as contracts. If Switch and Light were modules, they would need to agree on something like _true_ means _on_ and _false_ means _off_. In ALA, this type of coupling is also gone. The knowledge about interpretation of data is wholly contained inside the user story abstraction in the higher layer. This may seem trivial in this simple case, but it becomes enormously significant in larger programs and distributed programs.
 
-. If the instances of Switch and Light are deployed to different physical locations, the Switch-Light system is still a single cohesive abstraction describing that system. Normally programs are decomposed first into modules across physical locations, but in ALA you always compose first by user stories, regardless of the physical deployment of its instantiated domain abstractions. This will also be highly significant as the system scales up in size.
+. If the instances of Switch and Light are deployed to different physical locations, the Switch-Light system is still a single cohesive abstraction describing that system. Normally, conventional programs are decomposed first into modules across physical locations, but in ALA you always compose first by user stories, regardless of the physical deployment of its constituent domain abstraction instances. This will also be highly significant as the system scales up in size.
 
 . Switch and Light are easily testable with unit tests.
 
@@ -310,7 +312,7 @@ When the program is this small, it looks like we just created four abstractions 
 
 . The writing of the Switch and Light abstractions can be handed off to different individuals or teams because, as abstractions, they know nothing about each other, and they know nothing about the System. In fact abstractions will be better quality if the teams do _not_ collaborate with each other so that the abstractions themselves do not collaborate. (Corollary of Conway's law.)
 
-. In terms of methodology, instead of _decomposing_ the Switch-Light system into parts, we _compose_ it from abstractions. This point may seem subtle at first, but it is profoundly important. The conventional methodology of dividing a system into smaller parts until the parts are small enough to implement is arguably the prevalent approach in traditional software engineering. However it tends to result in parts that are more specific than the system (can't be reused for anything) and generally inter-collaborating parts that have implicit knowledge of each other to work. The meme _divide and conquer_ should be replaced with _invent abstractions and compose_
+. In terms of methodology, instead of _decomposing_ the Switch-Light system into parts, we _compose_ it from abstractions. This point may seem subtle, but it is profoundly important. The conventional methodology of dividing a system into smaller parts until the parts are small enough to implement is arguably the prevalent approach in traditional software engineering. However it tends to result in parts that are more specific than the system (can't be reused for anything) and more seriously inter-collaborating parts that have implicit knowledge of each other. The meme _divide and conquer_ should be replaced with _invent and compose_
 
 Here is skeleton code of the two domain abstractions. 
 
@@ -357,9 +359,9 @@ class Light : IDataFlow<bool>
 
 Each of these abstractions implements a _port_, which allows instances of them to be wired using the programming paradigm, DataFlow.
 
-You may be wondering why the Switche's output port is private. That's because we wan't the public interface of Switch to just be the 'configuration interface' used by the system abstraction when it instantiates a Switch. The WireTo method is designed to be able to wire the port even if it is private.
+You may be wondering why the Switch's output port is private. That's because we wan't the public interface of Switch to just be the 'configuration interface' used by the system abstraction when it instantiates a Switch. The WireTo method is designed to be able to wire the private port.
 
-Here is our programming paradigms layer which contains IDataFlow:
+Here is our programming paradigms layer which contains the DataFlow abstraction:
 
 
 *Programming Paradigms layer*
@@ -377,7 +379,7 @@ interface IDataFlow<T>
 ....
 
 
-In ALA, we frequently use a *wiring pattern*, as depicted by the diagram in Figure 4, which consists of instantiating domain abstractions and wiring them together by ports that use an even more abstract interface representing a programming paradigm. The wiring pattern is quite ubiquitous, and therefore comes from a foundation layer that resides below the Programming Paradigms layer: 
+In ALA, we frequently use the *wiring pattern*, as depicted by the diagram in Figure 4, which consists of instantiating domain abstractions and wiring them together by ports that use an even more abstract interface. The wiring pattern is quite ubiquitous, and therefore comes from a foundation layer that resides below the Programming Paradigms layer: 
 
 
 *Foundation layer*
@@ -398,7 +400,7 @@ public static object WireTo(this object a, object b)
 
 Note: A basic implementation of WireTo is listed in Chapter Two. You can get the source for a WireTo extension method from one of the Github repositories for the example projects in several following chapters.
 
-Note: ALA does not require the use of reflection. I like to use reflection because it allows me to use an extension method to get a WireTo operator implemented for all domain abstractions. It allows me to make specifying the port name optional. It also allows me to make the port fields in the class private so they do not look like part of the public configuration interface to the layer above.
+Note: ALA does not require the use of reflection. I like to use reflection because it allows me to use an extension method to get a WireTo operator implemented for all domain abstractions. It allows me to make specifying the port name optional. It also allows me to make the port fields in the class private so they do not look like part of the public configuration interface to the layer above. And it spares me from writing setter methods for every port.
 
 Instead of using a WireTo function, and if you are generating wiring code from the diagram automatically using a tool, and you make the port fields public, you could generate wiring code like the following: 
 
@@ -460,7 +462,7 @@ Notice that this application is easier to write in this way than it would be in 
 
 The astute reader will notice that the AndGate can't implement IDataFlow<bool> twice for its two inputs. In later projects, we will show how we work around this unnecessary language constraint.
 
-You may also notice that the fanout from the output of the AndGate to both the Light and the Indicator won't work. We show how this implementation problem is solved in later projects as well.
+You may also notice that the fanout from the output of the AndGate to both the Light and the Indicator won't work because an output port can be wired only once. We show how this implementation problem is solved in later projects as well.
 
 Now that we have some reusable domain abstractions and programming paradigms, let's quickly write another trivial application:
 
