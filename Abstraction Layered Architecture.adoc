@@ -25,7 +25,7 @@ image::BOSS_Great_Wall.jpg[BOSS_Great_Wall.jpg,900, title="*The large scale stru
 
 John R Spray
 
-Last update: 2022-01-09
+Last update: 2023-03-20
 
 This online book is a work in progress. Feedback is welcome. Please send to johnspray274<at>gmail<dot>com
 
@@ -161,7 +161,9 @@ Since bad dependencies are illegal in ALA, how do parts of the system communicat
 
 If you think about it, circular dependencies come about because there is circular communications. Circular communications is perfectly valid. When you stop representing communications with dependencies, and start representing them with wiring code, circular wiring makes perfect sense. When you use only good dependencies, the whole dependency management problem just goes away.
 
-Nearly all relationships in the UML class diagram are bad dependencies. The only legal UML class relationship is composition (filled diamond arrow), and then _only_ if the class being used is more abstract (in a lower layer). Now when you use  abstractions you always refer to it by name, not use an arrow on a diagram. You wouldn't draw a line on a diagram to a library function such as squareroot - you would just use squareroot by name as if it's part of your language. Similarly, you wouldn't draw composition relationships on a UML diagram of an ALA application. So, it turns out that if you drew a UML class diagram of an ALA application, you would just get disconnected boxes sitting in space. They would be arranged in layers, as described below, but there would be no lines at all. The UML class diagram is redundant in ALA. In fact the UML class diagram, by encouraging relationships between would-be peer abstractions, has probably caused more damage to software than any other software engineering meme. UML class diagrams are evil.
+Nearly all relationships in a typical UML class diagram are bad dependencies. The only legal UML class relationship is composition (filled diamond arrow), and then _only_ if the class being used is more abstract (in a lower layer). 
+
+Now when you use abstractions you always refer to it by name, not use an arrow on a diagram. You wouldn't draw a line on a diagram to a library function such as squareroot - you would just use squareroot by name as if it's part of your language. Similarly, you wouldn't draw composition relationships in an ALA application on a UML diagram. So, it turns out that if you drew a UML class diagram of an ALA application, you would just get disconnected boxes sitting in space. They would be arranged in layers, as described below, but there would be no lines at all. The UML class diagram is redundant in ALA. In fact the UML class diagram, by encouraging relationships between would-be peer abstractions, has probably caused more damage to software than any other software engineering meme. UML class diagrams are evil.
 
 *Metrics*
 

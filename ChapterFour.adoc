@@ -1,6 +1,6 @@
 :imagesdir: images
 
-== Chapter four - Programming paradigms and their execution models. 
+== Chapter four - Execution models. 
 
 === Introduction to programming paradigms
 

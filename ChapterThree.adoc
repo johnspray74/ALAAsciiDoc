@@ -1,6 +1,6 @@
 :imagesdir: images
 
-== Chapter three - Why the structure works
+== Chapter three - How the structure solves the problems
 
 In the previous chapter we described what the structure, the anatomy, of ALA looks like as if we were dissecting a dead body. We see where things are but we don't yet understand why they are there. In this chapter we explain why that structure works. Why does this way of organising code result in software that meets those non-functional requirements we listed in Chapter one?
 

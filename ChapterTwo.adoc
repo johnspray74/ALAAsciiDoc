@@ -4,24 +4,24 @@
 
 == Chapter two - The structure
 
-In this section we describe the structure of ALA without trying to explain too much about why it looks that way. An analogy is if we described the physical anatomy of the human body without explaining how it works. How ALA works will be covered in chapter three, and why it works in chapter six.  
+In this chapter we describe the structure or anatomy of ALA without delving too much into the hows and whys, which are covered in later chapters.
 
-The organisation of this chapter (and all chapters) is to use different perspectives. We all have different prior knowledge on which we build new knowledge, so we will each have a different best way to understand things. Use the perspective that makes the most sense to you. Because of the use of perspectives, there will often be some repetition of ideas between the major sections. 
+The organisation of this chapter (and all chapters) is different perspectives. We all have different prior knowledge on which we build new knowledge, so we each have a different way to understand new things. Use the section whose perspective makes the most sense to you. Because of the use of perspectives, there will sometimes be repetition of ideas across sections. 
 
 
 === Software elements, relations among them
 
-Some definitions of software architecture see it in terms of software elements and the relations among them. Indeed the first two fundamental constraints of ALA define what elements are and what their relations are.
+In this first perspective, we describe ALA in the context of one of the definitions of software architecture, "software elements and the relations among them". Indeed the first two fundamental constraints of ALA define what elements are and what their permisable relations are.
 
-In this first perspective of ALA, we look at these two fundamental constraints in terms of code that lets us see how everything works right down to the C# executable level. We show all the code in all the layers so there are no gaps. 
+In this section, we also use an example code that lets us explain the concepts in a concrete way right down to the C# executable level. We show all the code in all the layers. 
 
 ==== The only unit of code is an abstraction
 
-The only unit of code in ALA is an abstraction. Not module, not class, not function. An abstraction is more than a module, class or function in that it must be a 'generalized conceptual idea'. It must be learnable as a concept. Many modules, classes or functions in traditional code will not be good abstractions, especially if they have dependencies on peer modules, classes or functions.
+The only unit of code in ALA is an abstraction. Not module, not class, not function. An abstraction is more than a module, class or function in that it must be a 'generalized conceptual idea'. It's what our brains use to understand the world, not what compilers use. It must be learnable as a concept. Many modules, classes or functions in traditional code are not be good abstractions, especially if they are an integral part of a specific system with have associations with peer modules, classes or functions.
 
-Abstraction goes hand in hand with reuse. Krueger said that abstraction and reuse are two sides of the same coin. Abstractions tend to be stable, as stable as their conceptual idea. When we have a dependency on an abstraction, it is a dependency on a conceptual idea.
+Abstraction goes hand in hand with reuse. Krueger said that abstraction and reuse are two sides of the same coin. Abstractions tend to be stable - as stable as their conceptual idea. When we have a dependency on an abstraction, it is a dependency only on that conceptual idea.
 
-Here is an example abstraction which smooths data arriving on its input and outputs it at a slower rate.
+Here is an example domain. The abstraction works on a stream of data. It smooths the data and slow its down the rate. It has an input and an output dataflow port: 
 
 .DomainAbstractions\LowPassFilter.cs
 [source,C#]
@@ -39,9 +39,10 @@ namespace DomainAbstractions
     /// and also sets the lower rate of output.
     /// e.g. if Strength is set to 10, then there is one output for every 10 input
     /// datas received.
-    /// You need to understand the programming paradigm, IDataFlow,
+    /// You need to understand the programming paradigm abstraction, IDataFlow,
     /// to understand this code.
     /// </summary>
+    
     class LowPassFilter : IDataFlow<double> // input port <1>
     {
         public LowPassFilter(int strength, double initialOutput = 0.0) <3>
@@ -70,13 +71,11 @@ namespace DomainAbstractions
 }
 ....
 
-The abstraction smooths an incoming data stream, and slow its down.
 
-The abstraction has two ports:
 
-<1> Input port, the implemented interface
+<1> The input port, the implemented interface
 
-<2> output port, simple private field of type interface
+<2> The output port, simple private field of type interface
 +
 The input port is the IDataFlow<double> interface that is implemented by the class. Dataflow is a programming paradigm which is a stream of data without end. Incoming data arrives via the Push method in this interface. We never know where the data comes from. The output port is the private field named "output". This field will be set pointing at an IDataFlow<double> input of an instance of another abstraction somewhere. We never know where the data goes to. How the _output_ field gets set is described later.
 +
@@ -87,16 +86,16 @@ Because the abstraction uses ports, it has no knowledge of other peer abstractio
 <4> The abstraction keeps some internal state. This goes somewhat contrary to functional programming where we want all state to be passed in. In ALA a good abstraction trumps being stateless. As an abstraction that is naturally stateful, a filter should hide its state internally.  
 
 <5> The implementation of the input interface does the work of the filter. Note that port interfaces are always implemented explicitly. (If implemented implicitly, they would be part of the public API of the class, which we don't wan't. We only want the port accessed via the interface.)
-+
-Internally, abstractions are cohesive (which means sticking together) or highly interconnected code collaborating for a single purpose.
-+
-In ALA, abstractions are implemented as files. The name of the file is the name of the abstraction. The code that implements an abstraction needs no internal organisation. We do not care about dependencies or any inter-relationships inside an abstraction. In fact the more cohesive everything is the better, as long as it is small. It will often be implemented as a single class or function, but may consist of a small number of items such as classes, functions, interfaces, enums, delegates, etc, as long as the total is small.
 
 <6> When an abstraction is created, it is critically important to add comments that make it learnable by explaining the concept it provides, its ports, its configurations and an example of its use. In Visual Studio, I copy these comments before the constructor because that allows them to pop up in the IDE when hovering on the constructor name where instances are created with a _new_ keyword.
 
+In ALA, abstractions are implemented as files. The name of the file is the name of the abstraction. The file typically contains a class, but may contain more than one class, enums, delegates, interfaces etc. I usually put the implementation of the public configuration interface first, then the ports that are implemented as fields, then any other internal state, then the implementations of the ports.  
+
+Internally, abstractions are cohesive (which means sticking together) or highly interconnected code collaborating for a single purpose. Because it's cohesive code, ALA does not prescribe any internal organisation for abstractions. We do not care about dependencies or any inter-relationships inside an abstraction. Any part of the code may need knowledge of any other part to understand. In fact the more cohesive everything is the better, as long as it is small.
+
 Abstractions are the only mechanism that provides design-time _information hiding_. When David Parnas coined the term _information hiding_ he meant at _design-time_. Unfortunately there is a popular meme that _information hiding_ means _encapsulation_. The same idea of design-time information hiding has other names such as Alistair Cockburn's _protected variations_, and Robert Martin's version of the OCP (open closed principle). 
 
-A module or class can encapsulate information at compile-time but does not necessarily hide information at design-time. In the case of our LowPassFilter, the fact that it is just a low pass filter means that its internals cannot be coupled or collaborating with other modules. It's bounded by its conceptual idea. If it were a module instead, it might primarily perform the filter function for a specific application, but knowing which application it is part would cause it to take on ancilliary functions, such as  offset and scale to output the units needed by the application. Or it might grab its input knowing where it comes from, or it might send it's output to two different places. It might connect to the applications setting menu for its settings. All these things can be encapsulated, but they are all causing design-time coupling.
+A module or class can encapsulate information at compile-time but does not necessarily hide information at design-time. In the case of our LowPassFilter, the quality of being a good abstraction means that its internals are not coupled or collaborating with other modules. It's bounded by its conceptual idea. If it were a module instead, it might primarily perform the filter function for a specific application, but knowing which application it is part of would cause it to take on ancilliary functions, such as  offset and scale to output the units needed by the application. Or it might grab its input knowing where it comes from. Or it might send it's output to a specific place, or even to multiple specific places using direct method calls. It might connect to the application's settings menu for its settings. All these things would cause design-time coupling through the application.
 
 
 ===== Meaning of abstraction
@@ -111,27 +110,23 @@ Miriam Webster: relating to or involving general ideas or qualities rather than 
 
 The other meaning of 'higher level of abstraction' used in the software engineering community appears to be 'further away from the domain of the computer and closer to the problem domain'. For example, layers are often shown building up from the hardware. They can also build up from the database, or a physical communication medium, such as the layers of the OSI communications model. In this meaning, the application is considered the most abstract. For example, a 3-tier system or a communication stack uses this type of layering. The perception is that because we no longer have to deal with computer domain details such as data storage, communications protocols, hardware, etc, we must be more abstract. The problem with this is that the problem domain also deals with details. These details come from the real world and are described by detailed requirements. The modules that contain these details are no more abstract than those in the various domains of computing.
 
-Conventional layering tends to use this second meaning of 'abstract'; layers are said to be more abstract as you go up. ALA layers use the original meaning of the word 'abstract' and layers get more abstract as you go down.
+Conventional layering tends to use this second meaning of 'abstract' and layers are said to be more abstract as you go up. ALA layers get more abstract as you go down.
 
-The layers are not the same either. To convert conventional layers to ALA, you generally just tip them on their side so that they are not layers but independent disconnected abstractions. Each of them knows about details of something but they no longer directly connect to each other in either direction. On their own they will do nothing. The layer above, whose job is to know the details of a specific application or system, composes instances of them by instantiating them, configuring them, and wiring them together. Conventional layers can be many. ALA layers are few.
+The layers are not the same either. To convert conventional layers to ALA, you generally just tip them on their side so that they are not layers but independent disconnected abstractions. Each of them knows about details of something but they no longer directly connect to each other in either direction. On their own they will do nothing. The layer above, whose job is to know the details of a specific application or system, composes instances of them by instantiating them, configuring them, and wiring them together using compositional abstractions in a lower layer.
 
-A final note about abstractions versus the SRP (single responsibility principle). The SRP is not really the best way to think about abstractions. It is better to think about what details an abstraction implementation knows about. It can be a specific user story, a specific feature, a type of UI element, a type of database, a protocol, a hardware device, etc. It will contain all the cohesive knowledge about that thing. In doing so, it may have multiple responsibilities. For example an abstraction that knows about a protocol or a hardware device may have responsibility for both input and output. It may have responsibility for configuring the hardware device and getting data. A filter abstraction may both smooth the input data and resample the input, because resampling is cohesive with smoothing. 
-
-We will look further at what 'abstraction' means in chapter six.
+A final thought about abstraction is to compare it with the SRP (single responsibility principle). The SRP is not really the best way to think about abstractions. It is better to think about what details an abstraction implementation knows about. It can be a specific user story, a specific feature, a type of UI element, a type of database, a protocol, a hardware device, etc. It will contain all the cohesive knowledge about that thing. In doing so, it may have multiple responsibilities. For example an abstraction that knows about a protocol or a hardware device may have responsibility for both input and output. It may have responsibility for configuring the hardware device. A filter abstraction may both smooth the input data and resample the to a lower rate at the output, because resampling is cohesive with smoothing. 
 
 
 
 ==== Abstraction internal structure
 
-Internally an abstraction is cohesive. This means that every line of code is related to, and collaborates with, every other line of code to. It has no structure. It is a small ball of mud.
+Internally an abstraction is cohesive. This means that every line of code is related to, and collaborates with, every other line of code to implement the idea of the abstraction. It has no internal structure imposed by ALA. It is essentially a small ball of mud.
 
-It should be more cohesive than most conventional code, simply because it is implementing an abstraction. An abstraction doesn't necessarily have a single purpose. An abstraction that represents a serial UART device type may have several responsibilities to do with the device, such as configuring, reading and writing. But it is still all cohesive code.
+We shouldn't think of an abstraction implementation as being a _composition_ of _elements_ such as functions, variables, structs, methods, enums, delegates, statements, lines of code or the like because they are all collaborating. They are all just syntactical components, but not semantic components. In other words, they don't have meaning on their own related to the concept of the abstraction. Only when we take all of lines of code together do we have meaning. So we never semantically break an abstraction implementation into smaller parts. 
 
-We shouldn't think of an abstraction as being composed functions, variables, structs, methods, enums, delegates, statements, lines of code or the like. These are all syntactical components of the abstraction, but not semantic components. None of them have meaning on their own related to the concept of the abstraction. Only when we take all of lines of code together do we have meaning. So from a semantic point of view, we can't break an abstraction into smaller parts. 
+The external structure and internal structure with respect to abstractions are at opposite extremes. One is zero coupled and constrained only to the use of instances of lower layer abstractions and the other is fully coupled and highly cohesive.
 
-The external structure and internal structure with respect to abstractions are at opposite extremes. One is zero coupled (no structure at all), and the other is fully coupled (highly cohesive).
-
-This idea that there is no structure an abstraction is important because we are used to structural hierarchies. In ALA, if we want to know the structure at a larger scale than abstractions, say a whole user story or even the whole system, well they are inside abstractions of their own. Those abstractions are in the higher layers, but they are still just small abstractions. They implement a whole user story or a whole system, yet remain small because they simply compose instances of abstractions from lower layers. 
+That there is no structure in an abstraction's implementation is important because in conventional architectures we are used to hierarchical encapsulation. In ALA their is strictly no containment nesting. Instead there is only abstraction layers. 
 
 
 
@@ -161,15 +156,15 @@ A -> B  [dir="both", arrowhead="open", arrowtail="tee", color=green, label=" req
 
 In terms of our previous example, LowPassFilter is Abstraction A and IDataFlow is Abstraction concept B.
 
-Notice how in the diagram the relationship arrow comes from inside A. This is significant. It is the code that implements A that requires knowledge of abstraction concept B. We never actually draw lines when using abstractions, so you wont see this type of line in ALA diagrams. We only use it here while describing this one relationship that we are allowed to use. 
+Notice how in the diagram the relationship arrow comes from inside A. This is significant. It is the code that implements A that requires knowledge of abstraction concept B. We never actually draw lines when using abstractions, so you wont see this type of line in ALA diagrams. We only use it here while describing this one type of relationship that we are allowed. 
 
 B must be more abstract than A. "More abstract" means more general, not specific to A, and have a greater scope of reuse than A.
 
 Because B is more abstract, it is more stable. ALA therefore automatically enforces the Stable Dependencies Principle. 
 
-The relationship means that, to read and understand the code inside A, you must know the abstraction concept B - not how the insides of abstraction B work. The word "abstraction" implies that it should be learnable in a short time and easy to retain. When we get an abstraction concept is sometimes described as a moment of insight. 
+The relationship means that, to read and understand the code inside A, you must know the abstraction concept B - not how the insides of abstraction B work. The word "abstraction" implies that it should be learnable in a short time and easy to retain. When we learn an abstraction concept, there is a moment when we suddenly 'get it', a small moment of insight. 
 
-Here are some more legal dependencies, this time from the application layer to the domain abstractions layer.
+Here are some more legal dependencies, this time in text form. They are from a user story in the application layer to the domain abstractions layer.
 
 .Application\Thermometer.cs
 [source,C#]
@@ -182,37 +177,48 @@ Here are some more legal dependencies, this time from the application layer to t
 
 Legal dependencies from a _Thermometer_ user story abstraction on abstractions _AnalogInput_, _LowPassFilter_, _OffsetAndScale_, _Display_ and _WireIn_. The user story takes input from an analog to digital converter, filters them to remove noise, scales them to be in degrees, and displays them.
 
-This type of dependency has zero coupling. Because of the way our brains have evolved to understand a complex world in terms of abstractions, abstractions are the only mechanism that hide knowledge at design-time. The dependency has zero coupling between all codes using the abstraction and the code that implements the abstraction.
+Because of the way our brains have evolved to understand a complex world in terms of abstractions, abstractions are the only mechanism that hide knowledge at design-time. Dependencies on more abstract abstractions have zero coupling between the code using the abstraction and the code implementing the abstraction.
+
+Dependencies on more abstract abstractions also explicitly tell us what knowledge we need in order to _understand_ code. For example, if abstraction A is __thermometer__ and abstraction B is __display__, then to understand the code that implements the thermometer requires knowledge of the concept of display. That's why we sometimes refer to it as a knowledge dependency. Such a dependency always applies at design-time, and may apply at compile-time and run-time. Some knowledge dependencies may apply at design-time only. For example a dependency may be on a convention, or it may be simply the knowledge of ALA. You need knowledge of those things to fully understand the code. We want to be explicit and clear about knowledge dependencies for every bit of code inside every abstraction, so we endeavour to always state implicit dependencies in comments. For example, in the implementation of an abstraction for a hardware device, I include a reference to the datasheet.
+
+Architectures generally work by applying constraints that restrict the infinite variety of ways code could be organised. The ALA constraint of this single relationship type may seem severe at first, but after some practice they change from a hinderence to being increasingly helpful in guiding the design. Sometimes the abstractions come easily from the wording in the requirements and sometimes they require sustained inventive thought processes, especially in a new domain. 
+
+If you are finding it difficult, then first make sure you have well written requirements that capture all details. The user story abstractions should be just a more formal expression of them in terms of abstractions they probably already mention. 
+
+In most domains, I usually start with the UI description in the requirements as they most readily reveal their domain abstractions. Then it becomes apparent that dataflows must be connected to these instances of UI abstraction elements. Data transformation and state abstractions will then become apparent next. 
 
 
-This type of dependency also tells us explicitly what other knowledge we need in order to _understand_ code. For example, if abstraction A is __standard deviation__ and abstraction B is __square root__, then to understand the code that implements standard deviation requires knowledge of the concept of square root. That's why we sometimes refer to it as a knowledge dependency. Such a dependency always applies at design-time, as well as compile-time and run-time. Some knowledge dependencies may be implicit and so apply at design-time only. For example a dependency may be on a convention, or it may be simply the knowledge of ALA. You need knowledge of those things to fully understand the code. We want to be explicit and clear about knowledge dependencies for every bit of code inside every abstraction, so we endeavour to always state implicit dependencies in comments.
+===== RIP the UML class diagram
 
-Architectures generally work by applying constraints that restrict the infinite variety of ways code could be organised. The ALA constraints seem severe at first, but after some practice they are exceedingly helpful in guiding the design. There is essentially one right way to organise the code. Sometimes the abstractions come easily and sometimes they require sustained inventive thought processes, especially in a new domain. In most domains, I usually start with the UI description in the requirements as they most readily reveal their abstractions. Then it becomes apparent that dataflows must be connected to these instances of UI abstraction elements. Data transformation and state abstractions will then become apparent next. 
-
-
-===== ALA compared with the UML class diagram
-
-All UML relationships except one are illegal in ALA, and that one is highly restricted to being a composition on a more abstract class. Such a relationship is always represented in code by just referring to the abstraction by name. You do not draw a line on a UML class diagram. For example, you would never use a library abstraction such as _regex_ by drawing a line on a diagram to a box representing the regex class. You would just use the regex abstraction by name.
+All UML relationships except one are illegal in ALA, and that one is restricted to being a composition on a more abstract class or interface. Such a relationship is always represented in code by just referring to the abstraction by its name. For example, you wouldn't use a library abstraction such as _regex_ by drawing a line on a diagram to a box representing the regex class. You would just use the regex abstraction by name. 
 
 Furthermore, such a use of an abstraction by name is inside the class. It's part of the class's internal implementation. It makes no sense to show the relationship at the zoomed out scale outside the class with a filled diamond line coming from the border.
 
-Class diagrams are evil. They have done more damage to software architecture than any other meme.
-
-If a UML class diagram were drawn of an ALA application, there would be no lines at all, just boxes in space arranged in layers. This makes sense, because classes are used to implement abstractions, and abstractions have zero coupling with one another. 
+So, if a UML class diagram were drawn of an ALA application, there would be no lines at all, just boxes in space arranged in layers. This makes sense, because classes are used to implement abstractions, and abstractions have zero coupling with one another. 
 
 image::ALAClassDiagram.drawio.png[ALAClassDiagram.drawio.png, title="UML class diagrams for ALA have no relation lines.", width=90%, link=ALAClassDiagram.drawio.png]
 
-The diagram is not useful. We will never use it again. That's not to say we won't use diagrams. Diagrams can be used in ALA to represent the internals of an abstraction. This is often done in the layer representing the application or a feature or user story. In ALA terms, it shows instances of (lower layer) abstractions wired together. In implementation terms it is a (static) UML object diagram.
+The diagram is not useful. We will never use it again. That's not to say we won't use diagrams. Diagrams can be used in ALA to represent the internals of an abstraction. This is often done in the layer representing the application for a feature or user story. In ALA terms, it shows instances of (lower layer) abstractions composed together as a graph. In implementation terms it is a (static) UML object diagram.
 
-Following are the UML relationships you cannot use, and what you do instead.
+Class diagrams are evil. They have done more damage to software architecture than any other meme. Following are the UML relationships you cannot use in ALA, and what you do instead.
 
-* *Associations*: A conventional program will typically have many, many bad dependencies referred to as _associations_ in UML. Most are there because data, messages, events, execution flow, etc, need to get from one place to another in the program. These are simply illegal in ALA. The whole difficult concept of dependency management vanishes. But where do these relationships go? How can the program still work? How is it possible for messages and events to travel around at run-time? The short answer is that all these associations become a line of code inside an abstraction in the layer above. Or they become a line on a diagram composing two _instances_ of abstractions. Such lines are not relationships or dependencies - they are inside an abstraction, no different to a line of code that say calls one function and passes the result to another function. In ALA, you cannot use associations between classes. Instead you create objects in a higher level abstraction and then wire them together. The abstractions themselves will not know where their data comes from, nor where it goes.
+* *Association*: A conventional program will typically have many bad dependencies referred to as _associations_ in the UML. Most are there because data, messages, events, execution flow, etc, need to get from one place to another in the program. They are illegal in ALA. So how can a program work without them? How do we get data and events from one place to another at run-time? The short answer is that all these associations become a simple line of code inside an abstraction in the layer above. Such lines are not relationships or dependencies - they are contained inside a single abstraction, no different to a line of code that say calls one function and passes the result to another function. In ALA, you create objects in a higher level abstraction and then wire them together. The abstractions themselves then do not know where their data comes from, nor where it goes.
 +
-Note that dependency injection or otherwise passing an object into another object doesn't remove an association relationship between the classes. It only changes the relationship from composition to association, neither of which is allowed between peer classes. In other words, in ALA you are not allowed to know about a class in the same layer, not even its interface. Not even a base class. Instead you use ports that use a much more abstract interface called a programming paradigm interface from a lower layer.
+Note that simple dependency injection or otherwise passing an object into another object doesn't remove the association between their respective classes. It only changes the relationship from composition to association, neither of which is allowed between peer classes. In other words, in ALA you are not allowed to know about a class in the same layer, not even its interface. Not even a base class. Instead you must use a much more abstract interface called a programming paradigm interface from a lower layer. The use of this type of interface means that the classes know nothing about the outside world. That's why we call the usage a port.
 
-* *Composition*: Although the knowledge dependency relationship used in ALA can be implemented as a UML composition relationship (directed arrow with filled diamond), the ALA knowledge dependency is more constrained. It must be instantiating a class in a lower, more abstract, layer. This means that you cannot break a module up into pieces arbitrarily. Instead, you must invent abstractions. The composition relationship in ALA can go down by one or more layers, but never within a layer.
+* *Composition*, *Aggregation*, *Realization*: Although the knowledge dependency relationship used in ALA can be implemented as a UML composition relationship (arrow with filled diamond), an Aggregation (arrow with unfilled diamond) or Realization (dashed arrow) the ALA knowledge dependency is more constrained. It must be instantiating a class, using objects of a class or interface, or implementing an interface in a lower, more abstract, layer. The composition, aggregation and realization relationships in ALA can go down by one or more layers, but never up or across within a layer.
 
-* *Inheritance*: ALA doesn't need or use inheritance. It would break the abstraction of the (more abstract) base class in the lower layer. Instead we always use composition. Inheritance is often used to provides a 'calling up the layers at run-time' mechanism by its use of virtual functions. In ALA, we do this with ordinary observer pattern (events in C#), or by passing in a method as a configuration (usually anonymously or as a lambda expression), or with the strategy pattern. 
+* *Inheritance*: ALA doesn't need or use inheritance. It would break the abstraction of the (more abstract) base class in the lower layer. Instead we always use composition. 
++
+By way of example, given the concepts of vehicle, car and truck, in conventional object oriented programming we may be tempted to create a base vehicle class in a lower layer, and implement car and truck in the higher layer. But we may then be tempted to implement things that _most_ vehicles have such as 4 wheels, and attempt to override that when we have an exception such as a vehicle with tracks. 
++
+If we restrict ourselves to composition, we instead create multiple classes for common parts of vehicles in the lower layer, and just compose car, track and tank from them.
+
+() common parts of the vehicle domain would be invented as their own abstractions in the lower layer, and then car and truck would be composed from instances of them. In other words, the word 'vehicle' we would take to mean a category or domain, not a part in itself. Now we may need to express the requirement to "drive the vehicle". In this case the car and truck would each implement a 'drive' interface, not be derived from a generic vehicle that is drivable. 
+
+If there was justification to build a concrete generic drivable vehicle, it would be used from the upper layers using composition not inheritance. A real world example is more like a chassis concept. Variations would be handled by a configuration interface (the public interface), not overriding chassis components.
+
+Inheritance is often used to provide a 'calling up the layers at run-time' mechanism by its use of virtual functions. In ALA, we do this with ordinary observer pattern (events in C#), or by passing in a method as a configuration (usually anonymously or as a lambda expression), or with the strategy pattern. 
 
 * *Packages*: ALA does not use hierarchies or nesting. In other words, abstractions cannot be contained by other abstractions. Abstractions are never private. The reason they are never private is simple. An abstraction that is depended on should be more abstract than the abstraction using it. A more abstract abstraction needs to be public so it can be reused. ALA uses abstraction layers instead of encapsulation hierarchies. In ALA, packages would only be used as a distribution mechanism, not as part of the architecture for information hiding.
 +
