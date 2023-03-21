@@ -623,7 +623,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <p>John R Spray</p>
 </div>
 <div class="paragraph">
-<p>Last update: 2023-03-20</p>
+<p>Last update: 2023-03-22</p>
 </div>
 <div class="paragraph">
 <p>This online book is a work in progress. Feedback is welcome. Please send to johnspray274&lt;at&gt;gmail&lt;dot&gt;com</p>
@@ -635,7 +635,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="trueintroduction"><a class="anchor" href="#trueintroduction"></a>Introduction</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Intuitively, good quality software would allow you to read and understand any one part of the code without also having to read and understand any other part. I call this <em>zero coupling</em>. We are taught the meme <em>loose coupling and high cohesion</em>. Unfortunately, this implies that zero coupling is not achievable. It is said that a zero coupled system would not do anything. But this is only because we confuse <em>design-time coupling</em> with <em>run-time communications</em>. It is entirely possible for parts of a system to have zero knowledge about one another at design-time and still communicate at run-time. We define the word <em>coupling</em> to mean design-time coupling throughout this book. That&#8217;s the coupling that matters. By <em>design-time</em>, we mean that any time you are reading, writing or understanding code in one module, how much do you have to <em>know</em> about code inside other modules? Modules in conventional code tend to have a lot of coupling in the form of collaboration. ALA converts that collaborative coupling into cohesion contained in a new module. Here&#8217;s how:</p>
+<p>Intuitively, good quality software would allow you to read and understand any one part of the code without also having to read and understand any other part. I call this <em>zero coupling</em>. We are taught the meme <em>loose coupling and high cohesion</em>. Unfortunately, this implies that zero coupling is not achievable. It is said that a zero coupled system would not do anything. But this is only because we confuse <em>design-time coupling</em> with <em>run-time communications</em>. It is entirely possible for parts of a system to have zero knowledge about one another at design-time and still communicate at run-time. We define the word <em>coupling</em> to mean design-time coupling throughout this book. That&#8217;s the coupling that matters. By <em>design-time</em>, we mean that any time you are reading, writing or understanding code in one module, how much do you have to <em>know</em> about code inside other modules? We hear the terms compile-time and run-time often, but it is design-time where complexity happens. Modules in conventional code tend to have a lot of coupling in the form of design-time collaboration. ALA converts that collaborative coupling into cohesion contained in a new module. Here&#8217;s how:</p>
 </div>
 <div class="paragraph">
 <p>ALA is a set of three architectural constraints:</p>
@@ -654,7 +654,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </ul>
 </div>
 <div class="paragraph">
-<p>Many patterns and properties emerge from these three constraints. These are explored throughout this book. But first let&#8217;s elaborate on these constraints.</p>
+<p>Many patterns and properties emerge from these three constraints. These are explored throughout this book. But first let&#8217;s elaborate on these three constraints.</p>
 </div>
 <div class="paragraph">
 <p><span class="big"><strong>The only unit of code is an abstraction</strong></span></p>
@@ -667,16 +667,16 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div class="paragraph">
-<p>Abstractions are fundamental to the constraints. It&#8217;s important that we think in terms of abstractions rather than modules or classes, because abstractions are zero coupled with one another at design-time.</p>
+<p>Abstractions are design-time modules. Where a compiler uses modules or encapsulation, our brains use abstractions.</p>
 </div>
 <div class="paragraph">
-<p>An abstraction is a learnable idea or concept. Once learned it becomes part of your language.</p>
+<p>An abstraction is a learnable idea or concept. Once learned it becomes an embedded part of your language, allowing you to compose more specific abstractions using it it.</p>
 </div>
 <div class="paragraph">
-<p>In conventional methods, a system is broken into smaller pieces that we call modules, components or classes. These modules, components or classes tend to have a fixed arrangement with one-another (although an individual piece may be substitutable). This fixed arrangement leads to implicit collaboration with one another to form the system. They are like jigsaw pieces. Specific pieces fit together in a specific way to make a specific picture. The system is not explicit, it is just the collaboration of all the individual parts.</p>
+<p>In conventional methods, a system is broken into smaller pieces that we call modules, components or classes. These modules, components or classes tend to have a fixed arrangement with one-another (although an individual piece may be substitutable). This fixed arrangement leads to implicit collaboration with one another to form the system. They are like jigsaw pieces. Specific pieces fit together in a specific way to make a specific picture. The system is not explicit in itself, it is just the collaboration of all the individual parts.</p>
 </div>
 <div class="paragraph">
-<p>In contrast, abstractions are like lego pieces. These pieces are general and can be composed in an infinite variety of ways. A specific arrangement is an explicit artefact in itself. The parts in a specific arrangment are not collaborating. What makes the system is the particular compositon of them. It can be varied without changing the abstractions it uses.</p>
+<p>In contrast, abstractions are like lego pieces. These pieces are general and can be composed in an infinite variety of ways. A specific arrangement is an explicit artefact in itself. The parts in a specific arrangement are not collaborating. What makes the system is the particular compositon of them. It can be varied without changing the abstractions it is composed of.</p>
 </div>
 </div>
 </div>
@@ -707,10 +707,13 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <p>In the absence of direct computer language support for abstractions, ALA generally implements abstractions as source files (like modules in C). The file usually contains one class, but may contain a small number of classes, interfaces, enums, delegates, typedefs, functions, etc.</p>
 </div>
 <div class="paragraph">
-<p>Inside an abstraction, there are no dependency rules, or any organisational rules for that matter. It is all considered <em>cohesive</em> code. So internally, abstractions are small balls of mud.</p>
+<p>Inside an abstraction, there are no relationship rules, or any organisational rules for that matter. It is all considered <em>cohesive</em> code. So internally, abstractions are small balls of mud.</p>
 </div>
 <div class="paragraph">
-<p>Charles Krueger pointed out that <em>abstraction</em> and <em>reuse</em> are two sides of the same coin. More abstract means more reusable. More abstract also tends to mean more stable because a more abstract idea is drawn from more examples, and is therefore a more ubiquitous, more fundamental idea. The abstraction 'squareroot' has been stable for thousands of years despite the fact that new instances of its use occur every day.</p>
+<p>Charles Krueger pointed out that <em>abstraction</em> and <em>reuse</em> are two sides of the same coin. More abstract means more reusable. This makes sense since an abstraction is commonality drawn from many instances.</p>
+</div>
+<div class="paragraph">
+<p>More abstract also tends to mean more stable because a more abstract idea is drawn from more instances, and is therefore a more ubiquitous, more fundamental idea. The abstraction 'squareroot' has been stable for thousands of years despite the fact that new instances of its use occur every day.</p>
 </div>
 <div class="paragraph">
 <p>Software libraries tend to be good abstractions because they were written without knowledge of what will use them. If we conceive of and write abstractions in our applications similarly, without knowledge of the code that will use them, we will also get good abstractions. However, we also need to build useful abstractions. This will require some knowledge of what sorts of applications we are wanting to build. We call that the domain, and the abstractions are called domain specific abstractions.</p>
@@ -750,19 +753,19 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <p>So in ALA, abstractions do not communicate. Their instances do. The instances only communicate at run-time but for that to happen something else needs to connect them.</p>
 </div>
 <div class="paragraph">
-<p>In ALA, there must be a more specific abstraction in a higher layer to represent the system consisting of an instance of a standard deviation abstraction connected to an instance of a display abstraction. This higher layer abstraction calls the standard deviation function and then calls the display function, or arranges for this to happen in some way. The higher layer abstraction can be thought of as representing the user story.</p>
+<p>In ALA, there must be a more specific abstraction in a higher layer to represent the system consisting of an instance of a standard deviation abstraction connected to an instance of a display abstraction. This higher layer abstraction could just call the standard deviation function and then call the display function, but more commonly in ALA it creates an instance of the standard deviation abstraction and an instance of the display abstraction, and then arranges for these instances to communicate at run-time. The higher layer abstraction can be thought of as representing the user story consisting of a standard deviation connected to a display.</p>
 </div>
 <div class="paragraph">
 <p><strong>Classes with ports</strong></p>
 </div>
 <div class="paragraph">
-<p>In ALA we wont be restricting ourselves to pure functions. We will use classes as well. That&#8217;s because in ALA, when we need state, we consider abstraction to be more important than referential transparency (invariant behaviour over time.) Essentially we are using zero design-time coupling through use of abstractions as the tool to get analysability instead of removing time. Sometimes separating state from functions breaks otherwise good abstractions. An example would be if our standard deviation abstraction receives a stream of data and produces a running standard deviation result. In ALA, such an abstraction has it&#8217;s state (SumX, SumXX and N) stored with it, not passed into it. In other words, if state together with some methods makes a good abstraction, then we don&#8217;t break it.</p>
+<p>In ALA we wont be restricting ourselves to pure functions. We will use classes as well. That&#8217;s because in ALA, when we need state, we consider abstraction to be more important than referential transparency (invariant behaviour over time.) Essentially we are using zero design-time coupling through use of abstractions as the tool to get analysability instead of removing time. Sometimes separating state from functions breaks otherwise good abstractions. An example would be if our standard deviation abstraction receives a stream of data and produces a running standard deviation result. In ALA, such an abstraction has it&#8217;s state (SumX, SumXX and N) stored with it, not passed into it. In other words, if state together with some methods makes a good abstraction, then we don&#8217;t break it. ALA is highly object oriented. It is object oriented programming as it should have been.</p>
 </div>
 <div class="paragraph">
 <p>Another example of the need for a class rather than a function might be our display abstraction. A display probably needs some configuration, for example to tell it how many decimal places to display. That kind of configuration is usually set once when the abstraction is instantiated, so the state should be stored inside the display abstraction.</p>
 </div>
 <div class="paragraph">
-<p>ALA is actually highly object oriented. But it&#8217;s object oriented in a more disciplined way than conventional object orientation. That&#8217;s because peer classes may not have associations, period. In other words, an object&#8217;s communication with another object at run-time may not be implemented by one class having knowledge of another at design-time. Not even on an interface of a peer class.</p>
+<p>ALA is object oriented in a much more disciplined way than conventional object orientation. That&#8217;s because peer classes may not have associations. In other words, an object&#8217;s communication with another object at run-time may not be implemented by one class having knowledge of another at design-time. Not even on an interface of a peer class.</p>
 </div>
 <div class="paragraph">
 <p>There must be a more specific abstraction in a higher layer that instantiates two classes and arranges for them to communicate. This is more than dependency injection. Dependency injection, where one class knows about the interface belonging to another peer class, or a set of substitutable peer classes, is illegal in ALA.</p>
@@ -774,23 +777,28 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <p>To do this, we build the classes with <em>ports</em>. We then simply wire the instances together by their ports.  For example, we could make a <em>standard deviation</em> class with an output Dataflow port and a <em>display</em> class with an input Dataflow port. Instances of them can then be wired together by the <em>user story</em> abstraction in a higher layer.</p>
 </div>
 <div class="paragraph">
-<p>It is important to understand that these ports must use a significantly more abstract interface that comes from an even lower layer. We call these more abstract interfaces <em>programming paradigms</em>. For example, the Dataflow programming paradigm can be used anywhere we need to pipe data in or out of an abstraction.</p>
+<p>It is important to understand that these ports must use a significantly more abstract interface that comes from an even lower layer. In ALA, we call these more abstract interfaces <em>programming paradigms</em>. For example, the Dataflow programming paradigm can be used anywhere we need to pipe data into or out of an abstraction.</p>
 </div>
 <div class="paragraph">
-<p>Classes can have multiple ports. Ports can use different programming paradigms, not just data flow. For example, the <em>display</em> class could also have a UI port. The UI programming paradigm would be about laying out the user interface. A wiring of UI ports means one part of the UI is displayed within another part. Instances of <em>display</em> could be put inside an instance of a panel. Other types of programming paradigms are invented as we need them in order to meaningfully express requirements.
-So now, while the standard deviation and display <em>abstractions</em> know nothing about each other, their <em>instances</em> can communicate directly at run-time.</p>
+<p>So now, while the standard deviation and display <em>abstractions</em> know absolutely nothing about each other, they both know about the dataflow programming paradigm, and so their <em>instances</em> can be wired to communicate directly at run-time.</p>
+</div>
+<div class="paragraph">
+<p>Classes can have multiple ports. Ports can use different programming paradigms, not just data flow. For example, the <em>display</em> class could also have a UI port. The UI programming paradigm would be about laying out the user interface. A wiring of UI ports means one part of the UI is displayed within another part. Instances of <em>display</em> could be put inside an instance of a panel.</p>
+</div>
+<div class="paragraph">
+<p>Other types of programming paradigms are invented as we need them in order to meaningfully express requirements. Think of programming paradigms as <em>compositional abstractions</em>. They are abstractions that provide the meaning of composing, such as dataflow, UI layout, events, data schemas or others you can invent.</p>
 </div>
 <div class="paragraph">
 <p><strong>All dependencies are knowledge dependencies</strong></p>
 </div>
 <div class="paragraph">
-<p>A dependency on an abstraction in a lower layer means you need to understand the concept the abstraction represents at design-time. We call it a knowledge dependency. You could not understand the code that calculates standard deviation without first knowing about the concept of squareroot. However, to understand the code that calculates standard deviation does not require knowledge of the concept of a display, so that&#8217;s why that dependency is illegal.</p>
+<p>A dependency on an abstraction in a lower layer means you need to understand the concept the abstraction represents at design-time. It is a <em>knowledge</em> dependency. You could not understand the code that calculates standard deviation without first knowing about the concept of squareroot. However, to understand the code that calculates standard deviation does not require knowledge of the concept of a display, so that&#8217;s why that dependency is illegal.</p>
 </div>
 <div class="paragraph">
 <p>Going one layer up, to understand the code in our example user story abstraction requires knowledge of both the concept of standard deviation and the concept of display. It is therefore fine for the user story abstraction to have dependencies on both and compose a standard deviation and a display.</p>
 </div>
 <div class="paragraph">
-<p>Abstractions that are more abstract become part of your language. We take this for granted when we use library abstractions, such as squareroot. In ALA, all lower layers make up the language for the next higher, more specific layer until we are able to express the application.</p>
+<p>Abstractions that are more abstract become part of your language. We take this for granted when we use library abstractions, such as squareroot. In ALA, all lower layers make up the language for the next higher, more specific layer until we are able to express the application&#8217;s user story abstractions.</p>
 </div>
 <div class="paragraph">
 <p><strong>Good and bad dependencies</strong></p>
@@ -806,13 +814,15 @@ So now, while the standard deviation and display <em>abstractions</em> know noth
 </div>
 </div>
 <div class="paragraph">
-<p>Conventional code contains both good and bad dependencies. Good dependencies are when we use abstractions, such as when we use a library class.</p>
+<p>Conventional code contains both <em>good</em> and <em>bad</em> dependencies. Good dependencies are when we use abstractions, such as when we use a library class.</p>
 </div>
 <div class="paragraph">
-<p>There will typically be very high numbers of bad dependencies in every application. These bad dependencies are usually put there for different modules of a program to inter-communicate. They are also used to break a large module up into smaller modules - hierarchical decomposition. These smaller pieces may start with a stated functionality, but they are pieces specific to the module they are in, and therefore more specific than the module.</p>
+<p>There will typically be very high numbers of bad dependencies in conventional applications. These bad dependencies are usually put there for different modules of a program to inter-communicate. They are also used to break a large module up into smaller modules - hierarchical decomposition. These smaller pieces may start with a stated functionality, but they are pieces specific to the module they are in, and therefore actually more specific than the module.</p>
 </div>
 <div class="paragraph">
-<p>Bad dependencies make the dependency diagram look like the one on the right. My partner says these look like two ferris wheels engaged in a mating act. Even if we manage to avoid cyclic dependences, there are still typically many bad dependencies.</p>
+<p>Bad dependencies make the dependency diagram look like the one on the right. It is an actual dependency graph of a conventional application that was completely cleaned up by ALA. My partner says it looks like two ferris wheels engaged in a mating act. Even if we manage to avoid cyclic dependences, there are still typically many bad dependencies.</p>
+</div>
+</div>
 </div>
 <div class="paragraph">
 <p>In ALA, all bad dependencies are illegal. Normally in conventional code we don&#8217;t distinguish between good and bad dependencies. We consider them all to be necessary if the system is to work. But it turns out that systems can be built using only good dependencies.</p>
@@ -820,31 +830,26 @@ So now, while the standard deviation and display <em>abstractions</em> know noth
 <div class="paragraph">
 <p>Good dependencies are not just good - they are really good. We want as many of them as possible, because then we are reusing our abstractions. Bad dependencies are not just bad - they are really bad. They cause a growing tangled network of complexity.</p>
 </div>
-</div>
+<div class="paragraph">
+<p>Since bad dependencies are illegal in ALA, how do parts of the system communicate? Each bad dependency becomes a line of code completely inside a higher layer abstraction. That line of code connects two instances of abstractions. There it is cohesive with other lines of code that connect other instances of abstractions that togther make a whole user story.</p>
 </div>
 <div class="paragraph">
-<p>Since bad dependencies are illegal in ALA, how do parts of the system communicate? Each bad dependency becomes a line of code completely inside a higher layer abstraction. That line of code connects two instances of the abstractions. There it is cohesive with other lines of code that connect other instances of abstractions to make a cohesive user story.</p>
+<p>If you think about it, circular dependencies come about because there is circular communications. Circular communications is perfectly valid. When you stop representing communications with dependencies, and start representing them with wiring code, circular wiring makes perfect sense. When you use only good dependencies, circular dependencies, and the whole dependency management problem just go away.</p>
 </div>
 <div class="paragraph">
-<p>If you think about it, circular dependencies come about because there is circular communications. Circular communications is perfectly valid. When you stop representing communications with dependencies, and start representing them with wiring code, circular wiring makes perfect sense. When you use only good dependencies, the whole dependency management problem just goes away.</p>
-</div>
-<div class="paragraph">
-<p>Nearly all relationships in a typical UML class diagram are bad dependencies. The only legal UML class relationship is composition (filled diamond arrow), and then <em>only</em> if the class being used is more abstract (in a lower layer).</p>
-</div>
-<div class="paragraph">
-<p>Now when you use abstractions you always refer to it by name, not use an arrow on a diagram. You wouldn&#8217;t draw a line on a diagram to a library function such as squareroot - you would just use squareroot by name as if it&#8217;s part of your language. Similarly, you wouldn&#8217;t draw composition relationships in an ALA application on a UML diagram. So, it turns out that if you drew a UML class diagram of an ALA application, you would just get disconnected boxes sitting in space. They would be arranged in layers, as described below, but there would be no lines at all. The UML class diagram is redundant in ALA. In fact the UML class diagram, by encouraging relationships between would-be peer abstractions, has probably caused more damage to software than any other software engineering meme. UML class diagrams are evil.</p>
+<p>Nearly all relationships in a typical UML class diagram are bad dependencies. The only legal UML class relationship is composition (filled diamond arrow), and then <em>only</em> if the class being used is more abstract (in a lower layer). Now when you use an abstraction, you always refer to it by name, not use an arrow on a diagram. You wouldn&#8217;t draw a line on a diagram to a library function such as squareroot - you would just use squareroot by name as if it&#8217;s part of your language. Similarly, you wouldn&#8217;t draw composition relationships in an ALA application on a UML diagram. So, it turns out that if you drew a UML class diagram of an ALA application, you would just get disconnected boxes sitting in space. They would be arranged in layers, as described below, but there would be no lines at all. The UML class diagram is completely redundant in ALA. In fact the UML class diagram, by encouraging relationships between would-be peer abstractions, has probably caused more damage to software than any other software engineering meme. UML class diagrams are evil.</p>
 </div>
 <div class="paragraph">
 <p><strong>Metrics</strong></p>
 </div>
 <div class="paragraph">
-<p>Unfortunately metrics do not understand abstractions. For example, CBO (Coupling of objects), which, despite its name, is the total number of classes with dependencies to or from a given class, does not distinguish between good and bad dependencies.</p>
+<p>Unfortunately metrics do not understand abstractions. For example, CBO (Coupling of objects), (which, despite its name, is the total number of classes with dependencies to or from a given class) does not distinguish between good and bad dependencies.</p>
 </div>
 <div class="paragraph">
 <p>ALA recognises the importance of using abstractions and composability in dealing with complex systems. If metrics don&#8217;t also take into account this importance, they cannot work well.</p>
 </div>
 <div class="paragraph">
-<p>A problem when calculating CBO is whether or not to include library classes. Intuitively we know that library classes are abstractions. We see them as part of our programming language. So we feel they should not be included in the metric. The same should apply to all good dependencies - those that are dependencies on the knowledge of a concept in a lower layer. CBO should count only bad dependencies.</p>
+<p>A common problem when calculating CBO is whether or not to include library classes. Intuitively we know that library classes are abstractions. We see them as part of our programming language. So we feel they should not be included in the metric. The same should apply to all good dependencies - those that are dependencies on the knowledge of a concept in a lower layer. CBO should count only bad dependencies.</p>
 </div>
 <div class="paragraph">
 <p>If the metric first identified all potential abstractions, and then identified their abstraction levels relative to each other, then it could just count the bad dependencies. CBO would then be an extremely useful metric.</p>
@@ -875,7 +880,7 @@ So now, while the standard deviation and display <em>abstractions</em> know noth
 <p>There is no 'hierarchical' structure in ALA. In other words, abstractions cannot be contained within abstractions. There is no analog of a sub-module or sub-component - no such thing as a sub-abstraction. <em>Abstraction layers</em> replace <em>hierarchical containment</em>. This is because lower layer abstractions must be visible for reuse, not hidden inside an encapsulation hierarchy.</p>
 </div>
 <div class="paragraph">
-<p>Once you have learned the set of concepts of the abstractions available in lower layers, it is easy to read and understand code in higher layers that use instances of them. Reading a line of code that uses an abstraction by name is like reading any other line of code. A good abstraction is when we don&#8217;t need to follow the indirection and go and read the code that implements the abstraction. For example, when we see a use of squareroot, if our brain has already learned the concept of squareroot once, we can concentrate on the code that is using the squareroot. We do not have to change contect to read any code. Squareroot is just part of our language. ALA is about achieving that level of readability for every single dependency in the entire application.</p>
+<p>Once you have learned the set of concepts of the abstractions available in lower layers, it is easy to read and understand code in higher layers that use instances of them. Reading a line of code that uses an abstraction by name is like reading any other line of code. A good abstraction is when we don&#8217;t need to follow the indirection and go and read the code that implements the abstraction. For example, when we see a use of squareroot, if our brain has already learned the concept of squareroot once, we can concentrate on the code that is using the squareroot. We do not have to change context and go and read other code. ALA is about achieving that level of readability for every single dependency in the entire application.</p>
 </div>
 <div class="paragraph">
 <p><span class="big"><strong>All abstractions must be small</strong></span></p>
@@ -888,7 +893,7 @@ So now, while the standard deviation and display <em>abstractions</em> know noth
 </div>
 </div>
 <div class="paragraph">
-<p>The final constraints prevents us from conforming to the first two constraints by simply putting everything into one big ball of mud abstraction. That&#8217;s obviously not desirable, so we need this constraint to force us to create abstractions from which we can compose applications.</p>
+<p>This third constraint prevents us from conforming to the first two constraints by simply putting everything into one big ball of mud abstraction. That&#8217;s obviously not desirable, so we need this constraint to force us to create abstractions from which we can compose applications.</p>
 </div>
 <div class="paragraph">
 <p>Abstractions are internally highly cohesive, which means that all code inside them is inter-related. Internally they are a small ball of mud. If that highly interrelated code is to be understood, it needs to be small.</p>
@@ -912,7 +917,7 @@ So now, while the standard deviation and display <em>abstractions</em> know noth
 </div>
 </div>
 <div class="paragraph">
-<p>ALA emerges many other patterns and properties. Many of them are already known about in software engineering, which is not surprising - such things as DSLs (Domain Specific Languages), Dependency Injection, Composite and Decorator patterns, monad like composition, etc. However, there are often subtle but important differences. For example the observer pattern (publish/subscribe) can be used to achieve calls going up the layers at run-time, but may not be used between abstractions in the same layer. The subscribers&#8217;s reference to the publisher would be an illegal dependency. A line of code in an abstraction in a higher layer must do the subscribing, which is effectively what the wiring pattern described below is.</p>
+<p>ALA emerges many other patterns and properties. Many of them are already known about in software engineering, which is not surprising - such things as DSLs (Domain Specific Languages), Dependency Injection, Composite and Decorator patterns, monad like composition, etc. However, there are often subtle but important differences. For example the observer pattern (publish/subscribe) can be used to achieve calls going up the layers at run-time, but may not be used between abstractions in the same layer. If they were in the same layer, the subscribers&#8217;s reference to the publisher would be an illegal dependency. A line of code in an abstraction in a higher layer must do the subscribing, which is effectively what the wiring pattern described below is.</p>
 </div>
 </div>
 </div>
@@ -946,7 +951,7 @@ So now, while the standard deviation and display <em>abstractions</em> know noth
 <p>A can create an instance of B and an instance of C and wire them together because they have compatible ports. Wiring causes the instance of C, cast as the interface, to be assigned to the field in B.</p>
 </div>
 <div class="paragraph">
-<p>While abstraction B and abstraction C know nothing about each other, the instances of B and C can communicate with each other at run-time because they both know about the interface D.</p>
+<p>While abstraction B and abstraction C know nothing about each other, the instances of B and C can communicate with each other at run-time because they both know about the programming paradigm interface, D.</p>
 </div>
 </div>
 </div>
@@ -957,7 +962,7 @@ So now, while the standard deviation and display <em>abstractions</em> know noth
 <p>When the idea first occurred that zero coupling could be achieved through the stated constraints, we did not know what it would be like, or even if it was possible, to write working systems. Our experience since then is that it has always been possible, and gets easier with experience. Coming up with the abstractions is sometimes obvious and sometimes not so obvious. The most difficult part is breaking bad habits. Your programming language, some conventional patterns such as MVC like patterns, and architectural styles such as conventional UI/business logic/database layering are memes that will conspire against you.</p>
 </div>
 <div class="paragraph">
-<p>In time there will be tools to help enforce the ALA constraints. As Robert Martin points out, an indication of a good abstraction can be the number of times it is used, but ultimately this may require AI. When that is achieved, it will be possible to automatically refactor legacy code into ALA code.
+<p>In time there will be tools to help enforce the ALA constraints. As Robert Martin points out, a measure of a good abstraction can be the number of times it is used, but ultimately this may require AI. When that is achieved, it will be possible to automatically refactor legacy code into ALA code.
 ---</p>
 </div>
 <div class="paragraph">
@@ -1040,7 +1045,7 @@ system.Run();</code></pre>
 <p>The writing of the Switch and Light abstractions can be handed off to different individuals or teams because, as abstractions, they know nothing about each other, and they know nothing about the System. In fact abstractions will be better quality if the teams do <em>not</em> collaborate with each other so that the abstractions themselves do not collaborate. (Corollary of Conway&#8217;s law.)</p>
 </li>
 <li>
-<p>In terms of methodology, instead of <em>decomposing</em> the Switch-Light system into parts, we <em>compose</em> it from abstractions. This point may seem subtle, but it is profoundly important. The conventional methodology of dividing a system into smaller parts until the parts are small enough to implement is arguably the prevalent approach in traditional software engineering. However it tends to result in parts that are more specific than the system (can&#8217;t be reused for anything) and more seriously inter-collaborating parts that have implicit knowledge of each other. The meme <em>divide and conquer</em> should be replaced with <em>invent and compose</em></p>
+<p>In terms of methodology, instead of <em>decomposing</em> the Switch-Light system into parts, we <em>compose</em> it from abstractions. This point may seem subtle, but it is profoundly important. The conventional methodology of dividing a system into smaller parts until the parts are small enough to implement is arguably the prevalent approach in traditional software engineering. However it tends to result in parts that are more specific than the system (can&#8217;t be reused for anything) and, more significantly, inter-collaborating parts that have implicit knowledge of each other. The meme <em>divide and conquer</em> should be replaced with <em>invent and compose</em>.</p>
 </li>
 </ol>
 </div>
@@ -1178,7 +1183,7 @@ new Main
 <p>Notice that this application is easier to write in this way than it would be in conventional C code. This is because the programming paradigm we are using, dataflow, suits the expression of these requirements. Most C code to do even such a simple requirement as this would likely already be messy in the way it handles run-time execution.</p>
 </div>
 <div class="paragraph">
-<p>The astute reader will notice that the AndGate can&#8217;t implement IDataFlow&lt;bool&gt; twice for its two inputs. In later projects, we will show how we work around this unnecessary language constraint.</p>
+<p>The astute reader will notice that the AndGate can&#8217;t implement IDataFlow&lt;bool&gt; twice for its two inputs. In later projects, we will show how we work around this completely unnecessary constraint of most languages.</p>
 </div>
 <div class="paragraph">
 <p>You may also notice that the fanout from the output of the AndGate to both the Light and the Indicator won&#8217;t work because an output port can be wired only once. We show how this implementation problem is solved in later projects as well.</p>
@@ -1220,7 +1225,7 @@ new MainWindow()
 <p>Here we are introducing some graphical UI, so we invented another programming paradigm for "UI layout". It is used between all the UI elements: MainWindow, Menu, Tickbox, StatusBar, Indicator. Wiring things together using that programming paradigm means things are arranged inside things on the UI.</p>
 </div>
 <div class="paragraph">
-<p>Notice how ALA is a polyglot programming paradigm. We use two programming paradigms, UI layout and dataflow, in the same diagram. Notice also that we don&#8217;t separate UI from business logic and data models as we do in conventional architectural laering patterns. These are highly cohesive things from the perspective of user stories. Instead we separate the implementations of the domain abstractions. It is still easy to swap out, for example, the UI implementation. The diagram above could be implemented as a web application or a desktop application by swapping between two sets of UI domain abstraction implementations.</p>
+<p>Notice how ALA is a polyglot programming paradigm. We use two programming paradigms, UI layout and dataflow, in the same diagram. Notice also that we don&#8217;t separate UI from business logic and data models as we do in conventional architectural layering patterns. These are highly cohesive things from the perspective of user stories and ought to be kept together. Instead, we separate the implementations of the domain abstractions. It is still easy to swap out, for example, the UI implementation. The diagram above could be implemented as a web application or a desktop application by swapping between two sets of UI domain abstraction implementations.</p>
 </div>
 <div class="paragraph">
 <p>Let&#8217;s do an application to browse for and display a (dynamic content) CSV file on a grid, filtered by a user specified name, and sorted by names. The CSV file has headings that will display in the grid.</p>
@@ -1264,7 +1269,7 @@ new MainWindow()
 </div>
 <div class="literalblock">
 <div class="content">
-<pre>Note: if you already have monads in your programming library for things like sorting and filtering (such as LINQ or reactive extensions), then instead of creating new domain abstractons for Filter and Sort, you could just create a domain abstraction called _query_ and use LINQ or reacitve extensions code to configure the query instance.</pre>
+<pre>Note: if you already have monads in your programming library for things like sorting and filtering (such as LINQ or reactive extensions), then instead of creating new domain abstractons for Filter and Sort, you could just create a domain abstraction called _query_ and use LINQ or reactive extensions code to configure the query instance.</pre>
 </div>
 </div>
 <div class="literalblock">
@@ -1308,19 +1313,19 @@ interface IPullTable : IEnumerable&lt;List&lt;string&gt;&lt;T&gt;&gt;
 <p>Notice how in the above examples, we have used software engineering patterns we already know about, just in a different way. There is DSL (Domain Specific Language), Dependency Injection (which is what the WireTo operator does), Event driven programming, XAML-like UI layout (without the XML), RX (Reactive programming), monad-like wiring up, and the fluent style.</p>
 </div>
 <div class="paragraph">
-<p>Notice how the application diagram in each case is both a direct representation of the requirements and the executable. It is executable because unlike conventional higher level or architecture diagrams, ALA application diagrams do not leave out details from the requirements because. They are a complete expression of them. Instead, they leave out all details of implementation, which are taken care of by the domain and programming paradigm abstractions.</p>
+<p>Notice how the application diagram in each case is both a direct representation of the requirements and the executable. It is executable because unlike conventional higher level or architecture diagrams, ALA application diagrams do not leave out details from the requirements. They are a complete expression of them. Instead, they leave out all details of implementation, which are taken care of by the domain and programming paradigm abstractions.</p>
 </div>
 <div class="paragraph">
 <p>To the extent that requirements are cohesive, so the code that expresses them should be. For example, we do not try to separate the specific UI, I/O, business logic, persistent data etc into different modules because they are highly cohesive for a given requirement. Most other architectural patterns, such as MVC, do separate in this way, which creates coupling. Instead we reduce the problem in a different way - through the use of domain abstractions which provide reusable aspects of implementation. All knowledge and details from the requirements end up in the application layer, but that&#8217;s all that goes there.</p>
 </div>
 <div class="paragraph">
-<p>Note: A graph-like structure is showing up in these small applications because each requirement in itself contains a graph of relationships. ALA embraces this and makes it explicit, which is why the requirements are best expressed as diagrams. In conventional code, the graph structure is still there, but it is typically obfuscated as many intermodule relationships, making it hard to see. Worse still, the natural cycles in the graph of relationships in the requirements, would cause circular dependencies amoung the modules. Conventionally, some of these dependencies are broken by using pulling data half the time rather than pushing, or worse still, using indirections such as the observer pattern. These removals of dependencies don&#8217;t make the relationships themselves go away, they just make them harder to see.</p>
+<p>Note: A graph-like structure is showing up in these small applications because each requirement in itself contains a graph of relationships. ALA embraces this and makes it explicit, which is why the requirements are best expressed as diagrams. In conventional code, the graph structure is still there, but it is typically obfuscated as many intermodule relationships, making it hard to see. Worse still, the natural cycles in the graph of relationships in the requirements, would cause circular dependencies among conventional modules. Conventionally, some of these dependencies are broken by using pulling data half the time rather than pushing, or worse still, using indirections such as the observer pattern. These removals of dependencies don&#8217;t make the relationships themselves go away, they just make them harder to see.</p>
 </div>
 <div class="paragraph">
 <p>Although the fluent style is a nice way to hand-compile these small diagrams, code like this with indenting and nested brackets does not scale up well for large diagrams. (It is still better than the tangled web of dependencies they would form in conventional modular code though.) But we can do better. We will not be hand-writing code like this for large applications - we will automatically generate the code from the diagrams.</p>
 </div>
 <div class="paragraph">
-<p>Finally, the wiring pattern used in the examples above is only one possible way of meeting the fundamental ALA constraints. For example, ALA can also be applied to functional programming using monads as domain abstractions. But we will use explicit objects with explicit classes and the wiring pattern shown above in most of our examples. The wiring itself is implemented by a field in the objects, but that is field is immutable. ALA may appear to be synonymous with this wiring pattern, but actually ALA is just the three fundamental constraints stated at the beginning of this introduction.</p>
+<p>Finally, the wiring pattern used in the examples above is only one possible way of meeting the fundamental ALA constraints. For example, ALA can also be applied to functional programming using monads as domain abstractions. But we will use explicit objects with explicit classes and the wiring pattern shown above in most of our examples. The wiring itself is implemented by a field in the objects, but that field is immutable. ALA may appear to be synonymous with this wiring pattern, but actually ALA is just the three fundamental constraints stated at the beginning of this introduction.</p>
 </div>
 <hr>
 <div class="paragraph">
@@ -2088,7 +2093,7 @@ interface IPullTable : IEnumerable&lt;List&lt;string&gt;&lt;T&gt;&gt;
 <p>In this chapter we describe the structure or anatomy of ALA without delving too much into the hows and whys, which are covered in later chapters.</p>
 </div>
 <div class="paragraph">
-<p>The organisation of this chapter (and all chapters) is different perspectives. We all have different prior knowledge on which we build new knowledge, so we each have a different way to understand new things. Use the section whose perspective makes the most sense to you. Because of the use of perspectives, there will sometimes be repetition of ideas across sections.</p>
+<p>The organisation of this chapter (and all chapters) is by different perspectives. We all have different prior knowledge on which we build new knowledge, so we each have a different way to understand new things. Use the section whose perspective makes the most sense to you. Because of the use of perspectives, there will sometimes be repetition of ideas across sections.</p>
 </div>
 <div class="sect2">
 <h3 id="truesoftware-elements-relations-among-them"><a class="anchor" href="#truesoftware-elements-relations-among-them"></a>2.1. Software elements, relations among them</h3>
@@ -2101,13 +2106,13 @@ interface IPullTable : IEnumerable&lt;List&lt;string&gt;&lt;T&gt;&gt;
 <div class="sect3">
 <h4 id="truethe-only-unit-of-code-is-an-abstraction"><a class="anchor" href="#truethe-only-unit-of-code-is-an-abstraction"></a>2.1.1. The only unit of code is an abstraction</h4>
 <div class="paragraph">
-<p>The only unit of code in ALA is an abstraction. Not module, not class, not function. An abstraction is more than a module, class or function in that it must be a 'generalized conceptual idea'. It&#8217;s what our brains use to understand the world, not what compilers use. It must be learnable as a concept. Many modules, classes or functions in traditional code are not be good abstractions, especially if they are an integral part of a specific system with have associations with peer modules, classes or functions.</p>
+<p>The only unit of code in ALA is an abstraction. Not module, not class, not function. An abstraction is more than a module, class or function in that it must be a 'generalized conceptual idea'. It&#8217;s what our brains use to understand the world, not what compilers use. It must be learnable as a concept. Many modules, classes or functions in traditional code are not good abstractions, especially if they are an integral part of a specific system with associations with peer modules, classes or functions.</p>
 </div>
 <div class="paragraph">
 <p>Abstraction goes hand in hand with reuse. Krueger said that abstraction and reuse are two sides of the same coin. Abstractions tend to be stable - as stable as their conceptual idea. When we have a dependency on an abstraction, it is a dependency only on that conceptual idea.</p>
 </div>
 <div class="paragraph">
-<p>Here is an example domain. The abstraction works on a stream of data. It smooths the data and slow its down the rate. It has an input and an output dataflow port:</p>
+<p>Here is an example domain abstraction. It works on a stream of data. It smooths the data and slows down the rate. It has an input and an output dataflow port:</p>
 </div>
 <div class="listingblock">
 <div class="title">DomainAbstractions\LowPassFilter.cs</div>
@@ -2165,7 +2170,7 @@ namespace DomainAbstractions
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>The output port, simple private field of type interface
+<td>The output port, simple private field of an interface type
 <div class="paragraph">
 <p>The input port is the IDataFlow&lt;double&gt; interface that is implemented by the class. Dataflow is a programming paradigm which is a stream of data without end. Incoming data arrives via the Push method in this interface. We never know where the data comes from. The output port is the private field named "output". This field will be set pointing at an IDataFlow&lt;double&gt; input of an instance of another abstraction somewhere. We never know where the data goes to. How the <em>output</em> field gets set is described later.</p>
 </div>
@@ -2198,10 +2203,10 @@ namespace DomainAbstractions
 <p>Internally, abstractions are cohesive (which means sticking together) or highly interconnected code collaborating for a single purpose. Because it&#8217;s cohesive code, ALA does not prescribe any internal organisation for abstractions. We do not care about dependencies or any inter-relationships inside an abstraction. Any part of the code may need knowledge of any other part to understand. In fact the more cohesive everything is the better, as long as it is small.</p>
 </div>
 <div class="paragraph">
-<p>Abstractions are the only mechanism that provides design-time <em>information hiding</em>. When David Parnas coined the term <em>information hiding</em> he meant at <em>design-time</em>. Unfortunately there is a popular meme that <em>information hiding</em> means <em>encapsulation</em>. The same idea of design-time information hiding has other names such as Alistair Cockburn&#8217;s <em>protected variations</em>, and Robert Martin&#8217;s version of the OCP (open closed principle).</p>
+<p>Abstractions are the only mechanism that provides design-time <em>information hiding</em>. When David Parnas coined the term <em>information hiding</em> he meant at <em>design-time</em>. Unfortunately there is a popular meme that <em>information hiding</em> means <em>encapsulation</em>, which only hides at compile-time, not necessarily at design-time. The same idea of design-time information hiding has other names such as Alistair Cockburn&#8217;s <em>protected variations</em>, and Robert Martin&#8217;s version of the OCP (open closed principle).</p>
 </div>
 <div class="paragraph">
-<p>A module or class can encapsulate information at compile-time but does not necessarily hide information at design-time. In the case of our LowPassFilter, the quality of being a good abstraction means that its internals are not coupled or collaborating with other modules. It&#8217;s bounded by its conceptual idea. If it were a module instead, it might primarily perform the filter function for a specific application, but knowing which application it is part of would cause it to take on ancilliary functions, such as  offset and scale to output the units needed by the application. Or it might grab its input knowing where it comes from. Or it might send it&#8217;s output to a specific place, or even to multiple specific places using direct method calls. It might connect to the application&#8217;s settings menu for its settings. All these things would cause design-time coupling through the application.</p>
+<p>In the case of our LowPassFilter, the quality of being a good abstraction means that its internals are not coupled or collaborating with other modules. It&#8217;s bounded by its conceptual idea. If it were a module instead, it might primarily perform the filter function for a specific application, but knowing which application it is part of would cause it to take on ancilliary functions, such as  offset and scale to output the units needed by the application. Or it might grab its input knowing where it comes from. Or it might send it&#8217;s output to a specific place, or even to multiple specific places using direct method calls. It might connect to the application&#8217;s settings menu for its settings. All these things would cause design-time coupling through the application.</p>
 </div>
 <div class="sect4">
 <h5 id="truemeaning-of-abstraction"><a class="anchor" href="#truemeaning-of-abstraction"></a>Meaning of abstraction</h5>
@@ -2342,19 +2347,22 @@ namespace DomainAbstractions
 <p>By way of example, given the concepts of vehicle, car and truck, in conventional object oriented programming we may be tempted to create a base vehicle class in a lower layer, and implement car and truck in the higher layer. But we may then be tempted to implement things that <em>most</em> vehicles have such as 4 wheels, and attempt to override that when we have an exception such as a vehicle with tracks.</p>
 </div>
 <div class="paragraph">
-<p>If we restrict ourselves to composition, we instead create multiple classes for common parts of vehicles in the lower layer, and just compose car, track and tank from them.</p>
+<p>If we restrict ourselves to composition, common parts of the vehicle domain would be invented as their own abstractions in the lower layer. We create multiple classes for these common parts as building blocks. Then we just compose car, track and tank from them.</p>
+</div>
+<div class="paragraph">
+<p>In other words, the word, 'vehicle', would mean a category or domain, not a part in itself.</p>
+</div>
+<div class="paragraph">
+<p>Now if we need to express the requirement to "drive the vehicle", car, truck and tank would each implement a 'drive' interface with, say, accelerate, slowdown, and steer methods, not be derived from a generic vehicle that is drivable. In the domain layer we may implement a behaviour class that implements general driving behaviour. The Drive domain abstraction may have ports that are connectable to other domain components' ports such as engine control port, and brake control port. Most variations would be handled by a configuration interface (the public interface) for common variations such as settings. To overriding the drive domain abstractions behaviour, you would insert code in the car, truck or tank application code where it uses the Drive object.</p>
+</div>
+<div class="paragraph">
+<p>If there <em>was</em> justification to build a concrete generic drivable vehicle, it would be used from the upper layers using composition not inheritance. A real world example would be more like a chassis platform concept. But this is probably a bad design as the chassis concept would have many functions and so not be abstract enough, versatile enough, or small enough.</p>
 </div>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>() common parts of the vehicle domain would be invented as their own abstractions in the lower layer, and then car and truck would be composed from instances of them. In other words, the word 'vehicle' we would take to mean a category or domain, not a part in itself. Now we may need to express the requirement to "drive the vehicle". In this case the car and truck would each implement a 'drive' interface, not be derived from a generic vehicle that is drivable.</p>
-</div>
-<div class="paragraph">
-<p>If there was justification to build a concrete generic drivable vehicle, it would be used from the upper layers using composition not inheritance. A real world example is more like a chassis concept. Variations would be handled by a configuration interface (the public interface), not overriding chassis components.</p>
-</div>
-<div class="paragraph">
-<p>Inheritance is often used to provide a 'calling up the layers at run-time' mechanism by its use of virtual functions. In ALA, we do this with ordinary observer pattern (events in C#), or by passing in a method as a configuration (usually anonymously or as a lambda expression), or with the strategy pattern.</p>
+<p>Inheritance provides a mechanism for 'calling up the layers' at run-time through its virtual functions. In ALA, we do this with ordinary observer or publish/subscribe pattern (events in C#), or by passing in a method as a configuration (usually anonymously or as a lambda expression), or by using the strategy pattern.</p>
 </div>
 <div class="ulist">
 <ul>
@@ -16053,7 +16061,7 @@ Once the code for the single user story is understood, some acceptance tests are
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2023-03-20 09:54:43 01300
+Last updated 2023-03-22 09:40:59 01300
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/Docco.min.css">

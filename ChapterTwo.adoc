@@ -6,7 +6,7 @@
 
 In this chapter we describe the structure or anatomy of ALA without delving too much into the hows and whys, which are covered in later chapters.
 
-The organisation of this chapter (and all chapters) is different perspectives. We all have different prior knowledge on which we build new knowledge, so we each have a different way to understand new things. Use the section whose perspective makes the most sense to you. Because of the use of perspectives, there will sometimes be repetition of ideas across sections. 
+The organisation of this chapter (and all chapters) is by different perspectives. We all have different prior knowledge on which we build new knowledge, so we each have a different way to understand new things. Use the section whose perspective makes the most sense to you. Because of the use of perspectives, there will sometimes be repetition of ideas across sections. 
 
 
 === Software elements, relations among them
@@ -17,11 +17,11 @@ In this section, we also use an example code that lets us explain the concepts i
 
 ==== The only unit of code is an abstraction
 
-The only unit of code in ALA is an abstraction. Not module, not class, not function. An abstraction is more than a module, class or function in that it must be a 'generalized conceptual idea'. It's what our brains use to understand the world, not what compilers use. It must be learnable as a concept. Many modules, classes or functions in traditional code are not be good abstractions, especially if they are an integral part of a specific system with have associations with peer modules, classes or functions.
+The only unit of code in ALA is an abstraction. Not module, not class, not function. An abstraction is more than a module, class or function in that it must be a 'generalized conceptual idea'. It's what our brains use to understand the world, not what compilers use. It must be learnable as a concept. Many modules, classes or functions in traditional code are not good abstractions, especially if they are an integral part of a specific system with associations with peer modules, classes or functions.
 
 Abstraction goes hand in hand with reuse. Krueger said that abstraction and reuse are two sides of the same coin. Abstractions tend to be stable - as stable as their conceptual idea. When we have a dependency on an abstraction, it is a dependency only on that conceptual idea.
 
-Here is an example domain. The abstraction works on a stream of data. It smooths the data and slow its down the rate. It has an input and an output dataflow port: 
+Here is an example domain abstraction. It works on a stream of data. It smooths the data and slows down the rate. It has an input and an output dataflow port: 
 
 .DomainAbstractions\LowPassFilter.cs
 [source,C#]
@@ -75,7 +75,7 @@ namespace DomainAbstractions
 
 <1> The input port, the implemented interface
 
-<2> The output port, simple private field of type interface
+<2> The output port, simple private field of an interface type
 +
 The input port is the IDataFlow<double> interface that is implemented by the class. Dataflow is a programming paradigm which is a stream of data without end. Incoming data arrives via the Push method in this interface. We never know where the data comes from. The output port is the private field named "output". This field will be set pointing at an IDataFlow<double> input of an instance of another abstraction somewhere. We never know where the data goes to. How the _output_ field gets set is described later.
 +
@@ -93,9 +93,9 @@ In ALA, abstractions are implemented as files. The name of the file is the name 
 
 Internally, abstractions are cohesive (which means sticking together) or highly interconnected code collaborating for a single purpose. Because it's cohesive code, ALA does not prescribe any internal organisation for abstractions. We do not care about dependencies or any inter-relationships inside an abstraction. Any part of the code may need knowledge of any other part to understand. In fact the more cohesive everything is the better, as long as it is small.
 
-Abstractions are the only mechanism that provides design-time _information hiding_. When David Parnas coined the term _information hiding_ he meant at _design-time_. Unfortunately there is a popular meme that _information hiding_ means _encapsulation_. The same idea of design-time information hiding has other names such as Alistair Cockburn's _protected variations_, and Robert Martin's version of the OCP (open closed principle). 
+Abstractions are the only mechanism that provides design-time _information hiding_. When David Parnas coined the term _information hiding_ he meant at _design-time_. Unfortunately there is a popular meme that _information hiding_ means _encapsulation_, which only hides at compile-time, not necessarily at design-time. The same idea of design-time information hiding has other names such as Alistair Cockburn's _protected variations_, and Robert Martin's version of the OCP (open closed principle). 
 
-A module or class can encapsulate information at compile-time but does not necessarily hide information at design-time. In the case of our LowPassFilter, the quality of being a good abstraction means that its internals are not coupled or collaborating with other modules. It's bounded by its conceptual idea. If it were a module instead, it might primarily perform the filter function for a specific application, but knowing which application it is part of would cause it to take on ancilliary functions, such as  offset and scale to output the units needed by the application. Or it might grab its input knowing where it comes from. Or it might send it's output to a specific place, or even to multiple specific places using direct method calls. It might connect to the application's settings menu for its settings. All these things would cause design-time coupling through the application.
+In the case of our LowPassFilter, the quality of being a good abstraction means that its internals are not coupled or collaborating with other modules. It's bounded by its conceptual idea. If it were a module instead, it might primarily perform the filter function for a specific application, but knowing which application it is part of would cause it to take on ancilliary functions, such as  offset and scale to output the units needed by the application. Or it might grab its input knowing where it comes from. Or it might send it's output to a specific place, or even to multiple specific places using direct method calls. It might connect to the application's settings menu for its settings. All these things would cause design-time coupling through the application.
 
 
 ===== Meaning of abstraction
@@ -212,13 +212,15 @@ Note that simple dependency injection or otherwise passing an object into anothe
 +
 By way of example, given the concepts of vehicle, car and truck, in conventional object oriented programming we may be tempted to create a base vehicle class in a lower layer, and implement car and truck in the higher layer. But we may then be tempted to implement things that _most_ vehicles have such as 4 wheels, and attempt to override that when we have an exception such as a vehicle with tracks. 
 +
-If we restrict ourselves to composition, we instead create multiple classes for common parts of vehicles in the lower layer, and just compose car, track and tank from them.
+If we restrict ourselves to composition, common parts of the vehicle domain would be invented as their own abstractions in the lower layer. We create multiple classes for these common parts as building blocks. Then we just compose car, track and tank from them.
++ 
+In other words, the word, 'vehicle', would mean a category or domain, not a part in itself. 
++
+Now if we need to express the requirement to "drive the vehicle", car, truck and tank would each implement a 'drive' interface with, say, accelerate, slowdown, and steer methods, not be derived from a generic vehicle that is drivable. In the domain layer we may implement a behaviour class that implements general driving behaviour. The Drive domain abstraction may have ports that are connectable to other domain components' ports such as engine control port, and brake control port. Most variations would be handled by a configuration interface (the public interface) for common variations such as settings. To overriding the drive domain abstractions behaviour, you would insert code in the car, truck or tank application code where it uses the Drive object. 
++
+If there _was_ justification to build a concrete generic drivable vehicle, it would be used from the upper layers using composition not inheritance. A real world example would be more like a chassis platform concept. But this is probably a bad design as the chassis concept would have many functions and so not be abstract enough, versatile enough, or small enough.
 
-() common parts of the vehicle domain would be invented as their own abstractions in the lower layer, and then car and truck would be composed from instances of them. In other words, the word 'vehicle' we would take to mean a category or domain, not a part in itself. Now we may need to express the requirement to "drive the vehicle". In this case the car and truck would each implement a 'drive' interface, not be derived from a generic vehicle that is drivable. 
-
-If there was justification to build a concrete generic drivable vehicle, it would be used from the upper layers using composition not inheritance. A real world example is more like a chassis concept. Variations would be handled by a configuration interface (the public interface), not overriding chassis components.
-
-Inheritance is often used to provide a 'calling up the layers at run-time' mechanism by its use of virtual functions. In ALA, we do this with ordinary observer pattern (events in C#), or by passing in a method as a configuration (usually anonymously or as a lambda expression), or with the strategy pattern. 
+Inheritance provides a mechanism for 'calling up the layers' at run-time through its virtual functions. In ALA, we do this with ordinary observer or publish/subscribe pattern (events in C#), or by passing in a method as a configuration (usually anonymously or as a lambda expression), or by using the strategy pattern. 
 
 * *Packages*: ALA does not use hierarchies or nesting. In other words, abstractions cannot be contained by other abstractions. Abstractions are never private. The reason they are never private is simple. An abstraction that is depended on should be more abstract than the abstraction using it. A more abstract abstraction needs to be public so it can be reused. ALA uses abstraction layers instead of encapsulation hierarchies. In ALA, packages would only be used as a distribution mechanism, not as part of the architecture for information hiding.
 +
