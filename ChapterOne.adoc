@@ -172,7 +172,7 @@ anchor:ComplexityGraph1[]
 1000,50
 --
 
-This is a qualitative graph comparing the complexity of an ALA application with that of a big ball of mud and an average loosely coupled application. This is further explained later <<ComplexityGraph2,here>>.
+This is a qualitative graph comparing the complexity of an ALA application with that of a big ball of mud and an average loosely coupled application. This is further explained in chapter seven <<Dijkstra1,here>>.
 
 
 ==== Maintainability

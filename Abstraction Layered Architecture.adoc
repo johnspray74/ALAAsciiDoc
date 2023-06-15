@@ -11,6 +11,9 @@
 //:stylesheet: asciidoctor-default.css
 //:stylesdir:
 
+
+anchor:Beginning[]
+
 [big]*How to organise code in the large scale*
 
 
@@ -25,9 +28,9 @@ image::BOSS_Great_Wall.jpg[BOSS_Great_Wall.jpg,900, title="*The large scale stru
 
 John R Spray
 
-Last update: 2023-03-30
+Last update: 2023-06-16
 
-This online book is a work in progress. Feedback is welcome. Please send to johnspray274<at>gmail<dot>com
+This online book is a work in progress. Feedback is welcome. Please leave a comment at the end of this book <<Comments,here>> or e-mail johnspray274<at>gmail<dot>com
 
 ---
 
@@ -891,6 +894,11 @@ include::ChapterEight.adoc[]
 
 
 
+anchor:Comments[]
+
+== Leave a comment
+
+<<Beginning,Back to beginning of book>>
 
 
 

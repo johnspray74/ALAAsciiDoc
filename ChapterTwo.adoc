@@ -162,7 +162,10 @@ B must be more abstract than A. "More abstract" means more general, not specific
 
 Because B is more abstract, it is more stable. ALA therefore automatically enforces the Stable Dependencies Principle. 
 
-The relationship means that, to read and understand the code inside A, you must know the abstraction concept B - not how the insides of abstraction B work. The word "abstraction" implies that it should be learnable in a short time and easy to retain. When we learn an abstraction concept, there is a moment when we suddenly 'get it', a small moment of insight. 
+The relationship means that, to read and understand the code inside A, you must know the abstraction concept B - not how the insides of abstraction B work. The word "abstraction" implies that it should be learnable in a short time and easy to retain. When we learn an abstraction concept, there is a moment when we suddenly 'get it', a small moment of insight.
+
+In our A & B example above, the code inside B knows nothing of A. The code inside A, while it knows about the concept of the abstraction B, knows nothing about the code that is inside B. So there is zero coupling between the code that implements teh two abstractions. ALA is basically a constraint to force us to _always_ use zero coupling.
+
 
 Here are some more legal dependencies, this time in text form. They are from a user story in the application layer to the domain abstractions layer.
 
