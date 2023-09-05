@@ -1,10 +1,10 @@
 :imagesdir: images
 
-== Chapter three - How the structure solves the problems
+== Chapter three - Why the structure works
 
-In the previous chapter we described what the structure, the anatomy, of ALA looks like as if we were dissecting a dead body. We see where things are but we don't yet understand why they are there. In this chapter we explain why that structure works. Why does this way of organising code result in software that meets those non-functional requirements we listed in Chapter one?
+In the previous chapter we described what the structure, the anatomy, of ALA looks like as if we were dissecting a dead body. We saw where things are located but we didn't get an understand of why they are there. In this chapter we explain why that structure works. Why does this way of organising code result in software that meets those non-functional requirements we listed in Chapter one?
 
-The organisation of this chapter (and all chapters) is to use different perspectives. We all have different prior knowledge on which we build new knowledge, so we will each have a different best way to understand things. Use the perspective that makes the most sense to you. Because of the use of perspectives, there will often be some repetition of ideas between the major sections in this chapter. 
+The organisation of this chapter (and all chapters) is to use different perspectives. We all have different prior knowledge on which we build new knowledge, so we will each have a different best way to understand things. Use the perspective that makes the most sense to you. Because of the use of perspectives, there will be some repetition of ideas between the major sections in this chapter. 
 
 
 === A thought experiment
@@ -25,9 +25,9 @@ For this first perspective, imagine you are reading the following function, abc1
      ....
  }
 
-You don't know what abc123 nor xyz789 do. They may as well be called fubar (fubar stands for \******ed up beyond all recognition), so you follow the indirection, an inconvenience at the least because you are really just wanting to understand abc123. You have to mentally stack where you were in the code of abc123, including everything you understand about it so far. 
+You see that the function _abc123_ uses function _xyz789_. So you follow the indirection, an inconvenience at the least because you are really just wanting to understand abc123. Following the indirection may involve an all files search to even find xyz789. Then it's also not clear what xyz789 does. You have to mentally stack where you were in the code at abc123, including everything you understand about it so far, and start concentrating on xyz789. 
 
-You begin reading the code in xyz789. It only has about 20 lines but it is complicated. You need to use the code in abc123 to try to unravel what xyz789 might be providing to it. A comment mentions that it uses a CORDIC algorithm and gives a reference. But before following that indirection as well, you note that both abc123 and xyz789 have the following properties:
+Despite only having about 20 lines of code, xyz789 is complicated. You need to use the code in abc123 to try to unravel what xyz789 might be providing for it. A comment mentions that it uses a CORDIC algorithm and gives a reference. But before following that indirection as well, you note that both abc123 and xyz789 have the following properties:
 
 * they are modules
 * apparently loosely coupled 
@@ -41,7 +41,7 @@ You begin reading the code in xyz789. It only has about 20 lines but it is compl
 * follow coding guidelines
 * have comments
 
-Despite having all these great properties, still we are forced to read both functions to understand the code in either of them. They are effectively fully coupled - understanding any of the code involves understanding all of the code.  
+Despite having all these great properties that we are taught our code should have, we are still forced to read both functions to understand the code in either of them. They are effectively fully coupled at design-time - understanding any of the code involves understanding all of the code.  
 
 Now we make one small change: 
 
@@ -58,23 +58,23 @@ Now we make one small change:
      // complicated code
  }
 
-Suddenly understandability is absolutely transformed. All we did was make the two functions abstractions. Now we don't have to read the complicated code inside xyz123 at all. The code inside each of the two functions goes from highly mutually coupled to zero coupled. 
+Suddenly understandability is absolutely transformed. All we did was make the two functions abstractions. Now we don't have to read the complicated code inside xyz123 at all. We don't have to follow the indirection. The code inside each of the two functions goes from highly mutually coupled to zero coupled. 
 
 All those other attributes that we listed above seemingly made no difference. The quality attribute that really mattered was abstraction. The others are still good to have, but they are completely insufficient. The abstraction property is _the_ one that our brains have evolved to use.
 
-The quality of abstraction is subjective. Software engineers must invent good quality abstractions. No compiler or tool can yet check that quality.
+The quality of abstraction is somewhat subjective. We don't really have a good way to measure it. No compiler or tool can yet check that quality. However, a software engineer's job is inventing good quality abstractions. 
 
-* In the downward direction, coupling goes to zero because the standard deviation function need only know the concept of the square root abstraction.
+* In the downward direction, design-time coupling goes to zero because the standard deviation function need only know about the concept of the square root abstraction, not about any of the code that implements it.
 
-* In the upward direction, coupling goes to zero because square root is more abstract and therefore can't know anything about the more specific Standard deviation abstraction that happens to use it. 
+* In the upward direction, coupling goes to zero because we don't need to know about the caller to try to tease out what we are providing. By being an abstraction, square root is reusable, and can't know anything about the more specific Standard deviation abstraction that happens to use it. 
 
 There are other benefits too:
 
-* Abstraction and stability go hand in hand. The Sqrt abstraction is as stable as the concept of squareroot. That's a concept that's been stable for thousands of years. The StandardDeviation function has a dependency on something that has been stable for thousands of years! All dependencies in an ALA program go in the direction of the more stable.  
+* Abstraction and stability go hand in hand. The Sqrt abstraction is as stable as the concept of squareroot. That's a concept that's been stable for thousands of years. The Standard Deviation function has a dependency on something that has been stable for thousands of years! All dependencies in an ALA program go in the direction of the more stable.  
 
 * Abstraction and reuse go hand in hand (as pointed out by Krueger). The more abstract an abstraction is the more reusable. Code reuse in ALA programs increases markedly.  
 
-* The complicated code inside SQRT no longer matters. It is completely isolated by the abstraction. If your brain already knows the SQRT concept (I had to choose one that everyone knows), there is no need to follow the indirection when reading the code inside StandardDeviation. The reader just continues reading the next line of code after the Sqrt invocation as if Sqrt is just like any other line of code in their base language. That's what abstraction does, and only abstraction can do this.
+* The complicated code inside SQRT no longer matters at design-time. It is completely isolated by the abstraction. If your brain already knows the SQRT concept (I had to choose one that everyone knows), there is no need to follow the indirection when reading the code inside StandardDeviation. The reader just continues reading the next line of code after the Sqrt invocation as if Sqrt is just like any other line of code in their base language. That's what abstraction does, and only abstraction can do this. If you don't already know what a given abstraction is from it's name, then you need to follow the indirection once and read a comment that should describe each abstraction written just ahead of each abstraction. 
 
 With this new understanding, we will now define the word dependency to be compile-time relationships, and coupling to be the design-time. One is what the compiler sees, the other is what our brain sees. 
 
@@ -100,7 +100,7 @@ In summary, ALA's starting premise is a constraint. The constraint is that you c
 
 === Abstractions
 
-In this perspective, we look at what abstraction really are in depth. This is itself the most abstrat perspective we will take in this chapter.
+In this perspective, we look at what abstraction really are. This is itself the most abstract perspective we will take in this chapter.
 
 ==== Design-time encapsulation
 
@@ -136,6 +136,12 @@ A confusion comes from the UML class diagram, which already has the separate con
 ****
 The quality of an abstraction's _concept_ or _idea_ is important. It is the existence of the concept that allows the brain to learn it and not have to know how it's implemented each time it uses it. It is the concept of the abstraction that blocks coupling. ALA sometimes requires some effort to conceive good abstractions, especially for the first application in a new domain.
 ****
+
+==== Abstractions enable composability
+
+An important property of abstractions is that instances of abstractions can be composed or assembled in an infinite variety of ways. We call this composability. We discuss composabilty in detail in a section below.
+
+Even the tiniest amount of coupling between two abstractions completely kills composability, meaning they are no longer abstractions. So one test of abstractions is composability of their instances. If any two potential abstractions must work together, then they are not abstractions, they are just modules.
 
 
 
@@ -727,69 +733,74 @@ Diagrams and text are sometimes thought of as equivalent, as if they have a dual
 
 Consider an electronics engineer who uses a schematic diagram. Ask him to design a circuit using text and he will just laugh at you. Electronics naturally has a network or arbitrary graph structure that is best viewed and reasoned about in diagram form. If you turn a diagram into a textual list of nodes and connections, the brain can no longer work with it directly. It is constantly interrupted to search for symbolic references when it should be free to just reason about the design. 
 
-Try designing or reasoning about a non-trivial state machine without using a diagram. Most software naturally has an arbitrary network inherent within it. 
+Try designing or reasoning about a non-trivial state machine without using a diagram. Most software systems naturally have an arbitrary network inherent within it. 
 
-Text can readily be used to compose elements in a linear sequence. It is excellent for telling stories, because stories are a sequence. White space is the normal connector between the elements. Sometimes periods or other symbols are used instead. Text can also handle shallow tree structures, simply by using indenting. Compilers may use the indenting, or they may use brackets, usually () or {} instead. Interestingly, the brackets work for the compiler, but not for the brain. The brain doesn't see them without focussing on it, it just sees the indenting. So I personally don't agree that Python's significant indenting is a mistake as many do. I think using brackets for the compiler and indenting for our brain in the same code can lead to discrepancies.  
+Text can readily be used to compose elements in a linear sequence. It is excellent for telling stories, because stories are a sequence. Our brains are evolved to understand, and even recall stories as long as each sentence relates meaningfully to the previous and the next.
 
-Structured programming and XAML are examples of tree structured code represented in text. When the tree gets deep, the indenting is too deep for our brains to follow. So text is only suitable for shallow trees. 
+In sequential code, white space is the normal connector between the elements. Sometimes periods or other symbols are used instead. 
 
-Text becomes troublesome when there are arbitrary connections across the structure forming a graph. It must be done with matching labels. Most imperative programs are actually not a tree structure because of the connections to variables. They must be done with labels. Local variables in a small scope are not a problem (a small scope being what will fit on your screen and can be understood all at once by the human brain). It only requires an editor that highlights them. For large scopes we end up spending too much time finding and trying to remember the connections, resorting to many all-files searches. It is a cumbersome way to try to reason about what is usually a reasonably simple structure when viewed as a diagram. 
+Text can also handle shallow tree structures, simply by using indenting. Compilers may use the indenting, or they may use brackets, usually () or {} instead. Interestingly, the brackets work for the compiler, but not for the brain. The brain doesn't see them without specicly concentrating on them. At a glance, it just sees the indenting. So I personally don't agree that Python's significant indenting is a mistake as many do. I think using brackets for the compiler and indenting for our brain in the same code can lead to discrepancies. Fortunately moderne editor tend to keep the two methods in sync. 
 
+Ordinary structured programming (if statements and the like) and XAML are examples of tree structured code represented in text. When the tree gets deep, the indenting is too deep for our brains to follow. So text is only suitable for shallow trees. 
+
+Text becomes troublesome when there are arbitrary connections across the structure forming a graph. It must be done with matching labels. Most imperative programs are actually not a tree structure because of the connections to variables. They must be connected to the code with labels. Local variables in a small scope are not a problem (a small scope being what will fit on your screen and can be understood all at once by the human brain). It only requires an editor that highlights them. For large scopes we end up spending too much time finding and trying to remember the connections, resorting to many all-files searches. It is a cumbersome way to try to reason about what is usually a reasonably simple structure when viewed as a diagram. 
 (When I use the term 'labels', I am talking about labels that are used for connecting two or more points in the code. These labels are not abstractions. References to the names of abstractions are absolutely fine, and we don't draw lines for them even if we are using a diagram. We always just use abstractions by their name.)
 
-When we need to compose instances of abstractions in an arbitrary network structure, our brains work much better using a diagram. The brain can readily see and follow the lines between the instances of the abstractions. Unlike with text labels, the lines are anonymous, as they should be. When label connections are used, the labels themselves need an encapsulation scope. Lines don't need encapsulation. They connect two points with clearly no other code having access to them.
+When we need to compose instances of abstractions in an arbitrary network structure, our brains work much better using a diagram. Our brains not only evolved to be good at understanding and recalling stories, but also spacial graphs, presumably to allow navigation along pathways. 
+
+The brain can readily see and follow lines between the instances of the abstractions. Unlike text labels, the lines are anonymous, as they should be. When label connections are used, the labels themselves need an encapsulation scope. Lines don't need encapsulation. They connect two points with clearly no other code having access to them.
 
 Generally lines connect only two points or ports, but sometimes may connect three or more. To understand all places connected by a label connection requires an all files search. To understand all places connected by lines, the brain just follows the lines, generally a short distance on the diagram. The spacial positioning of elements in a diagram is also something the brain readily remembers better than where things are in text. So, diagrams can qualitatively do things that text simply cannot.
 
-If lines connect a high number of ports, it is a smell that a new abstraction may be waiting to be discovered. For example, in a schematic diagram, if there are a high number of lines all connected together at zero volts, that's the ground abstraction. We can use the domain abstraction 'Ground' instead. An example in software might be the game score if there are many instances of abstractions that interact with it. In this case 'GameScore' could be a domain abstraction in the layer below.
+If a lines connects together many ports, it is a smell that a new abstraction may be waiting to be discovered. For example, in a schematic diagram, if there are a high number of lines all connected together at zero volts, that's the ground abstraction. Electronic engineers will use a ground symbol to represent that abstraction instead of drawing long line everywhere. An example in software might be the game score if most instances of domain abstractions interact with it. In this case 'GameScore' could be a domain abstraction in the layer below instead of making it a domain abstraction and wiring every other domain abstraction to it.
 
-ALA does not require a diagram per-se. It only requires abstraction layering, and it's quite possible for a user story to just consist of a linear sequence of abstracted operations. For example, a sequence of movements by a robot or a "Pipes and Filters" sequence of operations on data. However, ALA is a polyglot programming paradigm because user stories will generally inherently contain multiple programming paradigms: UI, event-flows, dataflows, state machines, data schemas, etc. These aspects of a user story tend to be naturally interrelated , which is what causes the resulting relationships among its instances of abstractions to be an graph. Diagrams, then, embrace the bringing together of all these different interrelationships of a user story in one cohesive place.   
+The three ALA architectural constraints do not require a diagram per-se. It only requires abstraction layering, and it's quite possible for a user story to just consist of a linear sequence of instances of abstractions. For example, a sequence of movements by a robot or a "Pipes and Filters" sequence of operations on data. However, ALA is a polyglot programming paradigm because user stories will generally inherently contain multiple programming paradigms: UI, event-flows, dataflows, state machines, data schemas, etc. These aspects of a user story tend to be naturally interrelated, which is what causes the resulting relationships among its instances of abstractions to be a graph. The use of diagrams embraces the idea of bringing together of all these different interrelationships of a user story in one cohesive place.   
 
 ==== No XML as code
 
-If dependency injection is used to implement the wiring, I prefer not to use XML to specify the application. Firstly XML is not very readable. Secondly it only handles tree structures well, not networks, and it becomes more unreadable if the tree is deep. If you must use text for specifying wiring, use normal code. Represent the diagram as a tree as much as possible, and use indenting to represnet that tree. Any nodes that need cross connections should be saved in local variables. The cross connections can then be wired using the variables. You will see this done in many of the examples.
+If dependency injection is used to implement the wiring, I prefer not to use XML to specify the application. Firstly XML is not very readable. Secondly it only handles shallow tree structures well, not arbitrary graphs. If I use text for specifying wiring, I use normal code. I try to find a tree structure in the graph as much as possible and represent that as indented text as much as possible. Any nodes in the graph that need cross-tree connections have their instances saved in local variables. The cross connections can then be wired by referring to those variables. You will see this done in many of the examples.
 
-You are still better off with this code in one place than having it distributed inside your modules. But if a graph structure is inherent in the requirements, there is really no substitute for the readability of diagrams. In time there will be good tool support for ALA applications.
+You are still better off with this code in one place than having it distributed inside your modules. But if a graph structure is inherent in the requirements, there is really no substitute for the readability of a diagram.
 
 
 ==== Diagramming tools
 
-The ALA design process (which is describing your requirements and inventing the needed abstractions as you go) is an intense intellectual activity, especially the first time in a new domain. As well as expressing your user stories, you are inventing abstractions. You are inventing a set of domain abstractions and programming paradigms that will allow you to express all user stories with a finite number of them. It requires all your focus. I have found that hand drawing the diagram on paper is not good. The diagram quickly gets into a mess which requires redrawing, and that interrupts your design flow. I have found that a diagramming tool that constantly needs you to control the layout, such as Visio, is also not good.   
+The ALA design process is describing your requirements using abstractons and inventing the needed abstractions as you go. It is an intense intellectual activity, especially when doing it for the first time in a new domain. As well as expressing your user stories, you are inventing a set of domain abstractions and programming paradigms that will allow you to express all user stories. It requires all your focus. There is no focus left to deal with tools that are hard to use.
 
-So until there is a better tool, I have been using Xmind because as a mind-mapping tool, it is designed to not get in your way as you are creating. It lays itself out as a tree structure, and then allows cross connections on the tree to be added using a key short-cut at the source and a mouse click at the destination node. It has its limitations, however I use some simple conventions to get around these. For example, I use '<' and '>' to represent input and output ports.
+I have found that hand drawing the diagram on paper is not good. The diagram quickly gets into a state where it needs reorganising, which requires redrawing it from scratch. That totally interrupts your design flow. I have found that a diagramming tool that constantly needs you to control the layout, such as Visio, is also not good. The tool must be able to reorganize the diagram (push things out to make room).   
 
-Furthermore, the tree structure allows easy hand translation of the diagram into indented, fluent style code. 
+So until there is a better tool, I have been using Xmind because as a mind-mapping tool, it is designed to not get in your way as you are creating. It lays itself out as a tree structure, and then allows cross connections on the tree to be added using a key short-cut at the source and a mouse click at the destination node. It has serious limitations, however I use some simple conventions to mitigate these. For example, I use '<' and '>' to represent input and output ports.
 
-While Xmind allows you to be creative in the beginning (I couldn't imagine doing without it), it is far from ideal once the abstractions have matured, and you are just churning out user stories.
+Furthermore, the tree structure allows easy hand translation of the diagram into indented, fluent style code. We also have a tool that takes an XMind save file and gnerates the code from it automatically
 
-We use a simple tool that takes Xmind files and generates the code automatically.
+While Xmind allows you to be creative in the beginning while you are still inventing domain abstractions (I couldn't imagine doing without it), it is far from ideal once the abstractions have matured. At this point you are rapidly churning out user stories that are fairly obvious how to write, and Xmind's limitations start to slow you down somewhat.
 
-And even more recently, we have in progress a purpose built graphical IDE for ALA. But it is not complete.
+And even more recently, we have a purpose built graphical IDE for ALA. But it is not complete.
+
+In my experience, a low overhead drawing tool is essential during the iteration zero design phase and during subsequent maintenance.   
 
 See the end of this chapter for an example project using Xmind.
 
 
 // TBD review from here
 
-....
-Thoughts on the essentials of a diagramming tool.
+
+===== Essentials of a diagramming tool.
   
-It would have the low driving overhead of a mind mapping tool. As with a mind-mapping tool, you control the logical layout, and the tool does the actual spacial positioning. It would primarily use keypresses, but allow mouse clicks where it makes sense, for example, to specify the destination of a 'cross connection'. The tool would route the cross conenction for you.
+* Low effort to use like a mind mapping tool. As with a mind-mapping tool, you control the logical layout, and the tool does the actual spacial positioning.
 
-A tree topology can be done with simple key presses. The tree would capture the primary relationships between instances, on their main ports.
+* It would layout as a base tree structure, but allow cross connections that route themselves neatly around the nodes, crossing other lines as necessary.
 
-You can make mutiple trees for different user stories that are disconnected logically, but for the purpose of automatic layout, are connected to the main tree (just an invisible line).
+* It would primarily use keypresses shortcuts, for example to add a new node to the tree, but allow mouse clicks where it makes sense, for example, to specify the destination of a 'cross connection'.
 
-Abstractions are defined in a separate panel as stand-alone boxes with ports. Once a new abstraction is  defined, it can be instantiated in the diagram by its abstraction name with auto completion. Boxes represent these instances of abstractions with the ports still lablled around their boundary.
+* You can make mutiple trees for different user stories (that may need some connection between them).
 
-The abstractions are fully inegrated with the classes in the code. This is in both directions. So for any existing classes, the IDE shows them with their port, and fully supports the entry of constructor arguments and properties.
+* Abstractions are defined in a separate panel. The consist of boxes with lebelled ports. Inside the box, the configuration parameters are defined. Once a new abstraction is  defined, it can be instantiated in the diagram by its abstraction name with auto completion. Boxes represent these instances with the ports lablled around their boundary as they were on the abstraction in the abstractions panel.
 
-In the other direction, if you create a new abstraction in the tool. You can specify its ports and their types and names. You can specify the constructor arguments and properties and their default values. It will create/modify a template for that class.cs.
+* The abstractions in the abstractions panel are fully integrated (synced) with the classes in the code. This syncing goes in both directions. If you change the ports or configuration parameters in the diagram, it changes the class code and vice versa. Configuration parameters are either required or optional types. Required parameters become constructor arguments. Option parameters become properties with default values.
 
-The tool's purpose is to aid creativity in the ALA process of representing a user story, inventing new abstractions as you go. Of course the tool would also automatically generate the wiring code.
-....
+* The tool's purpose is to aid creativity in the ALA process of representing a user story, inventing new abstractions as you go. Of course the tool would also automatically generate the all the code. The generated domain abstraction classes would then need to be completed with normal coding.
 
-In my experience, a low overhead drawing tool is essential during the iteration zero design phase and during subsequent maintenance.   
 
 
 // TBD two sections on decomposition copied in
@@ -798,9 +809,9 @@ In my experience, a low overhead drawing tool is essential during the iteration 
 
 === Composition, not decomposition
 
-In this perspective, we look at ALA as the antithesis of the prevalent decomposition methodolgy.
+In this perspective, we look at ALA as the antithesis of the prevalent decomposition methodology of software development.
 
-The conventional technique for tackling system complexity is "divide and conquer".
+The conventional technique for tackling system complexity is often referred to as "divide and conquer". The theory is that you break a system up into smaller and smaller parts hierarchically until the parts themselves are a manageable complexity to write. The problem is that this doesn't work well. This is because the parts are specific parts of specific parts all the way up the hierarchy. This mean that a lot of contextual knowledge is needed, not only of the parts that contains it all the way up the hierarchy, but of the parts around it that it will collaborate with. I have seen systems that come out even worse than just monolithic code would have been.
 
 Consider this phrase, which has been used as the definition of software architecture:
 
@@ -821,151 +832,45 @@ This seemingly subtle shift in thinking leads to a qualitative difference in the
 
 First let's understand what we mean by composition through a few examples: 
 
-* When we compose musical notes, we create a tune. The structure is linear. The execution is sequential like activity flow below. 
+* When we compose musical notes, we create a tune. The structure is linear. The execution is sequential like activity flow in software. 
 
-* When we write code in a general purpose programming language, we are composing  statements. Statements are low level (fine grained) elements and only support a single programming paradigm, which we could describe as 'imperative', but by composing enough instances of them we can create a program. The structure is a linear or a tree.
+* When we write code in a general purpose programming language, we are composing  statements and variables. Statements and variables are low level (fine grained) elements and only support a single programming paradigm, which we call 'imperative'. By composing enough instances of them we can create a program. The structure is a graph but is written as an indented tree, but with many labelled cross connections.
 
-* In functional programming, we are composing with functions, so the elements are higher level things that you create. But the programming paradigm is still imperative (unless you use monads). The structure is either linear or a tree.
+* In functional programming, we are composing with pure functions, so the elements are higher level things that you create. But the programming paradigm is still imperative.
 
-* When programming with monads, we are composing functions. The programming paradigm has changed from imperative to dataflow. The structure is usually linear, but sometimes it is a reverse tree (two dataflows can be combined). (ALA is compared with monads in detail later in this chapter.)
+* When programming with monads, we are composing functions, but the programming paradigm has changed from imperative to dataflow. The structure is primarily linear. Monads are explained in detail in chapter six.
 
-* When programming using the UML class diagram, we are composing with classes directly (not objects). The programming paradigms are associations and inheritance.
+* When programming using the UML class diagram, we are composing with classes directly (not objects). The programming paradigms are whatever is represented by particular associations.
 
-* When programming using the UML activity diagram, we are composing activities to be done in a set order. The structure is a graph, because you can branch, recombine and loop back arbitrarily. Activity diagrams are not imperative (like the old style flow diagrams). The CPU is not necessarily dedicated to each activity being done. Activities may take an arbitrarily long time without the system blocking. 
+* When programming using the UML activity diagram, we are composing activities to be done in a set order. The structure is a graph, because you can branch, recombine and loop back arbitrarily. Activity diagrams are not imperative (like the old style flow diagrams). The CPU is not necessarily dedicated to each activity being done. Activities may take an arbitrarily long time without the system blocking. The programming paradigm is sequencing of potentially activities with resyncing.
 
-* When programming with XAML, we are composing UI elements. The programming paradigm is UI layout (what goes inside what and in what order). The structure is a tree.
-
+* When programming with XAML, we are composing UI elements. The programming paradigm is UI layout (what goes inside what and in what order). 
 
 
 Let's list the different properties present in these types of composition:
 
 * Low-level or high-level - Sometimes we are composing fine-grained general elements and we need a lot of them. Sometimes we are composing 'higher level' more specific elements, and we need relatively few of them.
 +
-Note that sometimes people think of these higher level elements as more abstract. They are actually less abstract. For example, a class that handles complex numbers is less abstract than the fundamental float type. Complex numbers are a more specific case because its only useful when you need complex numbers in your solution. But when you do need complex numbers, then they are obviously more expressive than using pairs of floats everywhere. This means that you need to compose less abstractions to build your solution.
+ Note that sometimes people think of these higher level elements as _more_ abstract. This is completely incorrect. They are more specific to a particular application and therefore _less_ abstract. For example, a class that handles the display of a label-data pairs on a graphical display is more specific than the print statement. The misconception is caused by thinking that being further removed from the underlying hardware makes it more abstract because the hardware is concrete. People build layering schemes with the hardware at the bottom with assembler and then the programming language layers above that ("abstracting away the hardware"). In fact the general purpose programming language is the bottom (most abstract) layer on which everything is built. Both the specific application and the specific compiler for the hardware are built in their own sets of layers above it, both getting more specific as you go up.   
 
-* There is only one meaning of a composition relationship in each case. It can be one of imperative, dataflow, UI layout etc. 
+* There is usually only one meaning of a composition relationship in each case. It may be sequential, imperative, dataflow, UI layout, or something else. 
 
-* Linear/Tree/Network: The structure built by the composition relationships can be linear, a tree structure or a general graph or network. 
+* Linear/Tree/Network: The structure built by the composition relationships can be typically linear, a tree structure or a general graph or network. 
 
-* Syntax: The syntax for the composition of two joined elements can be using spaces, dots, or lines on a diagram. We can use various types of bracketing or indenting for the text form of tree structures.
+* Syntax: The syntax for the composition of two joined elements can be using spaces, dots, or lines on a diagram. We can use various types of bracketing or indenting for the text form of tree structures. Graphs represented in text form use matching pairs of labels for many of their connections.
 
-In ALA, we are setting up to use composition to create user stories or features. We want the composition to have the following properties:
+In ALA, we use composition to create user stories or features. We want the composition to have the following properties:
 
 * Composing more course grained expressive elements by letting them be specialized to your domain.
-* Allow use of many programming paradigms (meaning of composition)
-* Allow linear, tree or graph structures.
-* Allow the programmer to add new programming paradigms with new meaning if that's the best way to express typical requirements.
-* Uses the same syntax for all the different composition relationships.
+* Allow use of many programming paradigms (meanings of composition)
+* Easily allow for graph or netwrok structures, not just linear or tree.
+* Allow the programmer to add new programming paradigms with new meaning if that's the best way to express requirements.
+* Use the same syntax for all the different composition relationships.
 
-ALA can therefore be thought of as a 'generalised compose from abstractions' methodology. 
-
-
-
-=== No Data coupling
-
-The term _data coupling_ here doesn't mean that one module communicates data with another.  It means that the two modules agree on the meaning of that data.
-
-The actual communication of data at run-time is not a problem. The sharing of knowledge on how to interpret that data is. 
-
-In conventional programming, data coupling is considered unavoidable. There is a misconception meme that two modules have to share the knowledge of the meaning of data if they are to communicate at run-time. Even if you have an understanding of ALA, you will still be trapped by this misconception unless you know about it. This will cause you to write modules in the conventional way and they will have coupling.
-
-The misconception is especially rife if the two modules run in different locations. It seems a self-evident truth that the two modules must share some kind of language if they are to communicate, just as people do. 
-
-Let's use an example. There is a temperature sensor on a Mars rover. The temperature is to be displayed at a ground station on Earth.
-
-In conventional programming, to implement this user story, one module resides in the Mars rover and one module resides in the ground station. These two modules must agree on the meaning of data. For example, it is an integer number of tenths of degrees C (Celsius).
-
-Obviously a lot of other system parts are involved in transporting the data from the sensor module to the display module. These are referred to as middleware. It is common to _containerise_ the data so that none of the middleware needs to know its meaning. But the two end points at least seemingly must have shared knowledge.
-
-In ALA, the _meaning_ of the communication is completely contained inside another abstraction. That abstraction is the only one that knows about the user story, so it's the only one that needs to know the meaning of the data going from Mars to Earth. 
-
-Here is the user story implementation.
-
-[source,C#]
-....
-class AmbientTempertureUserStory {
-    new TemperatureSensor()
-        .WireIn(new OffsetAndScale(4.3, 712))
-        .WireIn(new Display("#.#"))
-}    
-....
-
-The meaning of the temperature data does not need to be known outside of this small abstraction. It does not need to be known by the sensor itself, or the display, or anything in-between. The meaning only needs to be known by the engineer who wants the sensor on the rover and wants to see what it says on the display, and so wites the above code.
-
-Now if he were to change the units of temperature were to change, only this user story abstraction would change. Just change the OffsetAndScale configuration, and change the way the display is formatted.
-
-It doesn't even matter if software needs to interpret the data. For example, let's add an alarm that goes off at 50 C: 
-
-[source,C#]
-....
-    new TempertureSensor()  // unit is celcius
-        .WireIn(new OffsetAndScale(4.3, 712))
-        .WireTo(new Display("#.#"))
-        .WireTo(new Alarm(500));
-....
-
-The interpretation of the data is still contained inside the user story abstraction. Everything about that temperature is here as cohesive code. 
-
-==== deployment
-
-The user story code spans physical locations. So how do those instances of abstractions get deployed?
-
-Inside the user story abstraction, we can annotate the three instances with their physical locations. An abstraction that knows about the concept of _physical view_ would already have been configured to know about the three physical locations. The physical view engine takes care of deploying the instances of abstractions for the user story to the correct locations, configuring them, and it takes care of actually connecting both ends through middleware. It also knows how to take care of version compatibility, and updating versions at different times at different locations. 
+ALA can therefore be thought of as a 'generalised composition' architecture. 
 
 
-
-==== modules written by different parties
-
-What happens if one end of the user story is written by a team that has no communication with the team who does the user story. They just provide an API. In this case the team responsible for the user story itself will write an adapter for the API that also knows about the common programming paradigm abstraction. We can still have a separate abstraction to repesent the whole user story, and keep the data coupling contained in the adapter.
-
-The idea of no data coupling of course relies on the common programming paradigm. It relies on the teams who write the domain abstractions (or the adapters) all using that programming paradigm. And it relies on having a spearate team responsible for the user story, and all teams agreeing to use ALA and the common programming paradigm.  
-
-But there is an organisational problem in the form of Conway's law.
-
- Conway's law: Any organisation that designs a system will produce a design whose structure is a copy of the organisation's communication structure. 
-
-It is unlikely that there would be a dedicated team in an organisation to write all the code for a specific user story if the user story spans different locations, or code written at different times. These are likely to fall to entirely different departments who both expect the two parts of the system to communicate between an agreed API and contract. In this siutaion there cannot be a separate abstraction for the user story, because there is no department for it. 
-
-So there will be collaboration in the code at each end in the form of data coupling. There will need to be be contracts. The contracts will describe all the implicit coupling. The contract will be a second source of truth, which must be kept updated.
-
-In this situation it is still possible to mitigate the effects of coupling somewhat. Let's say the display end has been written by the 3rd party, but is written in such a way that it accepts _self describing data_ according to a standard. Effectively this is just making it more abstract. Without changing the display end, the user story can be implemented from scratch by sending to the display the self describing data. The display then knows how how to receive the label and display format (which can be sent once) as well as the numeric data. The display knows how to create a space for displaying the data. This is how browsers work. 
-
-It is common, for example, for a 3rd party to provide a sensor and publish the data on an MQTT server as self describing data. Say the other team is writing an application to use this data, not only display it, but interpret the data as well. They will subscribe to the topic. They will write code that is coupled with design knowledge provided by the 3rd party about the MQTT topic.
-
-However, if the 3rd party is selling you abstract sensors that you install yourself and selling you the MQTT communication infrastructure, then you could be provided with a more abstract 'configuration API' from the 3rd party. You would then write a domain abstraction that knows about that configuration API. Whenever you want to do a new user story, you can use an instance of that 'device configuration' abstraction. You can fully configure the MQTT topic, and its data format, then subscribe to it and process it. Everything specific to the user story is now cohesively contained inside a single abstraction once again. 
-
-==== 3rd party library abstractions
-
-All the above applies when teams are supplying peer modules for a system. The modules have a similar level of abstraction. If the 3rd party is providing something more abstract like a library, we can choose to be directly dependent on it, if it is abstract enough to be considered part of the language we want to write user stories in. The canonical example is a relational database with the abstraction being SQL. 
-
-The common problem here is that if the abstraction comes from a 3rd party, we are making ourselves dependent not only on the abstraction, which is ok, but on the provisioning of the implementation. This may be okay when we choose to depend on, for example, the windows or MacOS operating system, but is dubious for a database. (Actually its not ok for Windows either, but being able to swap out windows is considered too hard). So it's become good practice to allow swapping out of the database. And since SQL is not quite as abstract as it should be between vendors, it means we don't want to be dependent on SQL either. 
-
-Clean architecture suggests to do this by using interfaces specific to the user stories, and then writing adapters for every interface to SQL.
-
-In ALA, you probably already have a 'tabular dataflow' type of programming paradigm. All abstractions that deal with tabular data already use ports of that type.
-
-It is a matter of writing one adapter that is configured with the schema. The adapter then generates the appropriate SQL queries.
-
-//TBD provide code example of a lazy dynamic tabular programming paradigm, something like:
-////
-[source,C#]
-....
-    interface ITabularDataflow : IQueryable<dynamic>
-    {
-    }
-....
-////
-
-We can write a Query domain abstraction that takes a linq query as a parameter. This one abstraction allows us to use LINQ's From, Select, SelectMany, Sort, Where, Join etc. The query abstraction is then has ports to make it wirable into a user story using ALA. Since Linq is already compliant with ALA from the point of view of composing data manipulation abstractions, there is no reason not to use it directly in this way.
-
-TBD Write a query abstraction that takes a LINQ query as a parameter and has ITabularDataflow<T> ports. Shouldn't be too hard so full code can go here.
-
-TBD Write an abstract adapter for SQL Lite database with a special port that is used directly by the Query abstraction. 
-
-
-
-
-=== Composability and Compositionality
+==== Composability and Compositionality
 
 We have used the word _compose_ a lot so far in describing ALA. The term _Composability_ means the ability to create an infinite variety of things by composing instances of a finite number of things. Composability is a very important property for dealing with complexity. 
 
@@ -976,11 +881,11 @@ The Principle of Compositionality states:
 In semantics, mathematical logic and related disciplines, the principle of compositionality is the principle that the meaning of a complex expression is determined by the meanings of its constituent expressions and the rules used to combine them.
 ====
 
-The principle of compositionality restated for the context of software is:
+The principle of compositionality restated for the context of software might be:
 
 [TIP]
 ====
-[green]#*To understand any one part of the code should involve understanding only that one part of the code, and the abstraction concepts it uses.*#
+[green]#*The meaning of a piece of code is determined by the meanings of its constituent abstractions, and the programming paradigms used to combine them.*#
 ====
 
 Brian Beckman, in his explanation of monads called "Don't fear the monad" says that composability is _the_ way to deal with complexity.
@@ -994,66 +899,152 @@ ALA has the property of composability by using domain abstractions with ports. T
 There are other software systems that have composability, usually using the dataflow programming paradigm, such as RX (Reactive Extensions), or more generally monads. Most composability systems are restricted to a single paradigm. In ALA, to achieve the correct level of expressiveness of requirements, multiple different programming paradigms are used.
 
 
-=== ALA compared with Object oriented programming
-
-Let's start with Brian Will's explanation of why object oriented programming is crap from his Youtube channel:
-
-https://www.youtube.com/watch?v=QM1iUe6IofM[https://www.youtube.com/watch?v=QM1iUe6IofM]
-
-I am in agreement with Brian in that trying to associate _all_ code with data causes inappropriate fragmentation of the code, encourages a model of collaborating agents, and creates a dependency hell. 
-
-The idea of encapsulation is only partially realized because objects effectively know about the existence of another object's state and collaborate with that state. They reach into each other's data indirectly.   
-
-Also the UML class diagram encourages relationships directly between classes, which should be uncoupled abstractions. It encourages mutable data. And it encourages a horrendous model of agents interacting with each others data in a multithreaded environment. To solve this, Brian advocates a return to procedural programming and provides several examples which demonstrate that procedural programming is better.
-
-Although ALA uses objects, it is not object oriented. You don't try to model everything with objects and you can't create associations between classes. It uses objects as a language feature, not a design philosophy. Objects are used in ALA for the following four reasons. 
-
-. Objects store references to other objects to which they are wired. A form of dependency injection is used to receive the references to the other objects. 
-
-. Domain abstractions, being reusable entities, often need configuring. The object stores its own configuration data passed in the constructor or via setters.
-
-. Some abstractions need state to work internally. For example an abstraction that implements a low pass filter for a dataflow needs to keep some kind of historical value or values. It is inherent in the nature of the abstraction that it has state.
-
-. There is usually some state data that doesn't belong with any code. In ALA we will often create a special domain abstraction called 'state' that acts as a source or destination for dataflows.
 
 
-==== Dependency injection
 
-The dependency injection pattern was introduced as an attempt to clean up the dependency mess created by OOP. It came too late to make the famous GOF patterns book. The authors wish they had included it instead of singleton. But dependency injection alone does not solve OOPs problems.
+=== No Data Coupling
 
-Previously we mentioned the use of dependency injection in ALA by using the wiring pattern to wire up instances of abstractions by their ports. The way this dependency injection is done is quite different to container based dependency injection. 
+The term _data coupling_ here doesn't mean that one module communicates with another.  _Data coupling_ refers to two modules agreeing on the meaning of that data. This is the cause of a lot of coupling in conventional software systems. ALA has no data coupling.
 
-Container based dependency injection works by matching interface types. The interfaces are implemented by one class, and required by another. The matching of this interface type is the implicit wiring of the two classes. There is no place where you can see the wiring explicitly. This is really bad. It is very difficult to trace the flow of a user story through the classes.
+In conventional programming, data coupling is considered unavoidable. There is a misconception meme that two modules have to share the knowledge of the meaning of data if they are to communicate. Even if you have an understanding of ALAcin general, you may still fall for this misconception unless we are explicitly aware of it. Your abstractions may end up with implicit coupling about how they will interpret data, once again destroying them as abstractions. 
 
-Now a class may be substitutable with another class that implements or provides the same interfaces. That's why there is a container. You instantiate an object of the class you want to wire in, and put it into the container. But this is a far cry from general composability.
+The misconception is especially common when two modules run in different locations. It seems a self-evident truth that the two modules must share some kind of language if they are to communicate, just as people do. 
 
-In ALA interfaces do not belong to one or other of the classes being wired. They are more abstract and represent a compositional concept which we call a programming paradigm. When a domain abstraction uses one of these abstract interfaces, either implementing it or using it, we call it a port. The abstraction has no implicit fixed arrangement with other abstractions. A separate abstraction in a higher layer is needed to specify how instances of these abstractions with ports should be composed.
+Let's use an example to show that data coupling is not required. Lets's say there is a temperature sensor on a Mars rover. The temperature is to be displayed at a ground station on Earth.
 
-Note that ALA is extremely polymorphic. That's because from the point of view inside an abstraction with ports, you do not know where that port will be wired to. Despite the use of polymorphism for wiring up everything, there is none of the usual disadvantage of indirection. In fact it is way easier to trace through a proram or system. From inside an abstraction, the abstraction doesn't need or want to know where it is wired. It's completely self-readable up to the port. And if you are trying to trace a dataflow through the program or system, well that's explicit and all in one place for any given user story.
+In conventional programming, to implement this user story, one module resides in the Mars rover and one module resides in the ground station. These two modules must agree on the meaning of data. For example, it is an integer number of tenths of degrees C (Celsius).
+
+Obviously a lot of other system parts are involved in transporting the data from the sensor module on the rover to the display module in the lab on Earth. These are referred to as middleware. It is common to _containerise_ the data so that none of the middleware needs to know its meaning. But the two end points at least seemingly must have shared knowledge.
+
+To break the agreement, let's make the output of the Mars rover sensor degrees Kelvin, and well make a positive number of hundredths of degrees. Now the two ends have no agreement, and clearly have no data coupling.
+
+In ALA, the _meaning_ of the communication is completely contained inside another abstraction, not in the two abstractions it will set up to communicate. That abstraction is the only one that knows about the user story. It knows the ports interfaces of the abstractions on mars and Earth that it wants to connect. So it knows to wire in a converter in-between. 
+
+Here is the user story implementation.
+
+[source,C#]
+....
+class RoverAmbientTempertureUserStory {
+    new TemperatureSensor()
+        .WireIn(new OffsetAndScale(-273.15, 0.1))
+        .WireIn(new Display("#.#"))
+}    
+....
+
+The meaning of the temperature data does not need to be known outside of this small abstraction. It does not need to be known by the sensor itself, or the display, or anything in-between. The meaning only needs to be known by the engineer who wants the sensor on the rover and wants to see what it says on the display, and so writes the above code. This user story is cohesive, and so the code that implements it should be cohesive.
+
+Now if he were to change the units of temperature, only this user story abstraction would change. Just change the OffsetAndScale configuration, and change the way the display is formatted.
+
+It doesn't even matter if software needs to interpret the data. For example, let's add an alarm that goes off at 50 C: 
+
+[source,C#]
+....
+    new TempertureSensor()  // unit is celcius
+        .WireIn(new OffsetAndScale(-273.15, 0.1))
+        .WireTo(new Display("#.#"))
+        .WireTo(new Alarm(500));
+....
+
+The interpretation of the data is still contained inside the user story abstraction. Everything about that temperature is cohesive code. 
+
+==== deployment
+
+In the above example, the user story code spans physical locations. I deliberately chose a Mars rover to make this physical reality as extreme as possible. There is obviously a lot of middleware infrastructure in-between to support the communications. And yet in the user story code we have gone ahead and wired the sensor directly to the display with only a conversion abstraction in-between. So how do those instances of abstractions get deployed?
+
+Inside the user story abstraction, we can annotate the three instances with their physical locations. Another abstraction sits in a lower layer that knows about the concept of a _physical view_. It has already been configured to know about the three physical locations. The user story annotates the instances of abstractions it creates with where it wants them to physically run. It can do this because it knows about the physical view abstraction.  
+
+The physical view abstraction takes care of deploying the instances of abstractions for the user story to the correct locations, configuring them, and actually connecting them to the middleware. It also knows how to take care of version compatibility, and updating versions at different times at different locations. 
+
+
+
+==== Modules written by different parties
+
+The zero coupling of ALA, and zero data coupling in particular, allows all abstractions to be written by different parties or teams who don't need to communicate with each other. They can even be written at completely different times. Only the _knowledge dependencies_ must be communicated. In the example above, the user story abstraction cannot be completed without knowing about the three abstractions it composes. 
+
+The idea of no data coupling relies on a common programming paradigm. It relies on the teams who write the domain abstractions all using that programming paradigm. And it relies on having a separate team responsible for the user story, and all teams agreeing to use ALA and the common programming paradigm.  
+
+What happens if one of the abstractions to be used is written without knowledge of ALA? It has a conventional API that includes both configuration and data input/output methods. In this case the team responsible for the user story itself will write a wrapper that will make the abstraction into an ALA compatible domain abstraction that has a separate configuration interface and the relevant ports. The wrapper and the abstraction that it wraps become a single abstraction together. 
+
+
+==== Conway's law
+
+****
+Conway's law states: Any organisation that designs a system will produce a design whose structure is a copy of the organisation's communication structure. 
+****
+
+If a system spans physical locatons, it is likely that the oranisation will allocate teams to develop code based where the code runs. Whether it's frontend / backend or rover / lab, the teams are likely to be repsonsible for a deployed location. The teams then communicate with each other their APIs. It is highly unlikely that the teams will be told, in the interests of creating better abstractions, not to communicate with each other. And yet this is precisly what should be done to get the best architecture. Then there should be a team responsible for each user story. That team writes the cohesive user story code by composing using the set of domain abstractions provided by the other teams.
+
+Unless these extra teams dedicated to user stories are put in place, the modules at different locations will end up with a lot of data coupling and collaboration coupling in general, just because the teams that write them will need to collaborate.
+
+There will need to be be contracts that describe all this implicit coupling. The contracts will be a second source of truth, which must be kept updated.
+
+////
+JRS The following seems wrong or at best confusing the issue
+
+In this situation it is still possible to mitigate the effects of coupling somewhat. Let's say the display end has been written by the 3rd party, but is written in such a way that it accepts _self describing data_ according to a standard. Effectively this is just making it more abstract. Without changing the display end, the user story can be implemented from scratch by sending to the display the self describing data. The display then knows how how to receive the label and display format (which can be sent once) as well as the numeric data. The display knows how to create a space for displaying the data. This is how browsers work. 
+
+It is common, for example, for a 3rd party to provide a sensor and publish the data on an MQTT server as self describing data. Say the other team is writing an application to use this data, not only display it, but interpret the data as well. They will subscribe to the topic. They will write code that is coupled with design knowledge provided by the 3rd party about the MQTT topic.
+
+However, if the 3rd party is selling you abstract sensors that you install yourself and sell you the MQTT communication infrastructure, then you could be provided with a more abstract 'configuration API' from the 3rd party. You would then write a domain abstraction that knows about that configuration API. Whenever you want to do a new user story, you can use an instance of that 'device configuration' abstraction. You can fully configure the MQTT topic, and its data format, then subscribe to it and process it. Everything specific to the user story is now cohesively contained inside a single abstraction once again. 
+////
+
+////
+==== 3rd party library abstractions
+
+All the above applies when teams are supplying peer modules for a system. The modules have a similar level of abstraction. If the 3rd party is providing something more abstract like a library, we can choose to be directly dependent on it, if it is abstract enough to be considered part of the language we want to write user stories in. The canonical example is a relational database with the abstraction being SQL, although not all SQLs are equivalent so many prefer not to be dependent on it. 
+
+The common problem here is that if the abstraction comes from a 3rd party, we are making ourselves dependent not only on the abstraction, which is ok, but on the provisioning of the implementation. This may be okay when we choose to depend on, for example, the windows or MacOS operating system, but is dubious decision for a specific database. (Actually its not ok for Windows either, but being able to swap out windows is considered too hard). So it's become good practice to allow swapping out of the database. And since SQL is not quite as abstract as it should be between vendors, it means we don't want to be dependent on SQL either. 
+
+Clean architecture or hexagonal architecture suggests to do this by using interfaces specific to the user stories, and then writing adapters for every interface to SQL.
+
+In ALA, you probably already have a 'tabular dataflow' type of programming paradigm. All abstractions that deal with tabular data already use ports of that type.
+
+It is a matter of writing one adapter that is configured with the schema. The adapter then generates the appropriate SQL queries.
+
+//TBD provide code example of a lazy dynamic tabular programming paradigm, something like:
+[source,C#]
+....
+    interface ITabularDataflow : IQueryable<dynamic>
+    {
+    }
+....
+
+We can write a Query domain abstraction that takes a LINQ query as its configuration. This one abstraction allows us to use LINQ's From, Select, SelectMany, Sort, Where, Join etc in ALA applications. The query abstraction has ports to make it composable as part of user stories in ALA. Since LINQ is already compliant with ALA from the point of view of composing data manipulation abstractions, there is no reason not to use it directly in this way.
+
+TBD Write a query abstraction that takes a LINQ query as a parameter and has ITabularDataflow<T> ports. Shouldn't be too hard so full code can go here.
+
+TBD Write an abstract adapter for SQL Lite database with a special port that is used directly by the Query abstraction. 
+////
 
 
 === From procedural programming to ALA
 
-Let's get back to procedural programming that Brain Will advocates instead of object oriented programming. How does ALA relate to procedural programming?
+How does ALA compare with procedural programming?
 
-Starting from pure procedural programming, we will make five step changes to get to ALA. In this progression, you will see that we introduce objects but not object oriented programming per se.
+(Brian Will advocates pre-OOP procedural programming style in his Youtube video.) 
 
-. To begin with, you can apply ALA directly to procedural programming style. Abstractions are implemented as groups of procedures. You must structure the code so that you only call procedures in an abstraction that is significantly more abstract. You will have user story abstractions in the top layer, and domain abstractions in a second layer. Procedures that directly code a given user story are put together to form a user story abstraction. Procedures that are cohesive in the domain layer, such as configure/read/write sets, are grouped together as abstractions. Such abstractions could be implemented as a code source file or a static class.
+In procedural programming, data is always passed into procedures. Structs are passed in if there is a natural grouping of data items. 
 
-. Once you have abstractions, you can of course reuse them. Abstractions often need configuring. Configuring requires storing some data. We can put the configuration data inside the abstraction, and provide constructor parameters or setters. Since the abstraction now contains some data, the abstraction needs to be implemented as a class so that it can be instantiated with each instance having it own configuration. So already we have objects.
+
+Starting from pure procedural programming, we will make five incremental changes to get to ALA. In this progression, you will see that we introduce objects but not object oriented programming per se.
+
+. To begin with, you can apply ALA directly to procedural programming style. Abstractions are implemented as groups of procedures. You must structure the code so that you only call procedures in an abstraction that is significantly more abstract. You will have user story abstractions in the top layer, and domain abstractions in a second layer. Procedures that directly code a given user story are put together to form a user story abstraction. Procedures that are cohesive in the domain layer, such as configure/read/write sets, are grouped together as abstractions. Such abstractions could be bounded as a code source file or a static class. Such abstractions are reusable just by calling the procedures because the abstraction itself does not yet have any data.
+
+. Instances of abstractions often need configuring. Configuring requires storing some configuration parameters that are passed in when the abstraction is instantiated. We can put the configuration data in a struct, and provide a constructor with parameters or setters. The struct is passed as the first parameter to all the procedures belonging to the abstraction. The struct is immutable.
 +
-For example, a filter abstraction needs configuring with a cutoff frequency and a stop band rejection. If the abstraction consisted only of a function, then that configuration data would need to be passed in every time the function is used. That would be awkward. It would also mix the dataflow parameters of the function with the configuration parameters, breaking the Interface Segregation Principle. By using objects, ALA can configure an abstraction once, and then the contained function can be used may times. This separation of configuration and function use is important for abstractions - the configuration is done at instantiation time of the abstraction, whereas the function can be used many times once it is running.
-
-. In procedural programming, the user story will frequently call one procedure, get some data returned by that procedure and then pass it straight to another. This handling of data is not really something the abstraction should need to do. It should just compose procedures. But if we make the abstractions classes, then we can wire the instances so that at run-time data flows directly from one instance to another. Control of execution becomes the responsibility of dataflow programming paradigms. Now we have two reasons to use objects.
-
-
-
-
-. In procedural programming, you will tend to have some state variables, which are practically globals. We won't call them globals because we wouldn't access them directly from any procedures. We would instead always pass them into the procedures as required. This would create extra parameters for our procedures. Some procedures will need extra parameters even though they don't know what the data is. They are just passing it through to other procedures they call. All this extra passing around is a real pain. 
+For example, a filter abstraction needs configuring with a cutoff frequency and a stop band rejection. If the abstraction consisted only of a single function, then that configuration data would need to be passed in every time the function is used. That would be awkward. It would also mix the data parameters of the function with the configuration parameters, breaking the Interface Segregation Principle. By using a struct to represent an object, ALA can configure an abstraction once, and then the contained function can be used may times. This separation of configuration and function use is important for abstractions - the configuration is done once at instantiation time of the abstraction, whereas the function can be used many times.
 +
-Sometimes an abstraction is by its very nature stateful. Some of the data may really belong with a given procedure internally, so the pain seems to make no sense.
+Effectively we now have objects.  
+
+. In procedural programming, the user story will frequently call one procedure to get some data and then pass it straight to another procedure. This handling of data is not really something the user story code wants to do. It should just compose the procedures, declaratively. 
 +
-For example, a running average abstraction needs to hold past values. In procedural programming, the array of past values is kept in the top layer and is passed into the function every time. This completely breaks the abstraction. In ALA, we keep the state and code together to preserve the abstraction. This is what objects were meant for.
+What we need is another piece of data in the abstraction for doing direct wiring. That can be another two fields in the struct. Now the user story sets who it is wired to so that instances can communicate at runtime without the user story having to handle the data itself. The field points to the procedure of the abstraction it is wired to and the struct instance. The fields are immutable after they are set.
++
+Effectively we now have two reasons for having objects. 
+
+. In procedural programming, you will often need some state because the user stories themselves inherently are a state machine. (That is, the user story reacts to external events, and how it acts depends on past events.) We would normally store this state in variables and pass these variables into the procedures as required. This creates extra parameters for our procedures. Some procedures will need extra parameters even though they don't need the data, because they need to pass it through to other procedures that they call. 
++
+Sometimes these state variables are used only by one abstraction. For example, a running average abstraction needs to hold past values. In procedural programming, the array of past values is kept in the top layer and is passed into the function every time. This breaks the running average as an abstraction. In ALA, abstraction is all important, so we keep the state and code together where they are cohesive. This gives us a third reason to use objects.
 +
 In a multithreaded environments, it would be prudent for only one thread to be using each instance of such objects. 
 +
@@ -1072,7 +1063,7 @@ If the type system is static, and we want to group data together in a single ins
 
 Through the five steps above, we have transformed procedural code into ALA code. We have used objects, but we did not use object oriented design. The resulting ALA version has these properties:
 
-* No class knows of the existence of state in any other class. If a UML diagram was drawn, it have no association relationships between peer domain abstration classes.
+* No class knows of the existence of state in any other class. If a UML diagram was drawn, it have no association relationships between peer domain abstraction classes.
 
 * Despite the fact that we use objects, the ALA constraints avoid most of the problems of conventional object oriented programming. For example, both the configuration data, and the wiring data stored in an instance can be immutable. Only instances of abstractions that contain state data are mutable, and this is clear from very nature of the abstraction. 
 
@@ -1090,70 +1081,200 @@ It is an advantage of having a state abstraction that you can implement immutabi
 ////
 
 
-=== How ALA fixes object oriented programming
 
-Unconstrained or overdone object oriented programming causes serious issues:
 
-. Data gets associated with code, whether it makes a good abstraction or not. 
 
-. Code ends up 'reaching in' via class associations to get or manipulate data in other classes, creating coupling.
 
-. Multithreading issues like race conditions and deadlocks. 
+=== ALA compared with Object oriented programming
 
-ALA solves these issues by
+Before we compare ALA with object oriented programming, let's first discuss what object oriented programming is.
 
-. Only putting data with code when it makes a good abstraction. Other data goes into 'data' abstractions.
+ It is said that using a struct as the first parameter to the procedures is equivalent to classes with it being only a syntactical difference. I do not agree. Classes have a fundamental advantage over structs and procedures because with structs and procedures, the caller must specify the struct and the procedure both from among all visible in the scope. With classes, the caller specifies primarily the object and then a method from among the methods of that class only. That changes the way we think of objects. Primarily we just think of objects as a single reference - that object then contains its own small number of possible behaviours.
+ 
+ It is also interesting to note a misconception meme around object oriented programming. It is said that OOP = encapsulation + inheritance + polymorphism. Well encapsulation predates objects. Inheritance is now seen as a big mistake. That means that polymorphism in the form of virtual methods are also a mistake. That leaves interface polymorphism, which also predates OOP. The thing that OOP actually brought to the table has nothing to do with encapsulation, inheritance, or polymophism. It was to think about programming as passing messages. The idea is that the object decides the behaviour it will do when it gets a given message. With procedures you are specifying directly what to do. With objects, you are sending it a message and what it does with it is decided by the object. This difference is subtle - it involves only a difference in the way we name procedures or methods. A procedure's name describes what it does. A method's name is a message name describing something that has happened elsewhere. This is a sort of half step toward polymorphism. You don't know what the receiver will do as a reult of getting the message. Full polymorphism is not even knowing what the receiver is. Read about Alan Kay to understand what he meant when he coined the term 'object oriented'. 
 
-. Associations between abstractions are illegal.
+ALA uses this message emphasised view of object oriented programming. In fact in ALA, all messages are sent fully polymorphically. So we have no choice but to think of them as message rather than procedure calls. This is from the point of view of the sender and the receiver. The receiver also does not know where the message comes from. From the point of the code in a higher layer that wires the sender to the receiver, it may or may not be thought of as a message depending on the programming paradigm in use. More generally it is just a compositional idea that gives meaning to the relationship. For example if the instances of abstractions being wired are UI elements, then the meaning of the relationship is one element being laid out inside another on a graphical display.
 
-. Asynchronous dataflow programming paradigms ensure that any given instance of an abstraction only executes on one thread. Where local synchronous communication is used, groups of instances always run on the same thread.
+Brian Will makes an argument that OOP is crap and procedural programming is better on his Youtube channel:
+
+https://www.youtube.com/watch?v=QM1iUe6IofM[https://www.youtube.com/watch?v=QM1iUe6IofM]
+
+I am in agreement with Brian in so far that trying to associate _all_ data with code and all code with data causes inappropriate fragmentation of the code, encourages a model of highly coupled, collaborating agents, and creates dependency hell. 
+
+The idea of encapsulation is only partially realized because objects effectively know about the existence of another object's state and collaborate with that state. They reach into each other's data indirectly. But this can be seen as breaking the half step to polymorphism idea discussed above. It's not how OOP was meant to be done. 
+
+Also, the UML class diagram encourages relationships directly between classes, which should be uncoupled abstractions. It encourages mutable data. And it encourages a horrendous model of agents interacting with each others data in a multithreaded environment. To solve this, Brian advocates a return to procedural programming and provides several examples which demonstrate that procedural programming is better.
+
+Although ALA uses objects, it is not object-oriented in this way. Firstly you don't try to model everything with objects. It uses objects as a language feature, not a design philosophy. Secondly, you can't create associations between classes. So classes literally cannot tell other classes what to do in a similar way to calling a procedure, and they cannot access another class's data. ALA is always fully polymorphic. All messages are sent polymorphically.
+
+
+Objects are used in ALA for the following four reasons. 
+
+. Objects store references to other objects to which they are wired. A form of dependency injection is used to receive the references to the other objects. 
+
+. Domain abstractions, being reusable entities, often need configuring. The object stores its own configuration data passed in the constructor or via setters.
+
+. Some abstractions naturally have state. For example an abstraction that implements a low pass filter for a dataflow needs to keep some kind of historical value or values. It is inherent in the nature of the abstraction that it has state.
+
+. There is usually some state data that doesn't belong with any code. In ALA we often create a special domain abstraction called 'State<T>' that acts as a source or destination for dataflows.
+
+
+==== Dependency injection
+
+The dependency injection pattern was introduced as an attempt to clean up the dependency mess created by OOP. It came too late to make the famous GOF patterns book. The authors wish they had included it instead of singleton. But dependency injection alone does not solve OOPs problems.
+
+Previously we mentioned the use of dependency injection in ALA by using the wiring pattern to wire up instances of abstractions by their ports. The way this dependency injection is done is quite different to container based dependency injection. 
+
+Container based dependency injection works by matching interface types. The interfaces are implemented by one class, and required by another. The matching of this interface type is the implicit wiring of the two classes. There is no place where you can see the wiring explicitly. This is really bad. It is very difficult to trace the flow of a user story through the classes.
+
+Now a class may be substitutable with another class that implements or provides the same interface. That's why there is a container. You instantiate an object of the class you want to wire in, and put it into the container. But this is a far cry from general composability.
+
+In ALA interfaces do not belong to the classes being wired. They are more abstract and represent a compositional concept which we call a programming paradigm. When a domain abstraction uses one of these abstract interfaces, either implementing it or using it, we call it a port. The abstraction has no implicit fixed arrangement with other abstractions. A separate abstraction in a higher layer is needed to specify how instances of abstractions with ports should be composed.
+
+Note that this makes ALA not only fully polymorphic, but, in a way, extremely polymorphic. That's because from the point of view inside an abstraction sending a message out of it port, there is potentially an infinite number of different abstraction types that it could go to. In conventional OOP, it's typically a finite set, usually just a few. A finite set potentially allows the sender to have some implicit knowledge of those receivers.  
+
+Despite the extreme use of polymorphism in ALA, there is none of the usual disadvantage of indirection. Often indirection makes the flow of a program difficult to trace. But in ALA it is way easier to trace through a program. Consider it from two points of view. The first point of view is from inside an abstraction that is sending a message out via an output port. The abstraction doesn't need or want to know where the message goes. That's because along with extreme polymorphism comes zero coupling. You don't need to know anything about the outside world to understand the sending code. The second point of view is outside the abstraction that is sending the message, the view of where it is wired to. Well that's explicit and cohesive wiring to do with a given user story is in one place. You don't have to trace through modules, you just reading normal code in one place in ALA. 
+
+
+
+
+==== Multithreaded programming with mutable state
+
+Some abstractions are about describing change over time. ALA uses mutable state within such abstractions because these are abstractions that naturally contain state.
+
+In functional programming, the way to express change over time is to pass the state into the function that represents the change over time, and the function returns the next state. The problem is it breaks the abstraction. Functional programming overcomes this problem by using monads. Monads can contain state, but are composed by pure functions. This hides the state in the more abstract and well tested monad itself. ALA uses this same principle. Domain abstractions completely hide their contained state in well tested code and are composed by pure functional code.
+
+Monads vs domain abstraction is discussed in detail in chapter six. Here we are concerned with multithreading issues that can occur because we are using instances of domain abstractions that contain state.
+
+We need multithreading strategies or rules to avoid the usual threading issues: race conditions, deadlocks or priority inversions. Unlike with conventional OOP programming, ALA's zero coupling between abstractions makes it easier to put in place these strategies.
+
+(In functional programming, the issues of multithreading are handled by using immutable data. I suspect that systems that only use immutable state also have problems when using multiple threads. For example one thread could be using and inconsistent or outdated copy of the current actual state.)
+
+The strategies I use in ALA do not use locks. Making classes thread-safe with locks is highly problematic because insufficient use of locks results in race conditions, but liberal use of locks results in deadlocks or priority inversions. Successful locking requires detailed knowledge of the specific threading allocations of all objects. So if locks are implemented in the classes themselves it introduces coupling, destroying the abstractions. Locks would need to be implemented by the user story abstractions in the higher layer. That would encumber the user story code execution specific details.
+
+
+
+===== Single threaded strategies
+
+The first strategy in ALA is to use a single thread by default.
+
+Many times in conventional code, multiple threads and stacks are used to solve problems that they should not be used for, such as to implement activity flows where the activities are broken up in time. For example, there may be a built in delay or waiting for I/O. The only valid reasons to use multiple threads and stacks is when one CPU cannot handle the total workload, so work is done on a background thread, or when one or a few high priority threads are needed for low latency response.
+
+If everything runs on a single thread, then mutable data used in good abstractions do not cause problems. Even when using synchronous message passing between the instances of those abstractions, there is no problem. Effectively, this is equivalent to locking the entire system until the each task runs to completion and returns to the main loop.
+
+The second single threaded strategy allows for concurrency. It deals with cases where processing a message synchronously would take a long time. It may have to wait for I/O, for example in communicating over a physical network. It may simply contain a built-in delay. Or it may need to wait for the work to be done on a  different process (processes are like threads that share no memory). In any of these cases, we want to allow the single thread's CPU to do other work during such waits. Sometimes this other work is allowing the sender of the message to continue execution, but it could be any work in any other instances of abstractions where a message is waiting in a queue. 
+
+Implementing concurrency in this way effectively requires a state machine inside the abstraction that allows for the time discontinuities in its execution as states. Often that state machine is best implemented by the compiler using *async* and *await*. Or you can use callback functions, or use task, future or promide objects that can be chained together. 
+
+Even if none of these patterns is available, it is still better to implement a state machine manually than to resort to multiple threads to solve the problem. In fact it can often be advantageous for understanding the system to represent it as a state machine rather than a flow of activities, because then different events can easily transition to any other state. For example, when waiting for a response to a message that has been sent to another, you probably only want to continue on to the next activity if you get a valid response. You will also typically need to handle cases where you get an error response or a timeout, and go to different states for those. Also, a different message could arrive while you are waiting for a response message, such as a cancel message. That would also take you to a different states. This type of state machine does not code elegantly in imperative sequential code running on a dedicated thread. 
+
+The main drawback of explicit state machines is usually in manually transforming loops into state machines, and in handling what would be local variables and parameters whose scope now spans multiple event handling methods. Breaking a method into two methods at a point that is inside a loop involves also transforming the loop into a state machine.
+
+Whether we use *async*/*await*, callbacks, tasks, or manually written state machines, it requires asynchronous messaging. Asynchronous means that a method call can return to the caller before the message is fully processed. This is usually achieved by simply putting the message in a queue to be acted upon later by the main loop of the single thread.
+
+
+
+===== Using push dataflows
+
+In ALA, for the dataflow programming paradigms we usually default to using a push execution model. This makes it easier to wire for either synchronous or asynchronous messages. 
+
+The zero coupled nature of ALA abstractions means that senders often do not need to know when receivers have completed processing a message. Many messages can be purely one way. For example an ADC abstraction can send a message, and it can be wired to a display. The ADC never needs a response. 
+
+The preference to push data is made possible because ALA does not have dependency issues that would normally cause about half of all calls to use pull in conventional code. So all calls can default to push unless there are performance reasons for using pull.
+
+When abstractions don't care if a message is processed before or after the call returns, it means that we can make a late decision on the execution model. The choice is not bound until instances of the abstraction are wired together to make an application. Then we can chose to wire instances of abstractions with either a synchronous or an asynchronous execution model. If synchronous, the wiring connects the sender instance directly to the receiver instance. If asynchronous, the sender is connected to a message queue that queues messages to the receiving instance. How these execution models work is discussed in the next chapter.
+
+Whether an instance is wired to use a synchronous or an asynchronous execution model, the same calling code can be used in the sender. From the point of view of the abstraction, the call only goes as far as its output port. The call can return immediately and asynchronously before the message is processed or it can return synchronously after the message has been processed by the wired receiver. If it returns before, then the sending instance can continue on with its own execution.
+
+
+
+===== Using pull dataflows
+
+As mentioned, in ALA, for the dataflow programming paradigms we usually default to using a push execution model. However, sometimes we want to use a pull dataflow programming paradigm for performance reasons. For example, the source data may change very frequently, but the receivers of the data only need the latest value infrequently. Or the source may be logically passive such as a database. 
+
+When the receiver needs to pull the data, and we need to use asynchronous messaging, and we don't want the sender to have its own dedicated thread, the sender domain abstraction must be written to use asynchronous code style. That is it must send the request message, and then return to the main loop and wait passively for the response.
+
+By far the easiest way to implement asynchronous pull calls is to use *async*/*await*. This allows the domain abstraction to be written to look like synchronous style (except for the addition of *async* and *await* keywords), but it executes asynchronously.
+
+If async/await is not available, then you can use task, future or promise objects. A Bind function on theses object allows you to chain the response handling function so that it looks close to sequential code. This is effectively the monad pattern for asynchronous calling. Monads are explained in detail in chapter six. 
+
+If you can't even use the task monad, such as being restricted to using C with no heap, then the domain abstractions can be written in the style of a state machine. 
+
+Chapter four has an in depth discussion on these execution models together with how abstractions can be written so that their instances can be wired for either synchronous or asynchronous messaging.
+
+
+
+
+
+==== Multiple thread strategies
+
+Sometimes we need to use multiple CPUs for the shear amount of computing load, or we need to react to events faster than the single threaded model will allow. With a single threaded model, the maximum latency for the highest priority task is the time taken to process the longest of all tasks. This will be the longest compute bound task. In these performance cases we use either interrupts or multiple threads.
+
+The ALA strategy is that synchronous message passing may only be used between instances of abstractions allocated to the same thread. Instances that are allocated to different threads must be wired using asynchronous message passing. As described in the previous section for the single threaded case, it is already easy in ALA to  use either synchronous or asynchronous wiring for one way messages without changing the abstractions themselves.
+
+. If one or two high priority threads are added for latency performance reasons, we can use synchronous message passing between all instances allocated to the main thread, and only use asynchronous message passing to the high priority threads. 
+
+. If one or more back-ground threads are used to handle long running CPU bound work, we can use again use synchronous message passing for all instances on the main thread, and asynchronous message passing to the instances on the background threads.
+
+. the majority of instances of abstractions usually run on the main thread. However, there is nothing stopping us from using asynchronous message between these instances as well. This will make the longest running task shorter by only processing within a single abstraction at a time. 
+
+Effectively this strategy is a knowledge dependency on an underlying convention. User stories must know that if they allocate two instances of domain abstractions to different threads, they must be wired using an asynchronous programming paradigm. With knowledge of the underlying convention, domain abstractions can be written without regard to thread safety.
+
+You could argue that this knowledge dependency of user stories adds to the burden of the user stories. User story abstractions should just be about expressing requirements. However the user story is concerned with performance, because performance requirements are requirements too. Therefore, it is valid for user stories to do the allocating of instances to threads. The use of asynchronous message passing between them then follows.    
+
+This is the GALS principle (Globally Asynchronous, locally synchronous) applied to threads.  
+
+
+===== Messages and processes vs threads, mutable data and locks.
+
+Many have suggested that a *messages and processes* execution model is a safer programming model than multithreading with mutable shared data and locks. 
+
+By *process*, we mean a collection of code that all runs on the same thread, do not share memory with other processes, and communicate with asynchronous messages, that is the process has an incoming message queue.) 
+
+In ALA, when you use multiple threads, you use the messages and processes execution model. This model naturally fits with ALA's wiring concept. The alternative of using synchronous messages and locks would have to be managed by the application or user story code in the higher layer of ALA, because only it knows which instances of abstractions run on which threads. This could be done but we really want the application code to be about describing the requirements, not taking care of all necessary locking.    
+
+
 
 
 
 === ALA Compared with functional programming
 
+ALA is, essentially, functional programming. All the top layer code that implements the application itself by wiring up instances of domain abstractions in some combination is pure functional code. Domain abstractions are analogous to monads, but are more versatile than monads. 
+
 
 ==== ALA can be applied to pure functional programming
 
-The fundamental ALA constraints could be applied directly to pure functional programming (not using monads). This would require that the functions be abstractions, and that functions would only call or use functions that are significantly more abstract than themselves.
+The fundamental ALA constraints could be applied directly to pure functional programming (not using monads). This would only require that the functions be good abstractions, and that functions would only call or use functions that are significantly more abstract than themselves.
 
-But the functions would not be great abstractions for two reasons.
+But without monads, some functions would tend to be bad abstractions for two reasons.
 
 1) Functions expose their inputs and outputs to the layer above, but the layer above is not interested in the data itself, only in the abstract concept of what the function does. It just wants to compose the functions with other functions, not deal with the run-time data.
 
-2) Functions, or sets of functions, that naturally associate strongly with some state must have their state passed into and back out of them every time they are used. The layer above needs to handle this state data for the function. If the composing functions are intermediate level, they themselves will need to receive and return the state from high functions.
+2) Functions, or sets of functions, that naturally associate strongly with some state must have their state passed into and back out of them every time they are used. The layer above needs to handle this state data for the function. This is bad for the abstractions, both for the function and for the code in the higher layer.
 +
 Functional programming in one way encourages abstractions by not allowing side effects. However, this also destroys any abstractions that would otherwise be highly coherent with their own state. 
 +
 This problem gets even worse when there are several layers of functions. The middle layer functions end up with extra parameters that don't have anything to do with them, just so they can pass state data through to even lower functions. This makes these intermediate functions not great abstractions in themselves.
 
-Both ALA and monads solve these problems.
+To solve these problems, functional programming uses monads. A full explanation of monads is in chapter six. This explanation is for programmers who are familiar with imperative programming in C#. They are compared in detail with ALA. 
+
+Domain abstractions together with programming paradigms are a more versatile, more powerful but conceptually simpler analogue of monads. Domain abstractions are a more general solution than monads that allows any programming paradigms to be supported, and arbitrary networks of communications between them. The fundamental idea of monads, that of separating execution details, state, and I/O into pretested units that are then composed using pure functional code is the same for ALA.  
 
 
 
-==== ALA uses state
+==== ALA uses state when that makes a good abstraction
 
-The ALA constraints can be used for either object oriented or purely functional programming. Either way, using abstractions that have zero coupling with one another changes how the code is organised for the better.
+The ALA constraints can be used for either object oriented or purely functional programming. Either way, using abstractions that have zero coupling with one another changes how the code is organised.
 
-In pure functional programming, if the data and the functions are good abstractions, then the structure is already ALA compliant. Both the data and the functions are in the domain abstractions layer. Then user story functions in a higher layer passes the data to the functions. 
+In pure functional programming, if the data and the functions are separate good  abstractions, then in ALA we would put both the data and the functions in the domain abstractions layer. Then user story functions in a higher layer would pass the data to the functions. However this handling of data by the higher layer functions, data that they themselves do not use, breaks them as good abstractions. Those top layer functions should only be concerned with composing the right data with the right functions, not handling the data itself. 
 
-However, it is unlikely that pure functions that require state to be passed into them are also good abstractions. An example would be an averaging filter for a stream of data. Passing the running average to the function every timer there is new input data breaks an otherwise good abstraction. There are many situations when insistence on referential transparency makes a computation more awkward and less precise, and it is this loss of abstraction that causes this.
+Also, sometimes pure functions that require state to be passed into them are not good abstractions. An example would be an averaging filter for a stream of data. Passing the running average to the function every time there is new input data breaks an otherwise good abstraction. There are many situations when referential transparency breaks abstractions whose very nature is to describe change over time.
 
- In fairness pure functional prgramming uses monads to partially solve this problem. ALA is actually somewhat analogous to monads. Monads are a mechanism that allow the creation of abstractions that can be wired together, similar to domain abstractions. Indeed ALA user stories that wire instances of domain abstractions use pure functional code. A full explanation of monads for programmers who know nothing about them, but are familiar with imperative programming in C# is in chapter six. They are compared in detail with ALA. Essentially domain abstractions together with programming paradigms are a more versatile, powerful but conceptually simpler analog of monads.  
+ALA prioritizes abstraction over referential transparency. Each approach is just a method to achieve analysability. Referential transparency attempts to improve analysability by always removing time from the analysis, even when time is a fundamental aspect of what is being described. It will expose implementation details if necessary to do it. In contrast, abstractions attempt to improve analysability by providing a simple learnable, zero-coupled concept, which in turn hides its implementation details completely.
 
-ALA prioritizes abstraction over referential transparency as its method to achieve analysability. This sometimes results in pure functions and more often results in objects with mutable state. When using objects though, ALA's big difference from conventional object oriented programming is that the classes must be much better abstractions (because they can have no associations with one another).
+Many systems or subsystems are inherently state machines - they are driven by events and need to change their behaviour according to their history. Programs for such systems ultimately have mutable state. Functional programming tends to separate that state out causing design-time coupling between functions and this state data.
 
-The use of state in conventional object oriented programming is considered a problem for two reasons. 
-
-. Class methods lack the advantages of referential transparency. Referential transparency essentially works by removing time as factor when analysing or understanding a section of code.
-
-. At runtime, methods called on different threads can cause issues such as race conditions, deadlocks, and priority inversions.
-
-For the first problem, instead of removing time as an internal mechanic of the way classes work, ALA removes all coupling with other classes. So the class is locally analysable even if it contains state. This allows many computational problems that naturally involve time or ordered operations to be expressed in a straightforward way, without descending into the quagmire conventional unrestrained imperative programming.   
-
-Many systems or subsystems are inherently state machines anyway - they are driven by events and need to change their behaviour according to their history. Programs for such systems ultimately have mutable state. Functional programming tends to separate that state out causing a lot of design-time coupling between functons and their data. Object oriented programming on the other hand tends to encapsulate it with methods too much, causing a lot of coupling with other classes that indirectly use the data. ALA solves both these problems. 
-
-State is a fundamental aspect of _computation_. I define a 'computation' as some state and a function:
+State is a fundamental aspect of a _computation_. I define a 'computation' as some state and a function:
 
  input + state --> state + output. 
 
@@ -1165,82 +1286,56 @@ We can associate the state in two ways:
 
 The first form is the pure functional form. The second form is the object oriented form.
 
-In ALA we can use either form depending on where the abstractions are. When there is some state that is used by multiple user stories, then it would be put in its own abstraction. For example, a blackboard pattern or a game score could be an abstraction itself. This abstraction could then be wired by user story abstractions in a higher layer to various abstractions implemented as pure functions.
+In ALA we can use either form depending on where the abstractions are. When there is some state that is used by multiple user stories, then it would be put in its own abstraction. For example, a blackboard pattern or a game score could be an abstraction in itself. This abstraction could then be wired by user story abstractions in a higher layer to various abstractions implemented as pure functions.
 
-In ALA we choose between these two philosophies on a case by case basis. When it makes sense to put state with methods as a class, and that makes a good abstraction, then there is no resulting coupling of that state with other classes. On the other hand, when it makes sense to keep state separate, we can put it in its own separate abstraction (usually as a class with simple accessor methods). Either way, what you then must not do is create direct associations between these classes. That will break them as abstractions. Instead, top layer user stories wire up insteances of those classes using ports.
+In ALA we choose between these two philosophies on a case by case basis. When it makes sense to put state with methods as a class, and that makes a good abstraction, then there is no resulting coupling of that state with other classes. On the other hand, when it makes sense to keep state separate, we can put it in its own separate abstraction (in a class with ports). Either way, what you must not do is create direct associations between these classes. That will break them as abstractions. Instead, top layer user stories wire up instances of those classes by their ports.
 
 In other words, the problem with object oriented programming is not that objects contain state per-se. It is that most classes are not good abstractions of a computation. We allow other objects to 'reach' into them or couple with them at design-time. They know there is state there, even if that 'reaching in' is via methods. This coupling is what makes conventional programs with state so hard to reason about.  
 
-In summary, ALA enforces abstraction instead of referential transparency.
+In summary, ALA works by preferring abstraction over referential transparency.
 
-===== Multithreaded programming with state
 
-The second problem with object oriented programming is multi-threaded environments. 
-This is true even if we are using abstractions. That's because multi-threaded issues happen at run-time and abstractions only deal with design-time coupling. At rn-time, instances of abstractions communicate in ALA just as much as they do in conventional object oriented programs. The abstractions themselves may not know anything about each other, but their instances are wired to communicate.
 
-If the programming paradigms used for the wiring use asynchronous method calls, there is not problem with multi-threading. But if the programming paradigms used for the wiring use synchronous method calls, there will be issues such as race conditions, deadlocks or priority inversions.
-
-Effectively this is a dependency of all domain abstractions on an understanding that if synchronous method calling is used in the programming paradigm, two instances should not be wired if they run on different threads. 
-
-This is fine under the ALA constraints. Domain abstractions that contain state have a knowledge dependency that programming paradigms that use synchronous must be used only for instances that run on one thread. The user stories in the layer above similarly have this knowledge dependency. With this knowledge dependency, domain abstractions can be written without regard to thread safety, and user stories must be written only use synchronous programming paradigms for wiring instances of domain abstractions that run on the same thread. 
-
-You could argue that this knowledge used in the user stories is a violation of ALA in that the user story, as an abstraction expressing a requirement, should not also have to be concerned with this knowledge. This is a valid criticism.  
-
-From the point of view of the domain abstractions, you can write them so that they can be used for either asynchronous or synchronous. A port that uses a programming paradigm that is asynchronous can be used either asynchronously or synchronously. The user story can configure whether the programming paradigm instance uses synchronous or asynchronous at design time. User stories can then follow the GALS principle (Globally Asynchronous, locally synchronous) applied to threads.  
-
-Writing domain abstractions to use asynchronous programming paradigms is more difficult than ones that use synchronous programming paradigms. The difficulty comes when the port is used with an outgoing method call that returns a value. Such programming paradigms might be simple pull style data transfers, request/response type, or perhaps programming paradigms that return an error. 
-
-Using push style programming paradigms by default for data transfers mitigates this problem in most cases. That's why in ALA I recommend push style or reactive programming by default.
-
-But when something must be returned, and we want to use an asynchronous port, this forces the domain abstraction to be a state machine. By far the easiest way to do this is to use async/await. This allows the domain abstraction to be written in the synchronous style, save for the addition of *async* and *await* keywords everywhere in the code. The compiler turns the code into the required state machine. 
-
-If async/await is not available, but tasks or future objects are available, then you can use a bind function to chain the task objects. This will allow you to chain operations using dot syntax, which is just as elegant as a chain of synchronous calls. This is effectivly a monad. Monads are fully explained in chapter six. 
-
-If you can't even use the task monad, then the domain abstractions must be written in the style of a state machine. 
-
-Turning an outgoing port method call into a state machine means moving all the code that is after the method call into a separate call back function. Any local variables in the containing method become state that persists until the callback function is called. Writing code in this way can be straight-forward or awkward. If it's awkward, at least it is confined to the internals of an abstraction. 
-
-Remember all this is only necessary when you want to write domain abstractions whose instances can be wired to run on different threads (or over a network). 
 
 
 
 ==== ALA compared with monads
 
-In chapter six the first section explains monads for people familar with imperative programming. Here we just give a comparison of ALA and monads, assuming prior familiarity with monads. We will show how ALA does a similar job to monads, but in a more powerful, more versatile and more straight-forward way. 
+In chapter six, there is an explanation of monads in terms of concrete code for people familiar with imperative programming. Here we assuming prior familiarity with monads in comparing them with ALA. ALA includes the power of monads, but in a more powerful, more flexible and more straight-forward way that can be applied to all parts of the code. 
 
-When we use the term _monad library_ in this section, we are referring to a whole library based on monads. For the most common monad, the monad based on IEnumerable, this library consists of the familiar functions such as Select, Where and Order found in LINQ.  
+When we use the term _monad library_ in this section, we are referring to a whole library based on monads. For the most common monad, which is the monad based on the IEnumerable interface, this library consists of the familiar functions such as Select, Where and Order found in LINQ.  
 
-Strictly speaking the monad itself only has the Bind function (which is *SelectMany* in the case of the IEnumerable monad), not all the other map and reduce functions you find in the library as well. 
+Strictly speaking, the monad itself only includes the Bind function (which is *SelectMany* in the case of the IEnumerable monad), not all the other map and reduce type functions you find in the library as well. A monad actually has three components, A Type<T> that it works on such as IEmuerable<T>, the bind function, and a function to convert a T to the Type<T>.
 
 
-===== Monads compose functions, ALA composes objects
+===== ALA and Monads are both about composition, but of objects vs functions
 
-The fundamental difference between ALA and monads is that ALA composes objects whereas monads compose functions. Monads often use objects under the covers, but in the application code you are composing functions.
+ALA and monads are both about composition, the fundamental mental tool of sound software writing. The difference between ALA and monads is that ALA composes objects whereas monads compose functions. Monads often _use_ objects under the covers, but in the application code in the higher layer you are composing functions. ALA embraces the composition of more powerful and flexible objects. 
 
 With a monad library, your application code can combine functions in two different ways.
 
-. Compose more generic functions that essentially compose lambda functions. These more generic functions include Bind (SelectMany), Map (Select), Reduce (Aggregate), Filter (Where), Join, and GroupBy. Each takes a lambda function. The application code is composing both the generic functions and the specific lambda functions that are passed to them.
+. Compose generic functions that are passed lambda functions. These more generic functions include Bind (SelectMany), Map (Select), Reduce (Aggregate), Filter (Where), Join, and GroupBy. Each takes a lambda function. The application code is composing the generic functions and confguring them with specific lambda functions.
 
-. Compose more specific functions such as Repeat, Cast, Sum, First, Concat, Order. These functions generally work by themselves without also composing other functions passed to them. 
+. Compose more specific functions such as Repeat, Cast, Sum, First, Concat, Order. These functions generally work by themselves without also configuring them with lambda functions passed to them. 
 
-Whether we consider the more generic functions, the specific functions, or the lambda functions, most all the functions just have two 'ports', an input and an output. The input is the first parameter and the output is the return value. (Some functions such as Join, Zip, Concat, take two inputs.) ALA's domain abstractions, on the other hand, can have many ports for their inputs and outputs. These ports can use different programming paradigms, not just a specific data flow such as IEnumerable. This makes ALA abstractions more general. 
+Whether we consider the more generic functions, the lambda functions, or the more specific functions, most all the functions just have two 'ports', an input and an output. The input is the first parameter and the output is the return value. (Some functions such as Join, Zip, Concat, take two inputs.) ALA's domain abstractions, on the other hand, can have many ports for their inputs and outputs. Furthermore, these ports can use different programming paradigms, not just a specific data flow such as IEnumerable. Composing objects with ports is therefore a much more general tool for composition. It allows us to describe an entire application with composition, not just the piecemeal dataflow parts of it.  
 
-Furthermore, most of the monad library functions are designed to work with finite sequences. Sum, for example, requires the input sequence to complete. ALA ports can, and often are just a stream of data for the lifetime of the application. When data is in batches, such as from a file or database query, the ports use programming paradigms that handle batches of data. Such a programming paradigm is a stream of sequences (see IObserverPush in chapter six for an example). The ports remain wired for the lifetime of the application. For monad libraries, the composed expression is usually rewired for each use (although an IEnumerable can be saved in a variable and then reused). This is especially true for the reactive extensions, in which most functions stop working once OnCompleted or OnError occurs.
+Most of the monad library functions are designed to work with finite sequences. (That's why the IEnumerator interface has a Reset() method and the IObserver interface has an OnCompleted method.) Sum, for example, logically requires the input sequence to have a beginning and an end. A data stream can also be an infinite or continuous stream that flows forever like a river, but that is kind of a special case. It just never uses the Reset() method or the OnCompleted() method. The monad chain is usually used once per execution of the surrounding code. To be used again the code around it executes again, recreating the monad structure, and immediately running it again once. This is especially true of the monads based on IObservable because they generally stop working as soon as OnCompleted or OnError occurs. Subscribe() must be used to rewire and restart the monad chain execution again.     
 
-So the mental model of how monad libraries and ALA domain abstractions are composed is different. Monad library expressions are a declarative version of a finite loop such as a forloop. It builds an object structure for lazy execution. But these expressions are wired in isolation and then executed within the context of conventional imperative code.
+In ALA, things are static (or declarative) on a larger scale than just a single line of monad code. In fact the entire application is wired up once at the beginning when the application starts executing, and then all ports are considered infinite steams that work as long as the application is running. To get a finite sequence, you design a port that is an infinite stream of finite sequences.
 
-In ALA, on the other hand, the entire user story is built declaratively because the ports use programming paradigms that declaratively support everything needed to express a user story. The entire object structure representing the user story, indeed the entire application, is wired once, and then set running for the lifetime of the application.
+So the mental model of how ALA domain abstractions and monad libraries work is different. In ALA, the application code builds an entire application that is set then set running. With monads, this is done only on the scale of a single monad chain.  
 
-Having said that, WPF (Windows Presentation Foundation) provides a declarative way to build the UI. So when WPF is used with bindings to LINQ expressions, more of the user story can be expressed declaratively. ALA just makes the idea of declarative programming generalized to the point where you always build the entire application declaratively.
+Having said that, WPF (Windows Presentation Foundation) provides a declarative way to build the UI in addition to the dataflows. When WPF is used with bindings to LINQ expressions, much of a user story can be expressed declaratively. ALA just takes this declarative viewpoint to its logical completion and allows you to build the entire application. You can make any port types you like that go beyond just UI composition and dataflow composition.
 
-To use an analogy, ALA's domain abstractions are somewhat analogous to wiring integrated circuits in electronics. Like domain abstractions, integrated circuits can have multiple ports (pins) of different types to suit what the overall abstraction of the part. Monad libraries are more like discrete electronic components such as resistors and capacitors, components that just support analog data with a single input and output.   
+To use an analogy, ALA's domain abstractions are somewhat analogous to wiring integrated circuits in electronics. Like domain abstractions, integrated circuits can have multiple ports (pins) of different types to suit the overall abstraction of the part. A part might have analogue, boolean and I2C protocol ports for example. ALA domain abstractions are like these parts. Monad libraries are more like discrete electronic components such as resistors and capacitors, components that just support one type with a single input and output.   
 
 
 ===== Monad versus ALA syntax
 
-In ALA application layer code, you are wiring up instances of abstractions that have multiple ports in an arbitrary network (that expresses a whole cohesive user story).
+In ALA application layer code, you are wiring up instances of _abstractions_ in an _arbitrary network_ to expresses an _entire, cohesive_ user story. In contrast, in monad library application layer code, you are generally chaining _functions_, and only wiring up a _linear chain_ for the _dataflow part_ of a user story.
 
-In monad library application layer code, you are generally chaining functions, and only wiring up a dataflow. So the monad library code can look more succinct for the specific part that involves the chain of functions:
+Because the monad syntax is designed for a linear chain of functions, the syntax using monads can be more succinct for linear parts of the network:
 
 monad version
 [source,C#]
@@ -1255,53 +1350,53 @@ ALA version
 source.WireIn(new Filter(x => x>=0)).WireIn(new Select(x => x+1)
 ....
 
-However, we wouldn't normally create ALA domain abstractions to do the same job as monads if we already have a monad library. Instead, we would use the monads, and their more direct syntax to configure an ALA domain abstraction. Chapter six has full details of how to this.
+However, we wouldn't normally create ALA domain abstractions to do the same jobs as monads if we already have a monad library. Instead, we would create a domain abstraction as an adapter with ALA ports. Into this adapter we can simply plug in a monad chain. Chapter six has details of how to this.
 
-More generally, in ALA the usual pattern is to explicitly instantiate the domain abstractions using _new_ and then explicitly wire their ports using _WireTo_ or _WireIn_. We could create extension methods to combine these two operations, but we prefer to keep it explicit because conceptually we are wiring up a network like wiring up components of a schematic diagram. Extension methods that wire abstraction directly using dot syntax are only elegant for building linear chains.
+In ALA the usual pattern is to explicitly instantiate domain abstractions using _new_ and then explicitly wire their ports using _WireTo_ or _WireIn_. We could create extension methods to combine these two operations, but we prefer to keep it explicit because conceptually we are wiring up instances into a network analogous to wiring up components of a schematic diagram. A user story generally requires a network to express, not a linear chain of operators.
 
-If the application code is generated from a diagram, it doesn't make any difference, but if you are hand writing the wiring code, the ALA syntax is longer. But it's more obvious what is happening.
+In ALA, we could write extension methods that would instantiate a specific domain abstraction and wire to the previous one using dot syntax all in one go. If the application code is generated from a diagram, it doesn't make any difference. If you are hand writing the wiring code, these extension methods might be worthwhile for very common cases. Chapter six has examples of how to do this.
 
-Monad library code usually builds large object structures full of delegate objects, closure objects and other 'under the covers' objects. This 'under the covers' structure makes monads difficult to understand, trace and debug, compared to ALA object structures. 
-
-
-===== Deferred Monads vs wiring classes with ports
-
-Monad Bind functions can call the composed function immediately to return an actual value, or they can return an object that can be used later to get the value. For example, monad library functions that return an IEnumerable or IObservable are the deferred form. They can also work using either pull or push. It is the deferred/push form of monads that most closely compares with ALA, so that's the type of monad we will concentrate on in this section. 
-
-The deferred versions of monads are more difficult to understand in terms of equivalent imperative code because relatively simple expressions create large object structures containing delegates, closure, or other objects under the covers. You can't really see any of them.  This also makes them difficult to debug. Example diagrams of these structures are shown in Chapter six.
-
-ALA is easier to understand because it uses plain objects. You instantiate and wire up these objects yourself. 
-
-The only thing that is peculiar to ALA over conventional objected oriented programming is that the ALA objects must use _ports_. You are not allowed to make a class have an association with another peer class. You are not even allowed to make an association with a same layer interface.  
-
-Ports can be thought of as dependency injection with two constraints.
-
-. The interfaces must be significantly more abstract. These interfaces are called programming paradigms because they give meaning to the wiring.  
-
-. The dependency injection wiring must be explicit. It must be specified in code in a cohesive user story abstraction in a higher layer. The wiring cannot be done by using a dependency injection container or relying on matching interfaces. Because port interfaces are more abstract and can be used by many disparate classes, there is an infinite number of ways that objects could be wired together.
-
-Another difference about ALA dependency injection is that I like to use reflection and implement a single WireTo extension method for wiring every type of port. That way I don't need constructor injection or setter injection methods for every port of every domain abstraction class. 
-
-That's pretty much all there is to understanding the wiring of ALA classes.
+Monad library code usually builds large object structures full of delegate objects, closure objects and other objects 'under the covers'. This 'under the covers' structure makes monads difficult to understand, trace and debug. ALA also creates object structures, but it's done explicitly with wiring code, so it's a lot easier to understand, trace and debug what is happening. 
 
 
+===== Deferred push monads vs classes with push ports
+
+Monads use the _Bind()_ function to combine functions. The Bind() function can work in two different ways. It can either call the functions immediately, evaluating the result as it goes along the chain, or it can wire up little closure objects containing the function and return a structure of objects which can then be evaluated later. I call this second types a deferred monad. For example, a monad based on the List type is an immediate type of monad, whereas a monad based on IEnumerable is a deferred type of monad. Most monads are defferred monads.
+
+Deferred monads can work using either pull or push. The Bind function will return the end object in the chain for the pull form, so you can call it to pull the result out. The Bind function will return the first object in the chain for the push form, so you can give it a value and it will be pushed along the chain.  
+
+A monad based on IEnumerable is a pull type. A monad based IObservable is a push form (except that IObservable is a bit weird - the bind function returns the last object and you subscribe to it, which propagates down the chain to the source which causes the source to start pushing.) See chapter six for code implementation examples of pull and push monads.
+
+In ALA we prefer dataflow ports to work using push. Monads of the deferred push type are therefore what most closely compares with ALA. So that's the type of monad we will concentrate on in this section - monads based on IObservable. 
+
+The deferred versions of monads are more difficult to understand in terms of equivalent imperative code because relatively simple expressions create large object structures containing delegates, closures, and other implicit objects under the covers. You can't really see any of them. I have reverse engineered them to diagrams to show how they work in detail in Chapter six. ALA is easier to understand because it just uses plain explicit objects that you instantiate and wire up. 
+
+There is only one thing that is peculiar to ALA compared with conventional objected oriented programming. But it's so significant a change that it completely changes how you do object oriented programming. That is that the ALA objects must use _ports_. Ports must be wired by something external to the class higher up. In other words you are not allowed to make a class have an association with another peer class. You are not even allowed to make an association with an interface _belonging_ to a peer class. (Peer means in the same ALA layer.)  
+
+Ports can also be thought of as just conventional dependency injection, but with two additional constraints.
+
+. The interface that the port uses must be significantly more abstract. It can't be an interface that belongs to another peer class.
+
+. The dependency injection wiring must be explicit. It must be specified in cohesive user story abstraction in a higher layer. The wiring cannot be done by using a dependency injection container or relying on matching interfaces. Because port interfaces are more abstract and can be used by many disparate classes, there is an infinite number of ways that objects could be wired together using their ports.
+
+Another difference about ALA dependency injection is that I like to use reflection and implement a single WireTo extension method for wiring every port. That way I don't need constructor injection or setter injection methods for every port of every domain abstraction class. 
 
 
 ==== Why prefer deferred/push monads?
 
-We mentioned that deferred/push monads are closest to ALA. For the case of IObservable, these are the reactive extensions library. Deferred/push monads have two useful properties.
+Deferred/push monads, as described above, are closest to the preferred ALA dataflow programming paradigm. Deferred/push monads have two useful properties.
 
-. The first property comes from being deferred. Often people write a deferred query using monads, and then immediately run the query. The deferred nature of the monads is not really utilized because the query is used immediately. Usually it needs to be run immediately because even though the query itself is a declarative description of a dataflow, it is used in an imperative context.
+. The first property comes from being deferred. Usually people write a deferred query using monads, and then immediately run the query. The deferred nature of the monads is not really utilized because the query is used immediately. Usually it needs to be run immediately because even though the query itself is a declarative description of a dataflow, it is used in a local imperative code context.
 +
-Now imagine constructing a deferred query, and then wiring it into still more declarative code that describes the entire user story. It is the deferred property of the query code that allows us to build the query along with the UI, the schema, the business logic, etc, all declaratively. Once the whole program is built, it can be set running. 
+In ALA we describe the entire program declaratively first, so everything has to be deferred. Once the whole program is built, it can be set running. 
 +
-Building a query from deferred monads once with SelectMany, Select etc, and then reusing it many times as the program runs means that the monads must be designed to be used more than once. The monads based on IEnumerable are fine in this respect because it has a Reset method that can be used to re-run the IEnumerable. However monads based on the IObservable interface are not designed to be able to run more than once. Once that OnCompleted or OnError method is called, the object structure wont run ever again. It has to be reconstructed by re-running the SelectMany and Selects, which will re-run the Subscribe method calls. I think this design in reactive extension is rather limiting. You can have so called 'hot' observables, but that just means they never call OnCompleted or OnError.
+Since the program is built once, and then set running, queries built with SelectMany, Select etc, must be designed to be used more than once. The monads based on IEnumerable are fine in this respect because it has a Reset method that can be used to re-run the IEnumerable. However monads based on the IObservable interface are not designed to be able to run more than once. Once that OnCompleted or OnError method is called, the object structure wont run ever again. It has to be reconstructed by re-running the Subscribe method calls. I think this design in reactive extensions is rather limiting and even weird. You can have so called 'hot' observables, but that just means they never call OnCompleted or OnError.
 +
-So when I use IObservable monads as part of a user story, I need rebuild the query in imperative code each time it is used. With ALA domain abstractons, I can build the query once and wire it into the rest of the user story that also uses declarative code.
+So when I use IObservable monads as part of a user story, I need to rebuild the query in imperative code each time it is used. With ALA domain abstractions, on the other hand, I can build the user story once and just set it running forever.
 
-. The other advantage of deferred/push monads is the fact that they use push. In ALA we design dataflow or event programming paradigms to use push by default, and only use pull if there is some good reason to use pull.
+. The other advantage of _deferred/push_ monads is the fact that they use _push_. In ALA we design dataflow or event programming paradigms to use _push_ by default, and only use _pull_ if there is some good reason to use pull.
 +
-The difference is that push can be either synchronous or asynchronous, whereas pull can only be synchronous (unless you use future objects.)
+The reason to prefer _push_ is that push can be either synchronous or asynchronous, whereas _pull_ can only be synchronous (unless you use future objects.) Push works when the wiring of instances of domain abstractions will go over a physical network for example. 
 
 
 ////
@@ -1311,7 +1406,7 @@ Sometimes I will add an additional method going in the opposite direction to the
 
 You may think it would be better to use IEnumerable instead, but there is an advantage to using IObservable even when the destination needs to request the data. And that is that the IObserver interface can execute asynchronously. Since the domain abstractions themselves do not always know when they will be used in situations that need asynchronous communications, it is a great advantage to use push style programming paradigms which can do either synchronous or asynchronous, especially when there may be a lot of data to be transferred. It allows the data to be sent in batches. (IEnumerable can be made to work asynchronously as well, but it a lot more complicated as it involves futures.) 
 
-The method used by the destination to request a data transfer goes in the opposite direction from the interface that actually carries the data. We could implement it as a C# event in that interface. This would mean that we have one interface, and it is wired in the direction of the dataflow. When using this 'request' programming paradigm, it seems more natural to wire in the direction of the request rather than in the direction of the dataflow. Therefore, I use a second interface, which is analogous to the IObservable interface. This new interface has the request method, and is the one we use for wiring. The first time a request is made, the method send the requesting object, which allows the source object to wire the interface that goes in teh opposite direction. 
+The method used by the destination to request a data transfer goes in the opposite direction from the interface that actually carries the data. We could implement it as a C# event in that interface. This would mean that we have one interface, and it is wired in the direction of the dataflow. When using this 'request' programming paradigm, it seems more natural to wire in the direction of the request rather than in the direction of the dataflow. Therefore, I use a second interface, which is analogous to the IObservable interface. This new interface has the request method, and is the one we use for wiring. The first time a request is made, the method send the requesting object, which allows the source object to wire the interface that goes in the opposite direction. 
 
 In ALA, because we can create programming paradigms and design the interface for them, it is easy to implement all the aforementioned extra methods and the interface.
 ////

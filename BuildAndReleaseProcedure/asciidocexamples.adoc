@@ -1,3 +1,18 @@
+JRS Notes
+
+To get a blank line
+
+{empty} +s
+
+
+Highlighted box of text
+
+****
+Boxed text
+****
+
+
+
 The Article Title
 =================
 Author's Name <authors@email.address>

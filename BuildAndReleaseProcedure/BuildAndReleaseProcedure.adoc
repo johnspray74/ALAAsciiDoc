@@ -5,7 +5,7 @@
 * Change the Last Updated date in the ascii source file
 . In AsciiDocFX, Output the HTML file as index.html, replacing the existing one (Click HTML at top of right pane)
 . Put the code snippets in GoogleTagManagerSnippets.txt just inside the head and at the end of the body sections. (includes icon code) using notepad++
-. check in the ALA (AsciiDoc) project (to Github) by right clicking on the folder and selecting "Commit to Master"
+. check in the ALA (AsciiDoc) project (to Github) by right clicking on the folder and selecting 'Git commit -> "Master"'
 . Tick any new images
 . Note that the web site only uses the file index.html, the images in the \images folder, and the documents in the linkedDocuments folder. All other files being checked in are source files.
 . Wait for the website to be "published" takes a minute or so?
