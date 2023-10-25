@@ -15,26 +15,32 @@ In this chapter we look at each of these good and bad patterns or styles in deta
 
 === What are monads?
 
-In chapter 3, we did a brief comparison of ALA and monads in which we assumed prior familiarity with monads. In this section we assume no familiarity with monads. So we start by explaining what monads are. 
+In chapter 3, we did a brief comparison of ALA and monads in which we assumed prior familiarity with monads. In this section we assume no familiarity with monads. So we start by explaining what monads are.
+
+This section is necessarily long. Monads are notoriously one of the most difficult concept to understand in all of software engineering. But we will do it with tiny steps and a few examples built on real code. 
 
 ****
 Often abstract concepts in programming are explained in terms of how they are syntactical sugar for a longer form of conventional imperative code. For example, lambda expressions can be explained as syntactical sugar for passing in a named function. This is hard to do for monads because there is code generated under the hood. So most explanations of monads do not attempt to explain them in terms of equivalent imperative code. They go for either an abstract mathematical explanation or some kind of abstract concept such as 'amplified' types or 'boxed' types instead. I personally don't find these types of explanations all that helpful. They only make sense once you already understand monads. Many developers are not so much mathematicians, but understand imperative, object oriented code just fine. My explanation is based on showing how monads are a refactoring pattern of ordinary imperative code.
 ****
 
-We'll do four examples of imperative code along with the refactored code that we call monads. We will develop the refactoring in a several steps and point out advantages over the imperative code along the way.
+We'll do four examples of imperative code along with the refactored code that we call monads. Only by doing multiple examples will we get the underlying pattern of what monads are.
 
-Often in imperative programming we find ourselves calling several functions in succession. What we are really doing is 'composing' functions. We would like to do this composing declaratively. By declaratively we mean that we would like to choose what functions and in what order, but not be concerned with any other details beyond that. It allows us to think of the code as data flowing sequentially from operation to operation instead of imperative execution of statements. 
+We will start by doing the refactoring from conventional code to monads in several small steps. At each step we will point out the advantages over the imperative code.
 
-In imperative style, top layer code that calls functions needs to handle data for the functions. For example, data returned by one function is often passed to the next. This often involves creating local variables to hold data temporarily. When we _compose_ functions we want the output of one to be piped to the input of the next automatically without us having to do it explicitly. Looked at in a different way, the functions' interfaces for input/output (the parameter and the return value) are exposed to the top layer when they don't need to be. We would rather think of this input and output as separate interfaces or ports. When the top layer composes two functions, these ports are connected so that data is passed directly from one function to the next.
+So let's get started.
 
-We can achieve that using code like this:
+Often in imperative programming we find ourselves calling several functions in succession. What we are really doing is 'composing' functions. We would like to do this composing declaratively. By declaratively we mean that we would like to choose what functions and in what order, but not be concerned with any other details beyond that. It would allow us to think of the code as data flowing sequentially from operation to operation instead of imperative execution of statements. 
+
+In imperative style, top layer code that calls functions needs to handle data for the functions. For example, data returned by one function is often passed to the next. This often involves creating local variables to hold data temporarily. When we _compose_ functions we want the output of one to be piped to the input of the next automatically without us having to do it explicitly. Looked at it in a different way, the functions' interfaces for input/output (the parameter and the return value) are exposed to the top layer when they don't need to be. We would rather think of this input and output as separate interfaces or ports. When the top layer composes two functions, these ports are connected so that data is passed directly from one function to the next.
+
+We can of curse achieve that using code like this:
 
 [source,C#]
 ....
 int result = function3(function2(function1(42)));
 ....
 
-(In our sample code, we will use the number 42 as the input into the first function.)
+(In our sample code, we will use the number 42 as the input into the first function. That way we will be able to see where the source value being fed into the chain of functions is.)
 
 
 ////
@@ -76,7 +82,7 @@ int result = function3(r2);
 
 This form has the aforementioned disadvantage of handling the data that passes from function to function. Furthermore, those temporary local variables make the entire scope more complicated because anywhere in the scope can potentially use any variable. The variable can be immutable, but that doesn't help much. Nevertheless, this is representative of the basic style that a lot of imperative code follows.
 
-Let's try to get to a style where we don't need to handle that data ourselves and we don't have nested brackets. Let's try using a function called 'Compose' to compose the functions:
+Let's try to get to a style where we don't need to handle that data ourselves, and we don't have nested brackets. Let's try using a function called 'Compose' to compose the functions:
 
 [source,C#]
 ....
@@ -93,7 +99,7 @@ So now we can compose the functions like this:
 int result = Compose(Compose(Compose(42, function1), function2), function3);
 ....
 
-Well there doesn't seem like there is any advantage to that. We got our nested brackets back, plus it looks even more complicated than our original bracketed code. But let's persevere just a little longer with the idea of using a 'Compose' function, because its about to become really powerful.
+Well there doesn't seem like there is any advantage to that. We got our nested brackets back, plus it looks even more complicated than our original bracketed code. But let's persevere just a little longer with the idea of using a 'Compose' function, because it's about to become really powerful.
 
 First let's make the Compose function an extension method by adding a _this_ keyword:
 
@@ -119,10 +125,11 @@ int result = 42
     .Compose(function3);
 ....
 
-This syntax is called fluent syntax. Fluent syntax is our first advantage of using a Compose function. We just solved the nested brackets problem, so the chain of functions is now scalable - we can easily add more functions to the chain. And, notice how the code using Compose is pure functional code. That's because we got rid of all those local variables. That Compose function is starting to look useful.
+This syntax is called fluent syntax. Fluent syntax is our first advantage of using a Compose function. We just solved the nested brackets problem, so the chain of functions is now scalable - we can easily add more functions to the chain. And, notice how the code using Compose is pure functional code. That's because we got rid of all those local variables. The Compose function is starting to look useful.
 
-The code is now a declarative dataflow programming paradigm instead of an imperative programming paradigm. We are just specifying what functions we want to compose in what order instead of imperatively calling them ourselves, and passing the data between them ourselves. It describes a flow of data rather than a flow of execution. This is our second advantage of using a Compose function.
+The code is now a declarative dataflow programming paradigm instead of an imperative programming paradigm. We are just specifying what functions we want to compose in what order instead of imperatively calling them ourselves, and passing the data between them ourselves. It describes a flow of data rather than a flow of execution. You make think you know how this executes, but be careful, because you don't know how Compose does the execution. And you will soon see that it can handle the execution in a variety of ways. 
 
+This is our second advantage of using a Compose function - it's a pure dataflow programming paradigm where we are not concerned with how it executes.
 
 The Compose function takes a function pointer (delegate in C#) as its parameter. If the functions being composed are specific to the application, i.e only ever used once, we can make them anonymous and put the function's code directly into the Compose call:
 
@@ -155,9 +162,9 @@ You can see that although this last form is just a refactoring of the original i
 
 ==== Deferred execution
 
-In the example so far, we assume that the Compose function directly and immediately calls the functions. When we compose the functions as a dataflow in the top layer, we assume that under the covers in the Compose function, the execution flow will be the same as the dataflow.
+In the example so far, we assumed, based on the imperative code, that the Compose function directly and immediately calls the functions. When we compose the functions as a dataflow in the top layer, we assume that under the covers in the Compose function, the execution flow will be the same as the dataflow.
 
-However, it is quite possible for the execution flow implemented in the compose function to work entirely differently from the dataflow. We can, for example, implement deferred execution, where the Compose function builds an executable structure which can be run later. Or we can have the execution be asynchronous. This separation of how it executes from the declarative composition of the functions as a dataflow is our forth advantage of using a Compose function.
+However, it is quite possible for the execution flow implemented in the compose function to work entirely differently from the dataflow. We can, for example, implement deferred execution, where the Compose function builds an executable structure which can be run later. This separation of how it executes from the declarative composition of the functions as a dataflow is our forth advantage of using a Compose function. It allows us to build Compose functions that use deferred execution.
 
 The Compose function we had in the previous section evaluated the functions immediately and returned a result directly. Let's write a deferred (or lazy) version of _Compose_. Instead of returning the actual result, this version will return a new function that represents the composed functions. This returned function can then be called later. Here is a deferred version of the Compose function:
 
@@ -173,9 +180,9 @@ static class ExtensionMethods
 }
 ....
 
-It's the same as our previous Compose function except for the type of the first parameter and the return type.
+It's the same as our previous Compose function except for the type of the first parameter and the return type. In the immediate execution version, the type of the first parameter to compose was an int, which comes from the execution of the previous function in the chain. And the return value was also an int. Now these two things are functions because we are not evaluating the functions as we go, we are composing the functions to return a new single function.
 
-The _() =>_ syntax is a lambda expression for a function that takes no parameters. It the source function and then calls _f_. 
+The _() =>_ syntax is a lambda expression for a function that takes no parameters. It creates a new function that calls the source function and then calls _f_. 
 
 What the Compose function returns is actually an object structure made up of delegates and closure objects created by the compiler:
 
@@ -200,7 +207,7 @@ Func<int> composedFunction = 42.ToFunc<int>
     .Compose(x => x*10+1);
 ....
 
-That's just the same as out previous top layer code, except that we show how we can get a function back which we can save to be executed later. It's like we got a small program back.
+That's just the same as our previous top layer code, except that we show how we can get a function back which we can save to be executed later. It's like we got a small program back.
 
 When we want to execute the combined function, we can do it like this.
 
@@ -219,23 +226,23 @@ image::ThreeComposedFunctionsClosureDiagram.drawio.png[ThreeComposedFunctionsClo
 
 You can click on the diagram to see it enlarged. On the left side of the diagram you can see the four closure objects that implement the 42 and the three lambda expressions. Each of these closure objects has a delegate object that is used to reference it. Then there are three other closure objects that were created by the Compose function. These closures call the other closures via their delegates in the correct order. The entire structure is returned as a single delegate on the right hand side.
 
-Deferred execution is our fifth advantage of using a compose function.
-
-There is one more advantage to using a Compose function. This advantage is big, and is what allows us to finally call it a monad. 
+There is a fifth advantage to using a Compose function. This advantage is big, and is what allows us to finally call it a monad. 
 
 
 ==== Composing functions that need logic between them
 
 In imperative code we might typically need some extra code after every function call. A common example would be to check for errors returned by one function before calling the next function. If we have a compose function, we can put that extra code inside the Compose function instead. This refactoring is essentially what the monad pattern is.
 
-We'll give four examples of imperative code that needs some extra common logic after every function call. In each case, the functions we are composing are not returning a simple value that can be fed directly to the next function. They are returning a variety of different things, so in every case we need a little bit of extra logic to handle what the function returns before calling the next function.
+We'll give four examples of imperative code that needs some extra common logic after every function call. In each case, the functions we are composing are not returning a simple value that can be fed directly to the next function. They are returning something else, so in every case we need a little bit of extra logic to handle what the function returns before calling the next function.
+
+It's what this extra logic code does that distinguishes one monad from another.
 
 
 ==== Example 1
 
 Composition of functions that can fail.
 
-In this first example, we may need to allow for the fact that functions can throw an exception, or return null, or a Maybe object or even -1. For example the function may contain a divide by zero. In imperative code, we would commonly have to add if statements or try statements so that we don't call the rest of the functions in the chain when something goes wrong. 
+In this first example, we may need to allow for the fact that functions can throw an exception, or return null, or a Maybe object or even -1. For example, the function may be vulnerable to a divide by zero. In imperative code, we would commonly have to add if statements or try statements so that we don't call the rest of the functions in the chain when something goes wrong. That will likely create nesting, arrrgh.
 
 In C code, returning -1 is often used for this purpose, so let's use that for our first example just because it's so simple. Here is the imperative code:
 
@@ -263,7 +270,7 @@ Note that, even though we are using intermediate variables, we got our nasty nes
 
 ===== The MinusOne monad
 
-We simply factor out the if statements into the Compose function (which we renamed to Bind):
+We simply factor out the if statements into the Compose function. When we create actual monads, we will name the composing function "Bind" instead of "Compose":
 
 
 Application layer code
@@ -275,7 +282,7 @@ int result = 42
     .Bind(x = x*10+1);
 ....
 
-Note that this looks almost identical to the way we composed these functions previously. That's because our aim in the top layer is to just compose the functions.
+Note that this looks almost identical to the way we composed these functions previously. That's because our aim in the top layer is to just compose the functions, and nothing else.
 
 One difference is that we have renamed Compose to Bind. That's because Bind is the common name used for the Compose function in the monad world.
 
@@ -300,11 +307,11 @@ You can see that if any function in the chain returns -1, the rest of the functi
 
 That's a pretty straightforward refactoring, and with it we have our first example of a monad. 
 
-Note that this Bind function does immediate execution. we will do a deferred version soon.
+Note that this Bind function does immediate execution. We will do the deferred version soon.
 
 (Most of the code snippets in this section are demonstrated by small executable projects on Github here: https://github.com/johnspray74[https://github.com/johnspray74]. The project names are MaybeMonad, IEnumerableMonad, and ContinuationMonad.)
 
-To really 'get' monads, all we need is more examples of this type of refactoring:
+To really 'get' monads, all we need is more examples of this type of refactoring.
 
 
 
@@ -312,7 +319,7 @@ To really 'get' monads, all we need is more examples of this type of refactoring
 
 Composition of functions that return many values.
 
-We may have functions that return many values, such as an array, a list, an IEnumerable or an IObservable. We then want to feed all the individual values into the next function, and then recombine the results. In imperative code, we do this with nested _for_ statements. For example, the function may be given customers one at a time and returns a list of their orders, which we want to join back into a single list of orders.
+We may have functions that return many values, such as an array, a list, an IEnumerable or an IObservable. We then want to feed all the individual values into the next function, which will in turn return multiple values, and then recombine all the values nto a single array or list. In imperative code, we do this with nested _for_ statements. For example, the function may be given customers one at a time and returns a list of their orders, which we want to join back into a single list of orders.
 
 
 [source,C#]
@@ -335,11 +342,11 @@ foreach(result1 in results1)
 List<int> result = combinedList1;
 ....
 
-Again note the extra levels of brackets and indenting for every foreach. 
+Again note the nested levels of brackets and indenting for every foreach. 
 
 ===== The List monad
 
-We simply factor out the code for the foreachs into the Bind function:
+We simply factor out the code for the foreachs into a new Bind function:
 
 
 Application layer code
@@ -395,9 +402,9 @@ Often when dealing with lists, we do a one-to-one operation on the values in a l
 
 Or, we do a many-to-one operation which aggregates the values in a list down to a single value. An example is a Sum operation.
 
-Methods to do one-to-one and many-to-one operations are usually supplied along with the monad.
+Methods to do one-to-one and many-to-one operations are usually supplied in a library along with the actual monad.
 
-The list monad itself just includes of the one-to-many operation. Each value in the input becomes a list. So we then we have a list of lists, which is then flattened to a single list. This operation is called Bind, flatmap or, in C#, SelectMany. 
+The list monad itself just includes the one-to-many operation. Each value in the input becomes a list. So we then have a list of lists, which is then flattened to a single list. This operation is called Bind or flatmap in functional programming, or SelectMany in C#.
 
 Sometimes the term 'monads' is loosely, and incorrectly used to refer to the whole set of one-to-many, one-to-one and many-to-one composing functions such as Select, Map, and Aggregate.  
 ****
@@ -409,9 +416,15 @@ Once again, the Bind function we gave above is the immediate version. We will so
 
 Composition of asynchronous functions.
 
-The functions that we want to compose may contain delays, or they may wait for input or output, or they may wait for processing occurring on a different thread or processor. Such functions, instead of returning the result, take a callback function, or they return a Task or future object. For our purposes here, a Task or future object are the same thing. They are an object that will have a result placed into it at a later time.
+The functions that we want to compose may contain delays, or they may wait for input or output, or they may wait for processing occurring on a different thread or processor. In other words, the functions may be asynchronous - they will return a result later, not immediately. 
 
-If the composed functions take callbacks, the common code between function calls needs to pass in a callback function, which gets called when the function calls the callback at a later time. Here is the imperative version of the application layer code using lambda functions for the callback functions: 
+Because these type of function don't return a value immediately, we can't write an immediate execution monad. But we can still write a defered execution monad - a BInd function that will combine asynchronous functions, and return an asynchronous function. 
+
+There are different estanblished ways to implement asynchronous functions. The oldest is the callback. The function receives a callback function as an extra parameter. When the result is ready later, the callback function will be called to pass back the result. 
+
+More recently, asynchronous functions are implemented by returning a Task or future object. For our purposes here, a Task or future object are the same thing. They are an object that will have a result placed into it at a later time.
+
+Here is the imperative version of the application layer code that composes functions that use callbacks. The common logic between the functions, function1, function2, and WriteLine is to create a callback function to be passed to the next, which is done using lambda functions: 
 
 
 
@@ -432,7 +445,7 @@ static void ComposedFunction()
 ....
 
 
-If the compose functions return a future object, the common code between function calls needs to install a continuation function into the future object: Here is the imperative version of the application layer code: 
+Here is the imperative version of the application layer code that composes functions that return future objects. The common logic between the functions is to put a continuation function into the future object that was returned by the previous function: 
 
 
 [source,C#]
@@ -451,7 +464,7 @@ static void ComposedFunction()
 }
 ....
 
-In either case, notice the nasty indenting for every function we want to chain. In this case we could eliminate the indenting by using Unwrap() like this:
+In either case, notice the nasty indenting for every function we want to compose. In this case we could eliminate the indenting by using Unwrap() like this:
 
 [source,C#]
 ....
@@ -471,7 +484,7 @@ But I want to show how monads simplify this even further.
 
 (Note that both versions require lambda expressions (for example, the lambda expression starting with 'task1 =>" ). In the first implementation above, the lambda expression is an Action. In the second implementation the lambda expression is a function. So they are two different overloads of ContinueWith. In the second implementation, the lambda function returns the type returned by the function, which is a Task<T>. So ContinueWith returns Task<Task<T>>. The Unwrap discards the outer Task.) 
 
-Of course, async/await also simplifies this particular example, but I still want to show how monads can do it. 
+Of course, async/await also simplifies this particular example, but I want to show how monads can do it first. 
 
 ===== The Task monad
 
@@ -480,7 +493,7 @@ Of course, async/await also simplifies this particular example, but I still want
 We did the imperative code that called the functions one after the other earlier in this section. You may remember that we attached a continuation action to Task objects returned by each function. In the first imperative version, each continuation had another level of nesting, and in the second version, an Unwrap was required. Also, if you look at the version on Github, the ContinueWith requires an additional parameter to cause everything to run on one thread.
 ////
 
-For the Task monad, we simply factor out the ContinueWith logic into the Bind function:
+For the Task monad, we simply factor out the ContinueWith logic into the Bind function. We can then use the Bind function like this in our top layer application code:
 
 
 [source,C#]
@@ -494,9 +507,10 @@ Task<int> CombinedFunction =
     .Bind(function3);
 ....
 
-The value that Bind takes and returns is Task<T>. The starting value has to be converted to a Task<T> first, which is the purpose of the ToTask extension method.
+The value that Bind takes and returns is Task<T>. So the starting value, 42, has to be converted to a Task<T> first before it can be passed to the first Bind. That's the purpose of the ToTask extension method.
 
-There is a way of using the compiler to cheat to implement the Bind function:
+
+Now let's write the Bind function for the Task<T> monad. There is a way of using the compiler to cheat to implement the Bind function:
 
 
 [source,C#]
@@ -515,6 +529,7 @@ The async/await feature is indeed powerful, but our purpose is to see how Bind i
 public static Task<U> Bind<T, U>(this Task<T> source, Func<T, Task<U>> function)
 {
     var tcs = new TaskCompletionSource<U>();
+    
     source.ContinueWith(
         (t) => function(t.Result).ContinueWith(
             (t) => tcs.SetResult(t.Result)
@@ -526,7 +541,7 @@ public static Task<U> Bind<T, U>(this Task<T> source, Func<T, Task<U>> function)
 
 The Bind function is passed a Task<T> that will contain the input in the future. It immediately creates a new Task<U> to return. It actually creates a TaskCompletionSource object, which contains a Task. The TaskCompletionSource object just provides a method for putting the value into the Task when it is ready later. A closure object is created for the first lambda expression and a delegate object is created to call that. The ContinueWith attaches this delegate to the source Task<T> as a (callback) Action. The Task<> that is returned by ContinueWith is discarded.
 
-When the source Task<T> produces a result, the first lambda expression will run. When it does, it receives the Task<T> and passes the result from it to the function. The function immediately returns a Task<U> (a different Task<U> from the one created earlier). That Task<U> is attached to a second continuation lambda expression. When the Task<U> produces a result, the second lambda is called. It puts the result into the result Task via the TaskCompletionSource object.
+This is how the code works at runtime. When the source Task<T> produces a result, the first lambda expression will run. When it does, it receives the Task<T>, extracts the actual result from it, and passes it to the function. The function immediately returns a Task<U> (a different Task<U> from the one created earlier). When the Task<U> produces a result, the second lambda is called. It extracts the actual result from the Task<U> and puts it into the original Task<U> via the TaskCompletionSource object.
 
 The Bind function can also be written using Unwrap, which eliminates the need for the TaskCompletionSource:
 
@@ -538,7 +553,7 @@ public static Task<U> Bind<T, U>(this Task<T> source, Func<T, Task<U>> function)
 }
 ....
 
-When the lambda expression runs, it returns the Task<U> that is returned by the function, so the ContinueWith itself returns a Task<Task<U>>. The Unwrap discards the outer Task<>.
+When the lambda expression runs, it returns the Task<U> that is returned by the function, so the ContinueWith itself returns a Task<Task<U>>. The Unwrap discards the outer Task<>, leaving the Task<U> that is returned by the Bind function.
 
 The async/await version generally runs everything on the same thread by default, which is great, but this is not the case for the ContinueWith version unfortunately. The example code on Github 
 https://github.com/johnspray74/ContinuationMonad[https://github.com/johnspray74/ContinuationMonad]
@@ -546,7 +561,7 @@ shows a console application that passes a TaskScheduler.FromCurrentSynchronizati
 
 The functions that can be composed using this Bind function must return synchronously with a Task object, but can take as long as they want to put a value into the Task. In the examples below, we will use one function with a delay, and one that does I/O. Another case is a function that will do CPU bound work on another thread.
 
-Here are two example functions we can use to compose applications:
+For completeness, here are two example functions we can use to compose applications. These two function could be used in the application code that we did earlier:
 
 [source,C#]
 ....
@@ -570,12 +585,20 @@ private static Task<int> function2(int x)
 ....
 
 
+The Task<T> monad was pretty heavy. We had to cover it because it's one of the most important and most useful monads. But don't worry if you didn't get all the details of how those implementations of the Bind functions worked. The important point that we could write a Bind function that allowed us to compose asynchronous functions, functions that return a future rather than an immediate return value.
+
+Now for our forth example, let's do something much ligher. 
+
 
 ==== Example 4
 
-Composition of functions that return angles. 
+Let's compose functions that return angles. 
 
-There can be many other examples of functions that return values that can't directly be passed to the next function, so need some glue logic in-between. In fact we can do almost anything we like between the function calls as long as we are always doing the same thing. Let's do one more example just to show that we can do something fairly arbitrary. Let's say we always want to do modulo 360 arithmetic. And let's throw in a rotation counter as well:
+The three examples of monads that we did so far, the MinusOne monad, the List monad, and the Task monad are common monads in the industry. (Well, not the MinusOne monad, I made that one up, but the industry version of that is the Maybe monad, which we shall switch to when we look at deferred versions.) 
+
+For our last example, I wanted to do something custom, just to show that you really can create a monad to handle any type of intermediate logic you want between the functions you are composing. As long as we are always doing the same logic between all functions we compose, we can refactor that common logic into a Bind function.
+
+Let's say we always want to do modulo 360 arithmetic. And let's throw in a total rotations counter as well, which we want to pass through the chain. Here is some imperative code:
 
 [source,C#]
 ....
@@ -595,11 +618,10 @@ result3 = result3 mod 360;
 
 ===== The Mod360 monad
 
-Composition of functions that return angles. 
 
-This is not strictly speaking a monad because the function doesn't return the same type as the Bind function uses for its input and output. That's because in this case the function didn't need to know anything about the rotations. However it still shows how the monad pattern can refactor arbitrary common code between composed functions.
+This is not strictly speaking a monad because the function doesn't return the chaining interface type. That's because in this case the function didn't need to know anything about the rotations. However it still shows how the monad pattern can refactor arbitrary common code between composed functions.
 
-Here is top layer code to compose functions that return degrees. The second value in the Tuple is the number of rotations, which we initialize to 0.
+Here is top layer application code to compose some functions handle angles. The second value in the Tuple is the number of rotations, which we initialize to 0.
 
 
 Application layer code
@@ -628,7 +650,7 @@ public static Tuple<int,int> Bind<T, U>(this Tuple<int,int> source, Func<int, in
 ....
 
 
-This time Bind takes a Tuple and returns a Tuple. The Tuple contains the angle between 0 and 359 and the rotations. Bind will do the mod 360 on the result returned by the function, and add any rotations. It returns a new Tuple with those two values in it.
+This time Bind takes a Tuple and returns a Tuple. The Tuple contains the angle between 0 and 359 and the rotations. Bind will do the mod 360 on the result returned by the function, and add any whole rotations. It returns a new Tuple with those two values in it.
 
 Note that it was easy to get the starting 42 value into the Tuple needed by the Bind function by simply using 'new Tuple(42,0)'. So in this case we didn't need something like a ToTuple extension method.
 
@@ -637,32 +659,36 @@ Note that it was easy to get the starting 42 value into the Tuple needed by the 
 
 In all 4 of the above examples, the refactoring follows a pattern, which I will call the monad pattern. 
 
-In each case, we were able to create a compose function (called Bind) that just composes the three functions in a declarative way. In each case we were able to refactor any common logic between function calls into the Bind function. 
+In each case, we were able to create a compose function (called Bind) that just composes functions in a declarative way. In each case we were able to refactor any common logic needed in the imperative code between function calls into the Bind function. That's pretty much what we are about with monads, composing functions using a Bind function and putting any common logic that is needed between each function into the Bind function as well. It is that common logic that distiguishes different types of monads.
 
-The Compose function is usually called _Bind_, but can go by other names such as =\=>. If the monad is the list monad or IEnumerable monad, it can be called flatmap or SelectMany. The most common mand you will come across is the IEnumerable monad, but many other types of monads are possible.
+The Compose function is often called _Bind_, but can go by other names such as the symbol =\=>. If the monad is the list monad or IEnumerable monad, it can be called flatmap or SelectMany. The most common monad you will come across is the IEnumerable monad, but many other types of monads are possible.
 
-A monad consists of three elements:
+More formerly, a monad consists of three elements:
 
 . a Bind function  
 
-. a type that the Bind function takes as its first parameter and returns. This type is often an interface, or something we can think of as an interface in a general sense. We will refer to it as the chaining interface from now on. The chaining interfaces for the four monads we have done so far were int, List, Task and Tuple<int,int>. But often the type will be an actual interface as we will see soon. 
+. a type that the Bind function takes as its first parameter and returns. This type is often an interface, or something we can think of as an interface in a general sense. We will refer to it as the chaining interface from now on. The chaining interfaces for the four monads we have done so far were int, List, Task and Tuple<int,int>. But often the type will be an actual interface such as IEnumerable as we will see soon. 
 +
-Because Bind takes and returns the chaining interface, Bind calls can be chained with dot operators. That's why I cal it the chaining interface.
+Because Bind both takes and returns the chaining interface, Bind calls can be chained with dot operators. That's why I call it the chaining interface.
 +
-The chaining interface is used in a third place in the monad pattern. It is the return type for the functions that can be composed. Although both the functions and Bind return the same type of interface, Bind doesn't necessarily return the object that is returned by the function. 
+The chaining interface is used in a third place in the monad pattern. It is the return type for the functions that can be composed. Although both the functions and Bind return the same type of interface, The object returned by the composed function is necessarily the one that is returned by Bind.
 
-. a function to use at the start of a chain of bind functions to convert an ordinary value like 42 to the chaining interface type so that we can apply the first Bind function to it.  In monad land, this function is sometimes called _unit_ or _return_. For the four monads we have done so far we didn't need a unit function except for the Task monad, for which we created a ToTask extension method as the unit function. However in the upcoming monad examples, we will generally need such an extension method.
+. a function to use at the start of a chain of bind functions to convert an ordinary value like 42 to the chaining interface type so that we can pass it to the very first Bind.  In monad land, this function is sometimes called _unit_ or _return_. For the four example monads we have done, we didn't need a unit function except for the Task monad, for which we created a ToTask extension method as the unit function. However in the upcoming deferred monads, we will generally need such an extension method.
 
-Let's now do some more variations of the monads of our four examples from above:
+
+To see how monads compare with ALA, we now want to do deferred versions of our 4 examples. Actually the Task<T> monad is already deferred, so we will just do the other three examples. 
+
+
+For the minus_one example, we are going to switch to the IMaybe monad first, because that's the generally used solution to composing functions that may return no value. Skip this if you are already familiar with the IMaybe concept, unless you are interested to see how the IMaybe monad and its Bind function works. 
 
 
 ==== IMaybe monad
 
 Composition of functions that can fail by returning IMaybe<T> or Nullable<T>.
 
-Using minus one, as we did earlier to represent a 'no value', is not used outside the C world, and limits the data itself to positive integers. The more general solution in the monad world is the IMaybe<T> monad. It's called IMaybe because maybe it contains a value or maybe it doesn't.
+Using minus one, as we did earlier to represent a 'no value', is not used outside the C world, and limits the data itself to positive integers. The more general solution in the monad world is the IMaybe<T> monad. It's called IMaybe because maybe it contains a value, or maybe it doesn't.
 
-The IMaybe version of Bind is similar to the -1 version. However Bind takes an IMaybe interface and returns an IMaybe interface, and the functions that we compose together also return an IMaybe interface.
+The IMaybe version of Bind is similar to the -1 version. However the chaining  interface is IMaybe<T>. Bind takes an IMaybe interface and returns an IMaybe interface, and the functions that we compose together also return an IMaybe interface.
 
 We will have two classes that implement IMaybe. They are called Something and Nothing.
 
@@ -721,7 +747,7 @@ public class Something<T> : IMaybe<T>
 ....
 
 
-The Bind function uses its input IMaybe<T> to see if there is a value present or not. If there is nothing it doesn't call the function. It just returns a new IMaybe<U> implemented by a Nothing object. If there is a value, it gets the value and passes it to the function. Then Bind returns the IMaybe returned by the function.
+The Bind function uses its input IMaybe<T> to see if there is a value present or not. If there is nothing it doesn't call the function. It just returns a new IMaybe<U> implemented by a Nothing object. If there is a value, it gets the value and passes it to the function. Then Bind returns the IMaybe returned by the function. Here is the ToMaybe and Bind functions:
 
 
 Monad layer code
@@ -742,29 +768,41 @@ static class ExtensionMethods
 }
 ....
 
-For the IMaybe monad, the monad consists of the IMaybe interface, and the Bind and ToMaybe methods.
-
 
 ==== Deferred monad versions
 
-All the monads we have done so far, except for the Task monad, were immediate or eager versions of the monads. The Bind function calls the composed functions itself and evaluates the result immediately. We want deferred versions of all these monads because they are more versatile.
 
-If the monad is a deferred or lazy type, the value returned by the monad chain is an object structure that you can use later to get the value. You might do things like the following to force the execution of the object structure to get the actual value out (given a deferred monad object structure called _getresult_). 
+All the monads we have done so far (except for the Task monad), were immediate or eager versions of the monads. This means that the Bind function calls the composed functions itself and passes the results(s) to the next function. We did the immediate versions because they are so simple.
 
+However, we want to do deferred versions of all these monads because they are more versatile, and they create an object structure that is returned for later execution. We want to compare this object structure with the way ALA also creates an object structure composed of domain abstractions.
+
+With deferred monads, we can do either pull versions or push versions.
+
+For the pull version, we keep a reference to the last object in the structure. We call a method in that object when we want the result. That call pulls the data through the chain of objects. For the push version, we will keep a reference to the first object in the chain. When we want a result we will tell the first object to start, and the result will pop out of the other end.
+
+In ALA, we generally default to programming paradigms that use pushing. To compare monads with ALA, we will therefore want to understand the push variations of the monads. However, pull monads are more common in the monad world. So we will do both. It gets pretty interesting to see the differences between the two in terms of how everything works in the code. 
+
+
+The implemtation code for each of the deferred versions will obviously be a little more complicated than the immediate versions of these monads. It will involve using objects to build a structure that can be returned for deferred execution. However, for completeness, I have not shied away from including all the code for the three monad examples. I have done this for both pull and push versions. It's not necessary to read or understand all the code. But when you want to know exactly how something works, at least the code is there along with notes to explain it. I also include object diagrams explaining the object structure that is created beneath the covers by the Bind code.  
+
+
+==== Forcing execution of a deferred monad
+
+Once you have written top layer application code for composing functions using a deferred monad, you may be wondering how you would execute the returned structure of objects to get he actual value. Well, given an object, s, that was returned by the monad expression, here are examples of the ways of forcing it to execute for various types of common monads: 
 
 [source,C#]
 ....
-r = getresult(); if (r!=-1) { use r }        // -1 monad
-r = getresult(); if (r.hasValue) { use r.value } // maybe monad
-getresult.ToList()                           // IEnumerable
-foreach (var value in getresult) {...}       // IEnumerable
-getresult.Subscribe((x)=>{....})             // IObservable
-getresult.Result                             // task (blocks)
-await getresult                              // task (doesn't block)
-r = getresult(); use r.Item0, use r.Item1    // tuple
+if (s.HasValue) { use s.Value }      // maybe monad, calling HasValue causes eveluation
+s.ToList()                           // IEnumerable
+foreach (var value in s) {...}       // IEnumerable
+s.Subscribe((x)=>{....})             // IObservable (push version of IEnumerable)
+s.Result                             // Task (blocking version)
+await s                              // Task (non blocking version)
+use r.Item0, use r.Item1             // tuple. Accessing either Item cause evaluation
 ....
 
 
+////
 ==== MinusOne monad (deferred, pull version)
 
 Composition of functions that can fail by returning -1.
@@ -788,7 +826,7 @@ This code is the same as we had previously for the immediate version except for 
 
 
 
-Here are the ToMinusOne and Bind functions: 
+Here are the ToMinusOne and Bind functions for the deffered version of this monad: 
 
 Pull version
 [source,C#]
@@ -814,7 +852,7 @@ namespace Monad.MinusOne
 }
 ....
 
-You can see that the Bind function, instead of evaluating a reult, returns a lambad function that can be used later to eveluate the result.
+You can see that the Bind function, instead of evaluating a reult, returns a lamba function that can be used later to evaluate the result.
 
 The lambda function is turned into a closure object by the compiler. The returned object structure for the top layer code looks like the diagram below.
 
@@ -831,7 +869,7 @@ With deferred monads, we can do either pull versions or push versions.
 
 In ALA, we generally default to programming paradigms that use pushing. To compare monads with ALA, we will therefore show push variations of the monads.  
 
-For the pull version, we keep a reference to the last object in the structure. We call a function in that object when we want the result. That call pulls the data through the chain of objects.
+For the pull version, we keep a reference to the last object in the structure. We call a function in that object when we want the result. That call pulls the data through the chain of objects. For the push version, we will keep a reference to the first object in the chain so we can push values into it.
 
 Here is the application code for the push version. 
 
@@ -846,7 +884,7 @@ IMinusOneObservable<int> result = 42.ToMinusOne()
 }
 ....
 
-This code is the same as we had previously, and even the same as the immediate version except for the use of the ToMinuseOne method. However the chaining interface, the interface that Bind takes and returns is different. The chaining interface is IMinusOneObservable. Here it is:
+This code is the same as we had previously, and even the same as the immediate version except for the use of the ToMinuseOne method. However the chaining interface is different. The chaining interface is IMinusOneObservable. Here it is:
 
 [source,C#]
 ....
@@ -978,29 +1016,28 @@ You can start to see the ALA pattern to this structure. It is instantiating obje
 All the deferred monads we do from now on have this same structure. The push ones will be wired in the direction of dataflow, left to right, like this one is. The pull ones will be wired in the opposite direction of the dataflow, right to left. As I said, we were just lucky that the deferred pull version of the MinusOne monad that we did above was able to be implemented with compiler gnerated closure classes because the monad type was Func<int> instead of a real interface. We will always need an explicit class from now on. 
 
 Next well do a deferred pull monad that uses a real interface<T>, the IMaybe<T> monad.
-
+////
 
 
 ==== IMaybe monad (deferred, pull version)
 
-Composition of functions that can fail by returning IMaybe<T> or Nullable<T>.
 
-We will do both deferred pull and push variations so that we can properly understand the nuances of each.
+We will write a deferred version of Bind that composes functions that can fail by returning IMaybe<T> or Nullable<T>. It is deferred, so it returns an object that  implements IMaybe in a way that will evaluate the result when the Value is required.
 
 Here is top layer code to use the deferred/pull implementation of the maybe monad.
 
 
 [source,C#]
 ....
-IMaybe<double> combinedFunction = 42.ToMaybe()
+IMaybe<double> objectStructure = 42.ToMaybe()
     .Bind(x => new MaybeSomething<int>(x+1))
     .Bind(x => x==0 ? new MaybeNothing<double>() : new MaybeSomething<double>((double)1/x) )
     .Bind(x => new MaybeSomething<int>(x*10+1));
 ....
 
-It looks the same as the immediate version. But it returns an IMaybe that's implements a large object structure instead of returning one of the two concrete IMaybe value objects. 
+It looks the same as the immediate version. But it returns an IMaybe that's implemented by a large object structure instead of returning one of the two concrete IMaybe value objects. 
 
-First we define the IMaybe interface, which is the same as for the immediate version above. The MaybeNothing and MaybeSomething classes are also the same as before.
+First we define the IMaybe interface, which is the same as for the immediate version above. The MaybeNothing and MaybeSomething classes are also the same as before. Here they are again.
 
 
 [source,C#]
@@ -1031,8 +1068,7 @@ First we define the IMaybe interface, which is the same as for the immediate ver
 ....
 
 
-The Bind function is different as it must build a structure that can be run later. It instantiates a class that implements IMaybe, which will do all the work at runtime.
-
+The Bind function is different as it must build a structure that can be run later. 
 [source,C#]
 ....
 namespace Monad.MaybeDeferredPull
@@ -1049,15 +1085,22 @@ namespace Monad.MaybeDeferredPull
             return new Maybe<T, U>(source, function);
         }
     }
+....
+
+As you can see, Bind simply instantiates new class called "Maybe" that implements IMaybe, which will do all the work at runtime.
 
 
 
+[source,C#]
+....
+namespace Monad.MaybeDeferredPull
+{
     class Maybe<T, U> : IMaybe<U>
     {
         // implement the constructor, which receives the Action function
         private Func<T, IMaybe<U>> function;
         private IMaybe<T> source;
-        private IMaybe<U> result;
+        private IMaybe<U> result; // null if we haven't evaluated yet
 
         public Maybe(IMaybe<T> source, Func<T, IMaybe<U>> function) { this.source = source; this.function = function; }
 
@@ -1096,7 +1139,7 @@ namespace Monad.MaybeDeferredPull
 
 The code that runs later in the Maybe class is the HasValue and Value getters. They do all the work. 
 
-Bind creates objects of the class Maybe and chains them together. This diagram shows the resulting structure from our little bit of application code:
+This diagram shows the resulting structure from our little bit of application code above:
 
 
 image::MaybeDeferredPullMonadDiagram.drawio.png[MaybeDeferredPullMonadDiagram.drawio.png, title=Object diagram of expression using deferred/pull version of IMaybe monad, link=images/MaybeDeferredPullMonadDiagram.drawio.png]
@@ -1107,9 +1150,9 @@ Because this is a pull implementation of the monad, the references go in the opp
 
 ==== IMaybe monad (deferred, push version)
 
-Composition of functions that can fail by outputting IMaybe<T> or Nullable<T>.
+Having done the deferred pull version, we will now do the deferred push version, which has an interesting analogy with the IObservable.
 
-Now the push version of the deferred IMaybe monad. Here is the top layer code, which in this case returns a IMaybeObservable.
+Here is the top layer code, which in this case returns a IMaybeObservable.
 
 [source,C#]
 ....
@@ -1121,7 +1164,7 @@ IMaybeObservable<int> result = 42.ToMaybe()
 
 I've purposely left the lambda expressions out for now. Well get back to them in a minute.
 
-Just as we did for the MinusOne monad, we need two interfaces, IMaybeObservable<T> that Bind takes and returns, and IMaybeObserver for doing the actual pushing of data at runtime.
+For the push version we need two interfaces. One, which we will call _IMaybeObservable<T>_, is the chaining interface that Bind takes and returns. The other, which we will call _IMaybeObserver_ is for doing the actual pushing of data at runtime. The two interfaces work in opposite directions. That is _IMaybeObservable<T>_ is always implemented by the previous object in the chain . _IMaybeObserver_ is always implemented by the next object in the chain. 
 
 Here are the two interfaces:
 
@@ -1143,38 +1186,51 @@ Here are the two interfaces:
     }
 ....
 
-The Bind function uses the IMaybeObservable to wire the IMaybeObserver interface in the opposite direction.
 
-Normally with monads, the type that the composable functions return would be the chaining interface, the interface that Bind takes and returns. So that would be IMaybeObservable in this case. IMaybeObservable would certainly work, but the functions would be a little complicated. They would have to create an object implementing the IMaybeObservable interface to return. It would be simpler if the functions were passed an IMaybeObserver directly instead of returning an IMaybeIObservable. If we did that, instead of the form: 
+That _IMaybeObservable<T>_ implementation may at first seem a little strange. It has no way of getting the value out. That's because we are implementing a push style monad. The _IMaybeObservable<T>_ interface is used by Bind only to get a reference to the previous object in the chain. It then gives the previous object a reference to it's next object, which the previous object will use to push the data.  
+This second reference will use an interface called _IMaybeObserver_. And yes, these two interfaces are exactly analogous to the IObservable and IObserver interfaces in reactive extensions.
+
+_IMaybeObservable<T>_ is _used_ by the next object in the chain.
+
+The _IMaybeObserver_ interface is used by the pervious object. (We could have chosen to use C# style events (observer pattern) instead of using _IMaybeObserver_, but it's easier to do it exactly the same way as IObservable and IObserver). 
+
+Note that the _IMaybeObserver_ interface's methods are actions. They don't pull a value like in the pull version we did of this monad, they push. I am tempted to rename them PushValue and PushNoValue to make this obvious everywhere that Value and NoValue are used.
+
+Normally with monads, the type that the composable functions return would be the same as the chaining interface. So all functions that are composable by this monad should return IMaybeObservable, like this type:
 
  Func<T, IMaybeObservable<U>>
- 
-the functions would have the form
+
+Having all your functions return an IMaybeObservable would certainly work, but the functions would be a little complicated. They would all have to create an object that implements the IMaybeObservable interface to return. It would be far simpler if the functions were passed an IMaybeObserver instead of returning an IMaybeIObservable. So they would have this form:
 
  Action<T, IMaybeObserver<U>>
  
-Now when the functions run, they don't need to create an object, they just directly push the result out via the IMaybeObserver<U>> interface. So that's what we will do.
+Now when the functions run, they don't need to create an object, they just directly push the result out via the IMaybeObserver<U>> interface that was passed to them. So that's what we will do in our example. It's a more loose interpretation of the definition of monad, but it's just more sensible to do it that way.
 
 Note that the IMaybeObserver interface (listed above) could have been written with a single method like this:
 
  void Push(IMaybe<T> data)
 
-However, to make it easier for functions to use the interface (not have to create a Something or Nothing object), I have changed the interface to be two methods:
+However, to make it as easy as possible for the composable functions to use the interface (not have to create a Something or Nothing object), I have changed the interface to be two methods:
 
  void NoValue();
  void Value(T value);
 
-So now we can write the application layer code with the actual lambda expressions:
+So now we can write the application layer code using simple lambda expression syntax:
 
 [source,C#]
 ....
-IMaybeObservable<double> combinedFunction = 42.ToMaybe()
+IMaybeObservable<double> combinedFunction = 42.ToMaybe();
+    combinedFunction
     .Bind((x,ob) => ob.Value(x+1))
     .Bind((x,ob) => { if (x==0) ob.NoValue(); else ob.Value((double)1/x); } )
     .Bind((x,ob) => ob.Value(x*10+1));
+    
+    combinedFunction.Start();
 ....
 
-Here is the Bind function for the IMaybe deferred push monad:
+Note that we keep a reference to the source of the chain, not the end. That is the object returned by ToMaybe(). This object has a Run method. The structure starts executing when the Run method is called. This is a departure from the way IObservable and IObserver work. With IObservable, the Subscribe method both wires the IObserver in the opposite direction, and tells the source to start. So even though it's suppossedly a push style, execution is started from the destination end, which makes it look like a pull style. This loses some of the advantages of using a push style, for example, when it is the source that wants to initiate a push whenever the source changes, or when using asynchronous communication across a network. I really think the straightforward push system is conceptually purer and more useful. So that is what I have implemented. 
+
+Here are the ToMaybe and Bind functions for the IMaybe deferred push monad:
 
 
 [source,C#]
@@ -1196,9 +1252,19 @@ namespace Monad.MaybeDeferredPush
         }
     }
 
+}
+....
+
+<1> The Bind function just creates an object to do all the work at runtime. The object is defined by a class called Maybe (listed below). The Bind function takes an IMaybeObservable interface and returns that same interface. It composes Actions rather than functions. These actions take an IMaybeObserver.
 
 
 
+
+[source,C#]
+....
+
+namespace Monad.MaybeDeferredPush
+{
 
     class Maybe<T, U> : IMaybeObserver<T>, IMaybeObservable<U> <2>
     {
@@ -1274,13 +1340,11 @@ namespace Monad.MaybeDeferredPush
     }
 ....
 
-<1> The Bind function just creates an object to do all the work at runtime. The object is defined by a class called Maybe. The Bind function takes an IMaybeObservable interface and returns that same interface. It composes Actions rather than functions. These actions take an IMaybeObserver.
-
-<2> The Maybe class implements both IMaybeObservable and IMaybeObserver. IMaybeObservable is only used by Bind. It Subscribe method wires the IMaybeObserver in the opposite direction. IMaybeObserver is the one that is used at runtime to push the data through.
+<2> The Maybe class implements both IMaybeObservable and IMaybeObserver. IMaybeObservable is only used by Bind. It's Subscribe method wires the IMaybeObserver in the opposite direction. IMaybeObserver is the one that is used at runtime to push the data through.
 
 <3> Remember the 'composable functions' in the application layer are not Funcs but Actions that take a value and an IMaybeObserver<U>. So we need a class that implements IMaybeObserver so we can make observer objects to pass to the Actions when we call them at runtime. This class is implemented as an inner class called ActionObserver.
 
-<4> The wiring of Maybe supports fanout or multiple subscribers (just like the observer pattern). We didn't do this for the MinusOne deferred push monad just to keep it simpler. But we will do it for all deferred push style monads from now on. It is normal for push monads to support fan out, in other words many observers can be subscribed to the one observable. It is another advantage of push style monads over pull style monads.
+<4> The wiring of Maybe supports fanout or multiple subscribers (just like the observer pattern). We will do it for all deferred push style monads. It is normal for push monads to support fan out, in other words many observers can be subscribed to the one observable. It is another advantage of push style monads over pull style monads.
 
 
 Here is an object diagram of the complete expression.
@@ -1291,10 +1355,8 @@ You can see that although using the IMaybe monad Bind function from the top laye
 
 The references between the objects, which use IMaybeObserver, go in the same direction as the dataflow. IMaybeObservable is only used for wiring the structure up.
 
-The structure starts executing when the Run method in the MaybeStart object on the left is called. The application needs to keep a reference to this object so it can start the program.
 
-
-So far we have done deferred pull and deferred push implementations of the MinusOne and Maybe monads. Let's do a couple more examples of deferred monads to get more used to the monad pattern:
+So far we have done deferred pull and deferred push implementations of the IMaybe monad. Now lets do the deferred verson of the List monad, the IEnumerable monad
 
 
 ==== IEnumerable monad
@@ -1511,7 +1573,7 @@ The IObservable interface is apparently a push request/push response paradigm. I
 
 Unlike the IEnumerable/IEnumerator pair of interfaces which go in the same direction, the IObservable/IObserver interfaces go in opposite directions. The IObservable interface goes from destination to source whereas the IObserver interface goes from source to destination to carray the data. 
 
-In the context of monads, the IObservable interface, being in the direction of destination to source, is the one that is used by Bind. IObserable is then used to wire and initiate the IObserver interface in the opposite direction. This is exactly what we did earlier with the MinusOne and IMaybe push monads. 
+In the context of monads, the IObservable interface, being in the direction of destination to source, is the one that is used by Bind. IObserable is then used to wire and initiate the IObserver interface in the opposite direction. This is exactly what we did earlier with the IMaybe push monad. 
 
 ////
 It is possible for the source to not initiate the transfer on subscribe, and wait until it receives a separate event. As discussed above, this destination initiated data transfer paradigm appears to what we want for databases. However, with database queries, we need to pass request data in the push channel toward the database, and the Subscribe method can't do that. The only information it can take is timing information, that is 'when' to it wants the data. So it turns out that IObservable is not suitable for databases after all.
@@ -1716,7 +1778,7 @@ interface IMod360Observer
 
 Item0 in the Tuple is the angle, and Item1 in the tuple is the rotations.
 
-And we will need a second interface for the Bind function to use:
+And we will need a chaining interface for the Bind function to use:
 
 [source,C#]
 ....
@@ -1885,7 +1947,7 @@ Interface<W> I4 = I3.Bind(func<V, Interface<W>>);
 
 As you can see, while Bind always takes an interface and returns the same interface, the generic type may change along the way. In our examples above we didn't change the type much, but normally you can.
 
-Here is a diagram of the general monad pattern.
+Here is a diagram of the monad pattern.
 
 
 image::MonadPattern.png[MonadPattern.png, title=The monad pattern, link=images/MonadPattern.png]
@@ -1897,7 +1959,7 @@ The functions that are being composed take a T and return an Interface<U>. It is
 
 In many explanations of monads, they call the interface the _monad type_, or a _wrapped type_, or a _container type_, or a _type in a box_, or an _amplified type_, or just the notation _M T_. I don't think any of these terms are helpful in understaning monads. The _wrapped_, _container_ and _box_ terms don't work well for deferred monads, which don't actually contain a value. They contain a means of getting a value. For example, the deferred version of a list is IEnumerable. If our function returns an IEnumerable, that's not really a container or box.
 
-The term _amplified_ just introduces another seemingly abstract concept which is unnecessary. And the term Monad type or the notation M T seems a bit circular - let's not explain monads in terms of monads. So I prefer to think of the thing that the Bind function takes and returns as simply an interface. It sometimes has one implementation, such as Task or List, but often it has more than one implementation such as IMaybe or IEnumerable. Usually the Maybe monad uses IMaybe with two implementations, one for when there is a value and one for when there is no value. 
+The term _amplified_ just introduces another seemingly abstract concept which is unnecessary. And the term Monad type or the notation M T seems a bit circular - let's not explain monads in terms of monads. So I prefer to think of the thing that the Bind function takes and returns as simply a chaining interface. It sometimes has one implementation, such as Task or List, but often it has more than one implementation such as IMaybe or IEnumerable. Usually the Maybe monad uses IMaybe with two implementations, one for when there is a value and one for when there is no value. 
 
 So generally I just think of it as _Interface<T>_.
 
@@ -1908,7 +1970,7 @@ The monad pattern requires three things:
 
 The constructor or method for getting ordinary values into Interface<T> form is required to get started at the beginning of a chain.
 
-The push style monads we did don't exectly follow this definition because the functions didn't always return the chaining interface, but they did something equivalent.
+For push style monads, we didn't exactly follow this definition because the functions didn't always return the chaining interface, but they did something equivalent.
 
 The chaining interface and the Bind function can pipe through any extra information or capability we want through the interface. We could, for the sake of a silly example, pipe through an audio stream if we really wanted to. We could compose functions to modify the stream.
 
@@ -1920,7 +1982,7 @@ Select is like Map. It takes a function that maps inputs to outputs in one to on
 
 Select is probably the most common operator used in LINQ statements. So why is SelectMany the fundamental Bind operator of the IEnumerable monad and not Select?
 
-It's because SelectMany is the one that strictly fits the monad pattern as described in the previous section. For a monad, the function being composed returns the _chaining interface_. SelectMany is the one that does that. Select only takes a function that returns a single value. 
+It's because SelectMany is the one that strictly fits the monad pattern as described in the previous section. For a monad, the function being composed generally returns the same interface as the _chaining interface_. SelectMany is the one that does that. Select takes a function that returns a value, not an interface. 
 
 So while we sometimes think of the whole LINQ library as being monadic, strictly speaking only SelectMany is part of the monad.  
 

@@ -28,7 +28,7 @@ image::BOSS_Great_Wall.jpg[BOSS_Great_Wall.jpg,900, title="*The large scale stru
 
 John R Spray
 
-Last update: 2023-10-02
+Last update: 2023-10-25
 
 This online book is a work in progress. Feedback is welcome.
 
@@ -99,7 +99,14 @@ Software libraries tend to be good abstractions because they were written withou
 
 The second constraint is that dependencies must be on abstractions that are significantly more abstract (than the abstraction whose implementation has the dependency).
 
-When we use a more abstract abstraction, for example, when a function that calculates standard deviation uses a function that calculates squareroot, the dependency is only on the _concept_ of squareroot. As a concept, squareroot is stable and learnable. A dependency on a more abstract abstraction is a dependency on a concept that is relatively stable. Because of this stability, there is zero coupling between the code that _implements_ standard deviation and the code that _implements_ squareroot.
+ The word _dependency_ has many meanings in software engineering literature. See 
+ https://www.pathsensitive.com/2022/09/bet-you-cant-solve-these-9-dependency.html for a discussion on the meanings of word dependency. In this book we use the word _dependency_ for design-time (one abstraction depends on another at design-time, which is why we call it a knowledge dependency.) and also compile-time (one class or function, etc, depends on another at compile-time to compile).
+ 
+ When, in ALA, we wire two instances of abstractions, the two abstractions themselves will have no dependency on one another (because abstractions are design-time entities). The classes or functions that implement those abstractions will also have no dependency on one another (because classes/functions are compile-time entities). But the objects or executing functions will still have a dependency on one another at run-time (via an indirection of some kind). This is a run-time dependency between instances or objects or executing functions. When we use the word dependency throughout this book, we are not referring to these types of _run-time_ dependencies. We are refering to all _design-time_ and _compile-time_ dependencies. 
+ 
+ In the linked article, _design-time_ dependencies (knowledge dependencies) are referred to as "Program logic / Proof semantics". _Compile-time_ dependencies are referred to as "Static Semantics". And _Run-time_ dependencies are referred to as "Dynamic semantics".
+ 
+When we use a more abstract abstraction, for example, when a function that calculates standard deviation uses a function that calculates squareroot, the dependency at designtime is only on the _concept_ of squareroot. As a concept, squareroot is stable and learnable. A dependency on a more abstract abstraction is a dependency on a concept that is relatively stable. Because of this stability, there is zero coupling between the code that _implements_ standard deviation and the code that _implements_ squareroot.
 
 For this to work, the abstraction being used must be significantly more abstract than the one whose implementation code uses it.
 
@@ -110,7 +117,7 @@ For this to work, the abstraction being used must be significantly more abstract
 image::collaboration.jpg[collaboration.jpg, float="right",title="Collaboration between abstractions is illegal"]
 
 
-Seemingly, communication is needed between peer abstractions to make a system work. However, in ALA, a dependency from one abstraction on a peer abstraction is illegal. Even a dependency on the interface of a peer abstraction is illegal. For example, if the code implementing standard deviation were to, say, output the result directly to a peer module like a display, it would destroy the standard deviation abstraction. Even if the dependency is on the _interface_ of the _display_ abstraction, the code in standard deviation would still be coupled to a concept that is not more abstract. Standard deviation would no longer be an abstraction, no longer easily learnable as a concept, and it would no longer be reusable without dragging display with it.
+Seemingly, communication is needed between peer abstractions to make a system work. However, in ALA, a dependency from one abstraction on a peer abstraction is illegal. Even a dependency on the interface of a peer abstraction is illegal. For example, if the code implementing standard deviation were to, say, output the result directly to a peer module like a display, it would destroy the standard deviation abstraction. Even if the dependency is on the _interface_ of the _display_ abstraction, the code in standard deviation would still be coupled to a concept that is not more abstract. Standard deviation would no longer be an abstraction. It would no longer be easily learnable as a concept. Any code that used would not be readable in itself. Standard deviation would no longer be reusable without dragging display with it.
 --
 
 {empty} +
@@ -119,9 +126,9 @@ image::StdDispayDiagram.png[StdDispayDiagram.png,title="Standard Deviation abstr
 
 {empty} +
 
-Furthermore, over time, the fixed arrangement between the standard deviation function and the display function is likely to lead to the display function providing specifically what the standard deviation function needs, and vice versa. So both functions would be specific parts of a specific system. They would be collaborating modules.
+Furthermore, over time, the fixed arrangement between the standard deviation function and the display function is likely to lead to the display function providing specifically what the standard deviation function needs, and vice versa. So both functions would tend toward being specific parts of a specific system. They would just be collaborating modules, and not abstractions.
 
-In ALA, abstractions do not communicate. Their instances do. The instances only communicate at run-time but for that to happen something else needs to connect them. 
+In ALA, abstractions do not communicate. Their instances do. The instances only communicate at run-time but for that to happen something else needs to instantiate them and connect them. 
 
 In ALA, there must be a more specific abstraction in a higher layer to represent the system consisting of an instance of a standard deviation abstraction connected to an instance of a display abstraction.
 
@@ -190,21 +197,21 @@ In ALA, all bad dependencies are illegal. Normally in conventional code we don't
 
 Good dependencies are not just good - they are really good. We want as many of them as possible, because then we are reusing our abstractions. Bad dependencies are not just bad - they are really bad. They cause a growing tangled network of complexity.
 
-Since bad dependencies are illegal in ALA, how do parts of the system communicate? Each bad dependency becomes a line of code completely inside a higher layer abstraction. That line of code connects two instances of abstractions. There it is cohesive with other lines of code that connect other instances of abstractions that together make a whole user story. 
+Since bad dependencies are illegal in ALA, how do parts of the system communicate? Well, each bad dependency simply becomes a line of code completely inside a higher layer abstraction. That line of code connects two instances of abstractions. There it is cohesive with other lines of code that connect other instances of abstractions that together make a whole user story. 
 
 If you think about it, circular dependencies come about because there is circular communications. Circular communications is perfectly valid. When you stop representing communications with dependencies, and start representing them with wiring code, circular wiring makes perfect sense. When you use only good dependencies, circular dependencies, and the whole dependency management problem just goes away.
 
-Nearly all relationships in a typical UML class diagram are bad dependencies. The only legal UML class relationship is composition (filled diamond arrow), and then _only_ if the class being used is more abstract (in a lower layer). When you use an abstraction, you always refer to it by name, not use an arrow on a diagram. You wouldn't draw a line on a diagram to a library function such as squareroot - you would just use squareroot by name as if it's part of your language. Similarly, you wouldn't draw 'instantiates' relationships in an ALA application on a UML diagram. So, it turns out that if you drew a UML class diagram of an ALA application, you would just get disconnected boxes sitting in space. They would be arranged in layers, as described below, but there would be no lines at all. The UML class diagram is completely redundant in ALA. In fact the UML class diagram, by encouraging relationships between would-be peer abstractions, has probably caused more damage to software than any other software engineering meme. UML class diagrams are evil.
+Nearly all relationships in a typical UML class diagram are bad dependencies. In ALA, the only legal UML class relationship is composition (filled diamond arrow), and then _only_ if the class being used is more abstract (in a lower layer). Now, when you use an abstraction, you always refer to it by name, not use an arrow on a diagram. You wouldn't draw a line on a diagram when using a library function such as squareroot - you would just use squareroot by name as if it's part of your language. Similarly, you wouldn't draw 'instantiates and uses' relationships in an ALA application on a UML diagram. So, it turns out that if you drew a UML class diagram of an ALA application, you would just get disconnected boxes sitting in space. There would be no lines at all, They would be arranged in layers, as described below. The UML class diagram is completely redundant in ALA. In fact the UML class diagram, by encouraging bad dependencies between would-be peer abstractions, has probably caused more damage to software than any other software engineering meme. UML class diagrams are evil.
 
 *Metrics*
 
-Unfortunately metrics do not understand abstractions. For example, CBO (Coupling of objects), (which, despite its name, is the total number of classes with dependencies to or from a given class) does not distinguish between good and bad dependencies.
+Unfortunately, common metrics in use today do not understand abstractions. For example, CBO (Coupling of objects), (which, despite its name, is the total number of classes with dependencies to or from a given class) does not distinguish between good and bad dependencies. It just counts them all, making the metric completely useless.
 
 ALA recognises the importance of using abstractions and composability in dealing with complex systems. If metrics don't also take into account this importance, they cannot work well.
 
-A common problem when calculating CBO is whether or not to include library classes. Intuitively we know that library classes are abstractions. We see them as part of our programming language. So we feel they should not be included in the metric. The same should apply to all good dependencies - those that are dependencies on the knowledge of a concept in a lower layer. CBO should count only bad dependencies. 
+A common problem when calculating CBO is whether or not to include library classes. Intuitively we know that library classes are abstractions. We see them as part of our programming language. So we feel they should not be included in the metric. The same should apply to all good dependencies - those that are dependencies on the knowledge of a concept in a lower layer. If CBO counted only bad dependencies, it would be an extremely useful metric. Perfect software would require the metric to be zero. 
 
-If the metric first identified all potential abstractions, and then identified their abstraction levels relative to each other, then it could just count the bad dependencies. CBO would then be an extremely useful metric.
+If the CBO metric should first identify all potential abstractions, and then identify their abstraction levels relative to each other. Since abstraction and reuse are two sides of the same coin, Robert Martin points that we can use the number of uses (dependencies) on a given class as an estimate of its abstraction level. In this way it may be possible to take some bad legacy code and and suggest which classes should become abstractions at which levels. If the programmer agrees with the tool, then he can proceed to refactor out all the bad dependencies using ALA. This will require intrducing new specific abstractions at a higher layer in which put wiring code for each bad dependency. That in turn will require the invention of composition abstractions (interfaces) in a lower layer to allow the creation of ports on the classes that had the bad dependencies.
 
 
 
@@ -641,7 +648,7 @@ Notice how the application diagram in each case is both a direct representation 
 
 To the extent that requirements are cohesive, so the code that expresses them should be. For example, we do not try to separate the specific UI, I/O, business logic, persistent data etc into different modules because they are highly cohesive for a given requirement. Most other architectural patterns, such as MVC, do separate in this way, which creates coupling. Instead we reduce the problem in a different way - through the use of domain abstractions which provide reusable aspects of implementation. All knowledge and details from the requirements end up in the application layer, but that's all that goes there. 
 
-Note: A graph-like structure is showing up in these small applications because each requirement in itself contains a graph of relationships. ALA embraces this and makes it explicit, which is why the requirements are best expressed as diagrams. In conventional code, the graph structure is still there, but it is typically obfuscated as many intermodule relationships, making it hard to see. Worse still, the natural cycles in the graph of relationships in the requirements, would cause circular dependencies among conventional modules. Conventionally, some of these dependencies are broken by using pulling data half the time rather than pushing, or worse still, using indirections such as the observer pattern. These removals of dependencies don't make the relationships themselves go away, they just make them harder to see.
+Note: A graph-like structure is showing up in these small applications because each requirement in itself contains a graph of connections. ALA embraces this and makes it explicit, which is why the requirements are best expressed as diagrams. In conventional code, the graph structure is still there, but it is typically obfuscated as many intermodule relationships, making it hard to see. Worse still, the natural cycles in the graph of relationships in the requirements, would cause circular dependencies among conventional modules. Conventionally, some of these dependencies are broken by using pulling data half the time rather than pushing, or worse still, using indirections such as the observer pattern. These removals of dependencies don't make the relationships themselves go away, they just make them harder to see. In ALA the inter-module relationships go away and become connection code purely contaned inside a single module.
 
 Although the fluent style is a nice way to hand-compile these small diagrams, code like this with indenting and nested brackets does not scale up well for large diagrams. (It is still better than the tangled web of dependencies they would form in conventional modular code though.) But we can do better. We will not be hand-writing code like this for large applications - we will automatically generate the code from the diagrams. 
 

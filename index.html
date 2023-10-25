@@ -625,7 +625,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <p>John R Spray</p>
 </div>
 <div class="paragraph">
-<p>Last update: 2023-10-02</p>
+<p>Last update: 2023-10-25</p>
 </div>
 <div class="paragraph">
 <p>This online book is a work in progress. Feedback is welcome.</p>
@@ -735,8 +735,24 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="paragraph">
 <p>The second constraint is that dependencies must be on abstractions that are significantly more abstract (than the abstraction whose implementation has the dependency).</p>
 </div>
+<div class="literalblock">
+<div class="content">
+<pre>The word _dependency_ has many meanings in software engineering literature. See
+https://www.pathsensitive.com/2022/09/bet-you-cant-solve-these-9-dependency.html for a discussion on the meanings of word dependency. In this book we use the word _dependency_ for design-time (one abstraction depends on another at design-time, which is why we call it a knowledge dependency.) and also compile-time (one class or function, etc, depends on another at compile-time to compile).</pre>
+</div>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>When, in ALA, we wire two instances of abstractions, the two abstractions themselves will have no dependency on one another (because abstractions are design-time entities). The classes or functions that implement those abstractions will also have no dependency on one another (because classes/functions are compile-time entities). But the objects or executing functions will still have a dependency on one another at run-time (via an indirection of some kind). This is a run-time dependency between instances or objects or executing functions. When we use the word dependency throughout this book, we are not referring to these types of _run-time_ dependencies. We are refering to all _design-time_ and _compile-time_ dependencies.</pre>
+</div>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>In the linked article, _design-time_ dependencies (knowledge dependencies) are referred to as "Program logic / Proof semantics". _Compile-time_ dependencies are referred to as "Static Semantics". And _Run-time_ dependencies are referred to as "Dynamic semantics".</pre>
+</div>
+</div>
 <div class="paragraph">
-<p>When we use a more abstract abstraction, for example, when a function that calculates standard deviation uses a function that calculates squareroot, the dependency is only on the <em>concept</em> of squareroot. As a concept, squareroot is stable and learnable. A dependency on a more abstract abstraction is a dependency on a concept that is relatively stable. Because of this stability, there is zero coupling between the code that <em>implements</em> standard deviation and the code that <em>implements</em> squareroot.</p>
+<p>When we use a more abstract abstraction, for example, when a function that calculates standard deviation uses a function that calculates squareroot, the dependency at designtime is only on the <em>concept</em> of squareroot. As a concept, squareroot is stable and learnable. A dependency on a more abstract abstraction is a dependency on a concept that is relatively stable. Because of this stability, there is zero coupling between the code that <em>implements</em> standard deviation and the code that <em>implements</em> squareroot.</p>
 </div>
 <div class="paragraph">
 <p>For this to work, the abstraction being used must be significantly more abstract than the one whose implementation code uses it.</p>
@@ -753,7 +769,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="title">Figure 2. Collaboration between abstractions is illegal</div>
 </div>
 <div class="paragraph">
-<p>Seemingly, communication is needed between peer abstractions to make a system work. However, in ALA, a dependency from one abstraction on a peer abstraction is illegal. Even a dependency on the interface of a peer abstraction is illegal. For example, if the code implementing standard deviation were to, say, output the result directly to a peer module like a display, it would destroy the standard deviation abstraction. Even if the dependency is on the <em>interface</em> of the <em>display</em> abstraction, the code in standard deviation would still be coupled to a concept that is not more abstract. Standard deviation would no longer be an abstraction, no longer easily learnable as a concept, and it would no longer be reusable without dragging display with it.</p>
+<p>Seemingly, communication is needed between peer abstractions to make a system work. However, in ALA, a dependency from one abstraction on a peer abstraction is illegal. Even a dependency on the interface of a peer abstraction is illegal. For example, if the code implementing standard deviation were to, say, output the result directly to a peer module like a display, it would destroy the standard deviation abstraction. Even if the dependency is on the <em>interface</em> of the <em>display</em> abstraction, the code in standard deviation would still be coupled to a concept that is not more abstract. Standard deviation would no longer be an abstraction. It would no longer be easily learnable as a concept. Any code that used would not be readable in itself. Standard deviation would no longer be reusable without dragging display with it.</p>
 </div>
 </div>
 </div>
@@ -770,10 +786,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <p><br></p>
 </div>
 <div class="paragraph">
-<p>Furthermore, over time, the fixed arrangement between the standard deviation function and the display function is likely to lead to the display function providing specifically what the standard deviation function needs, and vice versa. So both functions would be specific parts of a specific system. They would be collaborating modules.</p>
+<p>Furthermore, over time, the fixed arrangement between the standard deviation function and the display function is likely to lead to the display function providing specifically what the standard deviation function needs, and vice versa. So both functions would tend toward being specific parts of a specific system. They would just be collaborating modules, and not abstractions.</p>
 </div>
 <div class="paragraph">
-<p>In ALA, abstractions do not communicate. Their instances do. The instances only communicate at run-time but for that to happen something else needs to connect them.</p>
+<p>In ALA, abstractions do not communicate. Their instances do. The instances only communicate at run-time but for that to happen something else needs to instantiate them and connect them.</p>
 </div>
 <div class="paragraph">
 <p>In ALA, there must be a more specific abstraction in a higher layer to represent the system consisting of an instance of a standard deviation abstraction connected to an instance of a display abstraction.</p>
@@ -876,28 +892,28 @@ Sometimes separating state from functions breaks otherwise good abstractions. An
 <p>Good dependencies are not just good - they are really good. We want as many of them as possible, because then we are reusing our abstractions. Bad dependencies are not just bad - they are really bad. They cause a growing tangled network of complexity.</p>
 </div>
 <div class="paragraph">
-<p>Since bad dependencies are illegal in ALA, how do parts of the system communicate? Each bad dependency becomes a line of code completely inside a higher layer abstraction. That line of code connects two instances of abstractions. There it is cohesive with other lines of code that connect other instances of abstractions that together make a whole user story.</p>
+<p>Since bad dependencies are illegal in ALA, how do parts of the system communicate? Well, each bad dependency simply becomes a line of code completely inside a higher layer abstraction. That line of code connects two instances of abstractions. There it is cohesive with other lines of code that connect other instances of abstractions that together make a whole user story.</p>
 </div>
 <div class="paragraph">
 <p>If you think about it, circular dependencies come about because there is circular communications. Circular communications is perfectly valid. When you stop representing communications with dependencies, and start representing them with wiring code, circular wiring makes perfect sense. When you use only good dependencies, circular dependencies, and the whole dependency management problem just goes away.</p>
 </div>
 <div class="paragraph">
-<p>Nearly all relationships in a typical UML class diagram are bad dependencies. The only legal UML class relationship is composition (filled diamond arrow), and then <em>only</em> if the class being used is more abstract (in a lower layer). When you use an abstraction, you always refer to it by name, not use an arrow on a diagram. You wouldn&#8217;t draw a line on a diagram to a library function such as squareroot - you would just use squareroot by name as if it&#8217;s part of your language. Similarly, you wouldn&#8217;t draw 'instantiates' relationships in an ALA application on a UML diagram. So, it turns out that if you drew a UML class diagram of an ALA application, you would just get disconnected boxes sitting in space. They would be arranged in layers, as described below, but there would be no lines at all. The UML class diagram is completely redundant in ALA. In fact the UML class diagram, by encouraging relationships between would-be peer abstractions, has probably caused more damage to software than any other software engineering meme. UML class diagrams are evil.</p>
+<p>Nearly all relationships in a typical UML class diagram are bad dependencies. In ALA, the only legal UML class relationship is composition (filled diamond arrow), and then <em>only</em> if the class being used is more abstract (in a lower layer). Now, when you use an abstraction, you always refer to it by name, not use an arrow on a diagram. You wouldn&#8217;t draw a line on a diagram when using a library function such as squareroot - you would just use squareroot by name as if it&#8217;s part of your language. Similarly, you wouldn&#8217;t draw 'instantiates and uses' relationships in an ALA application on a UML diagram. So, it turns out that if you drew a UML class diagram of an ALA application, you would just get disconnected boxes sitting in space. There would be no lines at all, They would be arranged in layers, as described below. The UML class diagram is completely redundant in ALA. In fact the UML class diagram, by encouraging bad dependencies between would-be peer abstractions, has probably caused more damage to software than any other software engineering meme. UML class diagrams are evil.</p>
 </div>
 <div class="paragraph">
 <p><strong>Metrics</strong></p>
 </div>
 <div class="paragraph">
-<p>Unfortunately metrics do not understand abstractions. For example, CBO (Coupling of objects), (which, despite its name, is the total number of classes with dependencies to or from a given class) does not distinguish between good and bad dependencies.</p>
+<p>Unfortunately, common metrics in use today do not understand abstractions. For example, CBO (Coupling of objects), (which, despite its name, is the total number of classes with dependencies to or from a given class) does not distinguish between good and bad dependencies. It just counts them all, making the metric completely useless.</p>
 </div>
 <div class="paragraph">
 <p>ALA recognises the importance of using abstractions and composability in dealing with complex systems. If metrics don&#8217;t also take into account this importance, they cannot work well.</p>
 </div>
 <div class="paragraph">
-<p>A common problem when calculating CBO is whether or not to include library classes. Intuitively we know that library classes are abstractions. We see them as part of our programming language. So we feel they should not be included in the metric. The same should apply to all good dependencies - those that are dependencies on the knowledge of a concept in a lower layer. CBO should count only bad dependencies.</p>
+<p>A common problem when calculating CBO is whether or not to include library classes. Intuitively we know that library classes are abstractions. We see them as part of our programming language. So we feel they should not be included in the metric. The same should apply to all good dependencies - those that are dependencies on the knowledge of a concept in a lower layer. If CBO counted only bad dependencies, it would be an extremely useful metric. Perfect software would require the metric to be zero.</p>
 </div>
 <div class="paragraph">
-<p>If the metric first identified all potential abstractions, and then identified their abstraction levels relative to each other, then it could just count the bad dependencies. CBO would then be an extremely useful metric.</p>
+<p>If the CBO metric should first identify all potential abstractions, and then identify their abstraction levels relative to each other. Since abstraction and reuse are two sides of the same coin, Robert Martin points that we can use the number of uses (dependencies) on a given class as an estimate of its abstraction level. In this way it may be possible to take some bad legacy code and and suggest which classes should become abstractions at which levels. If the programmer agrees with the tool, then he can proceed to refactor out all the bad dependencies using ALA. This will require intrducing new specific abstractions at a higher layer in which put wiring code for each bad dependency. That in turn will require the invention of composition abstractions (interfaces) in a lower layer to allow the creation of ports on the classes that had the bad dependencies.</p>
 </div>
 <div class="paragraph">
 <p><strong>Emerging layers</strong></p>
@@ -1359,7 +1375,7 @@ interface IPullTable : IEnumerable&lt;List&lt;string&gt;&lt;T&gt;&gt;
 <p>To the extent that requirements are cohesive, so the code that expresses them should be. For example, we do not try to separate the specific UI, I/O, business logic, persistent data etc into different modules because they are highly cohesive for a given requirement. Most other architectural patterns, such as MVC, do separate in this way, which creates coupling. Instead we reduce the problem in a different way - through the use of domain abstractions which provide reusable aspects of implementation. All knowledge and details from the requirements end up in the application layer, but that&#8217;s all that goes there.</p>
 </div>
 <div class="paragraph">
-<p>Note: A graph-like structure is showing up in these small applications because each requirement in itself contains a graph of relationships. ALA embraces this and makes it explicit, which is why the requirements are best expressed as diagrams. In conventional code, the graph structure is still there, but it is typically obfuscated as many intermodule relationships, making it hard to see. Worse still, the natural cycles in the graph of relationships in the requirements, would cause circular dependencies among conventional modules. Conventionally, some of these dependencies are broken by using pulling data half the time rather than pushing, or worse still, using indirections such as the observer pattern. These removals of dependencies don&#8217;t make the relationships themselves go away, they just make them harder to see.</p>
+<p>Note: A graph-like structure is showing up in these small applications because each requirement in itself contains a graph of connections. ALA embraces this and makes it explicit, which is why the requirements are best expressed as diagrams. In conventional code, the graph structure is still there, but it is typically obfuscated as many intermodule relationships, making it hard to see. Worse still, the natural cycles in the graph of relationships in the requirements, would cause circular dependencies among conventional modules. Conventionally, some of these dependencies are broken by using pulling data half the time rather than pushing, or worse still, using indirections such as the observer pattern. These removals of dependencies don&#8217;t make the relationships themselves go away, they just make them harder to see. In ALA the inter-module relationships go away and become connection code purely contaned inside a single module.</p>
 </div>
 <div class="paragraph">
 <p>Although the fluent style is a nice way to hand-compile these small diagrams, code like this with indenting and nested brackets does not scale up well for large diagrams. (It is still better than the tangled web of dependencies they would form in conventional modular code though.) But we can do better. We will not be hand-writing code like this for large applications - we will automatically generate the code from the diagrams.</p>
@@ -1386,7 +1402,7 @@ interface IPullTable : IEnumerable&lt;List&lt;string&gt;&lt;T&gt;&gt;
 <h2 id="truechapter-one-what-problem-does-it-solve"><a class="anchor" href="#truechapter-one-what-problem-does-it-solve"></a>1. Chapter one - What problem does it solve?</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>If you have already experienced difficult to maintain code, big balls of mud, spaghetti code, or the CRAP principle, you can probably skip this chapter.</p>
+<p>If you have already experienced difficult to maintain code, big balls of mud, spaghetti code, or the CRAP cycle (Create, Repair, Abandon, rePeat), you can probably skip this chapter.</p>
 </div>
 <div class="paragraph">
 <p>However, the example at the end is pretty cool - it starts with the type of typical C code that I see most students write, and then refactors, it step by step, into ALA compliant code - you should take a look at that.</p>
@@ -1628,16 +1644,16 @@ interface IPullTable : IEnumerable&lt;List&lt;string&gt;&lt;T&gt;&gt;
 <div class="sect2">
 <h3 id="truestructure-hidden-inside-the-modules"><a class="anchor" href="#truestructure-hidden-inside-the-modules"></a>1.4. Structure hidden inside the modules</h3>
 <div class="paragraph">
-<p>The problem in most large code bases is that the system structure, the in-the-large structure, is not explicit. It is distributed inside the modules themselves. Collaboration between modules is implicitly hidden inside them. Finding this structure, even for a single user story can be time consuming. I have often spent a whole day doing that, doing countless all-files searches following function calls or method calls of the user story through many modules just to end up changing one line of code. Many developers I have spoken to can identify with this experience.</p>
-</div>
-<div class="paragraph">
-<p>It can get a lot worse as the system gets larger. In a seemingly bizarre twist, the more loosely coupled you make the elements, the harder it gets to trace a user story because of the indirections. Some people conclude that loose coupling and being able to trace through a user-story are naturally in conflict.</p>
+<p>The problem in most large code bases is that the system structure, the structure at the largest scale, is not explicit. It is distributed inside the modules themselves. Collaboration between modules is implicitly hidden inside them. Finding this structure, even for a single user story can be time consuming. I have often spent a whole day doing that, doing countless all-files searches following function calls or method calls of the user story through many modules just to end up changing one line of code in the end. Many developers I have spoken to can identify with this experience.</p>
 </div>
 <div class="paragraph">
 <p>I call this situation SMITA (Structure Missing in the Action). The internal structure is sometimes drawn as a model - high-level documentation of the hidden structure. But such models are a secondary source of truth.</p>
 </div>
 <div class="paragraph">
-<p>ALA completely eliminates this problem and this conflict. The structure is explicitly coded in one place, without any indirections. Yet the abstractions are zero-coupled.</p>
+<p>It can get a lot worse as the system gets larger. In a seemingly bizarre twist, the more loosely coupled you make the elements, the harder it gets to trace a user story because of the indirections. Some people conclude that loose coupling and being able to trace through a user-story are naturally in conflict. They are actually not in conflict.</p>
+</div>
+<div class="paragraph">
+<p>ALA is an architecture that has full indirection at runtime while at the same time having no indirection at design-time because the system is implemented all in one cohesive plave.</p>
 </div>
 </div>
 <div class="sect2">
@@ -1652,7 +1668,7 @@ interface IPullTable : IEnumerable&lt;List&lt;string&gt;&lt;T&gt;&gt;
 <div class="title">Figure 9. Code can quickly follow the Cynefin quadrants into the complex</div>
 </div>
 <div class="paragraph">
-<p>As the program gets larger, things get a little more complicated, but the young developer&#8217;s brain is still up to the task, not realizing he has already surpassed anyone else&#8217;s ability to read his code. He is still able to get more features working. One day parts of the 'transition'. It becomes somewhere you don&#8217;t want to go. On the Cynfin diagram, it has transitioned from the complicated quadrant to the complex quadrant. And now it is trapped there. It is too complex for refactoring.</p>
+<p>As the program gets larger, things get a little more complicated, but the young developer&#8217;s brain is still up to the task, not realizing he has already surpassed anyone else&#8217;s ability to read his code. He is still able to get more features working. One day parts of the code 'transition' to complex. It becomes somewhere you don&#8217;t want to go. On the Cynfin diagram, it has moved from the complicated quadrant to the complex quadrant. And now it is trapped there. It is too complex for refactoring.</p>
 </div>
 <div class="paragraph">
 <p>The incremental effort to maintain starts to eat away and eventually exceed the incremental increase in value. This now negative return causes the codebase itself to eventually lose value, until it is no longer an asset to the business.</p>
@@ -1678,7 +1694,7 @@ interface IPullTable : IEnumerable&lt;List&lt;string&gt;&lt;T&gt;&gt;
 <p>Analysing the common properties of those two code bases, gave clues that eventually resulted in a theoretical understanding of how to deal with complex systems. This meta-structure is what I now call Abstraction Layered Architecture.</p>
 </div>
 <div class="paragraph">
-<p>Subsequently, I ran some experiments to see if the maintainability and non-complexity could be predictably reproduced. These experiments, which have worked spectacularly well so far, are discussed as a project at the end of every chapter.</p>
+<p>Subsequently, I ran some experiments to see if the maintainability and non-complexity could be predictably reproduced. These experiments, which have worked spectacularly well so far, are discussed as a project at the end of each chapter.</p>
 </div>
 </div>
 </div>
@@ -1991,7 +2007,7 @@ interface IPullTable : IEnumerable&lt;List&lt;string&gt;&lt;T&gt;&gt;
 <p>The while loop and all the indenting are there only because we have 'execution flow' tied in with our composition of abstractions. Basically we want to make control of execution flow another abstraction so that the thermometer can be built by just composing abstractions rather than writing executing code.</p>
 </div>
 <div class="paragraph">
-<p>To do this we will first show how its done using monads. If you don&#8217;t know about monads just skip the section as we don&#8217;t need this step to understand our final goal. But for those who do understand monads, it is interesting to visit this step to see why the functional programming guys invented them. Then in the following step we will go to ordinary classes with ports instead of monads.</p>
+<p>To do this we will first show how its done using monads. If you don&#8217;t know about monads just skip this section as we don&#8217;t need this step to understand our final goal. But for those who do understand monads, it is interesting to visit this step to see why the functional programming guys invented them. Then in the following step we will go to ordinary classes with ports instead of monads.</p>
 </div>
 </div>
 <div class="sect3">
@@ -2029,7 +2045,7 @@ interface IPullTable : IEnumerable&lt;List&lt;string&gt;&lt;T&gt;&gt;
 <p>Also notice that the first statement just builds the program. Then the second statement sets it running. This two stage aspect of monads is common in the programming paradigms we will use in ALA. It is because the underlying execution flow is not the same as the flow of the programming paradigm. We first wire it up, and then we tell the wired up structure to 'execute'.</p>
 </div>
 <div class="paragraph">
-<p>There is a second important difference from the while loop version. The while loop version handled the data itself. Each function returned the data which was stored in a local, otherwise useless, variable and then passed into the next function. The monad code doesn&#8217;t do that. Instead, it creates and wires together objects which will, at run-time, send the data directly from one to another via an interface. This does not mean that the abstractions themselves know anything about each other - they are still zero coupled. But the application now doesn&#8217;t have to deal with the mechanics of dataflow. It just has to compose abstractions.</p>
+<p>There is a second important difference from the while loop version. The while loop version handled the data itself. Each function returned the data which was stored in a local, otherwise useless, variable and then passed into the next function. The monad code doesn&#8217;t do that. Instead, it creates and wires together objects which will, at run-time, send the data directly from one to another via an interface. This does not mean that the abstractions themselves know anything about each other - they are still zero coupled. But the application now doesn&#8217;t have to deal with data. It just has to compose abstractions.</p>
 </div>
 <div class="paragraph">
 <p>Lastly, here&#8217;s how monads actually execute - the execution model. Don&#8217;t worry if this doesn&#8217;t make sense.</p>
@@ -2073,7 +2089,7 @@ interface IPullTable : IEnumerable&lt;List&lt;string&gt;&lt;T&gt;&gt;
 <div class="sect3">
 <h4 id="trueusing-multiple-programming-paradigms"><a class="anchor" href="#trueusing-multiple-programming-paradigms"></a>1.6.6. Using multiple programming paradigms:</h4>
 <div class="paragraph">
-<p>Monads are generally not versatile enough to handle multiple ports of different programming paradigms, which we will want in ALA programs. Abstractions usually only support dataflow. But what if we want to also compose the UI, or event-driven? What if we want to compose transitions between states of a state machine? In ALA, we are able to do all this in the one application, in the same way - using whatever programming paradigms are the best way to express the requirements.</p>
+<p>Monads are generally not versatile enough to handle multiple ports of different programming paradigms, which we will want in ALA programs. Monads usually only support dataflow. But what if we want to also compose the UI, or event-driven? What if we want to compose transitions between states of a state machine? In ALA, we are able to do all this in the one application, in the same way - using whatever programming paradigms are the best way to express the requirements.</p>
 </div>
 <div class="paragraph">
 <p>Some instances of abstractions will need to take part in multiple paradigms, such as both UI and dataflow. When we boil down the description of our requirements to pure composition, our composition will often be a graph of relationships. And when you have a graph, your composition is best described by a diagram.</p>
@@ -2130,10 +2146,10 @@ interface IPullTable : IEnumerable&lt;List&lt;string&gt;&lt;T&gt;&gt;
 <h2 id="truechapter-two-the-structure"><a class="anchor" href="#truechapter-two-the-structure"></a>2. Chapter two - The structure</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>In this chapter we describe the structure or anatomy of ALA without delving too much into the hows and whys, which are covered in later chapters.</p>
+<p>In this chapter we describe the structure or anatomy of ALA without delving too much into the whys it is that way, which is covered in a later chapter.</p>
 </div>
 <div class="paragraph">
-<p>The organisation of this chapter (and all chapters) is by different perspectives. We all have different prior knowledge on which we build new knowledge, so we each have a different way to understand new things. Use the section whose perspective makes the most sense to you. Because of the use of perspectives, there will sometimes be repetition of ideas across sections.</p>
+<p>The organisation of this chapter (and all chapters) is by different perspectives. We all have different prior knowledge on which we build new knowledge, so we each have a different way to understand new things. Use the section whose perspective makes the most sense to you. Because of the use of multiple perspectives, there will sometimes be repetition of ideas across the sections.</p>
 </div>
 <div class="sect2">
 <h3 id="truesoftware-elements-relations-among-them"><a class="anchor" href="#truesoftware-elements-relations-among-them"></a>2.1. Software elements, relations among them</h3>
@@ -2146,7 +2162,7 @@ interface IPullTable : IEnumerable&lt;List&lt;string&gt;&lt;T&gt;&gt;
 <div class="sect3">
 <h4 id="truethe-only-unit-of-code-is-an-abstraction"><a class="anchor" href="#truethe-only-unit-of-code-is-an-abstraction"></a>2.1.1. The only unit of code is an abstraction</h4>
 <div class="paragraph">
-<p>The only unit of code in ALA is an abstraction. Not module, not class, not function. An abstraction is more than a module, class or function in that it must be a 'generalized conceptual idea'. It&#8217;s what our brains use to understand the world, not what compilers use. It must be learnable as a concept. Many modules, classes or functions in traditional code are not good abstractions, especially if they are an integral part of a specific system with associations with peer modules, classes or functions.</p>
+<p>The only unit of code in ALA is an abstraction. Not module, not class, not function. An abstraction may be implemented as a class or interface, (or multiple of them). But an abstraction is more than a module, class or function in that it must represent a 'generalized conceptual idea'. It&#8217;s what our brains use to understand the world, not what compilers use. It must be learnable as a concept. Many modules, classes or functions in traditional code are not good abstractions, especially if they are an integral part of a specific system with associations with peer modules, classes or functions.</p>
 </div>
 <div class="paragraph">
 <p>Abstraction goes hand in hand with reuse. Krueger said that abstraction and reuse are two sides of the same coin. Abstractions tend to be stable - as stable as their conceptual idea. When we have a dependency on an abstraction, it is a dependency only on that conceptual idea.</p>
@@ -2246,7 +2262,7 @@ namespace DomainAbstractions
 <p>Abstractions are the only mechanism that provides design-time <em>information hiding</em>. When David Parnas coined the term <em>information hiding</em> he meant at <em>design-time</em>. Unfortunately there is a popular meme that <em>information hiding</em> means <em>encapsulation</em>, which only hides at compile-time, not necessarily at design-time. The same idea of design-time information hiding has other names such as Alistair Cockburn&#8217;s <em>protected variations</em>, and Robert Martin&#8217;s version of the OCP (open closed principle).</p>
 </div>
 <div class="paragraph">
-<p>In the case of our LowPassFilter, the quality of being a good abstraction means that its internals are not coupled or collaborating with other modules. It&#8217;s bounded by its conceptual idea. If it were a module instead, it might primarily perform the filter function for a specific application, but knowing which application it is part of would cause it to take on ancilliary functions, such as  offset and scale to output the units needed by the application. Or it might grab its input knowing where it comes from. Or it might send it&#8217;s output to a specific place, or even to multiple specific places using direct method calls. It might connect to the application&#8217;s settings menu for its settings. All these things would cause design-time coupling through the application.</p>
+<p>In the case of our LowPassFilter, the quality of being a good abstraction means that its internals are not coupled or collaborating with other modules. It&#8217;s bounded by its conceptual idea. If it were a module instead, it might primarily perform the filter function for a specific application, but knowing which application it is part of may cause it to take on ancilliary functions, such as  offset and scale to output the units needed by the application. Or it might grab its input knowing where it comes from. Or it might send it&#8217;s output to a specific place, or even to multiple specific places using direct method calls. It might connect to the application&#8217;s settings menu for its settings. All these things would cause design-time coupling through the application.</p>
 </div>
 <div class="sect4">
 <h5 id="truemeaning-of-abstraction"><a class="anchor" href="#truemeaning-of-abstraction"></a>Meaning of abstraction</h5>
@@ -2270,10 +2286,10 @@ namespace DomainAbstractions
 <p>Conventional layering tends to use this second meaning of 'abstract' and layers are said to be more abstract as you go up. ALA layers get more abstract as you go down.</p>
 </div>
 <div class="paragraph">
-<p>The layers are not the same either. To convert conventional layers to ALA, you generally just tip them on their side so that they are not layers but independent disconnected abstractions. Each of them knows about details of something but they no longer directly connect to each other in either direction. On their own they will do nothing. The layer above, whose job is to know the details of a specific application or system, composes instances of them by instantiating them, configuring them, and wiring them together using compositional abstractions in a lower layer.</p>
+<p>The layers are not the same either. To convert conventional layers to ALA, you generally just tip them on their side so that they are not layers but independent disconnected abstractions. Each of them knows about details of something but they no longer directly connect to each other in either direction. On their own they will do nothing. The layer above, whose job is to know the details of a specific application or system, composes instances of them by instantiating them, configuring them, and wiring them together using compositional abstractions in a lower layer. This top layer code is the least abstract, even though it only has knowledge of the requirements, and no knowledge from any 'computing' domain.</p>
 </div>
 <div class="paragraph">
-<p>A final thought about abstraction is to compare it with the SRP (single responsibility principle). The SRP is not really the best way to think about abstractions. It is better to think about what details an abstraction implementation knows about. It can be a specific user story, a specific feature, a type of UI element, a type of database, a protocol, a hardware device, etc. It will contain all the cohesive knowledge about that thing. In doing so, it may have multiple responsibilities. For example an abstraction that knows about a protocol or a hardware device may have responsibility for both input and output. It may have responsibility for configuring the hardware device. A filter abstraction may both smooth the input data and resample the to a lower rate at the output, because resampling is cohesive with smoothing.</p>
+<p>A final thought about abstraction is to compare it with the SRP (single responsibility principle). The SRP is not really the best way to think about abstractions. It is better to think about what details an abstraction implementation knows about. It can be a specific user story, a specific feature, a type of UI element, a type of database, a protocol, a hardware device, etc. It will contain all the cohesive knowledge about that thing. In doing so, it may have multiple responsibilities. For example an abstraction that knows about a protocol or a hardware device may have responsibility for both input and output. It may have responsibility for configuring the hardware device. A filter abstraction may both smooth the input data and resample it to a lower rate at the output, because resampling is cohesive with smoothing. So an abstraction is not necessarily a single responsibility. It is a single thing it knows all details about.</p>
 </div>
 </div>
 </div>
@@ -2289,7 +2305,7 @@ namespace DomainAbstractions
 <p>The external structure and internal structure with respect to abstractions are at opposite extremes. One is zero coupled and constrained only to the use of instances of lower layer abstractions and the other is fully coupled and highly cohesive.</p>
 </div>
 <div class="paragraph">
-<p>That there is no structure in an abstraction&#8217;s implementation is important because in conventional architectures we are used to hierarchical encapsulation. In ALA their is strictly no containment nesting. Instead there is only abstraction layers.</p>
+<p>That there is no structure in an abstraction&#8217;s implementation is important because in conventional architectures we are used to hierarchical encapsulation. In ALA there is no containment nesting at all. Instead there is only abstraction layers.</p>
 </div>
 </div>
 <div class="sect3">
@@ -2318,7 +2334,7 @@ namespace DomainAbstractions
 <p>The relationship means that, to read and understand the code inside A, you must know the abstraction concept B - not how the insides of abstraction B work. The word "abstraction" implies that it should be learnable in a short time and easy to retain. When we learn an abstraction concept, there is a moment when we suddenly 'get it', a small moment of insight.</p>
 </div>
 <div class="paragraph">
-<p>In our A &amp; B example above, the code inside B knows nothing of A. The code inside A, while it knows about the concept of the abstraction B, knows nothing about the code that is inside B. So there is zero coupling between the code that implements teh two abstractions. ALA is basically a constraint to force us to <em>always</em> use zero coupling.</p>
+<p>In our A &amp; B example above, the code inside B knows nothing of A. The code inside A, while it knows about the concept of the abstraction B, knows nothing about the code that is inside B. So there is zero coupling between the code that implements the two abstractions. ALA is basically a constraint to force us to <em>always</em> use zero coupling.</p>
 </div>
 <div class="paragraph">
 <p>Here are some more legal dependencies, this time in text form. They are from a user story in the application layer to the domain abstractions layer.</p>
@@ -2339,16 +2355,19 @@ namespace DomainAbstractions
 <p>Because of the way our brains have evolved to understand a complex world in terms of abstractions, abstractions are the only mechanism that hide knowledge at design-time. Dependencies on more abstract abstractions have zero coupling between the code using the abstraction and the code implementing the abstraction.</p>
 </div>
 <div class="paragraph">
-<p>Dependencies on more abstract abstractions also explicitly tell us what knowledge we need in order to <em>understand</em> code. For example, if abstraction A is <em>thermometer</em> and abstraction B is <em>display</em>, then to understand the code that implements the thermometer requires knowledge of the concept of display. That&#8217;s why we sometimes refer to it as a knowledge dependency. Such a dependency always applies at design-time, and may apply at compile-time and run-time. Some knowledge dependencies may apply at design-time only. For example a dependency may be on a convention, or it may be simply the knowledge of ALA. You need knowledge of those things to fully understand the code. We want to be explicit and clear about knowledge dependencies for every bit of code inside every abstraction, so we endeavour to always state implicit dependencies in comments. For example, in the implementation of an abstraction for a hardware device, I include a reference to the datasheet.</p>
+<p>Dependencies on more abstract abstractions also explicitly tell us what knowledge we need in order to <em>understand</em> code. For example, if abstraction A is <em>thermometer</em> and abstraction B is <em>display</em>, then to understand the code that implements the thermometer requires knowledge of the concept of display. That&#8217;s why we sometimes refer to it as a knowledge dependency. Such a dependency always applies at design-time.</p>
 </div>
 <div class="paragraph">
-<p>Architectures generally work by applying constraints that restrict the infinite variety of ways code could be organised. The ALA constraint of this single relationship type may seem severe at first, but after some practice they change from a hinderence to being increasingly helpful in guiding the design. Sometimes the abstractions come easily from the wording in the requirements and sometimes they require sustained inventive thought processes, especially in a new domain.</p>
+<p>The dependency usually applies at compile-time and run-time as well, but not necessarily. It could be purely a knowledge dependency, for example a dependency may be on a convention, or it may be simply the knowledge of ALA. You need knowledge of those things to fully understand the code. We want to be explicit and clear about knowledge dependencies for every bit of code inside every abstraction, so we endeavour to always state implicit knowledge dependencies in comments. For example, in the implementation of an abstraction for a hardware device, I always include a reference to the datasheet.</p>
+</div>
+<div class="paragraph">
+<p>Architectures generally work by applying constraints that restrict the infinite variety of ways code could be written. The ALA constraint of allowing a single relationship type may seem severe, but after some practice, it changes from a hinderence to being an increasingly helpful guide to the design. Sometimes the abstractions come easily from the wording in the requirements and sometimes they require a determined inventive thought process, especially in a new domain.</p>
 </div>
 <div class="paragraph">
 <p>If you are finding it difficult, then first make sure you have well written requirements that capture all details. The user story abstractions should be just a more formal expression of them in terms of abstractions they probably already mention.</p>
 </div>
 <div class="paragraph">
-<p>In most domains, I usually start with the UI description in the requirements as they most readily reveal their domain abstractions. Then it becomes apparent that dataflows must be connected to these instances of UI abstraction elements. Data transformation and state abstractions will then become apparent next.</p>
+<p>In most domains, I usually start with the UI description in the requirements as they most readily reveal their domain abstractions. Then it becomes apparent that dataflows must be connected to these instances of UI abstraction elements. Data transformation and state abstractions will become apparent next.</p>
 </div>
 <div class="sect4">
 <h5 id="truerip-the-uml-class-diagram"><a class="anchor" href="#truerip-the-uml-class-diagram"></a>RIP the UML class diagram</h5>
@@ -2368,17 +2387,17 @@ namespace DomainAbstractions
 <div class="title">Figure 11. UML class diagrams for ALA have no relation lines.</div>
 </div>
 <div class="paragraph">
-<p>The diagram is not useful. We will never use it again. That&#8217;s not to say we won&#8217;t use diagrams. Diagrams can be used in ALA to represent the internals of an abstraction. This is often done in the layer representing the application for a feature or user story. In ALA terms, it shows instances of (lower layer) abstractions composed together as a graph. In implementation terms it is a (static) UML object diagram.</p>
+<p>The diagram is not useful. We will never use it again. That&#8217;s not to say we won&#8217;t use diagrams. Diagrams can be used in ALA to represent the internals of an abstraction. This is often done in the layer representing the application or a feature or user story. In ALA terms, it shows instances of (lower layer) abstractions composed together as a graph. In implementation terms it is a (static) UML object diagram.</p>
 </div>
 <div class="paragraph">
-<p>Class diagrams are evil. They have done more damage to software architecture than any other meme. Following are the UML relationships you cannot use in ALA, and what you do instead.</p>
+<p>Class diagrams are evil. I think they have done more damage to software architecture than any other meme in our industry. Following are the UML relationships you cannot use in ALA, and what you do instead.</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><strong>Association</strong>: A conventional program will typically have many bad dependencies referred to as <em>associations</em> in the UML. Most are there because data, messages, events, execution flow, etc, need to get from one place to another in the program. They are illegal in ALA. So how can a program work without them? How do we get data and events from one place to another at run-time? The short answer is that all these associations become a simple line of code inside an abstraction in the layer above. Such lines are not relationships or dependencies - they are contained inside a single abstraction, no different to a line of code that say calls one function and passes the result to another function. In ALA, you create objects in a higher level abstraction and then wire them together. The abstractions themselves then do not know where their data comes from, nor where it goes.</p>
+<p><strong>Association</strong>: A conventional program will typically have many bad dependencies referred to as <em>associations</em> in the UML. Most are there because data, messages, events, execution flow, etc, need to get from one place to another in the program. They are illegal in ALA. So how can a program work without them? How do we get data and events from one place to another at run-time? The short answer is that all these associations become a simple line of code inside an abstraction in the layer above. Such lines of code are not relationships or dependencies between the abstractions involved, they simply instantiate the abstractions involved. You create objects in a higher level abstraction and then wire them together. The abstractions themselves do not know where their data comes from, nor where it goes.</p>
 <div class="paragraph">
-<p>Note that simple dependency injection or otherwise passing an object into another object doesn&#8217;t remove the association between their respective classes. It only changes the relationship from composition to association, neither of which is allowed between peer classes. In other words, in ALA you are not allowed to know about a class in the same layer, not even its interface. Not even a base class. Instead you must use a much more abstract interface called a programming paradigm interface from a lower layer. The use of this type of interface means that the classes know nothing about the outside world. That&#8217;s why we call the usage a port.</p>
+<p>Note that simple dependency injection or otherwise passing an object into another object doesn&#8217;t remove the association between their respective classes. It only changes the relationship from composition to association, neither of which is allowed between peer classes. In other words, in ALA you are not allowed to know about a class in the same layer, not even its interface. Not even a base class. Instead you must use a much more abstract interface called a programming paradigm interface from a lower layer. The use of this type of interface means that the classes know nothing about each other. That&#8217;s why we call the usage a port.</p>
 </div>
 </li>
 <li>
@@ -2396,32 +2415,38 @@ namespace DomainAbstractions
 <p>In other words, the word, 'vehicle', would mean a category or domain, not a part in itself.</p>
 </div>
 <div class="paragraph">
-<p>Now if we need to express the requirement to "drive the vehicle", car, truck and tank would each implement a 'drive' interface with, say, accelerate, slowdown, and steer methods, not be derived from a generic vehicle that is drivable. In the domain layer we may implement a behaviour class that implements general driving behaviour. The Drive domain abstraction may have ports that are connectable to other domain components' ports such as engine control port, and brake control port. Most variations would be handled by a configuration interface (the public interface) for common variations such as settings. To overriding the drive domain abstractions behaviour, you would insert code in the car, truck or tank application code where it uses the Drive object.</p>
+<p>Now if we need to express the requirement to "drive the vehicle", car, truck and tank would each implement a 'drive' interface with, say, accelerate, slowdown, and steer methods, not be derived from a generic vehicle that is drivable. In the domain layer we may implement a behaviour class that implements general driving behaviour. Sych a <em>Drive</em> domain abstraction may have ports that are connectible to other domain components' ports such as engine control port, and brake control port.</p>
 </div>
 <div class="paragraph">
-<p>If there <em>was</em> justification to build a concrete generic drivable vehicle, it would be used from the upper layers using composition not inheritance. A real world example would be more like a chassis platform concept. But this is probably a bad design as the chassis concept would have many functions and so not be abstract enough, versatile enough, or small enough.</p>
+<p>To override the Drive domain abstraction&#8217;s behaviour, you would put code in the car, truck or tank application code where it uses the Drive object.</p>
+</div>
+<div class="paragraph">
+<p>Most variations would be handled by a configuration interface (the public interface) on each domain abstraction.</p>
+</div>
+<div class="paragraph">
+<p>If there <em>was</em> justification to build a concrete generic drivable vehicle, it would be used from the upper layers using composition not inheritance. It would likely have a lot of configuration. A real world example would be more like a chassis or platform concept. But this is probably a bad design as the chassis or platform concept would likely have many functions and so not be a good abstraction, would not be as versatile as composing it from parts, and would not be small enough in implementation.</p>
 </div>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>Inheritance provides a mechanism for 'calling up the layers' at run-time through its virtual functions. In ALA, we do this with ordinary observer or publish/subscribe pattern (events in C#), or by passing in a method as a configuration (usually anonymously or as a lambda expression), or by using the strategy pattern.</p>
+<p>Something inheritance provides is a mechanism for 'calling up the layers' at run-time through its virtual functions. In ALA, we do this with ordinary observer (publish/subscribe) pattern (events in C#), or by passing in a method as a configuration (usually anonymously or as a lambda expression), or by using the strategy pattern.</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
 <p><strong>Packages</strong>: ALA does not use hierarchies or nesting. In other words, abstractions cannot be contained by other abstractions. Abstractions are never private. The reason they are never private is simple. An abstraction that is depended on should be more abstract than the abstraction using it. A more abstract abstraction needs to be public so it can be reused. ALA uses abstraction layers instead of encapsulation hierarchies. In ALA, packages would only be used as a distribution mechanism, not as part of the architecture for information hiding.</p>
 <div class="paragraph">
-<p>The word package means container. Packages are usually just a container of abstractions such as a library. We should not consider knowledge dependencies to be on the package because we can&#8217;t generally learn a package. We should consider knowledge dependencies to be on the individual abstractions inside the package.</p>
+<p>The word package means things packed together. Packages are usually just a grouping of abstractions such as a library. We should not consider knowledge dependencies to be on the package because we can&#8217;t generally learn a package. They are not abstraction in themselves. We should consider knowledge dependencies to be on the individual abstractions of the package.</p>
 </div>
 <div class="paragraph">
-<p>Let&#8217;s consider the situation where a conventional package is a good abstraction in itself. Because it was implemented as a package, it&#8217;s internal implementation is large (Facade pattern). Let&#8217;s say our conventional package hides a lot of complex implementation and contains  abstractions that we are not interested in using in the rest of our application. For example it could be a compiler that we can invoke from our application. The thing is, if the compiler abstraction is written using ALA, it will use lots of useful abstractions for the domain of compilers and parsing. We still want those abstractions to be public for reuse. It&#8217;s just that we don&#8217;t want them particularly visible to the rest of our application, which is in a different domain. To solve this problem we should still make the abstractions used by the compiler abstraction public, but put them into a different DomainAbstractions folder and namespace. When we do this, we will want the DomainAbstractions folders to be qualified with the name of the domain, such as CompilerDomainAbstractions.</p>
+<p>Let&#8217;s consider a situation where a conventional package is a good abstraction in itself. Because it was implemented as a package, it&#8217;s internal implementation is large (Facade pattern). Let&#8217;s say our conventional package hides a lot of complex implementation and uses abstractions that we are not interested in using in the rest of our application. For example it could be a compiler that we can invoke from our application. The thing is, if the compiler abstraction is written using ALA, it will use lots of useful abstractions for the domain of compilers and parsing. We still want those abstractions to be public for reuse. It&#8217;s just that we don&#8217;t want them particularly visible to the rest of our application, which is in a different domain. To solve this problem we should still make the abstractions used by the compiler abstraction public, but put them into a different DomainAbstractions folder and namespace. When we do this, we will want the DomainAbstractions folders to be qualified with the name of the domain, such as CompilerDomainAbstractions.</p>
 </div>
 </li>
 <li>
 <p><strong>Namespaces</strong>: While not part of the UML, we can discuss namespaces here in case you think of them in some way similar to packeages. In ALA, namespaces are used for the layers. For example we use namespaces such as Application, DomainAbstractions and ProgrammingParadigms. This allows unrelated abstractions in different layers to have the same name. The files that implement abstractions are put inside folders that have the same names as the namespaces.</p>
 <div class="paragraph">
-<p>Note that unlike packages, namespaces are not encapsulations. Namespaces only make names unique. One 3rd party tool I used to generate dependency graphs showed dependencies on namespaces as if namespaces were abstractions. This gave a completely misleading view of the true nature of the dependencies in the code. I had to write a custom query for the tool to show the actual dependencies on the abstractions inside the namespaces.</p>
+<p>Note that unlike packages, namespaces are not encapsulations. Namespaces only make names unique. One 3rd party tool I used to generate dependency graphs showed dependencies on namespaces as if namespaces were encapsulations. This gave a completely misleading view of the true nature of the dependencies in the code. I had to write a custom query for the tool to show the actual dependencies on the abstractions inside the namespaces.</p>
 </div>
 </li>
 </ul>
@@ -2432,10 +2457,13 @@ namespace DomainAbstractions
 <div class="sect2">
 <h3 id="trueabstraction-layers"><a class="anchor" href="#trueabstraction-layers"></a>2.2. Abstraction layers</h3>
 <div class="paragraph">
-<p>Because the target of a dependency must be more abstract, abstractions arrange themselves in discrete layers. This is what gives the architecture its name: Abstraction Layered Architecture.</p>
+<p>In this perspective, we look at the structure of ALA in terms of layers. This is the perspective that gives Abstraction Layered Architecture its name, and its the one we should have in mind when organising our ALA code.</p>
 </div>
 <div class="paragraph">
-<p>Only a small number of layers are needed. Consider that we can construct the human body with just six layers: Atoms, Molecules, Proteins, Cells, Organs, Body. Probably need another two or three to build the human brain from neurons. Small applications generally use four. The layers are given standard names that describe their level of abstraction:</p>
+<p>Because the target of a dependency must be more abstract, abstractions naturally arrange themselves in discrete layers. In implementation, each layer should have its own folder under the parent project folder.</p>
+</div>
+<div class="paragraph">
+<p>Only a small number of layers are needed. Consider that we can construct the human body with just six abstraction layers: Atoms, Molecules, Proteins, Cells, Organs, Body. Probably need another two layers to build the human brain (an organ) from neurons (which are cells) according to the internal structure of the brain, which I don&#8217;t know. Small applications generally use four layers. The layers are given standard names that describe their level of abstraction:</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -2449,7 +2477,7 @@ namespace DomainAbstractions
 <div class="sect4">
 <h5 id="trueapplication-layer"><a class="anchor" href="#trueapplication-layer"></a>Application layer</h5>
 <div class="paragraph">
-<p>In describing example layers, we start with example code. This code will build into a complete running application so no holes are left in understanding the code level mechanics of how everything works. The accompanying bullet points then explain the high level theory of why the code is organised the way it is. The code is available here:
+<p>In describing example layers, we start with some code. This code will build into a complete running application so no holes are left in understanding how everything works. The accompanying bullet points then explain the organisation of the code in the layers. The code is available here:
 <a href="https://github.com/johnspray74/Thermometer">https://github.com/johnspray74/Thermometer</a></p>
 </div>
 <div class="listingblock">
@@ -2485,7 +2513,7 @@ namespace Application
 </div>
 </div>
 <div class="paragraph">
-<p>To understand the code, you need to have knowledge of the abstraction concepts on which it depends. These are:</p>
+<p>To understand ALA code, you need to have knowledge of the abstraction concepts it uses. In this top layer code, these are:</p>
 </div>
 <div class="colist arabic">
 <table>
@@ -2495,7 +2523,7 @@ namespace Application
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>LowPassFilter - domain abstraction - we already met this at the beginning of this chapter</td>
+<td>LowPassFilter - domain abstraction - we already met this at the beginning of this chapter. Has input and output ports of type IDataFlow&lt;double&gt;.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
@@ -2520,8 +2548,7 @@ namespace Application
 </table>
 </div>
 <div class="paragraph">
-<p>Once you have knowledge of these abstractions, notice that the application code is readabable by itself. It holds all knowledge about thermometers.
-That knowledge sits at the abstraction level of the requirements. It is highly cohesive - every line works with every other line to make a thermometer. It does none of the work itself - it just assembles and configures the needed worker objects.</p>
+<p>Once you have knowledge of these abstractions, notice that the application code is readabable by itself. That knowledge sits at the abstraction level of the requirements. It is highly cohesive - every line works together with every other line to make a thermometer. This abstraction holds all knowledge about thermometers. There is no code anywhere else that has anything specific to do with thermometers. It does none of the work itself - it just assembles and configures instances of the the needed domain abstractions.</p>
 </div>
 <div class="paragraph">
 <p>The application layer is three things in one: The architecture design, the expression of requirements, and the executable. In conventional software development, these are three separate artefacts.</p>
@@ -2581,18 +2608,18 @@ namespace DomainAbstractions
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Important to comment what the abstraction concept is.</td>
+<td>Important to say what the abstraction concept is in the comment section.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
 <td>The input port is the implemented interface.
 <div class="paragraph">
-<p>In the application code in the previous section, an instance of LowPassFilter was wired to an instance of OffsetAndScale. When wired, the <em>output</em> field of the LowPassFilter is set to the OffsetAndScale object, cast as the appropriate interface, in this case IDataFlow&lt;double&gt;.</p>
+<p>In the application code in the top layer, an instance of LowPassFilter was wired to an instance of OffsetAndScale. When wired, the <em>output</em> field of the LowPassFilter is set to the OffsetAndScale object, cast as the appropriate interface, in this case IDataFlow&lt;double&gt;.</p>
 </div></td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>The output port <em>output</em> is private so that it does not appear as a configuration to the layer above. It is set by WireIn or WireTo using reflection.</td>
+<td>The output port <em>output</em> is private so that it does not appear as a part of the configuration interface to the layer above. It is set by WireIn or WireTo using reflection.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
@@ -2600,7 +2627,7 @@ namespace DomainAbstractions
 </tr>
 <tr>
 <td><i class="conum" data-value="5"></i><b>5</b></td>
-<td>When data is pushed into the input, it is transformed and pushed out of the output port.</td>
+<td>When data arrives at the input port, it is transformed and pushed out of the output port.</td>
 </tr>
 </table>
 </div>
@@ -2724,28 +2751,34 @@ namespace DomainAbstractions
 </div>
 </div>
 <div class="paragraph">
-<p>As can be seen in the above examples, the domain abstractions layer contains concepts that can be composed into applications. These are typically building blocks for I/O, data transformations, and persistent state, but many other types of abstractions are possible.</p>
+<p>Note that the output port of ADCSimulator is IDataFlow&lt;int&gt;, and the application wired it directly to a LowPassFilter whose input port was type IDataFlow&lt;double&gt;. So we should have wired a type converter abstraction inbetween. We&#8217;ll do that in a later example.</p>
 </div>
 <div class="paragraph">
-<p>Some of these types of things may also be found in general language libraries but domain abstractions are more specific to the types of applications we want to express using them. They are specific to a domain, making them more expressive, but less reusable than general purpose language abstractions. They are still reusable both within a single application and by other applications in the same domain.</p>
+<p>As can be seen in the above examples, the domain abstractions layer contains abstractions that can be composed into applications. These are typically building blocks for I/O, data transformations, and persistent state, but many other types of abstractions are possible.</p>
 </div>
 <div class="paragraph">
-<p>Another difference between ALA domain abstractions and typical library abstractions is the use of ports. This supports building functionality by simply composing instances of abstractions. While the composing code controls who will communicate with whom, it does not actually handle the data at run-time. The data moves directly between instances via the wired ports.</p>
+<p>It&#8217;s important that these domain abstraction no nothing about the thermometer. They are not specifically parts of a thermometer. Even though in our example, an instance of an ADC is composed with an instance of a LowPassFilter, the ADC and the LowPassFilter don&#8217;t know who they are going to be wired to. They could be wired to anything that will give them data or take their data. They only know as far as their own ports, not beyond that.</p>
 </div>
 <div class="paragraph">
-<p>A further difference between ALA domain abstractions and typical library abstractions is that when domain abstractions are composed, the meaning of composition can be a programming paradigm other than imperative. For example the application above uses a dataflow programming paradigm. Imperative is not usually a good programming paradigm for the expression of requirements, but it&#8217;s all your basic language gives you (unless you are using language integrated monads, which also give you dataflow programming).</p>
+<p>Some of these types of abstractions may also be found in general language libraries but domain abstractions are more specific to the types of applications we want to express using them. They are specific to a domain, making them more expressive, but less reusable than general purpose library abstractions. They are still reusable both within a single application and by other applications in the same domain.</p>
 </div>
 <div class="paragraph">
-<p>The domain abstractions layer and programming paradigms layer together are like a DSL (Domain Specific Language). We can think of domain abstractions as composable domain language elements and the programming paradigms as providing the grammar.</p>
+<p>Another difference between ALA domain abstractions and typical library abstractions is the use of ports. This supports building functionality by simply composing instances of abstractions. While the higher layer composing code controls who will communicate with whom, it does not actually handle the data at run-time. The data moves directly between instances via the wired ports. Library abstractions typically don&#8217;t use ports. So the composing code typically has to handle the data. They will pass data to the library abstraction instance, and receive data back.</p>
 </div>
 <div class="paragraph">
-<p>It is an internal DSL because it uses the underlying language (<em>WireTo</em> method, and <em>new</em>). This allows you to easily fall back on the greater flexibility of the underlying language when you need to. For example, you can pass lambda expressions as configuration properties to a domain abstraction. Or, you can pass a whole object of a class that you write in the application layer (which is the strategy pattern).</p>
+<p>A further difference between ALA domain abstractions and typical library abstractions is that when domain abstractions are composed, the meaning of composition can be a programming paradigm other than imperative. For example the application above uses a dataflow programming paradigm. Imperative is not usually a good programming paradigm for the expression of requirements, but it&#8217;s all your basic language and library gives you (unless you are using language integrated monads, which also give you dataflow programming). But ports allow you to use any kind of programming paradigm. For example, we can make ports that when wired mean laying out a user interface. That is, wiring these types of ports means putting a UI element inside another UI element on the display.</p>
 </div>
 <div class="paragraph">
-<p>Conventional libraries generally contain good abstractions. What makes them good abstractions is that their designers don&#8217;t know anything about the specific applications that will use them. Writing domain abstractions is best done in the same way. After the need for an abstraction is decided, pretend you don&#8217;t know anything about the application, and are writing something to be useful, reusable and learnable as a new concept. Then they should not just be specific parts of a specific application.</p>
+<p>The domain abstractions layer and programming paradigms layer together are like a DSL (Domain Specific Language). We can think of domain abstractions as composable elements and the programming paradigms as the grammar.</p>
 </div>
 <div class="paragraph">
-<p>As we said, abstractions know nothing of each other at design-time, yet can still communicate directly with one another at run-time. It is the responsibility of the code in the layer above that composes them to know the meaning of the data. It knows the meaning of the data even though it does not handle the data. For example, our application above knows that data going from the ADC to the LowPassFilter is raw adc values representing temperature, and what the values mean. It knows that the data passing between the LowPassFilter and the OffsetAndScale is sufficiently smoothed and slowed down for a stable display. It knows that the data passing from the OffsetAndScale to the display is in degrees celsius. All these pieces of knowledge are cohesive in the design of the thermometer, and so belong together inside the Thermometer abstraction.</p>
+<p>The domain and programming paradigm layers are an internal DSL (as appossed to an external DSL). This means that they only use the underlying language (<em>WireTo</em> is an extension method, and <em>new</em> is a language keyword). They don&#8217;t introduce any new syntax outside of the underlying language that would need parsing. This allows you to easily fall back on the greater flexibility of the underlying language when you need to. For example, when configuring a domain abstraction, you could pass in lambda expressions. Or, you can pass a whole object of a class that you write in the application layer (which is the strategy pattern).</p>
+</div>
+<div class="paragraph">
+<p>Conventional libraries generally contain good abstractions. What makes them good abstractions is that their designers don&#8217;t know anything about the specific applications that will use them. Writing domain abstractions is best done in the same way. After the need for an abstraction is decided, pretend you don&#8217;t know anything about the application, and are writing something to be useful, reusable and learnable as a new concept. Then they should not just be specific parts of a specific application, but concepts that you can learn so that when you read that code that uses them, you don&#8217;t have to go and read the implementation.</p>
+</div>
+<div class="paragraph">
+<p>As we said, abstractions know nothing of each other at design-time, yet can still communicate directly with one another at run-time. It is the responsibility of the code in the layer above that composes them to know the meaning of the data. It knows the meaning of the data even though it does not handle the data. For example, our application above knows that data going from the ADC to the LowPassFilter is raw adc values representing temperature, and what the values mean. It knows that the data passing between the LowPassFilter and the OffsetAndScale is sufficiently smoothed and slowed down for a stable display. It knows that the data passing from the OffsetAndScale to the display is in degrees Celsius. All these pieces of knowledge are cohesive in the design of the thermometer, and are contained together inside the Thermometer abstraction. In a conventional application, these pieces of knowledge would likely be spread between multiple cooperating modules.</p>
 </div>
 </div>
 <div class="sect4">
@@ -2793,22 +2826,22 @@ namespace DomainAbstractions
 <p>The interface returns the .NET WPF element of the child. This allows domain abstractions to construct the UI using underlying WPF elements. In effect, UI domain abstractions are wired together in a similar way to XAML. Both have descriptive, tree structured syntax, but ALA is using the underlying C# language whereas XAML is using XML.</p>
 </div>
 <div class="paragraph">
-<p>You can conceive other programming paradigms to give different meanings to composition of domain abstractions in such a way as to allow the easiest representation of typical requirements. For example, for implementing game scoring, I used a programming paradigm called <em>ConsistsOf</em>. For tennis, I used it to express that a match consists of a sets, a set consists of a games, and a game consists of a points. See the example project at the end of chapter four which uses it to implement tennis and bowling. Being able to compose instances of domain abstractions together with meanings that you define in the programming paradigms layer is powerful.</p>
+<p>You can conceive other programming paradigms to give different meanings to composition of domain abstractions in such a way as to allow the easiest representation of typical requirements. For example, for implementing game scoring, I used a programming paradigm called <em>ConsistsOf</em>. For tennis, I used it to express that a Match consists of Sets, a Set consists of Games, and a Game consists of Points. See the example project at the end of chapter four which uses it to implement both tennis and bowling scoring programs. Being able to compose instances of domain abstractions together with meanings that you define in the programming paradigms layer is a powerful way to express requirements succinctly.</p>
 </div>
 <div class="paragraph">
 <p>ALA is polyglot in programming paradigms. An application typically mixes a small set of different paradigms. Each provides a different meaning when the application wires two instances of domain abstractions together. Examples might be Dataflow, UI Layout, Event driven, State machine transition, Data schema entity relationship. Some may have variations such as pushing or pulling, or synchronous and asynchronous.</p>
 </div>
 <div class="paragraph">
-<p>Programming paradigms control the way the application actually executes. Execution models such as synchronous vs asynchronous, push vs pull, and fan-out and fan-in wiring are discussed in Chapter four.</p>
+<p>Programming paradigms provide the execution mechanism of direct communication between instances of domain abstractions. They do this without the abstractions themselves knowing anything about each other. This means that it is the programming paradigms that control the whole way the application actually executes. Neither the Application layer, nor the domain abstractions layer are involved in this. The application layer is just composing domain abstractions. The domain abstractions only respond to what happens at their ports.</p>
+</div>
+<div class="paragraph">
+<p>Execution models such as synchronous vs asynchronous, push vs pull, and fan-out and fan-in wiring are discussed in Chapter four.</p>
 </div>
 <div class="paragraph">
 <p>Programming paradigms provide the rules for the way instances of domain abstractions can be composed by the application. They are the grammar of the DSL.</p>
 </div>
 <div class="paragraph">
-<p>Programming paradigms provide the mechanism of direct communication between instances of domain abstractions. They do this without the abstractions themselves knowing anything about each other.</p>
-</div>
-<div class="paragraph">
-<p>Through the use of programming paradigms, domain abstractions know nothing about each other at design-time, yet instances of them can communicate at run-time. Of course we could achieve this by making the application handle the run-time communications. The common example would be an application that calls one function which returns a result, and then calls another function passing the result to it. This would almost comply with ALA. The problem is we don&#8217;t really want the application to be concerned with run-time communications. The application really just wants to concentrate on representing user stories by composing instances of domain abstractions. So we use a layer below the domain abstractions called programming paradigms. The programming paradigms allow domain abstractions to have compatible ports, which in turn allows them to communicate directly with one another at run-time. The design of the communications is in the Application layer, but the execution is in the domain abstractions and programming paradigms layers.</p>
+<p>Through the use of programming paradigms, domain abstractions know nothing about each other at design-time, yet instances of them can communicate at run-time. Of course we could achieve this by making the application handle the run-time communications. The common example would be an application that calls one function which returns a result, and then calls another function passing the result to it. This would almost comply with ALA. The problem is we don&#8217;t really want the application to be concerned with run-time communications. The application really just wants to concentrate on representing user stories by composing instances of domain abstractions. So we use a layer below the domain abstractions called programming paradigms. The programming paradigms allow domain abstractions to have compatible ports, which in turn allows them to communicate directly with one another at run-time. The design of the specific communications that will take place is in the Application layer, but all the execution is in the domain abstractions and programming paradigms layers.</p>
 </div>
 </div>
 <div class="sect4">
@@ -2817,16 +2850,16 @@ namespace DomainAbstractions
 <p>The foundation layer contains code used to support ALA programs in general.</p>
 </div>
 <div class="paragraph">
-<p>A common pattern I use is a WireIn() and WireTo() extension methods in the foundation layer. The application layer uses them to wire together instances of Domain Abstractions using ports.</p>
+<p>A common pattern I use is a WireIn() and a WireTo() extension method in the foundation layer. The application layer uses them to wire together instances of Domain Abstractions using ports.</p>
 </div>
 <div class="paragraph">
-<p>WireIn() and WireTo() are dependency injection methods.</p>
+<p>WireIn() and WireTo() are dependency injection methods, but ALA is more constrained than your average application implemented on dependency injection, because the interfaces used must be more abstract than the domain abstractions whose instances are being wired together.</p>
 </div>
 <div class="paragraph">
-<p>WireTo(), uses reflection. It&#8217;s not essential to use reflection for ALA. You could use dependency injection setters in every domain abstraction instead. You would need one setter per port on the left abstraction. You wouldn&#8217;t use constructor dependency injection because sometimes wiring a port is optional. I prefer using the WireTo extension method because it allows domain abstractions to not need all these setters.</p>
+<p>WireTo(), uses reflection. It&#8217;s not essential to use reflection for ALA. You could use dependency injection setters in every domain abstraction instead. You would need one setter per port on the left abstraction. You wouldn&#8217;t use constructor dependency injection because sometimes wiring a port is optional. I prefer using the WireTo extension method because it allows domain abstractions to not need all these setter methods.</p>
 </div>
 <div class="paragraph">
-<p>Here is minimal code for the WireTo method.</p>
+<p>Here is minimal code for the WireTo method in case you are interested to see how the reflection works. It not necessary to understand this code to use ALA.</p>
 </div>
 <div class="literalblock">
 <div class="content">
@@ -2945,10 +2978,10 @@ namespace DomainAbstractions
 <p>If a single abstraction is used for the application, then as more and more user stories are added into it, it will eventually get too large for the ALA size constraint. Meanwhile, domain abstractions and programming paradigms are stable and do not generally grow larger with overall program size. They may increase in number, but it is the application that will go over the 500 line complexity limit.</p>
 </div>
 <div class="paragraph">
-<p>ALA will need to be applied to the large application abstraction by adding a new layer below it. The requirements are likely already written in terms of abstractions which we call <em>features</em> or <em>user stories</em> or <em>use cases</em>. We can use these abstractions as the basis for the new layer. We call the layer "Features" or "UserStories". The application abstraction becomes a composition of features or user stories.</p>
+<p>ALA will need to be applied to the large application abstraction by adding a new layer below it. The requirements are likely already written in terms of naturally separate abstractions which we call <em>features</em> or <em>user stories</em>. We can use these abstractions as the basis for the new layer. We call the layer "Features" or "User Stories". The application abstraction becomes a composition of features or user stories.</p>
 </div>
 <div class="paragraph">
-<p>Let&#8217;s extend the Thermometer example code we used above to have a new feature for measuring load. At the same time, let&#8217;s introduce a features layer with the two features: temperature and loadcell.</p>
+<p>Let&#8217;s change the Thermometer example application we used above to have a new feature for measuring load as well as temperature. At the same time, let&#8217;s introduce a features layer with the two features: temperature and loadcell.</p>
 </div>
 <div class="paragraph">
 <p>I have deliberately retained a need for communication between the two features to show how features can also have ports and be wired together.</p>
@@ -3011,7 +3044,7 @@ namespace Application
 <p>Each feature creates instances of domain abstractions, configures the instances with feature specific details, and connects them together as needed to express the feature or user story.</p>
 </div>
 <div class="paragraph">
-<p>Here is the Thermometer application rewritten to be a Temperature feature:</p>
+<p>Here is the Thermometer application rewritten to be a Temperature feature. It has been modified to output the temperature in Celsius to a port. This port can be wired to any other features that want to know the temperature:</p>
 </div>
 <div class="listingblock">
 <div class="title">Features\Temperature.cs</div>
@@ -3042,7 +3075,7 @@ namespace Features
                 .WireIn(new OffsetAndScale(offset: -200, scale: 0.2)) // 200 adc counts is 0 C, 300 adc counts is 20 C
                 .WireIn(new DataFlowFanout&lt;double&gt;()) <i class="conum" data-value="3"></i><b>(3)</b>
                 .WireTo(new DisplayNumeric&lt;double&gt;(label: "Temperature") { units = "C"} ) <i class="conum" data-value="5"></i><b>(5)</b>
-                .WireTo(new DataFlowExternalPort&lt;double&gt;((d) =&gt; output?.Push(d))); <i class="conum" data-value="4"></i><b>(4)</b>
+                .WireTo(new ToLambda&lt;double&gt;((d) =&gt; output?.Push(d))); <i class="conum" data-value="4"></i><b>(4)</b>
         }
 
 
@@ -3065,7 +3098,7 @@ namespace Features
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>ChangeType: allows Dataflow ports of one type to be wired to Dataflow ports of a different type. In this case, the output of ADCSimlator is <em>int</em> and the input of LowPassFilter is <em>double</em>.</td>
+<td>ChangeType: allows Dataflow ports of one type to be wired to Dataflow ports of a different type. In this case, the output of ADCSimlator is <em>int</em> and the input of LowPassFilter is <em>double</em>. (Remember in our Thermometer example application, we left this out, which was a problem, but now we have fixed it.)</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
@@ -3073,7 +3106,7 @@ namespace Features
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>DataFlowExternalPort. We want to wire the output of the DataFlowFanout to the external port <em>output</em>. You might think you could just write .WireTo(output). The reason this doesn&#8217;t work is that when the Temperature constructor runs, the code on the outside is instantiating a Temperature. That same external code would not have wired our <em>output</em> port yet. It&#8217;s value will be null at this time. Therefore we instead wire to a simple class that takes a function as its configuration. For the function we pass in a lambda expression that will push the data via the <em>output</em> port.</td>
+<td>ToLambda. We want to wire the output of the DataFlowFanout to the our own port, <em>output</em>. You might think you could just write .WireTo(output). This almost works. The reason it doesn&#8217;t work is that when the Temperature constructor runs, the application code in the layer above is instantiating a Temperature object. That  code would not have wired our the temperature object&#8217;s <em>output</em> port yet. It&#8217;s value will be null at this time. Therefore WireTo(output) would try to wire to null instead of some object. Therefore we instead wire to a simple intermediate object that will pass it&#8217;s input on to the Temperature classes output port at run-time. This intermediate object is from a domain abstraction class called ToLambda that simply has a single input port, and takes a function as its configuration. For the function we pass in a lambda expression that will push the data via the <em>output</em> port.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="5"></i><b>5</b></td>
@@ -3107,7 +3140,7 @@ namespace Features
 
         /// &lt;summary&gt;
         /// Constructor:
-        /// Feature to coninuously measure a load from a load cell and display it in kg /// on the console.
+        /// Feature to continuously measure a load from a load cell and display it in kg /// on the console.
         /// Displays with one decimal place.
         /// Has temperature compensation for better accuracy (optionally feed temperature
         /// into the input port in degress C)
@@ -3124,7 +3157,7 @@ namespace Features
                 .WireIn(add)
                 .WireTo(new DisplayNumeric&lt;double&gt;(label: "Load") { fixPoints = 1, units = "kg" } ); <i class="conum" data-value="2"></i><b>(2)</b>
 
-            // Wire the inut port for temperature to another OffsetAndScale to the other input of the Add.
+            // Wire the input port for temperature to another OffsetAndScale to the other input of the Add.
             defaultTemperature = new DataFlowInitializer&lt;double&gt;(); <i class="conum" data-value="6"></i><b>(6)</b>
             offsetAndScaleTemperature = new OffsetAndScale(offset: -20, scale: -0.1); // compensate -0.1 kg/C from 20 C <i class="conum" data-value="2"></i><b>(2)</b>
             defaultTemperature.WireIn(offsetAndScaleTemperature) <i class="conum" data-value="7"></i><b>(7)</b>
@@ -3162,11 +3195,11 @@ namespace Features
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Debugging a dataflow can be done by inserting an object (decorator pattern) that outputs the values in the stream.</td>
+<td>Debugging a dataflow can be done by inserting an object (decorator pattern) that outputs the values in the stream to a console output.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>A new domain abstraction called <em>Add</em> is used. It has two IDataflow&lt;double&gt; inputs and a IDataFflow&lt;double&gt; output. We assign the Add to a local variable so that we can wire the second input later. Note that a C# class cannot implement the same interface twice (even though there is no reason why not). There are several ways we have used to work around this limitation. The one used here is to make one of the ports a Double2, a struct containing a double. This allows to have a double with a different type.</td>
+<td>A new domain abstraction called <em>Add</em> is used. It has two IDataflow&lt;double&gt; inputs and a IDataFflow&lt;double&gt; output. We assign the Add to a local variable so that we can wire the second input later. Note that a C# class cannot implement the same interface twice (even though there is no reason why not). There are several ways we have used to work around this limitation. The one used here is to make one of the ports a Double2, a struct containing a double. This allows to have a double with a different type to the compiler, but the same type to us.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="5"></i><b>5</b></td>
@@ -3174,7 +3207,7 @@ namespace Features
 </tr>
 <tr>
 <td><i class="conum" data-value="6"></i><b>6</b></td>
-<td>DataFlow initializer is a domain abstraction that can be used to initialize inputs of a dataflow in case no input arrives in time at run-time. In this case one of the two inputs to <em>Add</em> may not arrive if the temperature input port is not connected to anything. We therefore want to initialize it with a default temperature of 20 C.</td>
+<td>DataFlow initializer is a domain abstraction that can be used to initialize inputs of a dataflow in case no input arrives at run-time. In this case one of the two inputs to <em>Add</em> may not arrive if the temperature input port is not connected to anything. We therefore want to initialize it with a default temperature of 20 C.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="7"></i><b>7</b></td>
@@ -3272,6 +3305,9 @@ namespace DomainAbstractions
 <td>Implement the second input port</td>
 </tr>
 </table>
+</div>
+<div class="paragraph">
+<p>That completes our code example of an application that includes a Features layer. The application layer instantiated two feature abstractions, and wired one to the other. Each feature used several abstractions from the domain abstractions layer. Both the Features layer abstractions and the Domain abstractions used ports of type DataFlow.</p>
 </div>
 </div>
 </div>
@@ -10049,6 +10085,9 @@ namespace ProgrammingParadigms
 <div class="paragraph">
 <p>In chapter 3, we did a brief comparison of ALA and monads in which we assumed prior familiarity with monads. In this section we assume no familiarity with monads. So we start by explaining what monads are.</p>
 </div>
+<div class="paragraph">
+<p>This section is necessarily long. Monads are notoriously one of the most difficult concept to understand in all of software engineering. But we will do it with tiny steps and a few examples built on real code.</p>
+</div>
 <div class="sidebarblock">
 <div class="content">
 <div class="paragraph">
@@ -10057,16 +10096,22 @@ namespace ProgrammingParadigms
 </div>
 </div>
 <div class="paragraph">
-<p>We&#8217;ll do four examples of imperative code along with the refactored code that we call monads. We will develop the refactoring in a several steps and point out advantages over the imperative code along the way.</p>
+<p>We&#8217;ll do four examples of imperative code along with the refactored code that we call monads. Only by doing multiple examples will we get the underlying pattern of what monads are.</p>
 </div>
 <div class="paragraph">
-<p>Often in imperative programming we find ourselves calling several functions in succession. What we are really doing is 'composing' functions. We would like to do this composing declaratively. By declaratively we mean that we would like to choose what functions and in what order, but not be concerned with any other details beyond that. It allows us to think of the code as data flowing sequentially from operation to operation instead of imperative execution of statements.</p>
+<p>We will start by doing the refactoring from conventional code to monads in several small steps. At each step we will point out the advantages over the imperative code.</p>
 </div>
 <div class="paragraph">
-<p>In imperative style, top layer code that calls functions needs to handle data for the functions. For example, data returned by one function is often passed to the next. This often involves creating local variables to hold data temporarily. When we <em>compose</em> functions we want the output of one to be piped to the input of the next automatically without us having to do it explicitly. Looked at in a different way, the functions' interfaces for input/output (the parameter and the return value) are exposed to the top layer when they don&#8217;t need to be. We would rather think of this input and output as separate interfaces or ports. When the top layer composes two functions, these ports are connected so that data is passed directly from one function to the next.</p>
+<p>So let&#8217;s get started.</p>
 </div>
 <div class="paragraph">
-<p>We can achieve that using code like this:</p>
+<p>Often in imperative programming we find ourselves calling several functions in succession. What we are really doing is 'composing' functions. We would like to do this composing declaratively. By declaratively we mean that we would like to choose what functions and in what order, but not be concerned with any other details beyond that. It would allow us to think of the code as data flowing sequentially from operation to operation instead of imperative execution of statements.</p>
+</div>
+<div class="paragraph">
+<p>In imperative style, top layer code that calls functions needs to handle data for the functions. For example, data returned by one function is often passed to the next. This often involves creating local variables to hold data temporarily. When we <em>compose</em> functions we want the output of one to be piped to the input of the next automatically without us having to do it explicitly. Looked at it in a different way, the functions' interfaces for input/output (the parameter and the return value) are exposed to the top layer when they don&#8217;t need to be. We would rather think of this input and output as separate interfaces or ports. When the top layer composes two functions, these ports are connected so that data is passed directly from one function to the next.</p>
+</div>
+<div class="paragraph">
+<p>We can of curse achieve that using code like this:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -10074,7 +10119,7 @@ namespace ProgrammingParadigms
 </div>
 </div>
 <div class="paragraph">
-<p>(In our sample code, we will use the number 42 as the input into the first function.)</p>
+<p>(In our sample code, we will use the number 42 as the input into the first function. That way we will be able to see where the source value being fed into the chain of functions is.)</p>
 </div>
 <div class="paragraph">
 <p>Composing functions in this way is not scalable because of the increasing levels of nested brackets every time we want to add a new function to the chain.</p>
@@ -10093,7 +10138,7 @@ int result = function3(r2);</code></pre>
 <p>This form has the aforementioned disadvantage of handling the data that passes from function to function. Furthermore, those temporary local variables make the entire scope more complicated because anywhere in the scope can potentially use any variable. The variable can be immutable, but that doesn&#8217;t help much. Nevertheless, this is representative of the basic style that a lot of imperative code follows.</p>
 </div>
 <div class="paragraph">
-<p>Let&#8217;s try to get to a style where we don&#8217;t need to handle that data ourselves and we don&#8217;t have nested brackets. Let&#8217;s try using a function called 'Compose' to compose the functions:</p>
+<p>Let&#8217;s try to get to a style where we don&#8217;t need to handle that data ourselves, and we don&#8217;t have nested brackets. Let&#8217;s try using a function called 'Compose' to compose the functions:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -10112,7 +10157,7 @@ int result = function3(r2);</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Well there doesn&#8217;t seem like there is any advantage to that. We got our nested brackets back, plus it looks even more complicated than our original bracketed code. But let&#8217;s persevere just a little longer with the idea of using a 'Compose' function, because its about to become really powerful.</p>
+<p>Well there doesn&#8217;t seem like there is any advantage to that. We got our nested brackets back, plus it looks even more complicated than our original bracketed code. But let&#8217;s persevere just a little longer with the idea of using a 'Compose' function, because it&#8217;s about to become really powerful.</p>
 </div>
 <div class="paragraph">
 <p>First let&#8217;s make the Compose function an extension method by adding a <em>this</em> keyword:</p>
@@ -10140,10 +10185,13 @@ int result = function3(r2);</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>This syntax is called fluent syntax. Fluent syntax is our first advantage of using a Compose function. We just solved the nested brackets problem, so the chain of functions is now scalable - we can easily add more functions to the chain. And, notice how the code using Compose is pure functional code. That&#8217;s because we got rid of all those local variables. That Compose function is starting to look useful.</p>
+<p>This syntax is called fluent syntax. Fluent syntax is our first advantage of using a Compose function. We just solved the nested brackets problem, so the chain of functions is now scalable - we can easily add more functions to the chain. And, notice how the code using Compose is pure functional code. That&#8217;s because we got rid of all those local variables. The Compose function is starting to look useful.</p>
 </div>
 <div class="paragraph">
-<p>The code is now a declarative dataflow programming paradigm instead of an imperative programming paradigm. We are just specifying what functions we want to compose in what order instead of imperatively calling them ourselves, and passing the data between them ourselves. It describes a flow of data rather than a flow of execution. This is our second advantage of using a Compose function.</p>
+<p>The code is now a declarative dataflow programming paradigm instead of an imperative programming paradigm. We are just specifying what functions we want to compose in what order instead of imperatively calling them ourselves, and passing the data between them ourselves. It describes a flow of data rather than a flow of execution. You make think you know how this executes, but be careful, because you don&#8217;t know how Compose does the execution. And you will soon see that it can handle the execution in a variety of ways.</p>
+</div>
+<div class="paragraph">
+<p>This is our second advantage of using a Compose function - it&#8217;s a pure dataflow programming paradigm where we are not concerned with how it executes.</p>
 </div>
 <div class="paragraph">
 <p>The Compose function takes a function pointer (delegate in C#) as its parameter. If the functions being composed are specific to the application, i.e only ever used once, we can make them anonymous and put the function&#8217;s code directly into the Compose call:</p>
@@ -10180,10 +10228,10 @@ int result = function3(r2);</code></pre>
 <div class="sect3">
 <h4 id="truedeferred-execution"><a class="anchor" href="#truedeferred-execution"></a>6.1.1. Deferred execution</h4>
 <div class="paragraph">
-<p>In the example so far, we assume that the Compose function directly and immediately calls the functions. When we compose the functions as a dataflow in the top layer, we assume that under the covers in the Compose function, the execution flow will be the same as the dataflow.</p>
+<p>In the example so far, we assumed, based on the imperative code, that the Compose function directly and immediately calls the functions. When we compose the functions as a dataflow in the top layer, we assume that under the covers in the Compose function, the execution flow will be the same as the dataflow.</p>
 </div>
 <div class="paragraph">
-<p>However, it is quite possible for the execution flow implemented in the compose function to work entirely differently from the dataflow. We can, for example, implement deferred execution, where the Compose function builds an executable structure which can be run later. Or we can have the execution be asynchronous. This separation of how it executes from the declarative composition of the functions as a dataflow is our forth advantage of using a Compose function.</p>
+<p>However, it is quite possible for the execution flow implemented in the compose function to work entirely differently from the dataflow. We can, for example, implement deferred execution, where the Compose function builds an executable structure which can be run later. This separation of how it executes from the declarative composition of the functions as a dataflow is our forth advantage of using a Compose function. It allows us to build Compose functions that use deferred execution.</p>
 </div>
 <div class="paragraph">
 <p>The Compose function we had in the previous section evaluated the functions immediately and returned a result directly. Let&#8217;s write a deferred (or lazy) version of <em>Compose</em>. Instead of returning the actual result, this version will return a new function that represents the composed functions. This returned function can then be called later. Here is a deferred version of the Compose function:</p>
@@ -10200,10 +10248,10 @@ int result = function3(r2);</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>It&#8217;s the same as our previous Compose function except for the type of the first parameter and the return type.</p>
+<p>It&#8217;s the same as our previous Compose function except for the type of the first parameter and the return type. In the immediate execution version, the type of the first parameter to compose was an int, which comes from the execution of the previous function in the chain. And the return value was also an int. Now these two things are functions because we are not evaluating the functions as we go, we are composing the functions to return a new single function.</p>
 </div>
 <div class="paragraph">
-<p>The <em>() &#8658;</em> syntax is a lambda expression for a function that takes no parameters. It the source function and then calls <em>f</em>.</p>
+<p>The <em>() &#8658;</em> syntax is a lambda expression for a function that takes no parameters. It creates a new function that calls the source function and then calls <em>f</em>.</p>
 </div>
 <div class="paragraph">
 <p>What the Compose function returns is actually an object structure made up of delegates and closure objects created by the compiler:</p>
@@ -10235,7 +10283,7 @@ int result = function3(r2);</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>That&#8217;s just the same as out previous top layer code, except that we show how we can get a function back which we can save to be executed later. It&#8217;s like we got a small program back.</p>
+<p>That&#8217;s just the same as our previous top layer code, except that we show how we can get a function back which we can save to be executed later. It&#8217;s like we got a small program back.</p>
 </div>
 <div class="paragraph">
 <p>When we want to execute the combined function, we can do it like this.</p>
@@ -10264,10 +10312,7 @@ int result = function3(r2);</code></pre>
 <p>You can click on the diagram to see it enlarged. On the left side of the diagram you can see the four closure objects that implement the 42 and the three lambda expressions. Each of these closure objects has a delegate object that is used to reference it. Then there are three other closure objects that were created by the Compose function. These closures call the other closures via their delegates in the correct order. The entire structure is returned as a single delegate on the right hand side.</p>
 </div>
 <div class="paragraph">
-<p>Deferred execution is our fifth advantage of using a compose function.</p>
-</div>
-<div class="paragraph">
-<p>There is one more advantage to using a Compose function. This advantage is big, and is what allows us to finally call it a monad.</p>
+<p>There is a fifth advantage to using a Compose function. This advantage is big, and is what allows us to finally call it a monad.</p>
 </div>
 </div>
 <div class="sect3">
@@ -10276,7 +10321,10 @@ int result = function3(r2);</code></pre>
 <p>In imperative code we might typically need some extra code after every function call. A common example would be to check for errors returned by one function before calling the next function. If we have a compose function, we can put that extra code inside the Compose function instead. This refactoring is essentially what the monad pattern is.</p>
 </div>
 <div class="paragraph">
-<p>We&#8217;ll give four examples of imperative code that needs some extra common logic after every function call. In each case, the functions we are composing are not returning a simple value that can be fed directly to the next function. They are returning a variety of different things, so in every case we need a little bit of extra logic to handle what the function returns before calling the next function.</p>
+<p>We&#8217;ll give four examples of imperative code that needs some extra common logic after every function call. In each case, the functions we are composing are not returning a simple value that can be fed directly to the next function. They are returning something else, so in every case we need a little bit of extra logic to handle what the function returns before calling the next function.</p>
+</div>
+<div class="paragraph">
+<p>It&#8217;s what this extra logic code does that distinguishes one monad from another.</p>
 </div>
 </div>
 <div class="sect3">
@@ -10285,7 +10333,7 @@ int result = function3(r2);</code></pre>
 <p>Composition of functions that can fail.</p>
 </div>
 <div class="paragraph">
-<p>In this first example, we may need to allow for the fact that functions can throw an exception, or return null, or a Maybe object or even -1. For example the function may contain a divide by zero. In imperative code, we would commonly have to add if statements or try statements so that we don&#8217;t call the rest of the functions in the chain when something goes wrong.</p>
+<p>In this first example, we may need to allow for the fact that functions can throw an exception, or return null, or a Maybe object or even -1. For example, the function may be vulnerable to a divide by zero. In imperative code, we would commonly have to add if statements or try statements so that we don&#8217;t call the rest of the functions in the chain when something goes wrong. That will likely create nesting, arrrgh.</p>
 </div>
 <div class="paragraph">
 <p>In C code, returning -1 is often used for this purpose, so let&#8217;s use that for our first example just because it&#8217;s so simple. Here is the imperative code:</p>
@@ -10316,7 +10364,7 @@ if (result1 != -1)
 <div class="sect4">
 <h5 id="truethe-minusone-monad"><a class="anchor" href="#truethe-minusone-monad"></a>The MinusOne monad</h5>
 <div class="paragraph">
-<p>We simply factor out the if statements into the Compose function (which we renamed to Bind):</p>
+<p>We simply factor out the if statements into the Compose function. When we create actual monads, we will name the composing function "Bind" instead of "Compose":</p>
 </div>
 <div class="paragraph">
 <p>Application layer code</p>
@@ -10330,7 +10378,7 @@ if (result1 != -1)
 </div>
 </div>
 <div class="paragraph">
-<p>Note that this looks almost identical to the way we composed these functions previously. That&#8217;s because our aim in the top layer is to just compose the functions.</p>
+<p>Note that this looks almost identical to the way we composed these functions previously. That&#8217;s because our aim in the top layer is to just compose the functions, and nothing else.</p>
 </div>
 <div class="paragraph">
 <p>One difference is that we have renamed Compose to Bind. That&#8217;s because Bind is the common name used for the Compose function in the monad world.</p>
@@ -10363,13 +10411,13 @@ if (result1 != -1)
 <p>That&#8217;s a pretty straightforward refactoring, and with it we have our first example of a monad.</p>
 </div>
 <div class="paragraph">
-<p>Note that this Bind function does immediate execution. we will do a deferred version soon.</p>
+<p>Note that this Bind function does immediate execution. We will do the deferred version soon.</p>
 </div>
 <div class="paragraph">
 <p>(Most of the code snippets in this section are demonstrated by small executable projects on Github here: <a href="https://github.com/johnspray74">https://github.com/johnspray74</a>. The project names are MaybeMonad, IEnumerableMonad, and ContinuationMonad.)</p>
 </div>
 <div class="paragraph">
-<p>To really 'get' monads, all we need is more examples of this type of refactoring:</p>
+<p>To really 'get' monads, all we need is more examples of this type of refactoring.</p>
 </div>
 </div>
 </div>
@@ -10379,7 +10427,7 @@ if (result1 != -1)
 <p>Composition of functions that return many values.</p>
 </div>
 <div class="paragraph">
-<p>We may have functions that return many values, such as an array, a list, an IEnumerable or an IObservable. We then want to feed all the individual values into the next function, and then recombine the results. In imperative code, we do this with nested <em>for</em> statements. For example, the function may be given customers one at a time and returns a list of their orders, which we want to join back into a single list of orders.</p>
+<p>We may have functions that return many values, such as an array, a list, an IEnumerable or an IObservable. We then want to feed all the individual values into the next function, which will in turn return multiple values, and then recombine all the values nto a single array or list. In imperative code, we do this with nested <em>for</em> statements. For example, the function may be given customers one at a time and returns a list of their orders, which we want to join back into a single list of orders.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -10402,12 +10450,12 @@ List&lt;int&gt; result = combinedList1;</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Again note the extra levels of brackets and indenting for every foreach.</p>
+<p>Again note the nested levels of brackets and indenting for every foreach.</p>
 </div>
 <div class="sect4">
 <h5 id="truethe-list-monad"><a class="anchor" href="#truethe-list-monad"></a>The List monad</h5>
 <div class="paragraph">
-<p>We simply factor out the code for the foreachs into the Bind function:</p>
+<p>We simply factor out the code for the foreachs into a new Bind function:</p>
 </div>
 <div class="paragraph">
 <p>Application layer code</p>
@@ -10475,10 +10523,10 @@ List&lt;int&gt; result = combinedList1;</code></pre>
 <p>Or, we do a many-to-one operation which aggregates the values in a list down to a single value. An example is a Sum operation.</p>
 </div>
 <div class="paragraph">
-<p>Methods to do one-to-one and many-to-one operations are usually supplied along with the monad.</p>
+<p>Methods to do one-to-one and many-to-one operations are usually supplied in a library along with the actual monad.</p>
 </div>
 <div class="paragraph">
-<p>The list monad itself just includes of the one-to-many operation. Each value in the input becomes a list. So we then we have a list of lists, which is then flattened to a single list. This operation is called Bind, flatmap or, in C#, SelectMany.</p>
+<p>The list monad itself just includes the one-to-many operation. Each value in the input becomes a list. So we then have a list of lists, which is then flattened to a single list. This operation is called Bind or flatmap in functional programming, or SelectMany in C#.</p>
 </div>
 <div class="paragraph">
 <p>Sometimes the term 'monads' is loosely, and incorrectly used to refer to the whole set of one-to-many, one-to-one and many-to-one composing functions such as Select, Map, and Aggregate.</p>
@@ -10496,10 +10544,19 @@ List&lt;int&gt; result = combinedList1;</code></pre>
 <p>Composition of asynchronous functions.</p>
 </div>
 <div class="paragraph">
-<p>The functions that we want to compose may contain delays, or they may wait for input or output, or they may wait for processing occurring on a different thread or processor. Such functions, instead of returning the result, take a callback function, or they return a Task or future object. For our purposes here, a Task or future object are the same thing. They are an object that will have a result placed into it at a later time.</p>
+<p>The functions that we want to compose may contain delays, or they may wait for input or output, or they may wait for processing occurring on a different thread or processor. In other words, the functions may be asynchronous - they will return a result later, not immediately.</p>
 </div>
 <div class="paragraph">
-<p>If the composed functions take callbacks, the common code between function calls needs to pass in a callback function, which gets called when the function calls the callback at a later time. Here is the imperative version of the application layer code using lambda functions for the callback functions:</p>
+<p>Because these type of function don&#8217;t return a value immediately, we can&#8217;t write an immediate execution monad. But we can still write a defered execution monad - a BInd function that will combine asynchronous functions, and return an asynchronous function.</p>
+</div>
+<div class="paragraph">
+<p>There are different estanblished ways to implement asynchronous functions. The oldest is the callback. The function receives a callback function as an extra parameter. When the result is ready later, the callback function will be called to pass back the result.</p>
+</div>
+<div class="paragraph">
+<p>More recently, asynchronous functions are implemented by returning a Task or future object. For our purposes here, a Task or future object are the same thing. They are an object that will have a result placed into it at a later time.</p>
+</div>
+<div class="paragraph">
+<p>Here is the imperative version of the application layer code that composes functions that use callbacks. The common logic between the functions, function1, function2, and WriteLine is to create a callback function to be passed to the next, which is done using lambda functions:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -10518,7 +10575,7 @@ List&lt;int&gt; result = combinedList1;</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>If the compose functions return a future object, the common code between function calls needs to install a continuation function into the future object: Here is the imperative version of the application layer code:</p>
+<p>Here is the imperative version of the application layer code that composes functions that return future objects. The common logic between the functions is to put a continuation function into the future object that was returned by the previous function:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -10537,7 +10594,7 @@ List&lt;int&gt; result = combinedList1;</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>In either case, notice the nasty indenting for every function we want to chain. In this case we could eliminate the indenting by using Unwrap() like this:</p>
+<p>In either case, notice the nasty indenting for every function we want to compose. In this case we could eliminate the indenting by using Unwrap() like this:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -10560,12 +10617,12 @@ List&lt;int&gt; result = combinedList1;</code></pre>
 <p>(Note that both versions require lambda expressions (for example, the lambda expression starting with 'task1 &#8658;" ). In the first implementation above, the lambda expression is an Action. In the second implementation the lambda expression is a function. So they are two different overloads of ContinueWith. In the second implementation, the lambda function returns the type returned by the function, which is a Task&lt;T&gt;. So ContinueWith returns Task&lt;Task&lt;T&gt;&gt;. The Unwrap discards the outer Task.)</p>
 </div>
 <div class="paragraph">
-<p>Of course, async/await also simplifies this particular example, but I still want to show how monads can do it.</p>
+<p>Of course, async/await also simplifies this particular example, but I want to show how monads can do it first.</p>
 </div>
 <div class="sect4">
 <h5 id="truethe-task-monad"><a class="anchor" href="#truethe-task-monad"></a>The Task monad</h5>
 <div class="paragraph">
-<p>For the Task monad, we simply factor out the ContinueWith logic into the Bind function:</p>
+<p>For the Task monad, we simply factor out the ContinueWith logic into the Bind function. We can then use the Bind function like this in our top layer application code:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -10579,10 +10636,10 @@ Task&lt;int&gt; CombinedFunction =
 </div>
 </div>
 <div class="paragraph">
-<p>The value that Bind takes and returns is Task&lt;T&gt;. The starting value has to be converted to a Task&lt;T&gt; first, which is the purpose of the ToTask extension method.</p>
+<p>The value that Bind takes and returns is Task&lt;T&gt;. So the starting value, 42, has to be converted to a Task&lt;T&gt; first before it can be passed to the first Bind. That&#8217;s the purpose of the ToTask extension method.</p>
 </div>
 <div class="paragraph">
-<p>There is a way of using the compiler to cheat to implement the Bind function:</p>
+<p>Now let&#8217;s write the Bind function for the Task&lt;T&gt; monad. There is a way of using the compiler to cheat to implement the Bind function:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -10600,6 +10657,7 @@ Task&lt;int&gt; CombinedFunction =
 <pre class="highlightjs highlight"><code data-lang="C#" class="language-C# hljs">public static Task&lt;U&gt; Bind&lt;T, U&gt;(this Task&lt;T&gt; source, Func&lt;T, Task&lt;U&gt;&gt; function)
 {
     var tcs = new TaskCompletionSource&lt;U&gt;();
+
     source.ContinueWith(
         (t) =&gt; function(t.Result).ContinueWith(
             (t) =&gt; tcs.SetResult(t.Result)
@@ -10613,7 +10671,7 @@ Task&lt;int&gt; CombinedFunction =
 <p>The Bind function is passed a Task&lt;T&gt; that will contain the input in the future. It immediately creates a new Task&lt;U&gt; to return. It actually creates a TaskCompletionSource object, which contains a Task. The TaskCompletionSource object just provides a method for putting the value into the Task when it is ready later. A closure object is created for the first lambda expression and a delegate object is created to call that. The ContinueWith attaches this delegate to the source Task&lt;T&gt; as a (callback) Action. The Task&lt;&gt; that is returned by ContinueWith is discarded.</p>
 </div>
 <div class="paragraph">
-<p>When the source Task&lt;T&gt; produces a result, the first lambda expression will run. When it does, it receives the Task&lt;T&gt; and passes the result from it to the function. The function immediately returns a Task&lt;U&gt; (a different Task&lt;U&gt; from the one created earlier). That Task&lt;U&gt; is attached to a second continuation lambda expression. When the Task&lt;U&gt; produces a result, the second lambda is called. It puts the result into the result Task via the TaskCompletionSource object.</p>
+<p>This is how the code works at runtime. When the source Task&lt;T&gt; produces a result, the first lambda expression will run. When it does, it receives the Task&lt;T&gt;, extracts the actual result from it, and passes it to the function. The function immediately returns a Task&lt;U&gt; (a different Task&lt;U&gt; from the one created earlier). When the Task&lt;U&gt; produces a result, the second lambda is called. It extracts the actual result from the Task&lt;U&gt; and puts it into the original Task&lt;U&gt; via the TaskCompletionSource object.</p>
 </div>
 <div class="paragraph">
 <p>The Bind function can also be written using Unwrap, which eliminates the need for the TaskCompletionSource:</p>
@@ -10627,7 +10685,7 @@ Task&lt;int&gt; CombinedFunction =
 </div>
 </div>
 <div class="paragraph">
-<p>When the lambda expression runs, it returns the Task&lt;U&gt; that is returned by the function, so the ContinueWith itself returns a Task&lt;Task&lt;U&gt;&gt;. The Unwrap discards the outer Task&lt;&gt;.</p>
+<p>When the lambda expression runs, it returns the Task&lt;U&gt; that is returned by the function, so the ContinueWith itself returns a Task&lt;Task&lt;U&gt;&gt;. The Unwrap discards the outer Task&lt;&gt;, leaving the Task&lt;U&gt; that is returned by the Bind function.</p>
 </div>
 <div class="paragraph">
 <p>The async/await version generally runs everything on the same thread by default, which is great, but this is not the case for the ContinueWith version unfortunately. The example code on Github
@@ -10638,7 +10696,7 @@ shows a console application that passes a TaskScheduler.FromCurrentSynchronizati
 <p>The functions that can be composed using this Bind function must return synchronously with a Task object, but can take as long as they want to put a value into the Task. In the examples below, we will use one function with a delay, and one that does I/O. Another case is a function that will do CPU bound work on another thread.</p>
 </div>
 <div class="paragraph">
-<p>Here are two example functions we can use to compose applications:</p>
+<p>For completeness, here are two example functions we can use to compose applications. These two function could be used in the application code that we did earlier:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -10659,15 +10717,27 @@ shows a console application that passes a TaskScheduler.FromCurrentSynchronizati
 }</code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>The Task&lt;T&gt; monad was pretty heavy. We had to cover it because it&#8217;s one of the most important and most useful monads. But don&#8217;t worry if you didn&#8217;t get all the details of how those implementations of the Bind functions worked. The important point that we could write a Bind function that allowed us to compose asynchronous functions, functions that return a future rather than an immediate return value.</p>
+</div>
+<div class="paragraph">
+<p>Now for our forth example, let&#8217;s do something much ligher.</p>
+</div>
 </div>
 </div>
 <div class="sect3">
 <h4 id="trueexample-4"><a class="anchor" href="#trueexample-4"></a>6.1.6. Example 4</h4>
 <div class="paragraph">
-<p>Composition of functions that return angles.</p>
+<p>Let&#8217;s compose functions that return angles.</p>
 </div>
 <div class="paragraph">
-<p>There can be many other examples of functions that return values that can&#8217;t directly be passed to the next function, so need some glue logic in-between. In fact we can do almost anything we like between the function calls as long as we are always doing the same thing. Let&#8217;s do one more example just to show that we can do something fairly arbitrary. Let&#8217;s say we always want to do modulo 360 arithmetic. And let&#8217;s throw in a rotation counter as well:</p>
+<p>The three examples of monads that we did so far, the MinusOne monad, the List monad, and the Task monad are common monads in the industry. (Well, not the MinusOne monad, I made that one up, but the industry version of that is the Maybe monad, which we shall switch to when we look at deferred versions.)</p>
+</div>
+<div class="paragraph">
+<p>For our last example, I wanted to do something custom, just to show that you really can create a monad to handle any type of intermediate logic you want between the functions you are composing. As long as we are always doing the same logic between all functions we compose, we can refactor that common logic into a Bind function.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s say we always want to do modulo 360 arithmetic. And let&#8217;s throw in a total rotations counter as well, which we want to pass through the chain. Here is some imperative code:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -10688,13 +10758,10 @@ result3 = result3 mod 360;</code></pre>
 <div class="sect4">
 <h5 id="truethe-mod360-monad"><a class="anchor" href="#truethe-mod360-monad"></a>The Mod360 monad</h5>
 <div class="paragraph">
-<p>Composition of functions that return angles.</p>
+<p>This is not strictly speaking a monad because the function doesn&#8217;t return the chaining interface type. That&#8217;s because in this case the function didn&#8217;t need to know anything about the rotations. However it still shows how the monad pattern can refactor arbitrary common code between composed functions.</p>
 </div>
 <div class="paragraph">
-<p>This is not strictly speaking a monad because the function doesn&#8217;t return the same type as the Bind function uses for its input and output. That&#8217;s because in this case the function didn&#8217;t need to know anything about the rotations. However it still shows how the monad pattern can refactor arbitrary common code between composed functions.</p>
-</div>
-<div class="paragraph">
-<p>Here is top layer code to compose functions that return degrees. The second value in the Tuple is the number of rotations, which we initialize to 0.</p>
+<p>Here is top layer application code to compose some functions handle angles. The second value in the Tuple is the number of rotations, which we initialize to 0.</p>
 </div>
 <div class="paragraph">
 <p>Application layer code</p>
@@ -10722,7 +10789,7 @@ result3 = result3 mod 360;</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>This time Bind takes a Tuple and returns a Tuple. The Tuple contains the angle between 0 and 359 and the rotations. Bind will do the mod 360 on the result returned by the function, and add any rotations. It returns a new Tuple with those two values in it.</p>
+<p>This time Bind takes a Tuple and returns a Tuple. The Tuple contains the angle between 0 and 359 and the rotations. Bind will do the mod 360 on the result returned by the function, and add any whole rotations. It returns a new Tuple with those two values in it.</p>
 </div>
 <div class="paragraph">
 <p>Note that it was easy to get the starting 42 value into the Tuple needed by the Bind function by simply using 'new Tuple(42,0)'. So in this case we didn&#8217;t need something like a ToTuple extension method.</p>
@@ -10735,13 +10802,13 @@ result3 = result3 mod 360;</code></pre>
 <p>In all 4 of the above examples, the refactoring follows a pattern, which I will call the monad pattern.</p>
 </div>
 <div class="paragraph">
-<p>In each case, we were able to create a compose function (called Bind) that just composes the three functions in a declarative way. In each case we were able to refactor any common logic between function calls into the Bind function.</p>
+<p>In each case, we were able to create a compose function (called Bind) that just composes functions in a declarative way. In each case we were able to refactor any common logic needed in the imperative code between function calls into the Bind function. That&#8217;s pretty much what we are about with monads, composing functions using a Bind function and putting any common logic that is needed between each function into the Bind function as well. It is that common logic that distiguishes different types of monads.</p>
 </div>
 <div class="paragraph">
-<p>The Compose function is usually called <em>Bind</em>, but can go by other names such as ==&gt;. If the monad is the list monad or IEnumerable monad, it can be called flatmap or SelectMany. The most common mand you will come across is the IEnumerable monad, but many other types of monads are possible.</p>
+<p>The Compose function is often called <em>Bind</em>, but can go by other names such as the symbol ==&gt;. If the monad is the list monad or IEnumerable monad, it can be called flatmap or SelectMany. The most common monad you will come across is the IEnumerable monad, but many other types of monads are possible.</p>
 </div>
 <div class="paragraph">
-<p>A monad consists of three elements:</p>
+<p>More formerly, a monad consists of three elements:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
@@ -10749,21 +10816,24 @@ result3 = result3 mod 360;</code></pre>
 <p>a Bind function</p>
 </li>
 <li>
-<p>a type that the Bind function takes as its first parameter and returns. This type is often an interface, or something we can think of as an interface in a general sense. We will refer to it as the chaining interface from now on. The chaining interfaces for the four monads we have done so far were int, List, Task and Tuple&lt;int,int&gt;. But often the type will be an actual interface as we will see soon.</p>
+<p>a type that the Bind function takes as its first parameter and returns. This type is often an interface, or something we can think of as an interface in a general sense. We will refer to it as the chaining interface from now on. The chaining interfaces for the four monads we have done so far were int, List, Task and Tuple&lt;int,int&gt;. But often the type will be an actual interface such as IEnumerable as we will see soon.</p>
 <div class="paragraph">
-<p>Because Bind takes and returns the chaining interface, Bind calls can be chained with dot operators. That&#8217;s why I cal it the chaining interface.</p>
+<p>Because Bind both takes and returns the chaining interface, Bind calls can be chained with dot operators. That&#8217;s why I call it the chaining interface.</p>
 </div>
 <div class="paragraph">
-<p>The chaining interface is used in a third place in the monad pattern. It is the return type for the functions that can be composed. Although both the functions and Bind return the same type of interface, Bind doesn&#8217;t necessarily return the object that is returned by the function.</p>
+<p>The chaining interface is used in a third place in the monad pattern. It is the return type for the functions that can be composed. Although both the functions and Bind return the same type of interface, The object returned by the composed function is necessarily the one that is returned by Bind.</p>
 </div>
 </li>
 <li>
-<p>a function to use at the start of a chain of bind functions to convert an ordinary value like 42 to the chaining interface type so that we can apply the first Bind function to it.  In monad land, this function is sometimes called <em>unit</em> or <em>return</em>. For the four monads we have done so far we didn&#8217;t need a unit function except for the Task monad, for which we created a ToTask extension method as the unit function. However in the upcoming monad examples, we will generally need such an extension method.</p>
+<p>a function to use at the start of a chain of bind functions to convert an ordinary value like 42 to the chaining interface type so that we can pass it to the very first Bind.  In monad land, this function is sometimes called <em>unit</em> or <em>return</em>. For the four example monads we have done, we didn&#8217;t need a unit function except for the Task monad, for which we created a ToTask extension method as the unit function. However in the upcoming deferred monads, we will generally need such an extension method.</p>
 </li>
 </ol>
 </div>
 <div class="paragraph">
-<p>Let&#8217;s now do some more variations of the monads of our four examples from above:</p>
+<p>To see how monads compare with ALA, we now want to do deferred versions of our 4 examples. Actually the Task&lt;T&gt; monad is already deferred, so we will just do the other three examples.</p>
+</div>
+<div class="paragraph">
+<p>For the minus_one example, we are going to switch to the IMaybe monad first, because that&#8217;s the generally used solution to composing functions that may return no value. Skip this if you are already familiar with the IMaybe concept, unless you are interested to see how the IMaybe monad and its Bind function works.</p>
 </div>
 </div>
 <div class="sect3">
@@ -10772,10 +10842,10 @@ result3 = result3 mod 360;</code></pre>
 <p>Composition of functions that can fail by returning IMaybe&lt;T&gt; or Nullable&lt;T&gt;.</p>
 </div>
 <div class="paragraph">
-<p>Using minus one, as we did earlier to represent a 'no value', is not used outside the C world, and limits the data itself to positive integers. The more general solution in the monad world is the IMaybe&lt;T&gt; monad. It&#8217;s called IMaybe because maybe it contains a value or maybe it doesn&#8217;t.</p>
+<p>Using minus one, as we did earlier to represent a 'no value', is not used outside the C world, and limits the data itself to positive integers. The more general solution in the monad world is the IMaybe&lt;T&gt; monad. It&#8217;s called IMaybe because maybe it contains a value, or maybe it doesn&#8217;t.</p>
 </div>
 <div class="paragraph">
-<p>The IMaybe version of Bind is similar to the -1 version. However Bind takes an IMaybe interface and returns an IMaybe interface, and the functions that we compose together also return an IMaybe interface.</p>
+<p>The IMaybe version of Bind is similar to the -1 version. However the chaining  interface is IMaybe&lt;T&gt;. Bind takes an IMaybe interface and returns an IMaybe interface, and the functions that we compose together also return an IMaybe interface.</p>
 </div>
 <div class="paragraph">
 <p>We will have two classes that implement IMaybe. They are called Something and Nothing.</p>
@@ -10845,7 +10915,7 @@ public class Something&lt;T&gt; : IMaybe&lt;T&gt;
 </div>
 </div>
 <div class="paragraph">
-<p>The Bind function uses its input IMaybe&lt;T&gt; to see if there is a value present or not. If there is nothing it doesn&#8217;t call the function. It just returns a new IMaybe&lt;U&gt; implemented by a Nothing object. If there is a value, it gets the value and passes it to the function. Then Bind returns the IMaybe returned by the function.</p>
+<p>The Bind function uses its input IMaybe&lt;T&gt; to see if there is a value present or not. If there is nothing it doesn&#8217;t call the function. It just returns a new IMaybe&lt;U&gt; implemented by a Nothing object. If there is a value, it gets the value and passes it to the function. Then Bind returns the IMaybe returned by the function. Here is the ToMaybe and Bind functions:</p>
 </div>
 <div class="paragraph">
 <p>Monad layer code</p>
@@ -10867,318 +10937,66 @@ public class Something&lt;T&gt; : IMaybe&lt;T&gt;
 }</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>For the IMaybe monad, the monad consists of the IMaybe interface, and the Bind and ToMaybe methods.</p>
-</div>
 </div>
 <div class="sect3">
 <h4 id="truedeferred-monad-versions"><a class="anchor" href="#truedeferred-monad-versions"></a>6.1.9. Deferred monad versions</h4>
 <div class="paragraph">
-<p>All the monads we have done so far, except for the Task monad, were immediate or eager versions of the monads. The Bind function calls the composed functions itself and evaluates the result immediately. We want deferred versions of all these monads because they are more versatile.</p>
+<p>All the monads we have done so far (except for the Task monad), were immediate or eager versions of the monads. This means that the Bind function calls the composed functions itself and passes the results(s) to the next function. We did the immediate versions because they are so simple.</p>
 </div>
 <div class="paragraph">
-<p>If the monad is a deferred or lazy type, the value returned by the monad chain is an object structure that you can use later to get the value. You might do things like the following to force the execution of the object structure to get the actual value out (given a deferred monad object structure called <em>getresult</em>).</p>
+<p>However, we want to do deferred versions of all these monads because they are more versatile, and they create an object structure that is returned for later execution. We want to compare this object structure with the way ALA also creates an object structure composed of domain abstractions.</p>
 </div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code data-lang="C#" class="language-C# hljs">r = getresult(); if (r!=-1) { use r }        // -1 monad
-r = getresult(); if (r.hasValue) { use r.value } // maybe monad
-getresult.ToList()                           // IEnumerable
-foreach (var value in getresult) {...}       // IEnumerable
-getresult.Subscribe((x)=&gt;{....})             // IObservable
-getresult.Result                             // task (blocks)
-await getresult                              // task (doesn't block)
-r = getresult(); use r.Item0, use r.Item1    // tuple</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="trueminusone-monad-deferred-pull-version"><a class="anchor" href="#trueminusone-monad-deferred-pull-version"></a>6.1.10. MinusOne monad (deferred, pull version)</h4>
-<div class="paragraph">
-<p>Composition of functions that can fail by returning -1.</p>
-</div>
-<div class="paragraph">
-<p>For the deferred version of the MinusOne monad, we use Func&lt;int&gt; instead of an integer as the chaining interface. The Bind function takes a Func&lt;int&gt; and returns a Func&lt;int&gt;:</p>
-</div>
-<div class="paragraph">
-<p>Here is top layer code that composes functions that can return -1:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code data-lang="C#" class="language-C# hljs">Func&lt;int&gt; CombinedFunction =
-    42.ToMinusOne()
-    .Bind(x =&gt; x+1)
-    .Bind(x =&gt; x==0 ? -1 : 1/x)
-    .Bind(x = x*10+1);
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This code is the same as we had previously for the immediate version except for the use of the ToMinuseOne method. However the chaining interface is different. The interface type is Func&lt;int&gt; instead of just &lt;int&gt;.</p>
-</div>
-<div class="paragraph">
-<p>Here are the ToMinusOne and Bind functions:</p>
-</div>
-<div class="paragraph">
-<p>Pull version</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code data-lang="C#" class="language-C# hljs">namespace Monad.MinusOne
-{
-    public static class ExtensionMethod
-    {
-        public static Func&lt;int&gt; ToMinusOne(this int source)
-        {
-            return () =&gt; source;
-        }
-
-        public static Func&lt;int&gt; Bind(this Func&lt;int&gt; source, Func&lt;int, int&gt; function)
-        {
-            return () =&gt;
-            {
-                int value = source();
-                return value == -1 ? -1 : function(value);
-            };
-        }
-    }
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>You can see that the Bind function, instead of evaluating a reult, returns a lambad function that can be used later to eveluate the result.</p>
-</div>
-<div class="paragraph">
-<p>The lambda function is turned into a closure object by the compiler. The returned object structure for the top layer code looks like the diagram below.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<a class="image" href="images/MinusOneDeferredPullMonadDiagram.drawio.png""><img src="images/MinusOneDeferredPullMonadDiagram.drawio.png" alt="MinusOneDeferredPullMonadDiagram.drawio.png"></a>
-</div>
-<div class="title">Figure 48. Object diagram of expression using deferred/pull version of MinusOne monad</div>
-</div>
-<div class="paragraph">
-<p>This structure is exactly the same as the one we showed above for the deffered Compose function that composed ordinary functions that couldn&#8217;t return an error. The only difference is that for the three closures that are created by the Bind function, the closure method contains the common code, that is it checks for -1 from the source before calling the next function.</p>
-</div>
-<div class="paragraph">
-<p>We got a little lucky with the implementation of the deferred MinusOne monad. That is that we were able to use Func&lt;int&gt; as the interface instead of using an actual interface with a function in it. That allowed us to use simple closures to implement the Bind and ToMinusOne functions, just as we did for the Compose function. From now on we won&#8217;t be able to do that because the monads will be using an actual interface. We will need to create our own class to be used by Bind. Let&#8217;s do a push verion of the Minusone monad to show how the Bind function needs a supporting class.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="trueminusone-monad-deferred-push-version"><a class="anchor" href="#trueminusone-monad-deferred-push-version"></a>6.1.11. MinusOne monad (deferred, push version)</h4>
 <div class="paragraph">
 <p>With deferred monads, we can do either pull versions or push versions.</p>
 </div>
 <div class="paragraph">
-<p>In ALA, we generally default to programming paradigms that use pushing. To compare monads with ALA, we will therefore show push variations of the monads.</p>
+<p>For the pull version, we keep a reference to the last object in the structure. We call a method in that object when we want the result. That call pulls the data through the chain of objects. For the push version, we will keep a reference to the first object in the chain. When we want a result we will tell the first object to start, and the result will pop out of the other end.</p>
 </div>
 <div class="paragraph">
-<p>For the pull version, we keep a reference to the last object in the structure. We call a function in that object when we want the result. That call pulls the data through the chain of objects.</p>
+<p>In ALA, we generally default to programming paradigms that use pushing. To compare monads with ALA, we will therefore want to understand the push variations of the monads. However, pull monads are more common in the monad world. So we will do both. It gets pretty interesting to see the differences between the two in terms of how everything works in the code.</p>
 </div>
 <div class="paragraph">
-<p>Here is the application code for the push version.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code data-lang="C#" class="language-C# hljs">// deferred monad composition of functions that might return -1
-
-IMinusOneObservable&lt;int&gt; result = 42.ToMinusOne()
-    .Bind(x =&gt; x+1)
-    .Bind(x =&gt; x==0 ? -1 : 1/x)
-    .Bind(x = x*10+1);
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This code is the same as we had previously, and even the same as the immediate version except for the use of the ToMinuseOne method. However the chaining interface, the interface that Bind takes and returns is different. The chaining interface is IMinusOneObservable. Here it is:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code data-lang="C#" class="language-C# hljs">public interface IMinusOneObservable
-{
-    void Subscribe(IMinusOneObserver observer);
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This may at first seem like a strange interface for a chaining interface. The chaining interface is always <em>implemented</em> by the source object in the chain, and <em>used</em> by the next object in the chain. That&#8217;s what allows the Bind function to work. But in this case we are writing a push style monad that will push the data from the source at execution time. So we need a second interface that will go in the opposite direction to carry the data (although we could have chosen to use C# style events (observer pattern) instead). The chaining interface is not used to pull data like in our previous monads, but instead it is used to simply wire the second interface in the opposite direction.</p>
-</div>
-<div class="paragraph">
-<p>This second interface we will call IMinusOneObserver. And yes, these two interfaces are exactly analogous to the IObservable and IObserver interfaces in reactive extensions.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code data-lang="C#" class="language-C# hljs">public interface IMinusOneObserver
-{
-    void Push(int value);
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The IMinusOneObserver interface is wired in the same direction as the dataflow, so destinations implement the interface and sources will have a field of the type of this interface.</p>
-</div>
-<div class="paragraph">
-<p>Bind can&#8217;t be defined on the IMinusOneObsever interface because it&#8217;s the wrong way around. Bind therefore uses the IMinusOneObservable interface for its first parameter and its return value.</p>
-</div>
-<div class="paragraph">
-<p>For the push version we don&#8217;t have the luck we had in the pull version that allowed us to implement it with closures because we had to use the IMinusOneObserver interface. The Bind function will instead use an explicit class that implements IMinusOneObserver, which we will call MinusOne. Here is that class, together with the ToMinusOne and Bind extension methods:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code data-lang="C#" class="language-C# hljs">namespace Monad.MinusOne
-{
-    static class ExtensionMethods
-    {
-        public static IMinusOneObservable ToMinusOneMonad(this int value) <i class="conum" data-value="6"></i><b>(6)</b>
-        {
-            return new MinusOneStart(value);
-        }
-
-        public static IMinusOneObservable Bind(this IMinusOneObservable source, Func&lt;int, int&gt; function) <i class="conum" data-value="1"></i><b>(1)</b>
-        {
-            MinusOne minusOne = new MinusOne(function);
-            source.Subscribe(minusOne);
-            return minusOne;
-        }
-    }
-
-
-
-
-    class MinusOne : IMinusOneObservable, IMinusOneObserver <i class="conum" data-value="2"></i><b>(2)</b>
-    {
-        private IMinusOneObserver observer; <i class="conum" data-value="3"></i><b>(3)</b>
-
-        private Func&lt;int, int&gt; function;
-
-        public MinusOne(Func&lt;int, int&gt; function) <i class="conum" data-value="4"></i><b>(4)</b>
-        {
-            this.function = function;
-        }
-
-        void IMinusOneObserver.Push(int value) <i class="conum" data-value="5"></i><b>(5)</b>
-        {
-            if (value == -1)
-            {
-                observer.Push(-1);
-            }
-            else
-            {
-                observer.Push(function(value));
-            }
-        }
-
-        void IMinusOneObservable.Subscribe(IMinusOneObserver observer)
-        {
-            this.observer = observer;
-        }
-    }
-
-
-
-
-    class MinusOneStart : IMinusOneObservable <i class="conum" data-value="7"></i><b>(7)</b>
-    {
-        private int value;
-        private IMinusOneObserver observer;
-
-
-        public MinusOneStart(int value) { this.value = value; }
-
-        void IMinusOneObservable.Subscribe(IMinusOneObserver observer)
-        {
-            this.observer = observer;
-        }
-
-        public void Run()
-        {
-            observer.Push(value);
-        }
-    }
-}</code></pre>
-</div>
-</div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>The Bind method instantiates a class to do the work. The Bind function also wires up the IMinusOneObserver interface using the Subscribe method.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>IMinusOneObservable is implemented by data sources. IMinusOneObserver is implemented by data destinations. Our MinusOne class, as part of a chain of operations, is both a source and a destination, so it implements both.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Once wired, the only reference between the objects is the reference from source to destination in the field called observer in the MinusOne class.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>The constructor just needs to store the function we are composing.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="5"></i><b>5</b></td>
-<td>The Push method is the only part that runs when the monad object structure executes.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="6"></i><b>6</b></td>
-<td>The last thing to note is the usual method we need to get the 42 into the chaining interface type so that we can start using Bind. The method is called ToMinusOneMonad.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="7"></i><b>7</b></td>
-<td>ToMinusOneMonad needs a class that implements IMinusOneObservable. That class is MinusOneStart. The ToMinusOneMonad extension method simply needs to instantiate this class.</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>Here is the object diagram of the resulting structure of the top layer code:</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<a class="image" href="images/MinusOneDeferredPushMonadDiagram.drawio.png"><img src="images/MinusOneDeferredPushMonadDiagram.drawio.png" alt="MinusOneDeferredPushMonadDiagram.drawio.png"></a>
-</div>
-<div class="title">Figure 49. Object diagram of expression using deferred/push version of MinusOne monad</div>
-</div>
-<div class="paragraph">
-<p>You can see that the three delegate-closure pairs we had in the pull version are replaced with an object of class MinusOne. The three objects are wired together in the direction of the data flow (left to right) using the IMinusOneObserver interface. The IMinusOneObservable was only used by the Bind function to effect the wiring of IMinusOneObserver. It is unused when the structure runs. The IMinusOneObservable interface at the end can be used to wire to an output object that implements IMinusOneObserver.</p>
-</div>
-<div class="paragraph">
-<p>The 42 is stored in the object of the MinusOneStart class. This class has a run function which is used to start the structure executing. We start it from the source end because it is a push monad we are using. (This differs from the reactive extensions, which starts executing on Subscribe, so execution is actually initiated from the destination end.) In ALAs push programming paradigms, we usually initiate dataflow at the source end.</p>
-</div>
-<div class="paragraph">
-<p>You can start to see the ALA pattern to this structure. It is instantiating objects and wiring them together to build a structure to run later. IMinusOneObserver is the equivalent of an ALA programming paradigm.</p>
-</div>
-<div class="paragraph">
-<p>All the deferred monads we do from now on have this same structure. The push ones will be wired in the direction of dataflow, left to right, like this one is. The pull ones will be wired in the opposite direction of the dataflow, right to left. As I said, we were just lucky that the deferred pull version of the MinusOne monad that we did above was able to be implemented with compiler gnerated closure classes because the monad type was Func&lt;int&gt; instead of a real interface. We will always need an explicit class from now on.</p>
-</div>
-<div class="paragraph">
-<p>Next well do a deferred pull monad that uses a real interface&lt;T&gt;, the IMaybe&lt;T&gt; monad.</p>
+<p>The implemtation code for each of the deferred versions will obviously be a little more complicated than the immediate versions of these monads. It will involve using objects to build a structure that can be returned for deferred execution. However, for completeness, I have not shied away from including all the code for the three monad examples. I have done this for both pull and push versions. It&#8217;s not necessary to read or understand all the code. But when you want to know exactly how something works, at least the code is there along with notes to explain it. I also include object diagrams explaining the object structure that is created beneath the covers by the Bind code.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="trueimaybe-monad-deferred-pull-version"><a class="anchor" href="#trueimaybe-monad-deferred-pull-version"></a>6.1.12. IMaybe monad (deferred, pull version)</h4>
+<h4 id="trueforcing-execution-of-a-deferred-monad"><a class="anchor" href="#trueforcing-execution-of-a-deferred-monad"></a>6.1.10. Forcing execution of a deferred monad</h4>
 <div class="paragraph">
-<p>Composition of functions that can fail by returning IMaybe&lt;T&gt; or Nullable&lt;T&gt;.</p>
+<p>Once you have written top layer application code for composing functions using a deferred monad, you may be wondering how you would execute the returned structure of objects to get he actual value. Well, given an object, s, that was returned by the monad expression, here are examples of the ways of forcing it to execute for various types of common monads:</p>
 </div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="C#" class="language-C# hljs">if (s.HasValue) { use s.Value }      // maybe monad, calling HasValue causes eveluation
+s.ToList()                           // IEnumerable
+foreach (var value in s) {...}       // IEnumerable
+s.Subscribe((x)=&gt;{....})             // IObservable (push version of IEnumerable)
+s.Result                             // Task (blocking version)
+await s                              // Task (non blocking version)
+use r.Item0, use r.Item1             // tuple. Accessing either Item cause evaluation</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="trueimaybe-monad-deferred-pull-version"><a class="anchor" href="#trueimaybe-monad-deferred-pull-version"></a>6.1.11. IMaybe monad (deferred, pull version)</h4>
 <div class="paragraph">
-<p>We will do both deferred pull and push variations so that we can properly understand the nuances of each.</p>
+<p>We will write a deferred version of Bind that composes functions that can fail by returning IMaybe&lt;T&gt; or Nullable&lt;T&gt;. It is deferred, so it returns an object that  implements IMaybe in a way that will evaluate the result when the Value is required.</p>
 </div>
 <div class="paragraph">
 <p>Here is top layer code to use the deferred/pull implementation of the maybe monad.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code data-lang="C#" class="language-C# hljs">IMaybe&lt;double&gt; combinedFunction = 42.ToMaybe()
+<pre class="highlightjs highlight"><code data-lang="C#" class="language-C# hljs">IMaybe&lt;double&gt; objectStructure = 42.ToMaybe()
     .Bind(x =&gt; new MaybeSomething&lt;int&gt;(x+1))
     .Bind(x =&gt; x==0 ? new MaybeNothing&lt;double&gt;() : new MaybeSomething&lt;double&gt;((double)1/x) )
     .Bind(x =&gt; new MaybeSomething&lt;int&gt;(x*10+1));</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>It looks the same as the immediate version. But it returns an IMaybe that&#8217;s implements a large object structure instead of returning one of the two concrete IMaybe value objects.</p>
+<p>It looks the same as the immediate version. But it returns an IMaybe that&#8217;s implemented by a large object structure instead of returning one of the two concrete IMaybe value objects.</p>
 </div>
 <div class="paragraph">
-<p>First we define the IMaybe interface, which is the same as for the immediate version above. The MaybeNothing and MaybeSomething classes are also the same as before.</p>
+<p>First we define the IMaybe interface, which is the same as for the immediate version above. The MaybeNothing and MaybeSomething classes are also the same as before. Here they are again.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -11208,7 +11026,7 @@ IMinusOneObservable&lt;int&gt; result = 42.ToMinusOne()
 </div>
 </div>
 <div class="paragraph">
-<p>The Bind function is different as it must build a structure that can be run later. It instantiates a class that implements IMaybe, which will do all the work at runtime.</p>
+<p>The Bind function is different as it must build a structure that can be run later.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -11225,16 +11043,22 @@ IMinusOneObservable&lt;int&gt; result = 42.ToMinusOne()
         {
             return new Maybe&lt;T, U&gt;(source, function);
         }
-    }
-
-
-
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As you can see, Bind simply instantiates new class called "Maybe" that implements IMaybe, which will do all the work at runtime.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="C#" class="language-C# hljs">namespace Monad.MaybeDeferredPull
+{
     class Maybe&lt;T, U&gt; : IMaybe&lt;U&gt;
     {
         // implement the constructor, which receives the Action function
         private Func&lt;T, IMaybe&lt;U&gt;&gt; function;
         private IMaybe&lt;T&gt; source;
-        private IMaybe&lt;U&gt; result;
+        private IMaybe&lt;U&gt; result; // null if we haven't evaluated yet
 
         public Maybe(IMaybe&lt;T&gt; source, Func&lt;T, IMaybe&lt;U&gt;&gt; function) { this.source = source; this.function = function; }
 
@@ -11275,25 +11099,25 @@ IMinusOneObservable&lt;int&gt; result = 42.ToMinusOne()
 <p>The code that runs later in the Maybe class is the HasValue and Value getters. They do all the work.</p>
 </div>
 <div class="paragraph">
-<p>Bind creates objects of the class Maybe and chains them together. This diagram shows the resulting structure from our little bit of application code:</p>
+<p>This diagram shows the resulting structure from our little bit of application code above:</p>
 </div>
 <div class="imageblock">
 <div class="content">
 <a class="image" href="images/MaybeDeferredPullMonadDiagram.drawio.png"><img src="images/MaybeDeferredPullMonadDiagram.drawio.png" alt="MaybeDeferredPullMonadDiagram.drawio.png"></a>
 </div>
-<div class="title">Figure 50. Object diagram of expression using deferred/pull version of IMaybe monad</div>
+<div class="title">Figure 48. Object diagram of expression using deferred/pull version of IMaybe monad</div>
 </div>
 <div class="paragraph">
 <p>Because this is a pull implementation of the monad, the references go in the opposite direction of the dataflow - from destination to source or from right to left. When you want to run the combined function, you pull the value from the right end.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="trueimaybe-monad-deferred-push-version"><a class="anchor" href="#trueimaybe-monad-deferred-push-version"></a>6.1.13. IMaybe monad (deferred, push version)</h4>
+<h4 id="trueimaybe-monad-deferred-push-version"><a class="anchor" href="#trueimaybe-monad-deferred-push-version"></a>6.1.12. IMaybe monad (deferred, push version)</h4>
 <div class="paragraph">
-<p>Composition of functions that can fail by outputting IMaybe&lt;T&gt; or Nullable&lt;T&gt;.</p>
+<p>Having done the deferred pull version, we will now do the deferred push version, which has an interesting analogy with the IObservable.</p>
 </div>
 <div class="paragraph">
-<p>Now the push version of the deferred IMaybe monad. Here is the top layer code, which in this case returns a IMaybeObservable.</p>
+<p>Here is the top layer code, which in this case returns a IMaybeObservable.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -11307,7 +11131,7 @@ IMinusOneObservable&lt;int&gt; result = 42.ToMinusOne()
 <p>I&#8217;ve purposely left the lambda expressions out for now. Well get back to them in a minute.</p>
 </div>
 <div class="paragraph">
-<p>Just as we did for the MinusOne monad, we need two interfaces, IMaybeObservable&lt;T&gt; that Bind takes and returns, and IMaybeObserver for doing the actual pushing of data at runtime.</p>
+<p>For the push version we need two interfaces. One, which we will call <em>IMaybeObservable&lt;T&gt;</em>, is the chaining interface that Bind takes and returns. The other, which we will call <em>IMaybeObserver</em> is for doing the actual pushing of data at runtime. The two interfaces work in opposite directions. That is <em>IMaybeObservable&lt;T&gt;</em> is always implemented by the previous object in the chain . <em>IMaybeObserver</em> is always implemented by the next object in the chain.</p>
 </div>
 <div class="paragraph">
 <p>Here are the two interfaces:</p>
@@ -11330,10 +11154,20 @@ IMinusOneObservable&lt;int&gt; result = 42.ToMinusOne()
 </div>
 </div>
 <div class="paragraph">
-<p>The Bind function uses the IMaybeObservable to wire the IMaybeObserver interface in the opposite direction.</p>
+<p>That <em>IMaybeObservable&lt;T&gt;</em> implementation may at first seem a little strange. It has no way of getting the value out. That&#8217;s because we are implementing a push style monad. The <em>IMaybeObservable&lt;T&gt;</em> interface is used by Bind only to get a reference to the previous object in the chain. It then gives the previous object a reference to it&#8217;s next object, which the previous object will use to push the data.
+This second reference will use an interface called <em>IMaybeObserver</em>. And yes, these two interfaces are exactly analogous to the IObservable and IObserver interfaces in reactive extensions.</p>
 </div>
 <div class="paragraph">
-<p>Normally with monads, the type that the composable functions return would be the chaining interface, the interface that Bind takes and returns. So that would be IMaybeObservable in this case. IMaybeObservable would certainly work, but the functions would be a little complicated. They would have to create an object implementing the IMaybeObservable interface to return. It would be simpler if the functions were passed an IMaybeObserver directly instead of returning an IMaybeIObservable. If we did that, instead of the form:</p>
+<p><em>IMaybeObservable&lt;T&gt;</em> is <em>used</em> by the next object in the chain.</p>
+</div>
+<div class="paragraph">
+<p>The <em>IMaybeObserver</em> interface is used by the pervious object. (We could have chosen to use C# style events (observer pattern) instead of using <em>IMaybeObserver</em>, but it&#8217;s easier to do it exactly the same way as IObservable and IObserver).</p>
+</div>
+<div class="paragraph">
+<p>Note that the <em>IMaybeObserver</em> interface&#8217;s methods are actions. They don&#8217;t pull a value like in the pull version we did of this monad, they push. I am tempted to rename them PushValue and PushNoValue to make this obvious everywhere that Value and NoValue are used.</p>
+</div>
+<div class="paragraph">
+<p>Normally with monads, the type that the composable functions return would be the same as the chaining interface. So all functions that are composable by this monad should return IMaybeObservable, like this type:</p>
 </div>
 <div class="literalblock">
 <div class="content">
@@ -11341,7 +11175,7 @@ IMinusOneObservable&lt;int&gt; result = 42.ToMinusOne()
 </div>
 </div>
 <div class="paragraph">
-<p>the functions would have the form</p>
+<p>Having all your functions return an IMaybeObservable would certainly work, but the functions would be a little complicated. They would all have to create an object that implements the IMaybeObservable interface to return. It would be far simpler if the functions were passed an IMaybeObserver instead of returning an IMaybeIObservable. So they would have this form:</p>
 </div>
 <div class="literalblock">
 <div class="content">
@@ -11349,7 +11183,7 @@ IMinusOneObservable&lt;int&gt; result = 42.ToMinusOne()
 </div>
 </div>
 <div class="paragraph">
-<p>Now when the functions run, they don&#8217;t need to create an object, they just directly push the result out via the IMaybeObserver&lt;U&gt;&gt; interface. So that&#8217;s what we will do.</p>
+<p>Now when the functions run, they don&#8217;t need to create an object, they just directly push the result out via the IMaybeObserver&lt;U&gt;&gt; interface that was passed to them. So that&#8217;s what we will do in our example. It&#8217;s a more loose interpretation of the definition of monad, but it&#8217;s just more sensible to do it that way.</p>
 </div>
 <div class="paragraph">
 <p>Note that the IMaybeObserver interface (listed above) could have been written with a single method like this:</p>
@@ -11360,7 +11194,7 @@ IMinusOneObservable&lt;int&gt; result = 42.ToMinusOne()
 </div>
 </div>
 <div class="paragraph">
-<p>However, to make it easier for functions to use the interface (not have to create a Something or Nothing object), I have changed the interface to be two methods:</p>
+<p>However, to make it as easy as possible for the composable functions to use the interface (not have to create a Something or Nothing object), I have changed the interface to be two methods:</p>
 </div>
 <div class="literalblock">
 <div class="content">
@@ -11369,18 +11203,24 @@ void Value(T value);</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>So now we can write the application layer code with the actual lambda expressions:</p>
+<p>So now we can write the application layer code using simple lambda expression syntax:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code data-lang="C#" class="language-C# hljs">IMaybeObservable&lt;double&gt; combinedFunction = 42.ToMaybe()
+<pre class="highlightjs highlight"><code data-lang="C#" class="language-C# hljs">IMaybeObservable&lt;double&gt; combinedFunction = 42.ToMaybe();
+    combinedFunction
     .Bind((x,ob) =&gt; ob.Value(x+1))
     .Bind((x,ob) =&gt; { if (x==0) ob.NoValue(); else ob.Value((double)1/x); } )
-    .Bind((x,ob) =&gt; ob.Value(x*10+1));</code></pre>
+    .Bind((x,ob) =&gt; ob.Value(x*10+1));
+
+    combinedFunction.Start();</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Here is the Bind function for the IMaybe deferred push monad:</p>
+<p>Note that we keep a reference to the source of the chain, not the end. That is the object returned by ToMaybe(). This object has a Run method. The structure starts executing when the Run method is called. This is a departure from the way IObservable and IObserver work. With IObservable, the Subscribe method both wires the IObserver in the opposite direction, and tells the source to start. So even though it&#8217;s suppossedly a push style, execution is started from the destination end, which makes it look like a pull style. This loses some of the advantages of using a push style, for example, when it is the source that wants to initiate a push whenever the source changes, or when using asynchronous communication across a network. I really think the straightforward push system is conceptually purer and more useful. So that is what I have implemented.</p>
+</div>
+<div class="paragraph">
+<p>Here are the ToMaybe and Bind functions for the IMaybe deferred push monad:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -11401,9 +11241,21 @@ void Value(T value);</pre>
         }
     }
 
-
-
-
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The Bind function just creates an object to do all the work at runtime. The object is defined by a class called Maybe (listed below). The Bind function takes an IMaybeObservable interface and returns that same interface. It composes Actions rather than functions. These actions take an IMaybeObserver.</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="C#" class="language-C# hljs">namespace Monad.MaybeDeferredPush
+{
 
     class Maybe&lt;T, U&gt; : IMaybeObserver&lt;T&gt;, IMaybeObservable&lt;U&gt; <i class="conum" data-value="2"></i><b>(2)</b>
     {
@@ -11483,19 +11335,15 @@ void Value(T value);</pre>
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>The Bind function just creates an object to do all the work at runtime. The object is defined by a class called Maybe. The Bind function takes an IMaybeObservable interface and returns that same interface. It composes Actions rather than functions. These actions take an IMaybeObserver.</td>
+<td>The Maybe class implements both IMaybeObservable and IMaybeObserver. IMaybeObservable is only used by Bind. It&#8217;s Subscribe method wires the IMaybeObserver in the opposite direction. IMaybeObserver is the one that is used at runtime to push the data through.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>The Maybe class implements both IMaybeObservable and IMaybeObserver. IMaybeObservable is only used by Bind. It Subscribe method wires the IMaybeObserver in the opposite direction. IMaybeObserver is the one that is used at runtime to push the data through.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="3"></i><b>3</b></td>
 <td>Remember the 'composable functions' in the application layer are not Funcs but Actions that take a value and an IMaybeObserver&lt;U&gt;. So we need a class that implements IMaybeObserver so we can make observer objects to pass to the Actions when we call them at runtime. This class is implemented as an inner class called ActionObserver.</td>
 </tr>
 <tr>
-<td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>The wiring of Maybe supports fanout or multiple subscribers (just like the observer pattern). We didn&#8217;t do this for the MinusOne deferred push monad just to keep it simpler. But we will do it for all deferred push style monads from now on. It is normal for push monads to support fan out, in other words many observers can be subscribed to the one observable. It is another advantage of push style monads over pull style monads.</td>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The wiring of Maybe supports fanout or multiple subscribers (just like the observer pattern). We will do it for all deferred push style monads. It is normal for push monads to support fan out, in other words many observers can be subscribed to the one observable. It is another advantage of push style monads over pull style monads.</td>
 </tr>
 </table>
 </div>
@@ -11506,7 +11354,7 @@ void Value(T value);</pre>
 <div class="content">
 <a class="image" href="images/MaybeDeferredPushMonadDiagram.drawio.png"><img src="images/MaybeDeferredPushMonadDiagram.drawio.png" alt="MaybeDeferredPushMonadDiagram.drawio.png"></a>
 </div>
-<div class="title">Figure 51. Object diagram of expression using deferred/push version of IMaybe monad</div>
+<div class="title">Figure 49. Object diagram of expression using deferred/push version of IMaybe monad</div>
 </div>
 <div class="paragraph">
 <p>You can see that although using the IMaybe monad Bind function from the top layer to compose three functions is extremely simple, the structure of objects that is generated under the covers is relatively complicated. It&#8217;s no wonder that these monad things seem so hard to understand at first.</p>
@@ -11515,14 +11363,11 @@ void Value(T value);</pre>
 <p>The references between the objects, which use IMaybeObserver, go in the same direction as the dataflow. IMaybeObservable is only used for wiring the structure up.</p>
 </div>
 <div class="paragraph">
-<p>The structure starts executing when the Run method in the MaybeStart object on the left is called. The application needs to keep a reference to this object so it can start the program.</p>
-</div>
-<div class="paragraph">
-<p>So far we have done deferred pull and deferred push implementations of the MinusOne and Maybe monads. Let&#8217;s do a couple more examples of deferred monads to get more used to the monad pattern:</p>
+<p>So far we have done deferred pull and deferred push implementations of the IMaybe monad. Now lets do the deferred verson of the List monad, the IEnumerable monad</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="trueienumerable-monad"><a class="anchor" href="#trueienumerable-monad"></a>6.1.14. IEnumerable monad</h4>
+<h4 id="trueienumerable-monad"><a class="anchor" href="#trueienumerable-monad"></a>6.1.13. IEnumerable monad</h4>
 <div class="paragraph">
 <p>Composition of functions that return many values, in this case an IEnumerable.</p>
 </div>
@@ -11727,14 +11572,14 @@ void Value(T value);</pre>
 <div class="content">
 <a class="image" href="images/IEnumerableDeferredPullMonadDiagram.drawio.png"><img src="images/IEnumerableDeferredPullMonadDiagram.drawio.png" alt="IEnumerableDeferredPullMonadDiagram.drawio.png"></a>
 </div>
-<div class="title">Figure 52. IEnumerable Deferred Pull Monad Object Diagram</div>
+<div class="title">Figure 50. IEnumerable Deferred Pull Monad Object Diagram</div>
 </div>
 <div class="paragraph">
 <p>Bind just wires the IEnumerable interface. The IEnumerable GetEnumerator method then effectively wires the IEnumerator interface (in the same direction). So you might wonder if the IEnumerable interface could be considered redundant. We not just make Bind wire up the IEnumerator interfaces and dispensed with IEnumerable altogether? That would work, but I guess the reason IEnumerable exists is because IEnumerator is already implemented by many underlying library collections. When writing a new class that will support foreach, we need only provide a GetEnumerator method that simply returns the underlying collection instead of implementing the whole IEnumerator interface. However in our class above, this didn&#8217;t help because we had to implement the whole IEnumerator interface because we were recombining multiple collections.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="trueiobservable-monad"><a class="anchor" href="#trueiobservable-monad"></a>6.1.15. IObservable monad</h4>
+<h4 id="trueiobservable-monad"><a class="anchor" href="#trueiobservable-monad"></a>6.1.14. IObservable monad</h4>
 <div class="paragraph">
 <p>The IObservable monad is the push version of the IEnumerable monad, sort of.</p>
 </div>
@@ -11754,7 +11599,7 @@ void Value(T value);</pre>
 <p>Unlike the IEnumerable/IEnumerator pair of interfaces which go in the same direction, the IObservable/IObserver interfaces go in opposite directions. The IObservable interface goes from destination to source whereas the IObserver interface goes from source to destination to carray the data.</p>
 </div>
 <div class="paragraph">
-<p>In the context of monads, the IObservable interface, being in the direction of destination to source, is the one that is used by Bind. IObserable is then used to wire and initiate the IObserver interface in the opposite direction. This is exactly what we did earlier with the MinusOne and IMaybe push monads.</p>
+<p>In the context of monads, the IObservable interface, being in the direction of destination to source, is the one that is used by Bind. IObserable is then used to wire and initiate the IObserver interface in the opposite direction. This is exactly what we did earlier with the IMaybe push monad.</p>
 </div>
 <div class="paragraph">
 <p>In the context of ALA, it is a disadvantage to combine the 'wiring' and the 'start transfer' in the same Subscribe method call. In ALA we keep these two things separate because we want the code for these two things to be in two separate places. The wiring code represents a user story and so goes in a user story abstraction in the top layer. We wire up the entire program first and then set it running. The starting of a data transfer is a run-time event. It originates in the same layer, for example, from a button domain abstraction that is wired to it. However, because this is the IObservable monad and not ALA, the Subscribe method will do both functions - the wiring of the observer and then starting a single data transfer.</p>
@@ -11977,7 +11822,7 @@ Observable.Create&lt;int&gt;(
 </div>
 </div>
 <div class="sect3">
-<h4 id="truemod360-monad"><a class="anchor" href="#truemod360-monad"></a>6.1.16. Mod360 monad</h4>
+<h4 id="truemod360-monad"><a class="anchor" href="#truemod360-monad"></a>6.1.15. Mod360 monad</h4>
 <div class="paragraph">
 <p>Finally, let&#8217;s do a deferred version of the mod360 monad that we used as one of our original examples. You&#8217;ll remember that we had imperative code that was doing mod 360 after every function call. We already did a simple immediate version of the monad. Let&#8217;s skip the deferred/pull version and go straight to the deferred/push version.</p>
 </div>
@@ -11996,7 +11841,7 @@ Observable.Create&lt;int&gt;(
 <p>Item0 in the Tuple is the angle, and Item1 in the tuple is the rotations.</p>
 </div>
 <div class="paragraph">
-<p>And we will need a second interface for the Bind function to use:</p>
+<p>And we will need a chaining interface for the Bind function to use:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -12123,7 +11968,7 @@ program.Run()</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="truethe-monad-pattern-2"><a class="anchor" href="#truethe-monad-pattern-2"></a>6.1.17. The monad pattern</h4>
+<h4 id="truethe-monad-pattern-2"><a class="anchor" href="#truethe-monad-pattern-2"></a>6.1.16. The monad pattern</h4>
 <div class="paragraph">
 <p>In the examples of Bind above, the type that Bind takes and returns is generally a class or interface. A class is like an interface with only one implementation, so we are generally going to think of it as an interface. We did have one example where it was an integer, and one where it was a Func, but these too can be thought of an interface in a broad sense.</p>
 </div>
@@ -12181,13 +12026,13 @@ Interface&lt;W&gt; I4 = I3.Bind(func&lt;V, Interface&lt;W&gt;&gt;);</code></pre>
 <p>As you can see, while Bind always takes an interface and returns the same interface, the generic type may change along the way. In our examples above we didn&#8217;t change the type much, but normally you can.</p>
 </div>
 <div class="paragraph">
-<p>Here is a diagram of the general monad pattern.</p>
+<p>Here is a diagram of the monad pattern.</p>
 </div>
 <div class="imageblock">
 <div class="content">
 <a class="image" href="images/MonadPattern.png"><img src="images/MonadPattern.png" alt="MonadPattern.png"></a>
 </div>
-<div class="title">Figure 53. The monad pattern</div>
+<div class="title">Figure 51. The monad pattern</div>
 </div>
 <div class="paragraph">
 <p>As you can see, monads are a 2-layer pattern. The two layers correspond roughly with ALA&#8217;s application and programming paradigms layers. The code that uses Bind to compose functions, and the lambda functions themselves are in the application layer. The Bind function and the Interface&lt;T&gt; are in the programming paradigms layer. Often monads come with a set of more specialized functions such as Sort, Filter and Sum. These would go in the equivalent of the domain abstractions layer. These functions either use Bind, or do the equivalent logic as Bind themselves.</p>
@@ -12199,7 +12044,7 @@ Interface&lt;W&gt; I4 = I3.Bind(func&lt;V, Interface&lt;W&gt;&gt;);</code></pre>
 <p>In many explanations of monads, they call the interface the <em>monad type</em>, or a <em>wrapped type</em>, or a <em>container type</em>, or a <em>type in a box</em>, or an <em>amplified type</em>, or just the notation <em>M T</em>. I don&#8217;t think any of these terms are helpful in understaning monads. The <em>wrapped</em>, <em>container</em> and <em>box</em> terms don&#8217;t work well for deferred monads, which don&#8217;t actually contain a value. They contain a means of getting a value. For example, the deferred version of a list is IEnumerable. If our function returns an IEnumerable, that&#8217;s not really a container or box.</p>
 </div>
 <div class="paragraph">
-<p>The term <em>amplified</em> just introduces another seemingly abstract concept which is unnecessary. And the term Monad type or the notation M T seems a bit circular - let&#8217;s not explain monads in terms of monads. So I prefer to think of the thing that the Bind function takes and returns as simply an interface. It sometimes has one implementation, such as Task or List, but often it has more than one implementation such as IMaybe or IEnumerable. Usually the Maybe monad uses IMaybe with two implementations, one for when there is a value and one for when there is no value.</p>
+<p>The term <em>amplified</em> just introduces another seemingly abstract concept which is unnecessary. And the term Monad type or the notation M T seems a bit circular - let&#8217;s not explain monads in terms of monads. So I prefer to think of the thing that the Bind function takes and returns as simply a chaining interface. It sometimes has one implementation, such as Task or List, but often it has more than one implementation such as IMaybe or IEnumerable. Usually the Maybe monad uses IMaybe with two implementations, one for when there is a value and one for when there is no value.</p>
 </div>
 <div class="paragraph">
 <p>So generally I just think of it as <em>Interface&lt;T&gt;</em>.</p>
@@ -12214,7 +12059,7 @@ Interface&lt;W&gt; I4 = I3.Bind(func&lt;V, Interface&lt;W&gt;&gt;);</code></pre>
 <p>The constructor or method for getting ordinary values into Interface&lt;T&gt; form is required to get started at the beginning of a chain.</p>
 </div>
 <div class="paragraph">
-<p>The push style monads we did don&#8217;t exectly follow this definition because the functions didn&#8217;t always return the chaining interface, but they did something equivalent.</p>
+<p>For push style monads, we didn&#8217;t exactly follow this definition because the functions didn&#8217;t always return the chaining interface, but they did something equivalent.</p>
 </div>
 <div class="paragraph">
 <p>The chaining interface and the Bind function can pipe through any extra information or capability we want through the interface. We could, for the sake of a silly example, pipe through an audio stream if we really wanted to. We could compose functions to modify the stream.</p>
@@ -12231,7 +12076,7 @@ Interface&lt;W&gt; I4 = I3.Bind(func&lt;V, Interface&lt;W&gt;&gt;);</code></pre>
 <p>Select is probably the most common operator used in LINQ statements. So why is SelectMany the fundamental Bind operator of the IEnumerable monad and not Select?</p>
 </div>
 <div class="paragraph">
-<p>It&#8217;s because SelectMany is the one that strictly fits the monad pattern as described in the previous section. For a monad, the function being composed returns the <em>chaining interface</em>. SelectMany is the one that does that. Select only takes a function that returns a single value.</p>
+<p>It&#8217;s because SelectMany is the one that strictly fits the monad pattern as described in the previous section. For a monad, the function being composed generally returns the same interface as the <em>chaining interface</em>. SelectMany is the one that does that. Select takes a function that returns a value, not an interface.</p>
 </div>
 <div class="paragraph">
 <p>So while we sometimes think of the whole LINQ library as being monadic, strictly speaking only SelectMany is part of the monad.</p>
@@ -12808,7 +12653,7 @@ Interface&lt;W&gt; I4 = I3.Bind(func&lt;V, Interface&lt;W&gt;&gt;);</code></pre>
 <div class="content">
 <a class="image" href="images/ConsoleOutputListMonad.png"><img src="images/ConsoleOutputListMonad.png" alt="ConsoleOutputListMonad.png"></a>
 </div>
-<div class="title">Figure 54. Output of demo code using EnumerableQuery domain abstraction</div>
+<div class="title">Figure 52. Output of demo code using EnumerableQuery domain abstraction</div>
 </div>
 <div class="paragraph">
 <p>The initial value of zero expands to 27 numbers because of the SelectMany in each of the LINQ expressions.</p>
@@ -14223,7 +14068,7 @@ private List&lt;List&lt;string&gt;&gt; TranslateFrameScores(List&lt;List&lt;int&
 <div class="content">
 <img src="images/Paintings_from_the_Chauvet_cave.jpg" alt="Paintings_from_the_Chauvet_cave.jpg" width="400">
 </div>
-<div class="title">Figure 55. Paintings in the Chauvet cave</div>
+<div class="title">Figure 53. Paintings in the Chauvet cave</div>
 </div>
 <div class="paragraph">
 <p>Our ancestors could use a word like 'bring your spear' and it had a simple meaning to them only because all the detail and knowledge that went into building a spear was replaced with the abstraction 'spear'. Without the abstraction, the sentence would have had to be more like "bring the object that we made by joining the object we made by applying blows to the hard material we found at the place&#8230;&#8203;, with the long material we cut in the place with the tall&#8230;&#8203;, by tying it with the long grass material using the gooey stuff we found at the&#8230;&#8203;". Even this sentence was only made possible by other abstractions: joining, material, blows, hard, long (twice), cut, tall, tying, gooey, and found. If we expanded all of them until we were only using a few basic concepts like 'object' and 'place', we would have a sentence so long that we could never communicate at all. That&#8217;s what abstractions do, and how our brains make use of them. The word spear, in turn can be used to create a new abstraction, a hunting plan, while all of that other detail remains hidden from that new context.</p>
@@ -14235,7 +14080,7 @@ private List&lt;List&lt;string&gt;&gt; TranslateFrameScores(List&lt;List&lt;int&
 <div class="content">
 <img src="images/neuron.svg" alt="neuron.svg" width="300">
 </div>
-<div class="title">Figure 56. </div>
+<div class="title">Figure 54. </div>
 </div>
 <div class="paragraph">
 <p>As software engineers we do learn and use many abstractions. For example if we want to protect simultaneous access to the resource, our brain should conjure up 'mutex'.</p>
@@ -14355,7 +14200,7 @@ private List&lt;List&lt;string&gt;&gt; TranslateFrameScores(List&lt;List&lt;int&
 <div class="content">
 <img src="images/creativity.jpg" alt="creativity.jpg" width="80%">
 </div>
-<div class="title">Figure 57. The creativity cycle</div>
+<div class="title">Figure 55. The creativity cycle</div>
 </div>
 <div class="paragraph">
 <p>A good abstraction separates the knowledge of different worlds. A clock is a good abstraction. On one side is the world of cog wheels. On the other side is someone trying to be on time in their busy daily schedule. Neither knows anything about the details of the other. SQL is another good abstraction. On one side is the world of fast indexing algorithms. On the other is finding all the orders for a particular customer. Let us consider a domain abstraction - the calculation of loan repayments. On one side is the world of mathematics with the derivation and implementation of a formula. On the other, the code is about a person wanting to know if they can afford to buy a house. If your abstractions don&#8217;t separate knowledge of different worlds like this, then you are probably just factoring common code. Find the abstraction in that common code. Make it hide something complicated that&#8217;s really easy to use and really useful, like a clock.</p>
@@ -14735,7 +14580,7 @@ When we use the word 'ubiquitous', it refers to the number of times the abstract
 <div class="content">
 <img src="images/caffeine%20molecule.png" alt="Caffeine molecule.png" width="300">
 </div>
-<div class="title">Figure 58. caffeine - oxygen atoms are red</div>
+<div class="title">Figure 56. caffeine - oxygen atoms are red</div>
 </div>
 <div class="paragraph">
 <p>Abstractions are fragile and get destroyed easily, so we have to take care to protect them. What we needed to do was to put the knowledge about the relationship between oxygen and hydrogen to make water in a new abstraction called Water.</p>
@@ -14856,7 +14701,7 @@ When we use the word 'ubiquitous', it refers to the number of times the abstract
 <div class="content">
 <img src="images/circuit%20diagram.gif" alt="circuit diagram.gif">
 </div>
-<div class="title">Figure 59. In an electronic schematic, the components are abstractions that are composed using two paradigm interfaces - live analog signals and live digital signals</div>
+<div class="title">Figure 57. In an electronic schematic, the components are abstractions that are composed using two paradigm interfaces - live analog signals and live digital signals</div>
 </div>
 <div class="paragraph">
 <p>Returning to a software example, let&#8217;s choose a single simple programming paradigm: activity flow. This programming paradigm is the same as the UML Activity diagram. When we wire A to B and they use this paradigm, it means that B starts after A finishes. If A and B accept and provide this interface respectively, then wiring them together by drawing an arrow will have that meaning, and cause that to happen at run-time.</p>
@@ -15340,7 +15185,7 @@ Later we will introduce an asynchronous (event driven) execution model. It is pr
 <div class="content">
 <img src="images/Layers.png" alt="Layers.png" width="75%">
 </div>
-<div class="title">Figure 60. Four ALA layers</div>
+<div class="title">Figure 58. Four ALA layers</div>
 </div>
 <div class="paragraph">
 <p>ALA uses slightly different names: Application layer, Domain Abstractions layer, Programming Paradigms layer, and Language layer.</p>
@@ -15537,7 +15382,7 @@ Later we will introduce an asynchronous (event driven) execution model. It is pr
 <div class="content">
 <img src="images/Slide11.jpg" alt="Slide11.jpg">
 </div>
-<div class="title">Figure 61. Decomposition Structure</div>
+<div class="title">Figure 59. Decomposition Structure</div>
 </div>
 <div class="paragraph">
 <p>The outer elements correctly only refer to the outer interface of the components - their package or namespace interface, facade, or aggregate root - however you want to think of it. Encapsulation is used at every level of the structure to hide implementation details.</p>
@@ -15552,7 +15397,7 @@ Later we will introduce an asynchronous (event driven) execution model. It is pr
 <div class="content">
 <img src="images/Slide13.jpg" alt="Slide13.jpg">
 </div>
-<div class="title">Figure 62. Tracing a User story</div>
+<div class="title">Figure 60. Tracing a User story</div>
 </div>
 <div class="paragraph">
 <p>The diagram shows both decomposition relationships (boxes inside boxes) and interaction relationships (lines).</p>
@@ -15567,7 +15412,7 @@ Later we will introduce an asynchronous (event driven) execution model. It is pr
 <div class="content">
 <img src="images/Slide14.jpg" alt="Slide14.jpg">
 </div>
-<div class="title">Figure 63. Composition Structure</div>
+<div class="title">Figure 61. Composition Structure</div>
 </div>
 <div class="paragraph">
 <p>Only 'composition' relationships are present. We have shown some of them as lines even though you wouldn&#8217;t normally draw them. For example, the one from <span class="underline">c</span> to C. In practice we wouldn&#8217;t normally draw a diagram like this at all - the abstractions would be just referred to by name. But here we are trying to make a combined diagram of the meta-architecture and the specific architecture. The meta-architecture is the three layers, and the knowledge dependencies that go from the higher layers to the lower layers. The specific architecture consists of the diagrams inside the user stories in the top layer, the specific composition of instances.</p>
@@ -16013,7 +15858,7 @@ Avoid use of symbolic indirection without abstraction
 <div class="content">
 <img src="images/Tru%20Test%20XR5000%20Weigh%20Scale%20Indicator.jpg" alt="Tru Test XR5000 Weigh Scale Indicator.jpg" width="75%">
 </div>
-<div class="title">Figure 64. Livestock weighing indicator</div>
+<div class="title">Figure 62. Livestock weighing indicator</div>
 </div>
 <div class="paragraph">
 <p>The architecture in the original software, was somewhat typically organised into modules and patterns by its developers. Also somewhat typically, it had ended up with a high cost of modifiability - a big ball of mud. After the first release, the first incremental requirement was a 'Treatments' feature, which involved several new tables, new columns in existing tables, new data pages, new settings pages and some new business logic. This feature took a further 3 months to complete (actually 6 calendar months), which seemed out of proportion for the size of the feature. Somehow the Product Owner and managers seemed to have a sort of intuition that if similar things had been done before, such as menus or database tables, those things were already done, and the only new work was in the specific details of the new requirements. Those requirements could be communicated in a relatively short time, say of the order of one hour or one day if you include follow up discussions of abnormal scenarios.  So 6 months did not go down well. ALA, of course, works in exactly this intuitive way that managers hope for. All the things already done are sitting there in the domain abstractions, waiting to be reused, configured and composed into new requirements.</p>
@@ -16045,7 +15890,7 @@ Avoid use of symbolic indirection without abstraction
 <div class="content">
 <a class="image" href="images/All%20Animals%20Screen%20V3.png"><img src="images/All%20Animals%20Screen%20V3.png" alt="All Animals Screen V3.png"></a>
 </div>
-<div class="title">Figure 65. Application diagram for the All Animals View feature</div>
+<div class="title">Figure 63. Application diagram for the All Animals View feature</div>
 </div>
 <div class="paragraph">
 <p>As I did the diagram, I deliberately left out anything to do with the aforementioned Treatments feature, so that I could see how easy it might have been to implement once the domain abstractions for the rest of the requirements had matured. So after the diagram was completed, I added the Treatments feature. This involved adding tables, columns to existing tables, a settings screen, a data screen, and some behaviours.  No further abstractions needed to be invented. The incremental time for the diagram additions was of the order of one hour. Obviously testing would be needed on top of that, and the 'Table' abstraction would need additional work so it could migrate itself, a function it had not needed up until this point. Although somewhat theoretical, the evidence was that we could get at least an order of magnitude improvement in incremental maintenance effort.</p>
@@ -16107,7 +15952,7 @@ Avoid use of symbolic indirection without abstraction
 <div class="content">
 <img src="images/XR5000ScreenShot.jpg" alt="XR5000ScreenShot.jpg" width="75%">
 </div>
-<div class="title">Figure 66. All Animals view in the weighing indicator</div>
+<div class="title">Figure 64. All Animals view in the weighing indicator</div>
 </div>
 <div class="paragraph">
 <p>The student&#8217;s job was to write 12 abstractions out of the 50. These 12 were the ones used by that feature. The initial brief was to make the new code work alongside the old code (as would be needed for an incremental legacy rewrite), but the old code was consuming too much time to integrate with, so this part was abandoned.</p>
@@ -16155,7 +16000,7 @@ Avoid use of symbolic indirection without abstraction
 <div class="content">
 <img src="images/diagram-24.png" alt="diagram 24">
 </div>
-<div class="title">Figure 67. Syntax Diagram showing implementation of statement using recursion</div>
+<div class="title">Figure 65. Syntax Diagram showing implementation of statement using recursion</div>
 </div>
 <div class="paragraph">
 <p>In ALA, we want to preserve the idea of clear layers defining what knowledge is needed to understand what. Resolving this dilemma could get a bit philosophical. Since abstractions are the first class artefacts of the human brain, it may be best to think about how the brain does it. The brain must actually have two abstractions with the same name but at different levels. The first is analogous to a 'forward declaration' in a language to allow a compiler to know about something that will be referred to in a more abstract way before it finds out about it in a more specific way.</p>
@@ -16307,7 +16152,7 @@ Once the code for the single user story is understood, some acceptance tests are
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2023-10-02 10:37:39 01300
+Last updated 2023-10-26 06:44:53 01300
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/Docco.min.css">

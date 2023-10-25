@@ -3,7 +3,7 @@
 
 == Chapter one - What problem does it solve?
 
-If you have already experienced difficult to maintain code, big balls of mud, spaghetti code, or the CRAP principle, you can probably skip this chapter.
+If you have already experienced difficult to maintain code, big balls of mud, spaghetti code, or the CRAP cycle (Create, Repair, Abandon, rePeat), you can probably skip this chapter.
 
 However, the example at the end is pretty cool - it starts with the type of typical C code that I see most students write, and then refactors, it step by step, into ALA compliant code - you should take a look at that.
 
@@ -276,18 +276,13 @@ Testing domain abstractions is easy with units tests because abstractions are ze
 
 === Structure hidden inside the modules
 
-The problem in most large code bases is that the system structure, the in-the-large structure, is not explicit. It is distributed inside the modules themselves. Collaboration between modules is implicitly hidden inside them. Finding this structure, even for a single user story can be time consuming. I have often spent a whole day doing that, doing countless all-files searches following function calls or method calls of the user story through many modules just to end up changing one line of code. Many developers I have spoken to can identify with this experience.
-
-It can get a lot worse as the system gets larger. In a seemingly bizarre twist, the more loosely coupled you make the elements, the harder it gets to trace a user story because of the indirections. Some people conclude that loose coupling and being able to trace through a user-story are naturally in conflict.
+The problem in most large code bases is that the system structure, the structure at the largest scale, is not explicit. It is distributed inside the modules themselves. Collaboration between modules is implicitly hidden inside them. Finding this structure, even for a single user story can be time consuming. I have often spent a whole day doing that, doing countless all-files searches following function calls or method calls of the user story through many modules just to end up changing one line of code in the end. Many developers I have spoken to can identify with this experience.
 
 I call this situation SMITA (Structure Missing in the Action). The internal structure is sometimes drawn as a model - high-level documentation of the hidden structure. But such models are a secondary source of truth.
 
-ALA completely eliminates this problem and this conflict. The structure is explicitly coded in one place, without any indirections. Yet the abstractions are zero-coupled. 
+It can get a lot worse as the system gets larger. In a seemingly bizarre twist, the more loosely coupled you make the elements, the harder it gets to trace a user story because of the indirections. Some people conclude that loose coupling and being able to trace through a user-story are naturally in conflict. They are actually not in conflict.
 
-
-
-
-
+ALA is an architecture that has full indirection at runtime while at the same time having no indirection at design-time because the system is implemented all in one cohesive plave. 
 
 
 === The CRAP cycle
@@ -296,7 +291,7 @@ Typical bright young engineers come out of university knowing C++ or Java (or ot
 
 image::Cynefin.jpg[Cynefin.jpg,800, title="Code can quickly follow the Cynefin quadrants into the complex",link=images/Cynefin.jpg]
 
-As the program gets larger, things get a little more complicated, but the young developer's brain is still up to the task, not realizing he has already surpassed anyone else's ability to read his code. He is still able to get more features working. One day parts of the 'transition'. It becomes somewhere you don't want to go. On the Cynfin diagram, it has transitioned from the complicated quadrant to the complex quadrant. And now it is trapped there. It is too complex for refactoring.  
+As the program gets larger, things get a little more complicated, but the young developer's brain is still up to the task, not realizing he has already surpassed anyone else's ability to read his code. He is still able to get more features working. One day parts of the code 'transition' to complex. It becomes somewhere you don't want to go. On the Cynfin diagram, it has moved from the complicated quadrant to the complex quadrant. And now it is trapped there. It is too complex for refactoring.  
 
 The incremental effort to maintain starts to eat away and eventually exceed the incremental increase in value. This now negative return causes the codebase itself to eventually lose value, until it is no longer an asset to the business. 
 
@@ -315,7 +310,7 @@ One of them had the same functionality as another piece of software that I had w
 
 Analysing the common properties of those two code bases, gave clues that eventually resulted in a theoretical understanding of how to deal with complex systems. This meta-structure is what I now call Abstraction Layered Architecture.
 
-Subsequently, I ran some experiments to see if the maintainability and non-complexity could be predictably reproduced. These experiments, which have worked spectacularly well so far, are discussed as a project at the end of every chapter.
+Subsequently, I ran some experiments to see if the maintainability and non-complexity could be predictably reproduced. These experiments, which have worked spectacularly well so far, are discussed as a project at the end of each chapter.
 
 
 === Example project - Thermometer
@@ -612,7 +607,7 @@ The next thing we want to do is get rid of the while loop, get rid of the indent
 
 The while loop and all the indenting are there only because we have 'execution flow' tied in with our composition of abstractions. Basically we want to make control of execution flow another abstraction so that the thermometer can be built by just composing abstractions rather than writing executing code. 
 
-To do this we will first show how its done using monads. If you don't know about monads just skip the section as we don't need this step to understand our final goal. But for those who do understand monads, it is interesting to visit this step to see why the functional programming guys invented them. Then in the following step we will go to ordinary classes with ports instead of monads.
+To do this we will first show how its done using monads. If you don't know about monads just skip this section as we don't need this step to understand our final goal. But for those who do understand monads, it is interesting to visit this step to see why the functional programming guys invented them. Then in the following step we will go to ordinary classes with ports instead of monads.
 
 ////
 <1> The application function is readable in isolation (without having to go and read code inside any of the abstractions.
@@ -733,7 +728,7 @@ If we are stuck with thinking in terms of imperative execution flow (the only wa
 
 Also notice that the first statement just builds the program. Then the second statement sets it running. This two stage aspect of monads is common in the programming paradigms we will use in ALA. It is because the underlying execution flow is not the same as the flow of the programming paradigm. We first wire it up, and then we tell the wired up structure to 'execute'.
 
-There is a second important difference from the while loop version. The while loop version handled the data itself. Each function returned the data which was stored in a local, otherwise useless, variable and then passed into the next function. The monad code doesn't do that. Instead, it creates and wires together objects which will, at run-time, send the data directly from one to another via an interface. This does not mean that the abstractions themselves know anything about each other - they are still zero coupled. But the application now doesn't have to deal with the mechanics of dataflow. It just has to compose abstractions.
+There is a second important difference from the while loop version. The while loop version handled the data itself. Each function returned the data which was stored in a local, otherwise useless, variable and then passed into the next function. The monad code doesn't do that. Instead, it creates and wires together objects which will, at run-time, send the data directly from one to another via an interface. This does not mean that the abstractions themselves know anything about each other - they are still zero coupled. But the application now doesn't have to deal with data. It just has to compose abstractions.
 
 Lastly, here's how monads actually execute - the execution model. Don't worry if this doesn't make sense. 
 
@@ -778,7 +773,7 @@ The WireIn method returns the new object, so it is possible to string WireIns to
 ==== Using multiple programming paradigms:
 
 
-Monads are generally not versatile enough to handle multiple ports of different programming paradigms, which we will want in ALA programs. Abstractions usually only support dataflow. But what if we want to also compose the UI, or event-driven? What if we want to compose transitions between states of a state machine? In ALA, we are able to do all this in the one application, in the same way - using whatever programming paradigms are the best way to express the requirements. 
+Monads are generally not versatile enough to handle multiple ports of different programming paradigms, which we will want in ALA programs. Monads usually only support dataflow. But what if we want to also compose the UI, or event-driven? What if we want to compose transitions between states of a state machine? In ALA, we are able to do all this in the one application, in the same way - using whatever programming paradigms are the best way to express the requirements. 
 
 Some instances of abstractions will need to take part in multiple paradigms, such as both UI and dataflow. When we boil down the description of our requirements to pure composition, our composition will often be a graph of relationships. And when you have a graph, your composition is best described by a diagram. 
 
