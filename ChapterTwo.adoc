@@ -1132,7 +1132,7 @@ Automatically generated code does not need to be readable except to the extent o
 
 === Composition vs decomposition methodologies
 
-In this perspective, we look at software design methodology. Conventional wisdom is a decomposition approach. You decompose a system into modules or components. Those modules are further decomposed into submodules and so on. By contrast, ALA is a composition approach. It composes the system from instances of abstractions. Those abstractions are composed from instances of even more abstract abstractions. The difference is important as it results in a completely difefrent structure.
+In this perspective, we look at software design methodology. Conventional wisdom is a decomposition approach. You decompose a system into modules or components. Those modules are further decomposed into submodules and so on. By contrast, ALA is a composition approach. It composes the system from instances of abstractions. Those abstractions are composed from instances of even more abstract abstractions. The difference is important as it results in a completely different structure.
 
 In the next chapter we will discuss in detail why ALA uses a 'composition' approach rather than a 'decomposition' approach. Here we describe the two different structures that result from these two approaches.
 
